@@ -1,10 +1,31 @@
+CREATE TABLE Roles (
+    RoleID INT AUTO_INCREMENT PRIMARY KEY,
+    RoleName VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE Permissions (
+    PermissionID INT AUTO_INCREMENT PRIMARY KEY,
+    PermissionName VARCHAR(255) NOT NULL UNIQUE,
+    Description VARCHAR(255)
+);
+
+CREATE TABLE Role_Permissions (
+    RoleID INT,
+    PermissionID INT,
+    PRIMARY KEY (RoleID, PermissionID),
+    FOREIGN KEY (RoleID) REFERENCES Roles(RoleID),
+    FOREIGN KEY (PermissionID) REFERENCES Permissions(PermissionID)
+);
+
+
 CREATE TABLE User (
     UserID INT AUTO_INCREMENT PRIMARY KEY,
     Email VARCHAR(255) NOT NULL,
     Password VARCHAR(255) NOT NULL, -- Should Add Encryption Method
     Forename VARCHAR(255),
     Surname VARCHAR(255),
-    Role ENUM('Customer', 'Staff', 'Manager')
+    RoleID INT,
+    FOREIGN KEY (RoleID) REFERENCES Roles(RoleID)
 );
 
 CREATE TABLE Address (
@@ -26,22 +47,13 @@ CREATE TABLE BankDetails (
     FOREIGN KEY (UserID) REFERENCES User(UserID)
 );
 
-CREATE TABLE Order (
+CREATE TABLE Orders (
     OrderNumber INT AUTO_INCREMENT PRIMARY KEY,
     Date DATE,
     TotalCost FLOAT,
     Status ENUM('Confirmed', 'Fulfilled', 'Declined'),
     UserID INT,
     FOREIGN KEY (UserID) REFERENCES User(UserID)
-);
-
-CREATE TABLE OrderLine (
-    ProductID INT,
-    Quantity INT,
-    LineCost FLOAT,
-    OrderNumber INT,
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
-    FOREIGN KEY (OrderNumber) REFERENCES Order(OrderNumber)
 );
 
 CREATE TABLE Brand (
@@ -61,6 +73,20 @@ CREATE TABLE Product (
     FOREIGN KEY (BrandID) REFERENCES Brand(BrandID)
 );
 
+CREATE TABLE OrderLines (
+    ProductID INT,
+    Quantity INT,
+    LineCost FLOAT,
+    OrderNumber INT,
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
+    FOREIGN KEY (OrderNumber) REFERENCES Orders(OrderNumber)
+);
+
+CREATE TABLE Era (
+    EraCode INT PRIMARY KEY,
+    Description VARCHAR(255)
+);
+
 CREATE TABLE ProductEra (
     EraCode INT,
     ProductID INT,
@@ -69,10 +95,6 @@ CREATE TABLE ProductEra (
     FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
-CREATE TABLE Era (
-    EraCode INT PRIMARY KEY,
-    Description VARCHAR(255)
-);
 
 CREATE TABLE Track (
     ProductID INT,
