@@ -10,10 +10,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import com.formdev.flatlaf.extras.*;
-import com.intellij.ide.ui.laf.*;
 import com.jgoodies.forms.factories.*;
-
-
 
 /**
  * @author Zhenyang Liu
