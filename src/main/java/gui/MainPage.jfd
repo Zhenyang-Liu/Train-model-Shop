@@ -344,8 +344,18 @@ new FormModel {
 				"width": 805
 				"height": 30
 			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "label15"
+				"text": new FormMessage( null, "MainPage.label15.text" )
+				"icon": new com.jformdesigner.model.SwingIcon( 1, "D:\\TrainShop\\src\\main\\images\\9c38a69746d64344b587bb9833430149.jpeg" )
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+				"x": 160
+				"y": 420
+				"width": 200
+				"height": 105
+			} )
 		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 300, 0 )
+			"location": new java.awt.Point( 65, 45 )
 			"size": new java.awt.Dimension( 805, 600 )
 		} )
 	}

@@ -21,6 +21,7 @@ import com.jgoodies.forms.factories.*;
 public class MainPage extends JFrame {
     public MainPage() {
         initComponents();
+        customizeComponents();
     }
 
     private void createUIComponents() {
@@ -68,6 +69,7 @@ public class MainPage extends JFrame {
         button8 = new JButton();
         button9 = new JButton();
         separator2 = compFactory.createSeparator("");
+        label15 = new JLabel();
 
         //======== this ========
         var contentPane = getContentPane();
@@ -326,6 +328,12 @@ public class MainPage extends JFrame {
         contentPane.add(separator2);
         separator2.setBounds(0, 540, 805, 30);
 
+        //---- label15 ----
+        label15.setText(bundle.getString("MainPage.label15.text"));
+        label15.setIcon(new ImageIcon("D:\\TrainShop\\src\\main\\images\\9c38a69746d64344b587bb9833430149.jpeg"));
+        contentPane.add(label15);
+        label15.setBounds(160, 420, 200, 105);
+
         {
             // compute preferred size
             Dimension preferredSize = new Dimension();
@@ -383,5 +391,25 @@ public class MainPage extends JFrame {
     private JButton button8;
     private JButton button9;
     private JComponent separator2;
+    private JLabel label15;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
+
+    private void customizeComponents() {
+        // 在这里添加自定义组件设置代码
+        ImageIcon originalIcon = new ImageIcon("D:\\TrainShop\\src\\main\\images\\9c38a69746d64344b587bb9833430149.jpeg");
+        Image originalImage = originalIcon.getImage();
+        Image resizedImage = originalImage.getScaledInstance(label15.getWidth(), label15.getHeight(), Image.SCALE_SMOOTH);
+        label15.setIcon(new ImageIcon(resizedImage));
+    }
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                MainPage frame = new MainPage();
+                frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
 }
