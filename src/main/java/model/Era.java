@@ -4,13 +4,13 @@ public class Era {
     private String eraCode;
     private String description;
 
-    // Constructor to initialize a Book object with its attributes
+    // Constructor to initialize 
     public Era(String eraCode, String description) {
         this.setEracode(eraCode);
         this.setDescription(description);
     }
 
-    // Getter and setter methods for the ISBN attribute with validation
+    // Getter and setter 
     public String getEracode() {
         return eraCode;
     }
@@ -23,7 +23,7 @@ public class Era {
         }
     }
 
-    // Getter and setter methods for the Title attribute with validation
+    //
     public String getDescription() {
         return description;
     }
@@ -38,12 +38,12 @@ public class Era {
 
     // Private validation methods for each attribute
     private boolean isValidEracode(String eraCode) {
-        // Implement ISBN validation logic here (e.g., length, format)
+        //
         return eraCode != null;
     }
 
     private boolean isValidDescription(String description) {
-        // Implement title validation logic here (e.g., length)
+        //
         return description != null;
     }
 
