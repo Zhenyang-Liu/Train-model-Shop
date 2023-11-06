@@ -13,14 +13,23 @@ public class Product {
     public Product() {
     }
 
-    // Parameterized constructor without productID
+    /**
+     * Constructs a new Product instance with the specified details.
+     *
+     * @param brand        The brand associated with the product.
+     * @param productName  The name of the product.
+     * @param productCode  The code of the product.
+     * @param retailPrice  The retail price of the product.
+     * @param description  The description of the product.
+     * @param stockQuantity The stock quantity of the product.
+     */
     public Product(Brand brand, String productName, String productCode,
                    float retailPrice, String description, int stockQuantity) {
-        this.brand = brand;
-        this.productName = productName;
+        this.setBrand(brand);
+        this.setProductName(productName);
         this.setProductCode(productCode);
-        this.retailPrice = retailPrice;
-        this.description = description;
+        this.setRetailPrice(retailPrice);
+        this.setDescription(description);
         this.setStockQuantity(stockQuantity);
     }
 
@@ -104,11 +113,15 @@ public class Product {
     }
 
     /**
-     * Sets the retail price of the product.
+     * Sets the retail price of the product. The price must be non-negative.
      *
-     * @param retailPrice the price to set for this product
+     * @param retailPrice the non-negative price to set for this product
+     * @throws IllegalArgumentException if the provided retailPrice is negative
      */
     public void setRetailPrice(float retailPrice) {
+        if (retailPrice < 0) {
+            throw new IllegalArgumentException("Retail Price cannot be negative.");
+        }
         this.retailPrice = retailPrice;
     }
 

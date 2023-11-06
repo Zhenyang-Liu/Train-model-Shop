@@ -10,8 +10,8 @@ public class Test {
         try {
             databaseConnectionHandler.openConnection();
 
-            // // Adding a book to the database.
-            Era book1 = new Era("978", "To Kill a Mockingbird");
+            // Adding a era to the database.
+            Era book1 = new Era(978, "To Kill a Mockingbird");
             databaseOperations.insertEra(book1, databaseConnectionHandler.getConnection());
 
         } catch (Throwable e) {

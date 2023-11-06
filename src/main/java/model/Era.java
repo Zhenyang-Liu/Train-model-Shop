@@ -1,21 +1,21 @@
 package model;
 
 public class Era {
-    private String eraCode;
+    private int eraCode;
     private String description;
 
     // Constructor to initialize 
-    public Era(String eraCode, String description) {
+    public Era(int eraCode, String description) {
         this.setEracode(eraCode);
         this.setDescription(description);
     }
 
     // Getter and setter 
-    public String getEracode() {
+    public int getEracode() {
         return eraCode;
     }
 
-    public void setEracode(String eraCode) {
+    public void setEracode(int eraCode) {
         if (isValidEracode(eraCode)) {
             this.eraCode = eraCode;
         } else {
@@ -37,9 +37,9 @@ public class Era {
     }
 
     // Private validation methods for each attribute
-    private boolean isValidEracode(String eraCode) {
+    private boolean isValidEracode(int eraCode) {
         //
-        return eraCode != null;
+        return eraCode >= 1 && eraCode <= 11;
     }
 
     private boolean isValidDescription(String description) {

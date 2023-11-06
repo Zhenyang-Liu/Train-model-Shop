@@ -8,7 +8,7 @@ import model.*;
 
 public class DatabaseOperations {
 
-    // Insert a new book into the database
+    // Insert a new Era into the database
     public void insertEra(Era newEra, Connection connection) throws SQLException {
         try {
             // Create an SQL INSERT statement
@@ -16,7 +16,7 @@ public class DatabaseOperations {
 
             // Prepare and execute the INSERT statement
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
-            preparedStatement.setString(1, newEra.getEracode());
+            preparedStatement.setInt(1, newEra.getEracode());
             preparedStatement.setString(2, newEra.getDescription());
 
             int rowsAffected = preparedStatement.executeUpdate();
