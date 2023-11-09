@@ -124,7 +124,7 @@ public class Locomotive extends Product {
      */
     public void setEra(Era era){
         Era[] set;
-        this.era = set;
+        //this.era = set;
     }
      
 }

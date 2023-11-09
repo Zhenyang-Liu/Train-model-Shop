@@ -5,6 +5,8 @@
 package gui;
 
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
@@ -27,7 +29,7 @@ public class MainPage extends JFrame {
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
-        ResourceBundle bundle = ResourceBundle.getBundle("src.form");
+        ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
         DefaultComponentFactory compFactory = DefaultComponentFactory.getInstance();
         label1 = new JLabel();
         button3 = new JButton();
@@ -53,20 +55,22 @@ public class MainPage extends JFrame {
         spinner1 = new JSpinner();
         button2 = new JButton();
         button5 = new JButton();
+        label15 = new JLabel();
         panel9 = new JPanel();
         label11 = new JLabel();
         label12 = new JLabel();
         spinner2 = new JSpinner();
         button6 = new JButton();
         button7 = new JButton();
+        label18 = new JLabel();
         panel10 = new JPanel();
         label13 = new JLabel();
         label14 = new JLabel();
         spinner3 = new JSpinner();
         button8 = new JButton();
         button9 = new JButton();
+        label19 = new JLabel();
         separator2 = compFactory.createSeparator("");
-        label15 = new JLabel();
 
         //======== this ========
         var contentPane = getContentPane();
@@ -189,6 +193,12 @@ public class MainPage extends JFrame {
             panel8.add(button5);
             button5.setBounds(105, 175, 65, 35);
 
+            //---- label15 ----
+            label15.setText(bundle.getString("MainPage.label15.text"));
+            label15.setIcon(new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg"));
+            panel8.add(label15);
+            label15.setBounds(3, 3, 184, 101);
+
             {
                 // compute preferred size
                 Dimension preferredSize = new Dimension();
@@ -246,6 +256,12 @@ public class MainPage extends JFrame {
             button7.setForeground(new Color(0xe0e2e8));
             panel9.add(button7);
             button7.setBounds(105, 175, 65, 35);
+
+            //---- label18 ----
+            label18.setText(bundle.getString("MainPage.label18.text"));
+            label18.setIcon(new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg"));
+            panel9.add(label18);
+            label18.setBounds(3, 3, 184, 101);
 
             {
                 // compute preferred size
@@ -305,6 +321,12 @@ public class MainPage extends JFrame {
             panel10.add(button9);
             button9.setBounds(105, 175, 65, 35);
 
+            //---- label19 ----
+            label19.setText(bundle.getString("MainPage.label19.text"));
+            label19.setIcon(new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg"));
+            panel10.add(label19);
+            label19.setBounds(3, 3, 184, 101);
+
             {
                 // compute preferred size
                 Dimension preferredSize = new Dimension();
@@ -324,12 +346,6 @@ public class MainPage extends JFrame {
         panel10.setBounds(590, 190, 190, 220);
         contentPane.add(separator2);
         separator2.setBounds(0, 540, 805, 30);
-
-        //---- label15 ----
-        label15.setText(bundle.getString("MainPage.label15.text"));
-        label15.setIcon(new ImageIcon("D:\\TrainShop\\src\\main\\images\\9c38a69746d64344b587bb9833430149.jpeg"));
-        contentPane.add(label15);
-        label15.setBounds(160, 420, 200, 105);
 
         {
             // compute preferred size
@@ -375,28 +391,37 @@ public class MainPage extends JFrame {
     private JSpinner spinner1;
     private JButton button2;
     private JButton button5;
+    private JLabel label15;
     private JPanel panel9;
     private JLabel label11;
     private JLabel label12;
     private JSpinner spinner2;
     private JButton button6;
     private JButton button7;
+    private JLabel label18;
     private JPanel panel10;
     private JLabel label13;
     private JLabel label14;
     private JSpinner spinner3;
     private JButton button8;
     private JButton button9;
+    private JLabel label19;
     private JComponent separator2;
-    private JLabel label15;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
     private void customizeComponents() {
         // 在这里添加自定义组件设置代码
-        ImageIcon originalIcon = new ImageIcon("D:\\TrainShop\\src\\main\\images\\9c38a69746d64344b587bb9833430149.jpeg");
+        ImageIcon originalIcon = new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg");
         Image originalImage = originalIcon.getImage();
         Image resizedImage = originalImage.getScaledInstance(label15.getWidth(), label15.getHeight(), Image.SCALE_SMOOTH);
         label15.setIcon(new ImageIcon(resizedImage));
+
+        Image resizedImage18 = originalImage.getScaledInstance(label18.getWidth(), label18.getHeight(), Image.SCALE_SMOOTH);
+        label18.setIcon(new ImageIcon(resizedImage18));
+
+        Image resizedImage19 = originalImage.getScaledInstance(label19.getWidth(), label19.getHeight(), Image.SCALE_SMOOTH);
+        label19.setIcon(new ImageIcon(resizedImage19));
+
     }
 
     public static void main(String[] args) {
