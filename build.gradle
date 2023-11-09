@@ -16,6 +16,7 @@ dependencies {
     implementation 'com.formdev:flatlaf-extras:3.2.5'
     implementation 'com.jgoodies:jgoodies-forms:1.9.0'
     implementation 'mysql:mysql-connector-java:8.0.27'
+    implementation 'com.zaxxer:HikariCP:5.1.0'
 }
 
 test {

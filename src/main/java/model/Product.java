@@ -5,7 +5,7 @@ public class Product {
     private Brand brand; // Association to Brand
     private String productName;
     private String productCode;
-    private float retailPrice;
+    private double retailPrice;
     private String description;
     private int stockQuantity;
 
@@ -19,16 +19,16 @@ public class Product {
      * @param brand        The brand associated with the product.
      * @param productName  The name of the product.
      * @param productCode  The code of the product.
-     * @param retailPrice  The retail price of the product.
+     * @param d  The retail price of the product.
      * @param description  The description of the product.
      * @param stockQuantity The stock quantity of the product.
      */
     public Product(Brand brand, String productName, String productCode,
-                   float retailPrice, String description, int stockQuantity) {
+                   double d, String description, int stockQuantity) {
         this.setBrand(brand);
         this.setProductName(productName);
         this.setProductCode(productCode);
-        this.setRetailPrice(retailPrice);
+        this.setRetailPrice(d);
         this.setDescription(description);
         this.setStockQuantity(stockQuantity);
     }
@@ -40,8 +40,8 @@ public class Product {
      *
      * @return the brand name associated with this product
      */
-    public String getBrand() {
-        return brand.getBrandName();
+    public Brand getBrand() {
+        return brand;
     }
 
     /**
@@ -60,6 +60,15 @@ public class Product {
      */
     public int getProductID() {
         return productID;
+    }
+
+     /**
+     * Sets the id of the product.
+     *
+     * @param productID the unique id of this product
+     */
+    public void setProductID(int productID) {
+        this.productID = productID;
     }
 
     /**
@@ -108,7 +117,7 @@ public class Product {
      *
      * @return the retail price
      */
-    public float getRetailPrice() {
+    public double getRetailPrice() {
         return retailPrice;
     }
 
@@ -118,7 +127,7 @@ public class Product {
      * @param retailPrice the non-negative price to set for this product
      * @throws IllegalArgumentException if the provided retailPrice is negative
      */
-    public void setRetailPrice(float retailPrice) {
+    public void setRetailPrice(double retailPrice) {
         if (retailPrice < 0) {
             throw new IllegalArgumentException("Retail Price cannot be negative.");
         }
@@ -236,6 +245,12 @@ public class Product {
         String regex = "^[RCLSMPT]\\d{3,5}$";
 
         return productCode != null && productCode.matches(regex);
+    }
+
+    //Test use
+    @Override
+    public String toString() {
+        return "ID: " + this.productID + "; Brand: " + this.getBrand().getBrandName() + "; ProductName: " + this.getProductName();
     }
     
 }

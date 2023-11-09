@@ -1,4 +1,4 @@
-package db;
+package DAO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,6 +38,33 @@ public class BrandDAO {
         }
     }
 
+    /**
+     * Finds brand information based on the brand code.
+     *
+     * @param brandID   The ID of the brand to be retrieved.
+     * @param connection  The database connection.
+     * @return            A Brand object containing the retrieved brand information, or null if not found.
+     * @throws SQLException If a SQLException occurs while executing the database operation.
+     */
+    public static Brand findBrand(int brandID, Connection connection) throws SQLException {
+        try {
+            String insertSQL = "SELECT * FROM Brand WHERE BrandID = ?;";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
+            preparedStatement.setInt(1, brandID);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Brand brand = new Brand();
+            while (resultSet.next()) {
+                    brand.setBrandName(resultSet.getString("BrandName"));
+                    brand.setCountry(resultSet.getString("Country"));
+                }
+            return brand;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
     
     /**
      * Checks if a brand with the specified name already exists in the Brand table.

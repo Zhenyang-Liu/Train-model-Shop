@@ -1,4 +1,4 @@
-package db;
+package DAO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 import model.*;
 
-public class DatabaseOperations {
+public class EraDAO {
 
     // Insert a new Era into the database
     public void insertEra(Era newEra, Connection connection) throws SQLException {

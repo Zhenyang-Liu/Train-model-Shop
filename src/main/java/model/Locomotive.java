@@ -1,9 +1,11 @@
 package model;
 
+import java.util.ArrayList;
+
 public class Locomotive extends Product {
     private Gauge gauge;
     private DCCType dccType;
-    private Era[] era;
+    private ArrayList<Era> era;
 
     /**
      * Represents the Digital Command Control (DCC) type of a locomotive.
@@ -31,7 +33,7 @@ public class Locomotive extends Product {
      * @param dccType      The Digital Command Control type of the locomotive.
      * @param era          The era classification of the locomotive.
      */
-    public Locomotive(Brand brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String gauge, String dccType, Era era) {
+    public Locomotive(Brand brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String gauge, String dccType, ArrayList<Era> era) {
         super(brand, productName, productCode, retailPrice, description, stockQuantity);
         this.setGauge(gauge);
         this.setDCCType(dccType);
@@ -43,8 +45,8 @@ public class Locomotive extends Product {
      *
      * @return the gauge of the locomotive.
      */
-    public Gauge getGauge() {
-        return gauge;
+    public String getGauge() {
+        return gauge.getName();
     }
 
     /**
@@ -104,16 +106,13 @@ public class Locomotive extends Product {
         throw new IllegalArgumentException("No constant with text " + text + " found");
     }
 
-
-    // Unfinished
-
     /**
      * Retrieves the era associated with the locomotive.
      *
      * @return the era associated with the locomotive.
      */
-    public Era[] getEra() {
-        return null;
+    public ArrayList<Era> getEra() {
+        return era;
     }
 
     
@@ -122,9 +121,8 @@ public class Locomotive extends Product {
      *
      * @param era 
      */
-    public void setEra(Era era){
-        Era[] set;
-        //this.era = set;
+    public void setEra(ArrayList<Era> era){
+       this.era = era;
     }
      
 }

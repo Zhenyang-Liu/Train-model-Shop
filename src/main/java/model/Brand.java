@@ -25,6 +25,10 @@ public class Brand {
     public int getBrandID() {
         return brandID;
     }
+
+    public void setBrandID(int brandID) {
+        this.brandID = brandID;
+    }
     
     /**
      * Retrieves the name of the brand.

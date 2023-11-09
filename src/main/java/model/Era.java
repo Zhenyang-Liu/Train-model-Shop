@@ -48,12 +48,5 @@ public class Era {
     }
 
 
-    @Override
-    public String toString() {
-        return "{ " +
-            " eraCode='" + getEracode() + "'" +
-            ", description='" + getDescription() +
-            " }";
-    }
 
 }
