@@ -1,0 +1,52 @@
+## Introduction
+This is a folder with Data Access Object (DAO) java files, contributing directly to interact with MySQL database. Every action later in Services layer (such as login(), placeOrder()) may be depended on these functions.
+
+## DAO Function Lists
+
+### BrandDAO.java (Finished)
+
+- `insertBrand(Brand brand)`: Add a new brand to the database.
+- `updateBrand(Brand brand)`: Update existing brand information.
+- `deleteBrand(int brandId)`: Delete a brand based on its ID.
+- `findBrandById(int brandId)`: Find a brand by its ID.
+- `findAllBrands()`: Get a list of all brands.
+- `brandExists(String brandName)`: Check if a brand with a given name exists in the database.
+
+### ProductDAO.java (Finished)
+
+- `insertProduct(Product product)`: Add a new product to the database.
+- `updateProduct(Product product)`: Update existing product information.
+- `deleteProduct(int productId)`: Delete a product based on its ID.
+- `findProductById(int productId)`: Find a product by its ID.
+- `findProductByCode(String productCode)`: Find a product by its code.
+- `findAllProducts()`: Get a list of all products.
+
+### LocomotiveDAO.java (Extends ProductDAO) (Doing)
+
+- `insertLocomotive(Locomotive locomotive)`: Add a new locomotive to the database.
+- `updateLocomotive(Locomotive locomotive)`: Update existing locomotive information.
+- `deleteLocomotive(int ProductID)`: Delete a locomotive based on its ID.
+- `findLocomotivesByEra(ArrayList<Era> eraList)`: Find locomotives based on era.
+- `findLocomotivesByGauge(Gauge gauge)`: Find locomotives based on gauge.
+- `findLocomotivesByDCC(DCCType dccType)`: Find locomotives based on DCC type.
+
+### RollingStockDAO.java (Extends ProductDAO) (Unfinished)
+
+- `insertRollingStock(RollingStock rollingStock)`: Add new rolling stock to the database.
+- `updateRollingStock(RollingStock rollingStock)`: Update existing rolling stock information.
+- `findRollingStockByType(RollingStockType type)`: Find rolling stock by type.
+
+### TrackDAO.java (Extends ProductDAO) (Unfinished)
+
+- `insertTrack(Track track)`: Add new tracks to the database.
+- `updateTrack(Track track)`: Update existing track information.
+- `findTracksByGauge(Gauge gauge)`: Find tracks based on gauge.
+
+### OrderDAO.java (Unfinished)
+
+- `createOrder(Order order)`: Create a new order.
+- `updateOrder(Order order)`: Update existing order information.
+- `deleteOrder(int orderId)`: Delete an order based on its ID.
+- `findOrderById(int orderId)`: Find an order by its ID.
+- `findAllOrdersByCustomer(Customer customer)`: Find all orders associated with a customer.
+

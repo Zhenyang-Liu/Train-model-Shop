@@ -37,7 +37,7 @@ public class ProductDAO {
             preparedStatement.setString(5, product.getDescription());
             preparedStatement.setInt(6, product.getStockQuantity());
 
-            // Execute the update
+            // Execute the insert
             int rowsAffected = preparedStatement.executeUpdate();
 
             // Check if the insert was successful
@@ -59,7 +59,35 @@ public class ProductDAO {
         return productId;
     }
 
-    public void updateProduct() {
+    /**
+     * Update a product information into the database.
+     *
+     * @param product The product to update.
+     * @throws SQLException If there is a problem executing the update.
+     */ 
+    public void updateProduct(Product product) throws SQLException {
+        String updateSQL = "UPDATE Product SET BrandID = ?, ProductName = ?, ProductCode = ?, RetailPrice = ?, "
+            + "Description = ?, StockQuantity = ? WHERE ProductID = ?;"; 
+        try (PreparedStatement preparedStatement = connection.prepareStatement(updateSQL, Statement.RETURN_GENERATED_KEYS)) {
+            // Set the parameters for the product
+            preparedStatement.setInt(1, product.getBrand().getBrandID());
+            preparedStatement.setString(2, product.getProductName());
+            preparedStatement.setString(3, product.getProductCode());
+            preparedStatement.setDouble(4, product.getRetailPrice());
+            preparedStatement.setString(5, product.getDescription());
+            preparedStatement.setInt(6, product.getStockQuantity());
+            preparedStatement.setInt(7,product.getProductID());
+
+            // Execute the update
+            preparedStatement.executeUpdate();
+
+            // Print for test
+            
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
 
     }
 
@@ -72,12 +100,11 @@ public class ProductDAO {
     public void deleteProduct(int productId) throws SQLException {
         String deleteSQL = "DELETE FROM Product WHERE ProductID = ?;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
-            // Set the parameters for the prepared statement
             preparedStatement.setInt(1, productId);
 
-            // Execute the delete statement
             int rowsAffected = preparedStatement.executeUpdate();
-
+            
+            // Print to Test
             if (rowsAffected > 0) {
                 System.out.println("Product with ID " + productId + " was deleted successfully.");
             } else {
@@ -89,21 +116,103 @@ public class ProductDAO {
         }        
     }
 
+    /**
+     * Retrieve the product in the database by its productID.
+     * 
+     * @param productID the product ID of the product to be found.
+     * @return The selected Product object in database.
+     * @throws SQLException If there is a problem executing the select.
+     */
+    public Product findProductByID(int productID) throws SQLException {
+        String selectSQL = "SELECT * FROM Product WHERE ProductID = ?;";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+            preparedStatement.setInt(1, productID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Product product = new Product();
+            while (resultSet.next()) {
+                product.setProductID(resultSet.getInt("ProductID"));
+                BrandDAO brandDAO = new BrandDAO(connection);
+                Brand brand = brandDAO.findBrand(resultSet.getInt("BrandID"));
+                product.setBrand(brand);
+                product.setProductName(resultSet.getString("ProductName"));
+                product.setProductCode(resultSet.getString("ProductCode"));
+                product.setDescription(resultSet.getString("Description"));
+                product.setRetailPrice(resultSet.getFloat("RetailPrice"));
+                product.setStockQuantity(resultSet.getInt("StockQuantity"));
+            }
+
+            // Print for test
+            System.out.println("<=================== GET SPECIFIC PRODUCTS By ID====================>");
+            System.out.println(product.toString());
+            System.out.println("<======================================================>");
+
+            return product;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+        
+    }
+
+    /**
+     * Retrieve the product in the database by its productCode.
+     * 
+     * @param productCode the product code of the product to be found.
+     * @return The selected Product object in database.
+     * @throws SQLException If there is a problem executing the select.
+     */
+    public Product findProductByCode(String productCode) throws SQLException {
+        String selectSQL = "SELECT * FROM Product WHERE ProductCode = ?;";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+            preparedStatement.setString(1, productCode);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Product product = new Product();
+            while (resultSet.next()) {
+                product.setProductID(resultSet.getInt("ProductID"));
+                BrandDAO brandDAO = new BrandDAO(connection);
+                Brand brand = brandDAO.findBrand(resultSet.getInt("BrandID"));
+                product.setBrand(brand);
+                product.setProductName(resultSet.getString("ProductName"));
+                product.setProductCode(resultSet.getString("ProductCode"));
+                product.setDescription(resultSet.getString("Description"));
+                product.setRetailPrice(resultSet.getFloat("RetailPrice"));
+                product.setStockQuantity(resultSet.getInt("StockQuantity"));
+            }
+
+            // Print for test
+            System.out.println("<=================== GET SPECIFIC PRODUCTS By Code====================>");
+            System.out.println(product.toString());
+            System.out.println("<======================================================>");
+
+            return product;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+        
+    }
 
     /**
      * Retrieve all products in the database.
-     * @return A arrayList<Product> with all Product in database.
-     * @throws SQLException If there is a problem executing the insert.
+     * 
+     * @return An ArrayList<Product> with all Product in database.
+     * @throws SQLException If there is a problem executing the select.
      */
     public ArrayList<Product> getAllProduct() throws SQLException {
         String selectSQL = "SELECT * FROM Product";
         ArrayList<Product> productList = new ArrayList<>();
+
         try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
+            
             while (resultSet.next()) {
                 Product product = new Product();
                 product.setProductID(resultSet.getInt("ProductID"));
-                product.setBrand(BrandDAO.findBrand(resultSet.getInt("BrandID"),connection));
+                BrandDAO brandDAO = new BrandDAO(connection);
+                Brand brand = brandDAO.findBrand(resultSet.getInt("BrandID"));
+                product.setBrand(brand);
                 product.setProductName(resultSet.getString("ProductName"));
                 product.setProductCode(resultSet.getString("ProductCode"));
                 product.setDescription(resultSet.getString("Description"));

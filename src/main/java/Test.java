@@ -1,5 +1,4 @@
 import model.Brand;
-import model.Era;
 import model.Product;
 
 import java.sql.SQLException;
@@ -23,6 +22,11 @@ public class Test {
             // Perform database operations using the DAO
             int id = opera.insertProduct(product);
             opera.getAllProduct();
+            opera.findProductByCode("T000");
+            product = new Product(brand, "Test Update", "T000", 8.8, "??", 0);
+            product.setProductID(id);
+            opera.updateProduct(product);
+            opera.findProductByID(id);
             opera.deleteProduct(id);
             opera.getAllProduct();
 
