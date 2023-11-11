@@ -113,9 +113,7 @@ CREATE TABLE Locomotive (
     ProductID INT,
     Gauge VARCHAR(255),
     DCCType ENUM('Analogue', 'Ready', 'Fitted', 'Sound'),
-    EraCode INT,
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
-    FOREIGN KEY (EraCode) REFERENCES Era(EraCode)
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
 CREATE TABLE RollingStock (

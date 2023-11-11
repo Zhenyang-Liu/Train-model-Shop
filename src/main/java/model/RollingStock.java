@@ -1,11 +1,9 @@
 package model;
 
-import java.util.ArrayList;
-
 public class RollingStock extends Product {
     private RollingStockType type;
     private Gauge gauge;
-    private ArrayList<Era> era;
+    private int[] era;
 
     public enum RollingStockType {
         CARRIAGE("Carriage"),
@@ -32,7 +30,7 @@ public class RollingStock extends Product {
         
     }
 
-    public RollingStock(Brand brand, String productName, String productCode, float retailPrice, String description, int stockQuantity,  String type, String gauge, ArrayList<Era> era) {
+    public RollingStock(Brand brand, String productName, String productCode, float retailPrice, String description, int stockQuantity,  String type, String gauge, int[] era) {
         super(brand, productName, productCode, retailPrice, description, stockQuantity);
         this.setRollingStockType(type);
         this.setGauge(gauge);
@@ -80,7 +78,7 @@ public class RollingStock extends Product {
      *
      * @return the era associated with the locomotive.
      */
-    public ArrayList<Era> getEra() {
+    public int[] getEra() {
         return era;
     }
 
@@ -90,7 +88,7 @@ public class RollingStock extends Product {
      *
      * @param era 
      */
-    public void setEra(ArrayList<Era> era){
+    public void setEra(int[] era){
        this.era = era;
     }
 

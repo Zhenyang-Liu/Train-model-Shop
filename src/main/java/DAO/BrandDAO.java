@@ -9,11 +9,6 @@ import java.util.ArrayList;
 import model.Brand;
 
 public class BrandDAO {
-    private Connection connection;
-
-    public BrandDAO(Connection connection) {
-        this.connection = connection;
-    }
     
     /**
      * Inserts a new brand into the Brand table in the database.
@@ -23,7 +18,8 @@ public class BrandDAO {
      */
     public void insertBrand(Brand newBrand) throws SQLException {
         String insertSQL = "INSERT INTO Brand (BrandName, Country) VALUES (?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);) {
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);) {
             preparedStatement.setString(1, newBrand.getBrandName());
             preparedStatement.setString(2, newBrand.getCountry());
 
@@ -43,7 +39,8 @@ public class BrandDAO {
      */ 
     public void updateBrand(Brand brand) throws SQLException {
         String updateSQL = "UPDATE Brand SET BrandName = ?, Country = ? WHERE BrandID = ?;"; 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
             preparedStatement.setString(1, brand.getBrandName());
             preparedStatement.setString(2, brand.getCountry());
             preparedStatement.setInt(3,brand.getBrandID());
@@ -65,7 +62,8 @@ public class BrandDAO {
      */
     public void deleteBrand(int brandId) throws SQLException {
         String deleteSQL = "DELETE FROM Brand WHERE BrandID = ?;";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
             // Set the parameters for the prepared statement
             preparedStatement.setInt(1, brandId);
 
@@ -94,7 +92,8 @@ public class BrandDAO {
      */
     public Brand findBrand(int brandID) throws SQLException {
         String selectSQL = "SELECT * FROM Brand WHERE BrandID = ?;";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
             preparedStatement.setInt(1, brandID);
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -122,7 +121,8 @@ public class BrandDAO {
     public ArrayList<Brand> findAllBrand() throws SQLException {
         String selectSQL = "SELECT * FROM Brand;";
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             ArrayList<Brand> brandList = new ArrayList<Brand>();
             
@@ -160,7 +160,8 @@ public class BrandDAO {
     public boolean brandExists(String brandName) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Brand WHERE BrandName = ?";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, brandName);
 
             try (ResultSet resultSet = statement.executeQuery()) {
