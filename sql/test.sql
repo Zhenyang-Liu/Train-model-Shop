@@ -11,3 +11,4 @@ INSERT INTO Era (EraCode, Description) VALUES
 (10, 'Era 10'),
 (11, 'Era 11');
 
+INSERT INTO Brand (Country, BrandName) VALUES ('UK','Bachmann');

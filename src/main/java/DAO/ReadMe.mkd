@@ -12,35 +12,52 @@ This is a folder with Data Access Object (DAO) java files, contributing directly
 - `findAllBrands()`: Get a list of all brands.
 - `brandExists(String brandName)`: Check if a brand with a given name exists in the database.
 
-### ProductDAO.java (Finished)
+### EraDAO.java (Finished)
 
-- `insertProduct(Product product)`: Add a new product to the database.
-- `updateProduct(Product product)`: Update existing product information.
+- `insertEra(int productID, int[] eraList)`: Insert era codes associated with a product to the database.
+- `deleteEra(int productID)`: Delete era codes associated with a product from the database.
+- `findEraByID(int productID)`: Retrieve a list of era codes associated with a product by its product ID.
+- `findIDByEra(int[] eraList)`: Retrieve a list of product IDs associated with one or more era codes.
+
+### ProductDAO.java (unFinished)
+
+- `insertProduct(Product product)`: Add a new product to the database. (a exception waited to be finished)
+- `updateProduct(Product product)`: Update existing product information. (a exception waited to be finished)
 - `deleteProduct(int productId)`: Delete a product based on its ID.
 - `findProductById(int productId)`: Find a product by its ID.
 - `findProductByCode(String productCode)`: Find a product by its code.
 - `findAllProducts()`: Get a list of all products.
+- `productCodeExist()`: Check if a product with a code exists in the database.
 
-### LocomotiveDAO.java (Extends ProductDAO) (Doing)
+### LocomotiveDAO.java (Extends ProductDAO) (Finished)
 
 - `insertLocomotive(Locomotive locomotive)`: Add a new locomotive to the database.
 - `updateLocomotive(Locomotive locomotive)`: Update existing locomotive information.
 - `deleteLocomotive(int ProductID)`: Delete a locomotive based on its ID.
-- `findLocomotivesByEra(ArrayList<Era> eraList)`: Find locomotives based on era.
+- `findLocomotivesByID(int ProductID)`: Find locomotives based on its ID.
+- `findLocomotivesByEra(int[] eraList)`: Find locomotives based on era.
 - `findLocomotivesByGauge(Gauge gauge)`: Find locomotives based on gauge.
-- `findLocomotivesByDCC(DCCType dccType)`: Find locomotives based on DCC type.
+- `findLocomotivesByDCCType(DCCType dccType)`: Find locomotives based on DCC type.
 
-### RollingStockDAO.java (Extends ProductDAO) (Unfinished)
+### RollingStockDAO.java (Extends ProductDAO) (Finished)
 
-- `insertRollingStock(RollingStock rollingStock)`: Add new rolling stock to the database.
-- `updateRollingStock(RollingStock rollingStock)`: Update existing rolling stock information.
-- `findRollingStockByType(RollingStockType type)`: Find rolling stock by type.
+- `insertRollingStock(RollingStock rollingStock)`: Add a new rollingstock to the database.
+- `updateRollingStock(RollingStock rollingStock)`: Update existing rollingstock information.
+- `deleteRollingStock(int ProductID)`: Delete a rollingstock based on its ID.
+- `findRollingStocksByID(int ProductID)`: Find rollingstocks based on its ID.
+- `findRollingStocksByEra(int[] eraList)`: Find rollingstocks based on era.
+- `findRollingStocksByGauge(Gauge gauge)`: Find rollingstocks based on gauge.
+- `findRollingStocksByType(RollingStockType type)`: Find rollingstocks based on type.
 
-### TrackDAO.java (Extends ProductDAO) (Unfinished)
+### TrackDAO.java (Extends ProductDAO) (Finished)
 
 - `insertTrack(Track track)`: Add new tracks to the database.
 - `updateTrack(Track track)`: Update existing track information.
+- `deleteTrack(int ProductID)`: Delete a track based on its ID.
 - `findTracksByGauge(Gauge gauge)`: Find tracks based on gauge.
+- `findTrackByType(TrackType type)`: Find tracks based on type.
+
+### BoxedSetDAO.java (Extends ProductDAO) (Unfinished)
 
 ### OrderDAO.java (Unfinished)
 

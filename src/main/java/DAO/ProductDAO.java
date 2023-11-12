@@ -23,9 +23,15 @@ public class ProductDAO {
         String insertSQL = "INSERT INTO Product (BrandID, ProductName, ProductCode, "
                 + "RetailPrice, Description, StockQuantity) "
                 + "VALUES (?,?,?,?,?,?)";
-    
+        
         try (Connection connection = DatabaseConnectionHandler.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+            // wait for change
+            if (!productCodeExist(product.getProductCode())) {
+                System.out.println("Check the product code since this code is duplicated in the database");
+                return -1;
+            }
+            
             // Set the parameters for the product
             preparedStatement.setInt(1, product.getBrand().getBrandID());
             preparedStatement.setString(2, product.getProductName());
@@ -77,17 +83,12 @@ public class ProductDAO {
             preparedStatement.setInt(6, product.getStockQuantity());
             preparedStatement.setInt(7,product.getProductID());
 
-            // Execute the update
             preparedStatement.executeUpdate();
-
-            // Print for test
             
-
         } catch (SQLException e) {
             e.printStackTrace();
             throw e;
         }
-
     }
 
     /**
@@ -270,5 +271,31 @@ public class ProductDAO {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    /**
+     * Checks if a product with the specified code already exists in the database.
+     * 
+     * @param productCode The code of the product to check in the database.
+     * @return {@code True} if the code exists, {@code False} otherwise.
+     * @throws SQLException If there is an error during the database query operation.
+     */
+    public static Boolean productCodeExist(String productCode) throws SQLException {
+        String selectSQL = "SELECT COUNT(*) FROM Product WHERE ProductCode = ?";
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+            preparedStatement.setString(1, productCode);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+        return false;
     }
 }

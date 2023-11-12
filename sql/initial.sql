@@ -98,7 +98,7 @@ CREATE TABLE ProductEra (
 
 CREATE TABLE Track (
     ProductID INT,
-    TrackType ENUM('Straight', 'Curve', 'Points', 'Crossovers'),
+    TrackType VARCHAR(255),
     Gauge VARCHAR(255),
     FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
@@ -118,11 +118,9 @@ CREATE TABLE Locomotive (
 
 CREATE TABLE RollingStock (
     ProductID INT,
-    Type ENUM('Carriages', 'Wagons'),
+    Type ENUM('Carriage', 'Wagon'),
     Gauge VARCHAR(255),
-    EraCode INT,
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
-    FOREIGN KEY (EraCode) REFERENCES Era(EraCode)
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
 CREATE TABLE BoxedSet (
