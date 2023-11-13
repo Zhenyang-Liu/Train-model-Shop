@@ -1,4 +1,4 @@
-package org.example;
+package controller;
 import gui.MainPage;
 
 import javax.swing.*;

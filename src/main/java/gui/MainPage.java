@@ -5,14 +5,14 @@
 package gui;
 
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import com.formdev.flatlaf.extras.*;
 import com.jgoodies.forms.factories.*;
+import controller.GlobalState;
 
 /**
  * @author Zhenyang Liu
@@ -27,14 +27,26 @@ public class MainPage extends JFrame {
         // TODO: add custom component creation code here
     }
 
+    private void button_accountMouseClicked(MouseEvent e) {
+        // TODO add your code here
+        SwingUtilities.invokeLater(() -> {
+            if (!GlobalState.isLoggedIn()) {
+                LoginPage loginPage = new LoginPage();
+                loginPage.setVisible(true);
+            } else {
+                // 用户已登录的情况
+            }
+        });
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
         DefaultComponentFactory compFactory = DefaultComponentFactory.getInstance();
         label1 = new JLabel();
-        button3 = new JButton();
+        button_account = new JButton();
         separator1 = compFactory.createSeparator("");
-        button4 = new JButton();
+        button_cart = new JButton();
         label2 = new JLabel();
         comboBox1 = new JComboBox();
         label3 = new JLabel();
@@ -81,28 +93,34 @@ public class MainPage extends JFrame {
         label1.setFont(label1.getFont().deriveFont(label1.getFont().getStyle() | Font.BOLD, label1.getFont().getSize() + 20f));
         label1.setForeground(new Color(0x003366));
         contentPane.add(label1);
-        label1.setBounds(275, 35, 260, 45);
+        label1.setBounds(370, 35, 260, 45);
 
-        //---- button3 ----
-        button3.setIcon(new FlatSVGIcon(new File("D:\\TrainShop\\src\\main\\images\\person_black_24dp.svg")));
-        button3.setBackground(new Color(0xf2f2f2));
-        contentPane.add(button3);
-        button3.setBounds(5, 0, 30, 30);
+        //---- button_account ----
+        button_account.setIcon(new FlatSVGIcon(new File("D:\\TrainShop\\src\\main\\images\\person_black_24dp.svg")));
+        button_account.setBackground(new Color(0xf2f2f2));
+        button_account.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                button_accountMouseClicked(e);
+            }
+        });
+        contentPane.add(button_account);
+        button_account.setBounds(5, 0, 30, 30);
         contentPane.add(separator1);
-        separator1.setBounds(0, 30, 805, 15);
+        separator1.setBounds(0, 30, 1000, 15);
 
-        //---- button4 ----
-        button4.setSelectedIcon(null);
-        button4.setIcon(new FlatSVGIcon(new File("D:\\TrainShop\\src\\main\\images\\shopping_cart_black_24dp.svg")));
-        button4.setBackground(new Color(0xf2f2f2));
-        contentPane.add(button4);
-        button4.setBounds(760, 0, 35, 30);
+        //---- button_cart ----
+        button_cart.setSelectedIcon(null);
+        button_cart.setIcon(new FlatSVGIcon(new File("D:\\TrainShop\\src\\main\\images\\shopping_cart_black_24dp.svg")));
+        button_cart.setBackground(new Color(0xf2f2f2));
+        contentPane.add(button_cart);
+        button_cart.setBounds(960, 0, 35, 30);
 
         //---- label2 ----
         label2.setText(bundle.getString("MainPage.label2.text"));
         label2.setFont(label2.getFont().deriveFont(label2.getFont().getSize() + 2f));
         contentPane.add(label2);
-        label2.setBounds(new Rectangle(new Point(315, 85), label2.getPreferredSize()));
+        label2.setBounds(new Rectangle(new Point(415, 80), label2.getPreferredSize()));
         contentPane.add(comboBox1);
         comboBox1.setBounds(new Rectangle(new Point(20, 145), comboBox1.getPreferredSize()));
 
@@ -183,7 +201,7 @@ public class MainPage extends JFrame {
             button2.setBackground(new Color(0x55a15a));
             button2.setForeground(new Color(0xe0e2e8));
             panel8.add(button2);
-            button2.setBounds(20, 175, 65, 35);
+            button2.setBounds(10, 175, 75, 35);
 
             //---- button5 ----
             button5.setFont(button5.getFont().deriveFont(button5.getFont().getSize() - 1f));
@@ -191,7 +209,7 @@ public class MainPage extends JFrame {
             button5.setBackground(new Color(0x3da2e7));
             button5.setForeground(new Color(0xe0e2e8));
             panel8.add(button5);
-            button5.setBounds(105, 175, 65, 35);
+            button5.setBounds(105, 175, 75, 35);
 
             //---- label15 ----
             label15.setText(bundle.getString("MainPage.label15.text"));
@@ -247,7 +265,7 @@ public class MainPage extends JFrame {
             button6.setBackground(new Color(0x55a15a));
             button6.setForeground(new Color(0xe0e2e8));
             panel9.add(button6);
-            button6.setBounds(20, 175, 65, 35);
+            button6.setBounds(10, 175, 75, 35);
 
             //---- button7 ----
             button7.setFont(button7.getFont().deriveFont(button7.getFont().getSize() - 1f));
@@ -255,7 +273,7 @@ public class MainPage extends JFrame {
             button7.setBackground(new Color(0x3da2e7));
             button7.setForeground(new Color(0xe0e2e8));
             panel9.add(button7);
-            button7.setBounds(105, 175, 65, 35);
+            button7.setBounds(105, 175, 75, 35);
 
             //---- label18 ----
             label18.setText(bundle.getString("MainPage.label18.text"));
@@ -311,7 +329,7 @@ public class MainPage extends JFrame {
             button8.setBackground(new Color(0x55a15a));
             button8.setForeground(new Color(0xe0e2e8));
             panel10.add(button8);
-            button8.setBounds(20, 175, 65, 35);
+            button8.setBounds(10, 175, 75, 35);
 
             //---- button9 ----
             button9.setFont(button9.getFont().deriveFont(button9.getFont().getSize() - 1f));
@@ -319,7 +337,7 @@ public class MainPage extends JFrame {
             button9.setBackground(new Color(0x3da2e7));
             button9.setForeground(new Color(0xe0e2e8));
             panel10.add(button9);
-            button9.setBounds(105, 175, 65, 35);
+            button9.setBounds(105, 175, 75, 35);
 
             //---- label19 ----
             label19.setText(bundle.getString("MainPage.label19.text"));
@@ -345,7 +363,7 @@ public class MainPage extends JFrame {
         contentPane.add(panel10);
         panel10.setBounds(590, 190, 190, 220);
         contentPane.add(separator2);
-        separator2.setBounds(0, 540, 805, 30);
+        separator2.setBounds(0, 660, 1000, 30);
 
         {
             // compute preferred size
@@ -368,9 +386,9 @@ public class MainPage extends JFrame {
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
     private JLabel label1;
-    private JButton button3;
+    private JButton button_account;
     private JComponent separator1;
-    private JButton button4;
+    private JButton button_cart;
     private JLabel label2;
     private JComboBox comboBox1;
     private JLabel label3;
