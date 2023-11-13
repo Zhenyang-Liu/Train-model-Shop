@@ -6,13 +6,14 @@ package gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import com.formdev.flatlaf.extras.*;
 import com.jgoodies.forms.factories.*;
-import controller.GlobalState;
 
 /**
  * @author Zhenyang Liu
@@ -29,14 +30,6 @@ public class MainPage extends JFrame {
 
     private void button_accountMouseClicked(MouseEvent e) {
         // TODO add your code here
-        SwingUtilities.invokeLater(() -> {
-            if (!GlobalState.isLoggedIn()) {
-                LoginPage loginPage = new LoginPage();
-                loginPage.setVisible(true);
-            } else {
-                // 用户已登录的情况
-            }
-        });
     }
 
     private void initComponents() {
