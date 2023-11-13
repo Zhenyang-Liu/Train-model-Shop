@@ -2,8 +2,6 @@ package model;
 
 import java.util.ArrayList;
 
-import model.RollingStock.RollingStockType;
-
 public class BoxedSet extends Product{
     private BoxedType boxedType;
     private ArrayList<Product> contain;
