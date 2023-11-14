@@ -14,6 +14,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 import com.formdev.flatlaf.extras.*;
 import com.jgoodies.forms.factories.*;
+import controller.GlobalState;
 
 /**
  * @author Zhenyang Liu
@@ -30,408 +31,352 @@ public class MainPage extends JFrame {
 
     private void button_accountMouseClicked(MouseEvent e) {
         // TODO add your code here
+        SwingUtilities.invokeLater(() -> {
+            if (!GlobalState.isLoggedIn()) {
+                LoginPage loginPage = new LoginPage();
+                loginPage.setVisible(true);
+            } else {
+                // 用户已登录的情况
+            }
+        });
     }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
         DefaultComponentFactory compFactory = DefaultComponentFactory.getInstance();
-        label1 = new JLabel();
+        panel3 = new JPanel();
+        panel4 = new JPanel();
         button_account = new JButton();
-        separator1 = compFactory.createSeparator("");
         button_cart = new JButton();
+        separator1 = compFactory.createSeparator("");
+        panel6 = new JPanel();
+        label1 = new JLabel();
         label2 = new JLabel();
-        comboBox1 = new JComboBox();
-        label3 = new JLabel();
-        label4 = new JLabel();
-        label5 = new JLabel();
-        label6 = new JLabel();
-        label7 = new JLabel();
-        comboBox2 = new JComboBox();
-        comboBox3 = new JComboBox();
-        comboBox4 = new JComboBox();
-        comboBox5 = new JComboBox();
+        panel2 = new JPanel();
         label8 = new JLabel();
         textField1 = new JTextField();
         button1 = new JButton();
-        panel8 = new JPanel();
-        label9 = new JLabel();
-        label10 = new JLabel();
-        spinner1 = new JSpinner();
-        button2 = new JButton();
-        button5 = new JButton();
-        label15 = new JLabel();
-        panel9 = new JPanel();
-        label11 = new JLabel();
-        label12 = new JLabel();
-        spinner2 = new JSpinner();
-        button6 = new JButton();
-        button7 = new JButton();
-        label18 = new JLabel();
-        panel10 = new JPanel();
-        label13 = new JLabel();
-        label14 = new JLabel();
-        spinner3 = new JSpinner();
-        button8 = new JButton();
-        button9 = new JButton();
-        label19 = new JLabel();
         separator2 = compFactory.createSeparator("");
+        splitPane1 = new JSplitPane();
+        panel1 = new JPanel();
+        label3 = new JLabel();
+        comboBox1 = new JComboBox();
+        label4 = new JLabel();
+        comboBox2 = new JComboBox();
+        label5 = new JLabel();
+        comboBox3 = new JComboBox();
+        label6 = new JLabel();
+        comboBox4 = new JComboBox();
+        label7 = new JLabel();
+        comboBox5 = new JComboBox();
+        panel9 = new JPanel();
+        productCardPanel14 = new JPanel();
+        label48 = new JLabel();
+        label49 = new JLabel();
+        purchasePanel14 = new JPanel();
+        label50 = new JLabel();
+        spinner14 = new JSpinner();
+        button28 = new JButton();
+        button29 = new JButton();
 
         //======== this ========
+        setPreferredSize(new Dimension(1080, 720));
         var contentPane = getContentPane();
-        contentPane.setLayout(null);
+        contentPane.setLayout(new BorderLayout());
 
-        //---- label1 ----
-        label1.setText(bundle.getString("MainPage.label1.text"));
-        label1.setFont(label1.getFont().deriveFont(label1.getFont().getStyle() | Font.BOLD, label1.getFont().getSize() + 20f));
-        label1.setForeground(new Color(0x003366));
-        contentPane.add(label1);
-        label1.setBounds(370, 35, 260, 45);
-
-        //---- button_account ----
-        button_account.setIcon(new FlatSVGIcon(new File("D:\\TrainShop\\src\\main\\images\\person_black_24dp.svg")));
-        button_account.setBackground(new Color(0xf2f2f2));
-        button_account.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                button_accountMouseClicked(e);
-            }
-        });
-        contentPane.add(button_account);
-        button_account.setBounds(5, 0, 30, 30);
-        contentPane.add(separator1);
-        separator1.setBounds(0, 30, 1000, 15);
-
-        //---- button_cart ----
-        button_cart.setSelectedIcon(null);
-        button_cart.setIcon(new FlatSVGIcon(new File("D:\\TrainShop\\src\\main\\images\\shopping_cart_black_24dp.svg")));
-        button_cart.setBackground(new Color(0xf2f2f2));
-        contentPane.add(button_cart);
-        button_cart.setBounds(960, 0, 35, 30);
-
-        //---- label2 ----
-        label2.setText(bundle.getString("MainPage.label2.text"));
-        label2.setFont(label2.getFont().deriveFont(label2.getFont().getSize() + 2f));
-        contentPane.add(label2);
-        label2.setBounds(new Rectangle(new Point(415, 80), label2.getPreferredSize()));
-        contentPane.add(comboBox1);
-        comboBox1.setBounds(new Rectangle(new Point(20, 145), comboBox1.getPreferredSize()));
-
-        //---- label3 ----
-        label3.setText(bundle.getString("MainPage.label3.text"));
-        contentPane.add(label3);
-        label3.setBounds(new Rectangle(new Point(20, 125), label3.getPreferredSize()));
-
-        //---- label4 ----
-        label4.setText(bundle.getString("MainPage.label4.text"));
-        contentPane.add(label4);
-        label4.setBounds(new Rectangle(new Point(20, 185), label4.getPreferredSize()));
-
-        //---- label5 ----
-        label5.setText(bundle.getString("MainPage.label5.text"));
-        contentPane.add(label5);
-        label5.setBounds(new Rectangle(new Point(20, 245), label5.getPreferredSize()));
-
-        //---- label6 ----
-        label6.setText(bundle.getString("MainPage.label6.text"));
-        contentPane.add(label6);
-        label6.setBounds(new Rectangle(new Point(20, 300), label6.getPreferredSize()));
-
-        //---- label7 ----
-        label7.setText(bundle.getString("MainPage.label7.text"));
-        contentPane.add(label7);
-        label7.setBounds(new Rectangle(new Point(20, 355), label7.getPreferredSize()));
-        contentPane.add(comboBox2);
-        comboBox2.setBounds(new Rectangle(new Point(20, 205), comboBox2.getPreferredSize()));
-        contentPane.add(comboBox3);
-        comboBox3.setBounds(new Rectangle(new Point(20, 265), comboBox3.getPreferredSize()));
-        contentPane.add(comboBox4);
-        comboBox4.setBounds(new Rectangle(new Point(20, 320), comboBox4.getPreferredSize()));
-        contentPane.add(comboBox5);
-        comboBox5.setBounds(new Rectangle(new Point(20, 375), comboBox5.getPreferredSize()));
-
-        //---- label8 ----
-        label8.setText(bundle.getString("MainPage.label8.text"));
-        contentPane.add(label8);
-        label8.setBounds(170, 125, label8.getPreferredSize().width, 15);
-        contentPane.add(textField1);
-        textField1.setBounds(170, 145, 195, textField1.getPreferredSize().height);
-
-        //---- button1 ----
-        button1.setText(bundle.getString("MainPage.button1.text"));
-        button1.setBackground(new Color(0x204688));
-        button1.setForeground(new Color(0xe0e2e8));
-        contentPane.add(button1);
-        button1.setBounds(375, 145, 65, button1.getPreferredSize().height);
-
-        //======== panel8 ========
+        //======== panel3 ========
         {
-            panel8.setBorder(new LineBorder(new Color(0x002c7b), 2, true));
-            panel8.setLayout(null);
+            panel3.setLayout(new BoxLayout(panel3, BoxLayout.Y_AXIS));
 
-            //---- label9 ----
-            label9.setText(bundle.getString("MainPage.label9.text"));
-            label9.setFont(label9.getFont().deriveFont(label9.getFont().getSize() + 4f));
-            label9.setHorizontalAlignment(SwingConstants.CENTER);
-            label9.setBorder(new LineBorder(Color.black, 2));
-            panel8.add(label9);
-            label9.setBounds(0, 105, 190, 30);
-
-            //---- label10 ----
-            label10.setText(bundle.getString("MainPage.label10.text"));
-            label10.setFont(label10.getFont().deriveFont(label10.getFont().getSize() + 7f));
-            panel8.add(label10);
-            label10.setBounds(new Rectangle(new Point(20, 140), label10.getPreferredSize()));
-
-            //---- spinner1 ----
-            spinner1.setModel(new SpinnerNumberModel(1, 1, null, 1));
-            panel8.add(spinner1);
-            spinner1.setBounds(105, 140, 65, 25);
-
-            //---- button2 ----
-            button2.setFont(button2.getFont().deriveFont(button2.getFont().getSize() - 1f));
-            button2.setText(bundle.getString("MainPage.button2.text"));
-            button2.setBackground(new Color(0x55a15a));
-            button2.setForeground(new Color(0xe0e2e8));
-            panel8.add(button2);
-            button2.setBounds(10, 175, 75, 35);
-
-            //---- button5 ----
-            button5.setFont(button5.getFont().deriveFont(button5.getFont().getSize() - 1f));
-            button5.setText(bundle.getString("MainPage.button5.text"));
-            button5.setBackground(new Color(0x3da2e7));
-            button5.setForeground(new Color(0xe0e2e8));
-            panel8.add(button5);
-            button5.setBounds(105, 175, 75, 35);
-
-            //---- label15 ----
-            label15.setText(bundle.getString("MainPage.label15.text"));
-            label15.setIcon(new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg"));
-            panel8.add(label15);
-            label15.setBounds(3, 3, 184, 101);
-
+            //======== panel4 ========
             {
-                // compute preferred size
-                Dimension preferredSize = new Dimension();
-                for(int i = 0; i < panel8.getComponentCount(); i++) {
-                    Rectangle bounds = panel8.getComponent(i).getBounds();
-                    preferredSize.width = Math.max(bounds.x + bounds.width, preferredSize.width);
-                    preferredSize.height = Math.max(bounds.y + bounds.height, preferredSize.height);
-                }
-                Insets insets = panel8.getInsets();
-                preferredSize.width += insets.right;
-                preferredSize.height += insets.bottom;
-                panel8.setMinimumSize(preferredSize);
-                panel8.setPreferredSize(preferredSize);
+                panel4.setLayout(new BorderLayout());
+
+                //---- button_account ----
+                button_account.setIcon(new FlatSVGIcon(new File("D:\\TrainShop\\src\\main\\images\\person_black_24dp.svg")));
+                button_account.setBackground(new Color(0xf2f2f2));
+                button_account.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        button_accountMouseClicked(e);
+                    }
+                });
+                panel4.add(button_account, BorderLayout.WEST);
+
+                //---- button_cart ----
+                button_cart.setSelectedIcon(null);
+                button_cart.setIcon(new FlatSVGIcon(new File("D:\\TrainShop\\src\\main\\images\\shopping_cart_black_24dp.svg")));
+                button_cart.setBackground(new Color(0xf2f2f2));
+                button_cart.setHorizontalAlignment(SwingConstants.RIGHT);
+                panel4.add(button_cart, BorderLayout.EAST);
             }
-        }
-        contentPane.add(panel8);
-        panel8.setBounds(170, 190, 190, 220);
+            panel3.add(panel4);
+            panel3.add(separator1);
 
-        //======== panel9 ========
-        {
-            panel9.setBorder(new LineBorder(new Color(0x002c7b), 2, true));
-            panel9.setLayout(null);
-
-            //---- label11 ----
-            label11.setText(bundle.getString("MainPage.label11.text"));
-            label11.setFont(label11.getFont().deriveFont(label11.getFont().getSize() + 4f));
-            label11.setHorizontalAlignment(SwingConstants.CENTER);
-            label11.setBorder(new LineBorder(Color.black, 2));
-            panel9.add(label11);
-            label11.setBounds(0, 105, 190, 30);
-
-            //---- label12 ----
-            label12.setText(bundle.getString("MainPage.label12.text"));
-            label12.setFont(label12.getFont().deriveFont(label12.getFont().getSize() + 7f));
-            panel9.add(label12);
-            label12.setBounds(new Rectangle(new Point(20, 140), label12.getPreferredSize()));
-
-            //---- spinner2 ----
-            spinner2.setModel(new SpinnerNumberModel(1, 1, null, 1));
-            panel9.add(spinner2);
-            spinner2.setBounds(105, 140, 65, 25);
-
-            //---- button6 ----
-            button6.setFont(button6.getFont().deriveFont(button6.getFont().getSize() - 1f));
-            button6.setText(bundle.getString("MainPage.button6.text"));
-            button6.setBackground(new Color(0x55a15a));
-            button6.setForeground(new Color(0xe0e2e8));
-            panel9.add(button6);
-            button6.setBounds(10, 175, 75, 35);
-
-            //---- button7 ----
-            button7.setFont(button7.getFont().deriveFont(button7.getFont().getSize() - 1f));
-            button7.setText(bundle.getString("MainPage.button7.text"));
-            button7.setBackground(new Color(0x3da2e7));
-            button7.setForeground(new Color(0xe0e2e8));
-            panel9.add(button7);
-            button7.setBounds(105, 175, 75, 35);
-
-            //---- label18 ----
-            label18.setText(bundle.getString("MainPage.label18.text"));
-            label18.setIcon(new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg"));
-            panel9.add(label18);
-            label18.setBounds(3, 3, 184, 101);
-
+            //======== panel6 ========
             {
-                // compute preferred size
-                Dimension preferredSize = new Dimension();
-                for(int i = 0; i < panel9.getComponentCount(); i++) {
-                    Rectangle bounds = panel9.getComponent(i).getBounds();
-                    preferredSize.width = Math.max(bounds.x + bounds.width, preferredSize.width);
-                    preferredSize.height = Math.max(bounds.y + bounds.height, preferredSize.height);
-                }
-                Insets insets = panel9.getInsets();
-                preferredSize.width += insets.right;
-                preferredSize.height += insets.bottom;
-                panel9.setMinimumSize(preferredSize);
-                panel9.setPreferredSize(preferredSize);
+                panel6.setMinimumSize(new Dimension(251, 90));
+                panel6.setPreferredSize(new Dimension(251, 80));
+                panel6.setLayout(new GridLayout(2, 1, 5, 0));
+
+                //---- label1 ----
+                label1.setText(bundle.getString("MainPage.label1.text"));
+                label1.setFont(label1.getFont().deriveFont(label1.getFont().getStyle() | Font.BOLD, label1.getFont().getSize() + 26f));
+                label1.setForeground(new Color(0x003366));
+                label1.setHorizontalAlignment(SwingConstants.CENTER);
+                label1.setMaximumSize(null);
+                label1.setBorder(new EmptyBorder(10, 0, 0, 0));
+                panel6.add(label1);
+
+                //---- label2 ----
+                label2.setText(bundle.getString("MainPage.label2.text"));
+                label2.setFont(label2.getFont().deriveFont(label2.getFont().getSize() + 5f));
+                label2.setHorizontalAlignment(SwingConstants.CENTER);
+                label2.setMaximumSize(new Dimension(163, 12));
+                label2.setMinimumSize(new Dimension(163, 12));
+                label2.setPreferredSize(new Dimension(163, 12));
+                panel6.add(label2);
             }
-        }
-        contentPane.add(panel9);
-        panel9.setBounds(380, 190, 190, 220);
+            panel3.add(panel6);
 
-        //======== panel10 ========
-        {
-            panel10.setBorder(new LineBorder(new Color(0x002c7b), 2, true));
-            panel10.setLayout(null);
-
-            //---- label13 ----
-            label13.setText(bundle.getString("MainPage.label13.text"));
-            label13.setFont(label13.getFont().deriveFont(label13.getFont().getSize() + 4f));
-            label13.setHorizontalAlignment(SwingConstants.CENTER);
-            label13.setBorder(new LineBorder(Color.black, 2));
-            panel10.add(label13);
-            label13.setBounds(0, 105, 190, 30);
-
-            //---- label14 ----
-            label14.setText(bundle.getString("MainPage.label14.text"));
-            label14.setFont(label14.getFont().deriveFont(label14.getFont().getSize() + 7f));
-            panel10.add(label14);
-            label14.setBounds(new Rectangle(new Point(20, 140), label14.getPreferredSize()));
-
-            //---- spinner3 ----
-            spinner3.setModel(new SpinnerNumberModel(1, 1, null, 1));
-            panel10.add(spinner3);
-            spinner3.setBounds(105, 140, 65, 25);
-
-            //---- button8 ----
-            button8.setFont(button8.getFont().deriveFont(button8.getFont().getSize() - 1f));
-            button8.setText(bundle.getString("MainPage.button8.text"));
-            button8.setBackground(new Color(0x55a15a));
-            button8.setForeground(new Color(0xe0e2e8));
-            panel10.add(button8);
-            button8.setBounds(10, 175, 75, 35);
-
-            //---- button9 ----
-            button9.setFont(button9.getFont().deriveFont(button9.getFont().getSize() - 1f));
-            button9.setText(bundle.getString("MainPage.button9.text"));
-            button9.setBackground(new Color(0x3da2e7));
-            button9.setForeground(new Color(0xe0e2e8));
-            panel10.add(button9);
-            button9.setBounds(105, 175, 75, 35);
-
-            //---- label19 ----
-            label19.setText(bundle.getString("MainPage.label19.text"));
-            label19.setIcon(new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg"));
-            panel10.add(label19);
-            label19.setBounds(3, 3, 184, 101);
-
+            //======== panel2 ========
             {
-                // compute preferred size
-                Dimension preferredSize = new Dimension();
-                for(int i = 0; i < panel10.getComponentCount(); i++) {
-                    Rectangle bounds = panel10.getComponent(i).getBounds();
-                    preferredSize.width = Math.max(bounds.x + bounds.width, preferredSize.width);
-                    preferredSize.height = Math.max(bounds.y + bounds.height, preferredSize.height);
-                }
-                Insets insets = panel10.getInsets();
-                preferredSize.width += insets.right;
-                preferredSize.height += insets.bottom;
-                panel10.setMinimumSize(preferredSize);
-                panel10.setPreferredSize(preferredSize);
-            }
-        }
-        contentPane.add(panel10);
-        panel10.setBounds(590, 190, 190, 220);
-        contentPane.add(separator2);
-        separator2.setBounds(0, 660, 1000, 30);
+                panel2.setMaximumSize(new Dimension(305, 30));
+                panel2.setPreferredSize(new Dimension(305, 30));
+                panel2.setMinimumSize(new Dimension(305, 30));
+                panel2.setLayout(new GridBagLayout());
+                ((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+                ((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
+                ((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+                ((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
 
-        {
-            // compute preferred size
-            Dimension preferredSize = new Dimension();
-            for(int i = 0; i < contentPane.getComponentCount(); i++) {
-                Rectangle bounds = contentPane.getComponent(i).getBounds();
-                preferredSize.width = Math.max(bounds.x + bounds.width, preferredSize.width);
-                preferredSize.height = Math.max(bounds.y + bounds.height, preferredSize.height);
+                //---- label8 ----
+                label8.setText(bundle.getString("MainPage.label8.text"));
+                label8.setFont(label8.getFont().deriveFont(label8.getFont().getSize() + 2f));
+                panel2.add(label8, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+                    new Insets(0, 0, 0, 5), 0, 0));
+
+                //---- textField1 ----
+                textField1.setPreferredSize(new Dimension(160, 23));
+                textField1.setMaximumSize(new Dimension(160, 23));
+                textField1.setMinimumSize(new Dimension(160, 23));
+                panel2.add(textField1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+                    new Insets(0, 5, 0, 5), 0, 0));
+
+                //---- button1 ----
+                button1.setText(bundle.getString("MainPage.button1.text"));
+                button1.setBackground(new Color(0x204688));
+                button1.setForeground(new Color(0xe0e2e8));
+                panel2.add(button1, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+                    new Insets(0, 5, 0, 0), 0, 0));
             }
-            Insets insets = contentPane.getInsets();
-            preferredSize.width += insets.right;
-            preferredSize.height += insets.bottom;
-            contentPane.setMinimumSize(preferredSize);
-            contentPane.setPreferredSize(preferredSize);
+            panel3.add(panel2);
         }
+        contentPane.add(panel3, BorderLayout.PAGE_START);
+        contentPane.add(separator2, BorderLayout.PAGE_END);
+
+        //======== splitPane1 ========
+        {
+
+            //======== panel1 ========
+            {
+                panel1.setAlignmentX(-0.6949153F);
+                panel1.setBorder(new EmptyBorder(10, 10, 0, 10));
+                panel1.setPreferredSize(null);
+                panel1.setFont(panel1.getFont().deriveFont(panel1.getFont().getSize() + 2f));
+                panel1.setLayout(new GridBagLayout());
+                ((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0};
+                ((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                ((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+                ((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+
+                //---- label3 ----
+                label3.setText(bundle.getString("MainPage.label3.text"));
+                label3.setHorizontalTextPosition(SwingConstants.LEFT);
+                label3.setHorizontalAlignment(SwingConstants.TRAILING);
+                label3.setPreferredSize(null);
+                panel1.add(label3, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                    new Insets(0, 0, 5, 0), 0, 0));
+                panel1.add(comboBox1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 5, 0), 0, 0));
+
+                //---- label4 ----
+                label4.setText(bundle.getString("MainPage.label4.text"));
+                panel1.add(label4, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                    new Insets(5, 0, 5, 0), 0, 0));
+                panel1.add(comboBox2, new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 5, 0), 0, 0));
+
+                //---- label5 ----
+                label5.setText(bundle.getString("MainPage.label5.text"));
+                panel1.add(label5, new GridBagConstraints(0, 4, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                    new Insets(5, 0, 5, 0), 0, 0));
+                panel1.add(comboBox3, new GridBagConstraints(0, 5, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 5, 0), 0, 0));
+
+                //---- label6 ----
+                label6.setText(bundle.getString("MainPage.label6.text"));
+                panel1.add(label6, new GridBagConstraints(0, 6, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                    new Insets(5, 0, 5, 0), 0, 0));
+                panel1.add(comboBox4, new GridBagConstraints(0, 7, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 5, 0), 0, 0));
+
+                //---- label7 ----
+                label7.setText(bundle.getString("MainPage.label7.text"));
+                panel1.add(label7, new GridBagConstraints(0, 8, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                    new Insets(5, 0, 5, 0), 0, 0));
+                panel1.add(comboBox5, new GridBagConstraints(0, 9, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 5, 0), 0, 0));
+            }
+            splitPane1.setLeftComponent(panel1);
+
+            //======== panel9 ========
+            {
+                panel9.setMaximumSize(new Dimension(300, 32767));
+                panel9.setLayout(new FlowLayout(FlowLayout.LEADING));
+
+                //======== productCardPanel14 ========
+                {
+                    productCardPanel14.setBorder(new LineBorder(new Color(0x002c7b), 2, true));
+                    productCardPanel14.setPreferredSize(new Dimension(260, 280));
+                    productCardPanel14.setMaximumSize(new Dimension(230, 240));
+                    productCardPanel14.setMinimumSize(new Dimension(230, 240));
+                    productCardPanel14.setLayout(new GridBagLayout());
+                    ((GridBagLayout)productCardPanel14.getLayout()).columnWidths = new int[] {0, 0};
+                    ((GridBagLayout)productCardPanel14.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
+                    ((GridBagLayout)productCardPanel14.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+                    ((GridBagLayout)productCardPanel14.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+
+                    //---- label48 ----
+                    label48.setText(bundle.getString("MainPage.label48.text"));
+                    label48.setIcon(new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg"));
+                    label48.setPreferredSize(new Dimension(216, 120));
+                    label48.setAlignmentY(0.0F);
+                    label48.setMaximumSize(new Dimension(216, 120));
+                    label48.setMinimumSize(new Dimension(216, 120));
+                    productCardPanel14.add(label48, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0,
+                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                        new Insets(0, 0, 0, 0), 0, 0));
+
+                    //---- label49 ----
+                    label49.setText(bundle.getString("MainPage.label49.text"));
+                    label49.setFont(label49.getFont().deriveFont(label49.getFont().getSize() + 4f));
+                    label49.setHorizontalAlignment(SwingConstants.CENTER);
+                    label49.setBorder(new MatteBorder(3, 0, 3, 0, Color.black));
+                    label49.setPreferredSize(new Dimension(220, 30));
+                    productCardPanel14.add(label49, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.4,
+                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                        new Insets(1, 0, 0, 0), 0, 0));
+
+                    //======== purchasePanel14 ========
+                    {
+                        purchasePanel14.setBorder(new EmptyBorder(10, 5, 5, 5));
+                        purchasePanel14.setMaximumSize(new Dimension(190, 85));
+                        purchasePanel14.setLayout(new GridLayout(2, 2, 20, 10));
+
+                        //---- label50 ----
+                        label50.setText(bundle.getString("MainPage.label50.text"));
+                        label50.setFont(label50.getFont().deriveFont(label50.getFont().getSize() + 7f));
+                        label50.setPreferredSize(new Dimension(80, 25));
+                        purchasePanel14.add(label50);
+
+                        //---- spinner14 ----
+                        spinner14.setModel(new SpinnerNumberModel(1, 1, null, 1));
+                        spinner14.setPreferredSize(new Dimension(50, 23));
+                        spinner14.setFont(spinner14.getFont().deriveFont(spinner14.getFont().getSize() + 4f));
+                        purchasePanel14.add(spinner14);
+
+                        //---- button28 ----
+                        button28.setText(bundle.getString("MainPage.button28.text"));
+                        button28.setBackground(new Color(0x55a15a));
+                        button28.setForeground(new Color(0xe0e2e8));
+                        button28.setPreferredSize(new Dimension(70, 30));
+                        purchasePanel14.add(button28);
+
+                        //---- button29 ----
+                        button29.setText(bundle.getString("MainPage.button29.text"));
+                        button29.setBackground(new Color(0x3da2e7));
+                        button29.setForeground(new Color(0xe0e2e8));
+                        button29.setPreferredSize(new Dimension(70, 30));
+                        purchasePanel14.add(button29);
+                    }
+                    productCardPanel14.add(purchasePanel14, new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0,
+                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                        new Insets(0, 10, 0, 10), 0, 0));
+                }
+                panel9.add(productCardPanel14);
+            }
+            splitPane1.setRightComponent(panel9);
+        }
+        contentPane.add(splitPane1, BorderLayout.CENTER);
         pack();
-        setLocationRelativeTo(getOwner());
+        setLocationRelativeTo(null);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
-    private JLabel label1;
+    private JPanel panel3;
+    private JPanel panel4;
     private JButton button_account;
-    private JComponent separator1;
     private JButton button_cart;
+    private JComponent separator1;
+    private JPanel panel6;
+    private JLabel label1;
     private JLabel label2;
-    private JComboBox comboBox1;
-    private JLabel label3;
-    private JLabel label4;
-    private JLabel label5;
-    private JLabel label6;
-    private JLabel label7;
-    private JComboBox comboBox2;
-    private JComboBox comboBox3;
-    private JComboBox comboBox4;
-    private JComboBox comboBox5;
+    private JPanel panel2;
     private JLabel label8;
     private JTextField textField1;
     private JButton button1;
-    private JPanel panel8;
-    private JLabel label9;
-    private JLabel label10;
-    private JSpinner spinner1;
-    private JButton button2;
-    private JButton button5;
-    private JLabel label15;
-    private JPanel panel9;
-    private JLabel label11;
-    private JLabel label12;
-    private JSpinner spinner2;
-    private JButton button6;
-    private JButton button7;
-    private JLabel label18;
-    private JPanel panel10;
-    private JLabel label13;
-    private JLabel label14;
-    private JSpinner spinner3;
-    private JButton button8;
-    private JButton button9;
-    private JLabel label19;
     private JComponent separator2;
+    private JSplitPane splitPane1;
+    private JPanel panel1;
+    private JLabel label3;
+    private JComboBox comboBox1;
+    private JLabel label4;
+    private JComboBox comboBox2;
+    private JLabel label5;
+    private JComboBox comboBox3;
+    private JLabel label6;
+    private JComboBox comboBox4;
+    private JLabel label7;
+    private JComboBox comboBox5;
+    private JPanel panel9;
+    private JPanel productCardPanel14;
+    private JLabel label48;
+    private JLabel label49;
+    private JPanel purchasePanel14;
+    private JLabel label50;
+    private JSpinner spinner14;
+    private JButton button28;
+    private JButton button29;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
     private void customizeComponents() {
         // 在这里添加自定义组件设置代码
         ImageIcon originalIcon = new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg");
         Image originalImage = originalIcon.getImage();
-        Image resizedImage = originalImage.getScaledInstance(label15.getWidth(), label15.getHeight(), Image.SCALE_SMOOTH);
-        label15.setIcon(new ImageIcon(resizedImage));
+        Image resizedImage = originalImage.getScaledInstance(label48.getWidth(), label48.getHeight(), Image.SCALE_SMOOTH);
+        label48.setIcon(new ImageIcon(resizedImage));
 
-        Image resizedImage18 = originalImage.getScaledInstance(label18.getWidth(), label18.getHeight(), Image.SCALE_SMOOTH);
-        label18.setIcon(new ImageIcon(resizedImage18));
+        //Image resizedImage18 = originalImage.getScaledInstance(label18.getWidth(), label18.getHeight(), Image.SCALE_SMOOTH);
+        //label18.setIcon(new ImageIcon(resizedImage18));
 
-        Image resizedImage19 = originalImage.getScaledInstance(label19.getWidth(), label19.getHeight(), Image.SCALE_SMOOTH);
-        label19.setIcon(new ImageIcon(resizedImage19));
+        //Image resizedImage19 = originalImage.getScaledInstance(label19.getWidth(), label19.getHeight(), Image.SCALE_SMOOTH);
+        //label19.setIcon(new ImageIcon(resizedImage19));
 
     }
 
