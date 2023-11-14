@@ -45,53 +45,53 @@ public class MainPage extends JFrame {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
         DefaultComponentFactory compFactory = DefaultComponentFactory.getInstance();
-        panel3 = new JPanel();
-        panel4 = new JPanel();
+        topPanel = new JPanel();
+        accountPanel = new JPanel();
         button_account = new JButton();
         button_cart = new JButton();
-        separator1 = compFactory.createSeparator("");
-        panel6 = new JPanel();
-        label1 = new JLabel();
-        label2 = new JLabel();
-        panel2 = new JPanel();
-        label8 = new JLabel();
-        textField1 = new JTextField();
-        button1 = new JButton();
-        separator2 = compFactory.createSeparator("");
-        splitPane1 = new JSplitPane();
-        panel1 = new JPanel();
-        label3 = new JLabel();
-        comboBox1 = new JComboBox();
-        label4 = new JLabel();
-        comboBox2 = new JComboBox();
-        label5 = new JLabel();
-        comboBox3 = new JComboBox();
-        label6 = new JLabel();
-        comboBox4 = new JComboBox();
-        label7 = new JLabel();
-        comboBox5 = new JComboBox();
-        panel9 = new JPanel();
-        productCardPanel14 = new JPanel();
-        label48 = new JLabel();
-        label49 = new JLabel();
-        purchasePanel14 = new JPanel();
-        label50 = new JLabel();
-        spinner14 = new JSpinner();
-        button28 = new JButton();
-        button29 = new JButton();
+        separatorForAccount = compFactory.createSeparator("");
+        titlePanel = new JPanel();
+        mainTitle = new JLabel();
+        subTitle = new JLabel();
+        searchPanel = new JPanel();
+        searchLabel = new JLabel();
+        searchKeywordField = new JTextField();
+        searchButton = new JButton();
+        mainPageSplitPane = new JSplitPane();
+        filterPanel = new JPanel();
+        filterLabel1 = new JLabel();
+        filterBox1 = new JComboBox();
+        filterLabel2 = new JLabel();
+        filterBox2 = new JComboBox();
+        filterLabel3 = new JLabel();
+        filterBox3 = new JComboBox();
+        filterLabel4 = new JLabel();
+        filterBox4 = new JComboBox();
+        filterLabel5 = new JLabel();
+        filterBox5 = new JComboBox();
+        productPanel = new JPanel();
+        productCardPanel1 = new JPanel();
+        productImage1 = new JLabel();
+        productName1 = new JLabel();
+        purchasePanel1 = new JPanel();
+        productPrice1 = new JLabel();
+        productNumber1 = new JSpinner();
+        addButton1 = new JButton();
+        moreButton1 = new JButton();
+        bottomSeparator = compFactory.createSeparator("");
 
         //======== this ========
         setPreferredSize(new Dimension(1080, 720));
         var contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
 
-        //======== panel3 ========
+        //======== topPanel ========
         {
-            panel3.setLayout(new BoxLayout(panel3, BoxLayout.Y_AXIS));
+            topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 
-            //======== panel4 ========
+            //======== accountPanel ========
             {
-                panel4.setLayout(new BorderLayout());
+                accountPanel.setLayout(new BorderLayout());
 
                 //---- button_account ----
                 button_account.setIcon(new FlatSVGIcon(new File("D:\\TrainShop\\src\\main\\images\\person_black_24dp.svg")));
@@ -102,267 +102,266 @@ public class MainPage extends JFrame {
                         button_accountMouseClicked(e);
                     }
                 });
-                panel4.add(button_account, BorderLayout.WEST);
+                accountPanel.add(button_account, BorderLayout.WEST);
 
                 //---- button_cart ----
                 button_cart.setSelectedIcon(null);
                 button_cart.setIcon(new FlatSVGIcon(new File("D:\\TrainShop\\src\\main\\images\\shopping_cart_black_24dp.svg")));
                 button_cart.setBackground(new Color(0xf2f2f2));
                 button_cart.setHorizontalAlignment(SwingConstants.RIGHT);
-                panel4.add(button_cart, BorderLayout.EAST);
+                accountPanel.add(button_cart, BorderLayout.EAST);
             }
-            panel3.add(panel4);
-            panel3.add(separator1);
+            topPanel.add(accountPanel);
+            topPanel.add(separatorForAccount);
 
-            //======== panel6 ========
+            //======== titlePanel ========
             {
-                panel6.setMinimumSize(new Dimension(251, 90));
-                panel6.setPreferredSize(new Dimension(251, 80));
-                panel6.setLayout(new GridLayout(2, 1, 5, 0));
+                titlePanel.setMinimumSize(new Dimension(251, 90));
+                titlePanel.setPreferredSize(new Dimension(251, 80));
+                titlePanel.setLayout(new GridLayout(2, 1, 5, 0));
 
-                //---- label1 ----
-                label1.setText(bundle.getString("MainPage.label1.text"));
-                label1.setFont(label1.getFont().deriveFont(label1.getFont().getStyle() | Font.BOLD, label1.getFont().getSize() + 26f));
-                label1.setForeground(new Color(0x003366));
-                label1.setHorizontalAlignment(SwingConstants.CENTER);
-                label1.setMaximumSize(null);
-                label1.setBorder(new EmptyBorder(10, 0, 0, 0));
-                panel6.add(label1);
+                //---- mainTitle ----
+                mainTitle.setText(bundle.getString("MainPage.mainTitle.text"));
+                mainTitle.setFont(mainTitle.getFont().deriveFont(mainTitle.getFont().getStyle() | Font.BOLD, mainTitle.getFont().getSize() + 26f));
+                mainTitle.setForeground(new Color(0x003366));
+                mainTitle.setHorizontalAlignment(SwingConstants.CENTER);
+                mainTitle.setMaximumSize(null);
+                mainTitle.setBorder(new EmptyBorder(10, 0, 0, 0));
+                titlePanel.add(mainTitle);
 
-                //---- label2 ----
-                label2.setText(bundle.getString("MainPage.label2.text"));
-                label2.setFont(label2.getFont().deriveFont(label2.getFont().getSize() + 5f));
-                label2.setHorizontalAlignment(SwingConstants.CENTER);
-                label2.setMaximumSize(new Dimension(163, 12));
-                label2.setMinimumSize(new Dimension(163, 12));
-                label2.setPreferredSize(new Dimension(163, 12));
-                panel6.add(label2);
+                //---- subTitle ----
+                subTitle.setText(bundle.getString("MainPage.subTitle.text"));
+                subTitle.setFont(subTitle.getFont().deriveFont(subTitle.getFont().getSize() + 5f));
+                subTitle.setHorizontalAlignment(SwingConstants.CENTER);
+                subTitle.setMaximumSize(new Dimension(163, 12));
+                subTitle.setMinimumSize(new Dimension(163, 12));
+                subTitle.setPreferredSize(new Dimension(163, 12));
+                titlePanel.add(subTitle);
             }
-            panel3.add(panel6);
+            topPanel.add(titlePanel);
 
-            //======== panel2 ========
+            //======== searchPanel ========
             {
-                panel2.setMaximumSize(new Dimension(305, 30));
-                panel2.setPreferredSize(new Dimension(305, 30));
-                panel2.setMinimumSize(new Dimension(305, 30));
-                panel2.setLayout(new GridBagLayout());
-                ((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
-                ((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
-                ((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
-                ((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+                searchPanel.setMaximumSize(new Dimension(305, 30));
+                searchPanel.setPreferredSize(new Dimension(305, 30));
+                searchPanel.setMinimumSize(new Dimension(305, 30));
+                searchPanel.setLayout(new GridBagLayout());
+                ((GridBagLayout)searchPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+                ((GridBagLayout)searchPanel.getLayout()).rowHeights = new int[] {0, 0};
+                ((GridBagLayout)searchPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+                ((GridBagLayout)searchPanel.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
 
-                //---- label8 ----
-                label8.setText(bundle.getString("MainPage.label8.text"));
-                label8.setFont(label8.getFont().deriveFont(label8.getFont().getSize() + 2f));
-                panel2.add(label8, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                //---- searchLabel ----
+                searchLabel.setText(bundle.getString("MainPage.searchLabel.text"));
+                searchLabel.setFont(searchLabel.getFont().deriveFont(searchLabel.getFont().getSize() + 2f));
+                searchPanel.add(searchLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                     new Insets(0, 0, 0, 5), 0, 0));
 
-                //---- textField1 ----
-                textField1.setPreferredSize(new Dimension(160, 23));
-                textField1.setMaximumSize(new Dimension(160, 23));
-                textField1.setMinimumSize(new Dimension(160, 23));
-                panel2.add(textField1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+                //---- searchKeywordField ----
+                searchKeywordField.setPreferredSize(new Dimension(160, 23));
+                searchKeywordField.setMaximumSize(new Dimension(160, 23));
+                searchKeywordField.setMinimumSize(new Dimension(160, 23));
+                searchPanel.add(searchKeywordField, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                     new Insets(0, 5, 0, 5), 0, 0));
 
-                //---- button1 ----
-                button1.setText(bundle.getString("MainPage.button1.text"));
-                button1.setBackground(new Color(0x204688));
-                button1.setForeground(new Color(0xe0e2e8));
-                panel2.add(button1, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+                //---- searchButton ----
+                searchButton.setText(bundle.getString("MainPage.searchButton.text"));
+                searchButton.setBackground(new Color(0x204688));
+                searchButton.setForeground(new Color(0xe0e2e8));
+                searchPanel.add(searchButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                     new Insets(0, 5, 0, 0), 0, 0));
             }
-            panel3.add(panel2);
+            topPanel.add(searchPanel);
         }
-        contentPane.add(panel3, BorderLayout.PAGE_START);
-        contentPane.add(separator2, BorderLayout.PAGE_END);
+        contentPane.add(topPanel, BorderLayout.NORTH);
 
-        //======== splitPane1 ========
+        //======== mainPageSplitPane ========
         {
 
-            //======== panel1 ========
+            //======== filterPanel ========
             {
-                panel1.setAlignmentX(-0.6949153F);
-                panel1.setBorder(new EmptyBorder(10, 10, 0, 10));
-                panel1.setPreferredSize(null);
-                panel1.setFont(panel1.getFont().deriveFont(panel1.getFont().getSize() + 2f));
-                panel1.setLayout(new GridBagLayout());
-                ((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0};
-                ((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                ((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-                ((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+                filterPanel.setAlignmentX(-0.6949153F);
+                filterPanel.setBorder(new EmptyBorder(10, 10, 0, 10));
+                filterPanel.setPreferredSize(null);
+                filterPanel.setFont(filterPanel.getFont().deriveFont(filterPanel.getFont().getSize() + 2f));
+                filterPanel.setLayout(new GridBagLayout());
+                ((GridBagLayout)filterPanel.getLayout()).columnWidths = new int[] {0, 0};
+                ((GridBagLayout)filterPanel.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                ((GridBagLayout)filterPanel.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+                ((GridBagLayout)filterPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
-                //---- label3 ----
-                label3.setText(bundle.getString("MainPage.label3.text"));
-                label3.setHorizontalTextPosition(SwingConstants.LEFT);
-                label3.setHorizontalAlignment(SwingConstants.TRAILING);
-                label3.setPreferredSize(null);
-                panel1.add(label3, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+                //---- filterLabel1 ----
+                filterLabel1.setText(bundle.getString("MainPage.filterLabel1.text"));
+                filterLabel1.setHorizontalTextPosition(SwingConstants.LEFT);
+                filterLabel1.setHorizontalAlignment(SwingConstants.TRAILING);
+                filterLabel1.setPreferredSize(null);
+                filterPanel.add(filterLabel1, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(0, 0, 5, 0), 0, 0));
-                panel1.add(comboBox1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+                filterPanel.add(filterBox1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
 
-                //---- label4 ----
-                label4.setText(bundle.getString("MainPage.label4.text"));
-                panel1.add(label4, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
+                //---- filterLabel2 ----
+                filterLabel2.setText(bundle.getString("MainPage.filterLabel2.text"));
+                filterPanel.add(filterLabel2, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
-                panel1.add(comboBox2, new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
+                filterPanel.add(filterBox2, new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
 
-                //---- label5 ----
-                label5.setText(bundle.getString("MainPage.label5.text"));
-                panel1.add(label5, new GridBagConstraints(0, 4, 1, 1, 1.0, 0.0,
+                //---- filterLabel3 ----
+                filterLabel3.setText(bundle.getString("MainPage.filterLabel3.text"));
+                filterPanel.add(filterLabel3, new GridBagConstraints(0, 4, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
-                panel1.add(comboBox3, new GridBagConstraints(0, 5, 1, 1, 1.0, 0.0,
+                filterPanel.add(filterBox3, new GridBagConstraints(0, 5, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
 
-                //---- label6 ----
-                label6.setText(bundle.getString("MainPage.label6.text"));
-                panel1.add(label6, new GridBagConstraints(0, 6, 1, 1, 1.0, 0.0,
+                //---- filterLabel4 ----
+                filterLabel4.setText(bundle.getString("MainPage.filterLabel4.text"));
+                filterPanel.add(filterLabel4, new GridBagConstraints(0, 6, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
-                panel1.add(comboBox4, new GridBagConstraints(0, 7, 1, 1, 1.0, 0.0,
+                filterPanel.add(filterBox4, new GridBagConstraints(0, 7, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
 
-                //---- label7 ----
-                label7.setText(bundle.getString("MainPage.label7.text"));
-                panel1.add(label7, new GridBagConstraints(0, 8, 1, 1, 1.0, 0.0,
+                //---- filterLabel5 ----
+                filterLabel5.setText(bundle.getString("MainPage.filterLabel5.text"));
+                filterPanel.add(filterLabel5, new GridBagConstraints(0, 8, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
-                panel1.add(comboBox5, new GridBagConstraints(0, 9, 1, 1, 1.0, 0.0,
+                filterPanel.add(filterBox5, new GridBagConstraints(0, 9, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
             }
-            splitPane1.setLeftComponent(panel1);
+            mainPageSplitPane.setLeftComponent(filterPanel);
 
-            //======== panel9 ========
+            //======== productPanel ========
             {
-                panel9.setMaximumSize(new Dimension(300, 32767));
-                panel9.setLayout(new FlowLayout(FlowLayout.LEADING));
+                productPanel.setMaximumSize(new Dimension(300, 32767));
+                productPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
 
-                //======== productCardPanel14 ========
+                //======== productCardPanel1 ========
                 {
-                    productCardPanel14.setBorder(new LineBorder(new Color(0x002c7b), 2, true));
-                    productCardPanel14.setPreferredSize(new Dimension(260, 280));
-                    productCardPanel14.setMaximumSize(new Dimension(230, 240));
-                    productCardPanel14.setMinimumSize(new Dimension(230, 240));
-                    productCardPanel14.setLayout(new GridBagLayout());
-                    ((GridBagLayout)productCardPanel14.getLayout()).columnWidths = new int[] {0, 0};
-                    ((GridBagLayout)productCardPanel14.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
-                    ((GridBagLayout)productCardPanel14.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-                    ((GridBagLayout)productCardPanel14.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+                    productCardPanel1.setBorder(new LineBorder(new Color(0x002c7b), 2, true));
+                    productCardPanel1.setPreferredSize(new Dimension(260, 280));
+                    productCardPanel1.setMaximumSize(new Dimension(230, 240));
+                    productCardPanel1.setMinimumSize(new Dimension(230, 240));
+                    productCardPanel1.setLayout(new GridBagLayout());
+                    ((GridBagLayout)productCardPanel1.getLayout()).columnWidths = new int[] {0, 0};
+                    ((GridBagLayout)productCardPanel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
+                    ((GridBagLayout)productCardPanel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+                    ((GridBagLayout)productCardPanel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
 
-                    //---- label48 ----
-                    label48.setText(bundle.getString("MainPage.label48.text"));
-                    label48.setIcon(new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg"));
-                    label48.setPreferredSize(new Dimension(216, 120));
-                    label48.setAlignmentY(0.0F);
-                    label48.setMaximumSize(new Dimension(216, 120));
-                    label48.setMinimumSize(new Dimension(216, 120));
-                    productCardPanel14.add(label48, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0,
+                    //---- productImage1 ----
+                    productImage1.setIcon(new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg"));
+                    productImage1.setPreferredSize(new Dimension(216, 120));
+                    productImage1.setAlignmentY(0.0F);
+                    productImage1.setMaximumSize(new Dimension(216, 120));
+                    productImage1.setMinimumSize(new Dimension(216, 120));
+                    productCardPanel1.add(productImage1, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0,
                         GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                         new Insets(0, 0, 0, 0), 0, 0));
 
-                    //---- label49 ----
-                    label49.setText(bundle.getString("MainPage.label49.text"));
-                    label49.setFont(label49.getFont().deriveFont(label49.getFont().getSize() + 4f));
-                    label49.setHorizontalAlignment(SwingConstants.CENTER);
-                    label49.setBorder(new MatteBorder(3, 0, 3, 0, Color.black));
-                    label49.setPreferredSize(new Dimension(220, 30));
-                    productCardPanel14.add(label49, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.4,
+                    //---- productName1 ----
+                    productName1.setText(bundle.getString("MainPage.productName1.text"));
+                    productName1.setFont(productName1.getFont().deriveFont(productName1.getFont().getSize() + 4f));
+                    productName1.setHorizontalAlignment(SwingConstants.CENTER);
+                    productName1.setBorder(new MatteBorder(3, 0, 3, 0, Color.black));
+                    productName1.setPreferredSize(new Dimension(220, 30));
+                    productCardPanel1.add(productName1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.4,
                         GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                         new Insets(1, 0, 0, 0), 0, 0));
 
-                    //======== purchasePanel14 ========
+                    //======== purchasePanel1 ========
                     {
-                        purchasePanel14.setBorder(new EmptyBorder(10, 5, 5, 5));
-                        purchasePanel14.setMaximumSize(new Dimension(190, 85));
-                        purchasePanel14.setLayout(new GridLayout(2, 2, 20, 10));
+                        purchasePanel1.setBorder(new EmptyBorder(10, 5, 5, 5));
+                        purchasePanel1.setMaximumSize(new Dimension(190, 85));
+                        purchasePanel1.setLayout(new GridLayout(2, 2, 20, 10));
 
-                        //---- label50 ----
-                        label50.setText(bundle.getString("MainPage.label50.text"));
-                        label50.setFont(label50.getFont().deriveFont(label50.getFont().getSize() + 7f));
-                        label50.setPreferredSize(new Dimension(80, 25));
-                        purchasePanel14.add(label50);
+                        //---- productPrice1 ----
+                        productPrice1.setText(bundle.getString("MainPage.productPrice1.text"));
+                        productPrice1.setFont(productPrice1.getFont().deriveFont(productPrice1.getFont().getSize() + 7f));
+                        productPrice1.setPreferredSize(new Dimension(80, 25));
+                        purchasePanel1.add(productPrice1);
 
-                        //---- spinner14 ----
-                        spinner14.setModel(new SpinnerNumberModel(1, 1, null, 1));
-                        spinner14.setPreferredSize(new Dimension(50, 23));
-                        spinner14.setFont(spinner14.getFont().deriveFont(spinner14.getFont().getSize() + 4f));
-                        purchasePanel14.add(spinner14);
+                        //---- productNumber1 ----
+                        productNumber1.setModel(new SpinnerNumberModel(1, 1, null, 1));
+                        productNumber1.setPreferredSize(new Dimension(50, 23));
+                        productNumber1.setFont(productNumber1.getFont().deriveFont(productNumber1.getFont().getSize() + 4f));
+                        purchasePanel1.add(productNumber1);
 
-                        //---- button28 ----
-                        button28.setText(bundle.getString("MainPage.button28.text"));
-                        button28.setBackground(new Color(0x55a15a));
-                        button28.setForeground(new Color(0xe0e2e8));
-                        button28.setPreferredSize(new Dimension(70, 30));
-                        purchasePanel14.add(button28);
+                        //---- addButton1 ----
+                        addButton1.setText(bundle.getString("MainPage.addButton1.text"));
+                        addButton1.setBackground(new Color(0x55a15a));
+                        addButton1.setForeground(new Color(0xe0e2e8));
+                        addButton1.setPreferredSize(new Dimension(70, 30));
+                        purchasePanel1.add(addButton1);
 
-                        //---- button29 ----
-                        button29.setText(bundle.getString("MainPage.button29.text"));
-                        button29.setBackground(new Color(0x3da2e7));
-                        button29.setForeground(new Color(0xe0e2e8));
-                        button29.setPreferredSize(new Dimension(70, 30));
-                        purchasePanel14.add(button29);
+                        //---- moreButton1 ----
+                        moreButton1.setText(bundle.getString("MainPage.moreButton1.text"));
+                        moreButton1.setBackground(new Color(0x3da2e7));
+                        moreButton1.setForeground(new Color(0xe0e2e8));
+                        moreButton1.setPreferredSize(new Dimension(70, 30));
+                        purchasePanel1.add(moreButton1);
                     }
-                    productCardPanel14.add(purchasePanel14, new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0,
+                    productCardPanel1.add(purchasePanel1, new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0,
                         GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                         new Insets(0, 10, 0, 10), 0, 0));
                 }
-                panel9.add(productCardPanel14);
+                productPanel.add(productCardPanel1);
             }
-            splitPane1.setRightComponent(panel9);
+            mainPageSplitPane.setRightComponent(productPanel);
         }
-        contentPane.add(splitPane1, BorderLayout.CENTER);
+        contentPane.add(mainPageSplitPane, BorderLayout.CENTER);
+        contentPane.add(bottomSeparator, BorderLayout.SOUTH);
         pack();
         setLocationRelativeTo(null);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
-    private JPanel panel3;
-    private JPanel panel4;
+    private JPanel topPanel;
+    private JPanel accountPanel;
     private JButton button_account;
     private JButton button_cart;
-    private JComponent separator1;
-    private JPanel panel6;
-    private JLabel label1;
-    private JLabel label2;
-    private JPanel panel2;
-    private JLabel label8;
-    private JTextField textField1;
-    private JButton button1;
-    private JComponent separator2;
-    private JSplitPane splitPane1;
-    private JPanel panel1;
-    private JLabel label3;
-    private JComboBox comboBox1;
-    private JLabel label4;
-    private JComboBox comboBox2;
-    private JLabel label5;
-    private JComboBox comboBox3;
-    private JLabel label6;
-    private JComboBox comboBox4;
-    private JLabel label7;
-    private JComboBox comboBox5;
-    private JPanel panel9;
-    private JPanel productCardPanel14;
-    private JLabel label48;
-    private JLabel label49;
-    private JPanel purchasePanel14;
-    private JLabel label50;
-    private JSpinner spinner14;
-    private JButton button28;
-    private JButton button29;
+    private JComponent separatorForAccount;
+    private JPanel titlePanel;
+    private JLabel mainTitle;
+    private JLabel subTitle;
+    private JPanel searchPanel;
+    private JLabel searchLabel;
+    private JTextField searchKeywordField;
+    private JButton searchButton;
+    private JSplitPane mainPageSplitPane;
+    private JPanel filterPanel;
+    private JLabel filterLabel1;
+    private JComboBox filterBox1;
+    private JLabel filterLabel2;
+    private JComboBox filterBox2;
+    private JLabel filterLabel3;
+    private JComboBox filterBox3;
+    private JLabel filterLabel4;
+    private JComboBox filterBox4;
+    private JLabel filterLabel5;
+    private JComboBox filterBox5;
+    private JPanel productPanel;
+    private JPanel productCardPanel1;
+    private JLabel productImage1;
+    private JLabel productName1;
+    private JPanel purchasePanel1;
+    private JLabel productPrice1;
+    private JSpinner productNumber1;
+    private JButton addButton1;
+    private JButton moreButton1;
+    private JComponent bottomSeparator;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
     private void customizeComponents() {
