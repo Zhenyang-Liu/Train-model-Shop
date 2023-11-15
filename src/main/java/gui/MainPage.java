@@ -84,7 +84,8 @@ public class MainPage extends JFrame {
         label1.setBounds(275, 35, 260, 45);
 
         //---- button3 ----
-        button3.setIcon(new FlatSVGIcon(new File("D:\\TrainShop\\src\\main\\images\\person_black_24dp.svg")));
+        String button3IconPath = (new File("src\\main\\images\\person_black_24dp.svg")).getAbsolutePath();
+        button3.setIcon(new FlatSVGIcon(new File(button3IconPath)));
         button3.setBackground(new Color(0xf2f2f2));
         contentPane.add(button3);
         button3.setBounds(5, 0, 30, 30);
@@ -93,7 +94,8 @@ public class MainPage extends JFrame {
 
         //---- button4 ----
         button4.setSelectedIcon(null);
-        button4.setIcon(new FlatSVGIcon(new File("D:\\TrainShop\\src\\main\\images\\shopping_cart_black_24dp.svg")));
+        String button4IconPath = (new File("src\\main\\images\\shopping_cart_black_24dp.svg")).getAbsolutePath();
+        button4.setIcon(new FlatSVGIcon(new File(button4IconPath)));
         button4.setBackground(new Color(0xf2f2f2));
         contentPane.add(button4);
         button4.setBounds(760, 0, 35, 30);
@@ -195,7 +197,7 @@ public class MainPage extends JFrame {
 
             //---- label15 ----
             label15.setText(bundle.getString("MainPage.label15.text"));
-            label15.setIcon(new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg"));
+            label15.setIcon(new ImageIcon((new File("src\\main\\images\\tgv.jpeg")).getAbsolutePath()));
             panel8.add(label15);
             label15.setBounds(3, 3, 184, 101);
 
@@ -259,7 +261,7 @@ public class MainPage extends JFrame {
 
             //---- label18 ----
             label18.setText(bundle.getString("MainPage.label18.text"));
-            label18.setIcon(new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg"));
+            label18.setIcon(new ImageIcon((new File("src\\main\\images\\tgv.jpeg")).getAbsolutePath()));
             panel9.add(label18);
             label18.setBounds(3, 3, 184, 101);
 
@@ -323,7 +325,7 @@ public class MainPage extends JFrame {
 
             //---- label19 ----
             label19.setText(bundle.getString("MainPage.label19.text"));
-            label19.setIcon(new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg"));
+            label19.setIcon(new ImageIcon((new File("src\\main\\images\\tgv.jpeg")).getAbsolutePath()));
             panel10.add(label19);
             label19.setBounds(3, 3, 184, 101);
 
@@ -411,7 +413,8 @@ public class MainPage extends JFrame {
 
     private void customizeComponents() {
         // Add custom component setting code here
-        ImageIcon originalIcon = new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg");
+        String originalIconPath = new File("src\\main\\images\\tgv.jpeg").getAbsolutePath();
+        ImageIcon originalIcon = new ImageIcon(originalIconPath);
         Image originalImage = originalIcon.getImage();
         Image resizedImage = originalImage.getScaledInstance(label15.getWidth(), label15.getHeight(), Image.SCALE_SMOOTH);
         label15.setIcon(new ImageIcon(resizedImage));
