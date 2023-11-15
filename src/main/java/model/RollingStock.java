@@ -45,6 +45,7 @@ public class RollingStock extends Product {
         this.setGauge(gauge);
         this.setRollingStockType(type);
         this.setEra(era);
+        this.setProductID(product.getProductID());
     }
     
     public String getRollingStockType() {

@@ -1,4 +1,4 @@
-.gradle
+.gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
@@ -29,7 +29,7 @@ bin/
 !**/src/test/**/bin/
 
 ### Gradle ###
-.gradle
+.gradle/
 
 ### NetBeans ###
 /nbproject/private/

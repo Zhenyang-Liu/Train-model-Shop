@@ -30,6 +30,8 @@ public class ProductDAO {
             if (productCodeExist(product.getProductCode())) {
                 System.out.println("Check the product code since this code is duplicated in the database");
                 return -1;
+            } else {
+                System.out.println("Successful pass the productCodeExist");
             }
             
             // Set the parameters for the product
@@ -136,8 +138,7 @@ public class ProductDAO {
 
             while (resultSet.next()) {
                 product.setProductID(resultSet.getInt("ProductID"));
-                BrandDAO brandDAO = new BrandDAO();
-                Brand brand = brandDAO.findBrand(resultSet.getInt("BrandID"));
+                Brand brand = BrandDAO.findBrand(resultSet.getInt("BrandID"));
                 product.setBrand(brand);
                 product.setProductName(resultSet.getString("ProductName"));
                 product.setProductCode(resultSet.getString("ProductCode"));
@@ -146,10 +147,10 @@ public class ProductDAO {
                 product.setStockQuantity(resultSet.getInt("StockQuantity"));
             }
 
-            //Print for test
-            System.out.println("<=================== GET SPECIFIC PRODUCTS By ID====================>");
-            System.out.println(product.toString());
-            System.out.println("<======================================================>");
+            // //Print for test
+            // System.out.println("<=================== GET SPECIFIC PRODUCTS By ID====================>");
+            // System.out.println(product.toString());
+            // System.out.println("<======================================================>");
 
             return product;
             
@@ -167,7 +168,7 @@ public class ProductDAO {
      * @return The selected Product object in database.
      * @throws SQLException If there is a problem executing the select.
      */
-    public Product findProductByCode(String productCode) throws SQLException {
+    public static Product findProductByCode(String productCode) throws SQLException {
         String selectSQL = "SELECT * FROM Product WHERE ProductCode = ?;";
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -178,8 +179,7 @@ public class ProductDAO {
 
             while (resultSet.next()) {
                 product.setProductID(resultSet.getInt("ProductID"));
-                BrandDAO brandDAO = new BrandDAO();
-                Brand brand = brandDAO.findBrand(resultSet.getInt("BrandID"));
+                Brand brand = BrandDAO.findBrand(resultSet.getInt("BrandID"));
                 product.setBrand(brand);
                 product.setProductName(resultSet.getString("ProductName"));
                 product.setProductCode(resultSet.getString("ProductCode"));
@@ -208,7 +208,7 @@ public class ProductDAO {
      * @return An ArrayList<Product> with all Product in database.
      * @throws SQLException If there is a problem executing the select.
      */
-    public ArrayList<Product> getAllProduct() throws SQLException {
+    public static ArrayList<Product> getAllProduct() throws SQLException {
         String selectSQL = "SELECT * FROM Product";
         ArrayList<Product> productList = new ArrayList<>();
 
@@ -219,8 +219,7 @@ public class ProductDAO {
             while (resultSet.next()) {
                 Product product = new Product();
                 product.setProductID(resultSet.getInt("ProductID"));
-                BrandDAO brandDAO = new BrandDAO();
-                Brand brand = brandDAO.findBrand(resultSet.getInt("BrandID"));
+                Brand brand = BrandDAO.findBrand(resultSet.getInt("BrandID"));
                 product.setBrand(brand);
                 product.setProductName(resultSet.getString("ProductName"));
                 product.setProductCode(resultSet.getString("ProductCode"));
@@ -254,7 +253,7 @@ public class ProductDAO {
      * @throws SQLException If a database error occurs.
      */
     public static int findIDByName(String productName) throws SQLException {
-        String selectSQL = "SELECT ProductID FROM Product WHERE productName = ?";
+        String selectSQL = "SELECT ProductID FROM Product WHERE ProductName = ?";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {

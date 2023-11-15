@@ -81,6 +81,7 @@ public class Locomotive extends Product {
         this.setGauge(gauge);
         this.setDCCType(dccType);
         this.setEra(era);
+        this.setProductID(product.getProductID());
     }
     
 

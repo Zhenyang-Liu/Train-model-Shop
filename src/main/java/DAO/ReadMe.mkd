@@ -38,6 +38,8 @@ This is a folder with Data Access Object (DAO) java files, contributing directly
 - `findLocomotivesByEra(int[] eraList)`: Find locomotives based on era.
 - `findLocomotivesByGauge(Gauge gauge)`: Find locomotives based on gauge.
 - `findLocomotivesByDCCType(DCCType dccType)`: Find locomotives based on DCC type.
+- `findAllLocomotives()`: Find all Locomotives.
+
 
 ### RollingStockDAO.java (Extends ProductDAO) (Finished)
 
@@ -54,12 +56,29 @@ This is a folder with Data Access Object (DAO) java files, contributing directly
 - `insertTrack(Track track)`: Add new tracks to the database.
 - `updateTrack(Track track)`: Update existing track information.
 - `deleteTrack(int ProductID)`: Delete a track based on its ID.
+- `findTrackByID(int productID)`: Find track based on its ID.
 - `findTracksByGauge(Gauge gauge)`: Find tracks based on gauge.
 - `findTrackByType(TrackType type)`: Find tracks based on type.
+- `findAllTracks()`: Find all tracks.
 
-### BoxedSetDAO.java (Extends ProductDAO) (Unfinished)
+### BoxedSetDAO.java (Extends ProductDAO) (Finished)
+- `insertBoxedSet(BoxedSet set)`: Add a new BoxedSet to the database.
+- `insertBoxedSetItems(BoxedSet boxedSet)`: Add a BoxedSet's contains to the database.
+- `updateBoxedSetItems(BoxedSet boxedSet)`: Update existing boxset information.
+- `deleteBoxedSet(int productId)`: Delete a boxset based on its ID.
+- `deleteItem(int productId)`: Delete a boxset's contains based.
+- `findBoxedSetByID(int setID)`: Find boxedset based on its ID.
+- `findBoxedSetItem(int setID)`: Find boxedset's contains.
+- `findBoxedSetByType(BoxedType type)`: Find boxedset based on its type.
+- `findAllBoxedSet()`: Find all boxedsets.
 
-### ControllerDAO.java (Extends ProductDAO) (Unfinished)
+### ControllerDAO.java (Extends ProductDAO) (Finished)
+- `insertController(Controller controller)`: Add new controller to the database.
+- `updateController(Controller controller)`: Update existing controller information.
+- `deleteController(int productId)`: Delete a controller based on its ID.
+- `findControllerByID(int productID)`: Find controller based on its ID.
+- `findControllersByType(boolean isDigital)`: Find controllers based on whether it is digital.
+- `findAllControllers()`: Find all controllers.
 
 ### OrderDAO.java (Unfinished)
 

@@ -21,7 +21,7 @@ public class LocomotiveDAO extends ProductDAO {
      * @param locomotive The locomotive object to be inserted.
      * @throws SQLException If a database error occurs.
      */
-    public void insertLocomotive(Locomotive locomotive) throws SQLException {
+    public static void insertLocomotive(Locomotive locomotive) throws SQLException {
         int productID = insertProduct(locomotive);
         String insertSQL = "INSERT INTO Locomotive (productID, Gauge, DCCType) VALUES (?, ?, ?);";
         
@@ -55,7 +55,7 @@ public class LocomotiveDAO extends ProductDAO {
      * @param locomotive The locomotive object with updated information.
      * @throws SQLException If a database error occurs.
      */
-    public void updateLocomotive(Locomotive locomotive) throws SQLException{
+    public static void updateLocomotive(Locomotive locomotive) throws SQLException{
         ProductDAO.updateProduct(locomotive);
         String updateSQL = "UPDATE Locomotive SET Gauge = ?, DCCType = ? WHERE productID = ?;";
         
@@ -82,7 +82,7 @@ public class LocomotiveDAO extends ProductDAO {
      * @param productId The ID of the locomotive product to be deleted.
      * @throws SQLException If a database error occurs.
      */
-    public void deleteLocomotive(int productId) throws SQLException{
+    public static void deleteLocomotive(int productId) throws SQLException{
         String deleteSQL = "DELETE FROM Locomotive WHERE ProductID = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -114,8 +114,8 @@ public class LocomotiveDAO extends ProductDAO {
      * @return A Locomotive object representing the retrieved locomotive record | null if can't find.
      * @throws SQLException If a database error occurs.
      */
-    public Locomotive findLocomotiveByID(int productID) throws SQLException {
-        String selectSQL = "SELECT * FROM Locomotive WHERE productID = ?";
+    public static Locomotive findLocomotiveByID(int productID) throws SQLException {
+        String selectSQL = "SELECT * FROM Locomotive WHERE ProductID = ?;";
         Locomotive locomotive = new Locomotive();
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -146,8 +146,8 @@ public class LocomotiveDAO extends ProductDAO {
      * @return An ArrayList of Locomotive objects that match the specified gauge | null if can't find.
      * @throws SQLException If a database error occurs.
      */
-    public ArrayList<Locomotive> findLocomotivesByGauge(Gauge gauge) throws SQLException{
-        String selectSQL = "SELECT * FROM Locomotive WHERE Gauge = ?";
+    public static ArrayList<Locomotive> findLocomotivesByGauge(Gauge gauge) throws SQLException{
+        String selectSQL = "SELECT * FROM Locomotive WHERE Gauge = ?;";
         ArrayList<Locomotive> locomotives = new ArrayList<Locomotive>();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -180,14 +180,14 @@ public class LocomotiveDAO extends ProductDAO {
      * @return An ArrayList of Locomotive objects that match the specified era(s) | null if can't find.
      * @throws SQLException If a database error occurs.
      */
-    public ArrayList<Locomotive> findLocomotivesByEra(int[] eraList) throws SQLException {
+    public static ArrayList<Locomotive> findLocomotivesByEra(int[] eraList) throws SQLException {
         ArrayList<Locomotive> locomotives = new ArrayList<Locomotive>();
     
         try (Connection connection = DatabaseConnectionHandler.getConnection()) {
             int[] productIDs = EraDAO.findIDByEra(eraList);
     
             String selectSQL = "SELECT * FROM Locomotive WHERE ProductID IN (" +
-                               String.join(",", Collections.nCopies(productIDs.length, "?")) + ")";
+                               String.join(",", Collections.nCopies(productIDs.length, "?")) + ");";
     
             try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
                 for (int i = 0; i < productIDs.length; i++) {
@@ -222,14 +222,46 @@ public class LocomotiveDAO extends ProductDAO {
      * @return An ArrayList of Locomotive objects that match the specified DCC type | null if can't find.
      * @throws SQLException If a database error occurs.
      */
-    public ArrayList<Locomotive> findLocomotivesByDCCType(DCCType dccType) throws SQLException{
-        String selectSQL = "SELECT * FROM Locomotive WHERE DCCType = ?";
+    public static ArrayList<Locomotive> findLocomotivesByDCCType(DCCType dccType) throws SQLException{
+        String selectSQL = "SELECT * FROM Locomotive WHERE DCCType = ?;";
         ArrayList<Locomotive> locomotives = new ArrayList<Locomotive>();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
 
             preparedStatement.setString(1, dccType.getName());
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int productId = resultSet.getInt("ProductID");
+                Product newProduct = ProductDAO.findProductByID(productId);
+                String newGauge = resultSet.getString("Gauge");
+                String newDCCType = resultSet.getString("DCCType");
+                int[] newEra = EraDAO.findEraByID(productId);
+
+                Locomotive locomotive = new Locomotive(newProduct, newGauge, newDCCType, newEra);
+                locomotives.add(locomotive);
+            }
+            return locomotives;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    /**
+     * Retrieves a list of all locomotives from the database.
+     *
+     * @return An ArrayList of all Locomotive objects in the database | null if can't find.
+     * @throws SQLException If a database error occurs.
+     */
+    public static ArrayList<Locomotive> findAllLocomotives() throws SQLException{
+        String selectSQL = "SELECT * FROM Locomotive;";
+        ArrayList<Locomotive> locomotives = new ArrayList<Locomotive>();
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {

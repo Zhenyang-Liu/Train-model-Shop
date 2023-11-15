@@ -62,6 +62,7 @@ public class Track extends Product {
         super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity());
         this.setGauge(gauge);
         this.setTrackType(trackType);
+        this.setProductID(product.getProductID());
     }
 
     // Getters and setters

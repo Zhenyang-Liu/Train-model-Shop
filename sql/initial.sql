@@ -105,7 +105,7 @@ CREATE TABLE Track (
 
 CREATE TABLE Controller (
     ProductID INT,
-    DigitalType BOOLEAN,
+    DigitalType TINYINT(1),
     FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
