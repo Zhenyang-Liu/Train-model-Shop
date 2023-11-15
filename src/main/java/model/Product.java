@@ -1,5 +1,8 @@
 package model;
 
+import java.io.File;
+import java.net.MalformedURLException;
+
 public class Product {
     private int productID;
     private Brand brand; // Association to Brand
@@ -8,6 +11,7 @@ public class Product {
     private double retailPrice;
     private String description;
     private int stockQuantity;
+    private String imagePath;
 
     // No-argument constructor
     public Product() {
@@ -174,6 +178,25 @@ public class Product {
         this.stockQuantity = stockQuantity;
     }
 
+    /**
+     * Get the image path.
+     *
+     * @return Returns the image path of the current object.
+     */
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    /**
+     * Set the image path.
+     *
+     * @param imagePath The new image path to be set.
+     */
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+
     // Other Function List
     
     /**
@@ -223,6 +246,26 @@ public class Product {
         }
     }
 
+    /**
+     * Get the URL of the product image.
+     *
+     * @return Returns the URL of the product image if the image path is valid; otherwise, returns null.
+     */
+    public String getProductImage() {
+        /**
+        if (imagePath != null && !imagePath.isEmpty()) {
+            try {
+                return new File(imagePath).toURI().toURL();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                // Handle the exception (e.g., return a default image URL or null)
+            }
+        }
+         */
+        return "D:\\TrainShop\\src\\main\\images\\tgv.jpeg";  // or return a URL for a default image
+    }
+
+
     // Private validation methods for product code
 
     /**
@@ -252,5 +295,6 @@ public class Product {
     public String toString() {
         return "ID: " + this.productID + "; Brand: " + this.getBrand().getBrandName() + "; ProductName: " + this.getProductName();
     }
-    
+
+
 }

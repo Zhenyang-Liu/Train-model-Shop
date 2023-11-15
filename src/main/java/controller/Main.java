@@ -9,8 +9,10 @@ public class Main {
 
         // Create Main Page Object
         MainPage mainPage = new MainPage();
-        
+
         mainPage.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainPage.setVisible(true);
+
+
     }
 }

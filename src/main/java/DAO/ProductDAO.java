@@ -230,13 +230,14 @@ public class ProductDAO {
                 productList.add(product);
             }
 
-            // Print for test
-            // System.out.println("<=================== GET ALL PRODUCTS ====================>");
-            // for (Product obj : productList) {
-            //     System.out.println(obj.toString());
-            // }
-            // System.out.println("<======================================================>");
-
+            /**
+             Print for test
+             System.out.println("<=================== GET ALL PRODUCTS ====================>");
+             for (Product obj : productList) {
+                 System.out.println(obj.toString());
+             }
+             System.out.println("<======================================================>");
+             */
             return productList;
             
         } catch (SQLException e) {
