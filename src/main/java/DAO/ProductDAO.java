@@ -27,7 +27,7 @@ public class ProductDAO {
         try (Connection connection = DatabaseConnectionHandler.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
             // wait for change
-            if (!productCodeExist(product.getProductCode())) {
+            if (productCodeExist(product.getProductCode())) {
                 System.out.println("Check the product code since this code is duplicated in the database");
                 return -1;
             }
@@ -146,10 +146,10 @@ public class ProductDAO {
                 product.setStockQuantity(resultSet.getInt("StockQuantity"));
             }
 
-            // Print for test
-            // System.out.println("<=================== GET SPECIFIC PRODUCTS By ID====================>");
-            // System.out.println(product.toString());
-            // System.out.println("<======================================================>");
+            //Print for test
+            System.out.println("<=================== GET SPECIFIC PRODUCTS By ID====================>");
+            System.out.println(product.toString());
+            System.out.println("<======================================================>");
 
             return product;
             
@@ -230,14 +230,14 @@ public class ProductDAO {
                 productList.add(product);
             }
 
-            /**
-             Print for test
+            
+             //Print for test
              System.out.println("<=================== GET ALL PRODUCTS ====================>");
              for (Product obj : productList) {
                  System.out.println(obj.toString());
              }
              System.out.println("<======================================================>");
-             */
+             
             return productList;
             
         } catch (SQLException e) {
