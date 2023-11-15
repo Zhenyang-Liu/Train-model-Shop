@@ -18,7 +18,7 @@ public class ProductDAO {
      * @return The productID of this product in database
      * @throws SQLException If there is a problem executing the insert.
      */  
-    public int insertProduct(Product product) throws SQLException {
+    public static int insertProduct(Product product) throws SQLException {
         int productId = 0;
         String insertSQL = "INSERT INTO Product (BrandID, ProductName, ProductCode, "
                 + "RetailPrice, Description, StockQuantity) "
