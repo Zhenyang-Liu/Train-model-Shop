@@ -27,10 +27,10 @@ public class ProductDAO {
         try (Connection connection = DatabaseConnectionHandler.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
             // wait for change
-            if (productCodeExist(product.getProductCode())) {
-                System.out.println("Check the product code since this code is duplicated in the database");
-                return -1;
-            }
+//            if (productCodeExist(product.getProductCode())) {
+//                System.out.println("Check the product code since this code is duplicated in the database");
+//                return -1;
+//            }
             
             // Set the parameters for the product
             preparedStatement.setInt(1, product.getBrand().getBrandID());

@@ -76,8 +76,8 @@ public class Test {
             op.deleteLocomotive(productID1);
             op.deleteLocomotive(productID2);*/
 
-            // Test LocomotiveDAO 
-            RollingStockDAO op = new RollingStockDAO();  
+            // Test LocomotiveDAO
+            RollingStockDAO op = new RollingStockDAO();
 
             Product product1 = new Product(brand, "Test RollingStock Insert1", "S344", 89.8, "A simple test case", 5);
             Product product2 = new Product(brand, "Test RollingStock Insert2", "S686", 114.5, "A simple test case", 6);
@@ -94,7 +94,7 @@ public class Test {
             ro1 = new RollingStock(product1,"Carriage", "OO", era3);
             ro1.setProductID(productID1);
             op.updateRollingStock(ro1);
-            
+
             System.out.println("Test findRollingStockByID Should be 2");
             System.out.println(op.findRollingStockByID(productID2).getProductName());
             System.out.println("Test indRollingStocksByType Should be 2");
@@ -108,9 +108,9 @@ public class Test {
             System.out.println("Test findRollingStocksByGauge Should be 2");
             System.out.println(op.findRollingStocksByGauge(Gauge.TT).get(0).getProductName());
 
-            
-            op.deleteRollingStock(productID1);
-            op.deleteRollingStock(productID2);
+
+//            op.deleteRollingStock(productID1);
+//            op.deleteRollingStock(productID2);
 
         } catch (SQLException e) {
             e.printStackTrace();

@@ -26,7 +26,7 @@ public class MainPage extends JFrame {
     private ProductDAO productDAO;
 
     public MainPage() {
-        productDAO = new ProductDAO();  // 实例化 ProductDAO
+        productDAO = new ProductDAO();  // Instantiating ProductDAO
         initComponents();
         loadProducts();
         customizeComponents();
@@ -43,7 +43,7 @@ public class MainPage extends JFrame {
                 LoginPage loginPage = new LoginPage();
                 loginPage.setVisible(true);
             } else {
-                // 用户已登录的情况
+                // User logged in
             }
         });
     }
@@ -89,6 +89,7 @@ public class MainPage extends JFrame {
 
         //======== this ========
         setPreferredSize(new Dimension(1080, 720));
+        setFont(new Font("Arial", Font.PLAIN, 12));
         var contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
 
@@ -390,87 +391,115 @@ public class MainPage extends JFrame {
         new SwingWorker<ArrayList<Product>, Void>() {
             @Override
             protected ArrayList<Product> doInBackground() throws Exception {
-                return productDAO.getAllProduct();  // 后台线程中从数据库获取产品
+                // Get products from the database in the background thread
+                return productDAO.getAllProduct();
             }
 
             @Override
             protected void done() {
                 try {
-                    ArrayList<Product> productList = get();  // 获取 doInBackground 的结果
-                    // 使用产品列表更新 GUI
+                    // Get the result of doInBackground
+                    ArrayList<Product> productList = get();
+                    // Updating the GUI with a Product List
                     for (Product product : productList) {
-                        JPanel productCard = createProductCard(product); // 为每个产品创建卡片
-                        productPanel.add(productCard); // 将卡片添加到容器中
+                        // Create cards for each product
+                        JPanel productCard = createProductCard(product);
+                        // Add the card to the container
+                        productPanel.add(productCard);
                     }
+
+                    productPanel.revalidate();
+                    productPanel.repaint();
 
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
-                    // 处理异常
+                    // Handling exceptions
                 }
             }
         }.execute();
     }
 
     public JPanel createProductCard(Product product) {
-        // 创建卡片的外层面板
+        // Create the outer panel of the card
         JPanel productCardPanel = new JPanel(new GridBagLayout());
         productCardPanel.setBorder(new LineBorder(new Color(0x002c7b), 2, true));
         productCardPanel.setPreferredSize(new Dimension(260, 280));
-        // 你可以根据需要调整最大和最小尺寸
+        productCardPanel.setLayout(new GridBagLayout());
+        ((GridBagLayout)productCardPanel.getLayout()).columnWidths = new int[] {0, 0};
+        ((GridBagLayout)productCardPanel.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
+        ((GridBagLayout)productCardPanel.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+        ((GridBagLayout)productCardPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+
+        // adjust the maximum and minimum sizes as needed.
         productCardPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
-        // 添加产品图片
+        // Add a product image
         JLabel productImage = new JLabel();
-        productImage.setIcon(new ImageIcon(product.getProductImage())); // 假设 getProductImage 返回图片路径
-        productImage.setPreferredSize(new Dimension(216, 120));
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.BOTH;
-        productCardPanel.add(productImage, gbc);
+        //productImage.setPreferredSize(new Dimension(260, 120));
+        ImageIcon originalIcon = new ImageIcon(product.getProductImage());
+        Image originalImage = originalIcon.getImage();
+        Image resizedImage = originalImage.getScaledInstance(256, 140, Image.SCALE_SMOOTH);
+        productImage.setIcon(new ImageIcon(resizedImage));
 
-        // 添加产品名称
+        productCardPanel.add(productImage, new GridBagConstraints
+                (0, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 0, 0, 0), 0, 0));
+
+
+        // Add product name
         JLabel productName = new JLabel();
-        productName.setText(product.getProductName()); // 假设 getProductName 返回产品名称
+        productName.setText(product.getProductName());
         productName.setFont(productName.getFont().deriveFont(productName.getFont().getSize() + 4f));
         productName.setHorizontalAlignment(SwingConstants.CENTER);
         productName.setBorder(new MatteBorder(3, 0, 3, 0, Color.black));
-        productName.setPreferredSize(new Dimension(220, 30));
-        gbc.gridy = 1;
-        productCardPanel.add(productName, gbc);
+        productName.setPreferredSize(new Dimension(260, 70));
+        productCardPanel.add(productName, new GridBagConstraints
+                (0, 1, 1, 1, 0.0, 0.7,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(1, 0, 0, 0), 0, 0));
 
-        // 创建购买面板，包含价格和按钮
+        // Create a purchase panel with prices and buttons
         JPanel purchasePanel = new JPanel(new GridLayout(2, 2, 20, 10));
         purchasePanel.setBorder(new EmptyBorder(10, 5, 5, 5));
+        purchasePanel.setMaximumSize(new Dimension(190, 85));
 
-        // 添加产品价格
+        // Add product price
         JLabel productPrice = new JLabel();
         productPrice.setText(String.format("£%.2f", product.getRetailPrice()));
+        Font newFont = new Font("Airal", Font.PLAIN, 12);
+        productPrice.setFont(newFont);
         productPrice.setFont(productPrice.getFont().deriveFont(productPrice.getFont().getSize() + 7f));
+        productPrice.setPreferredSize(new Dimension(80, 25));
         purchasePanel.add(productPrice);
 
-        // 添加产品数量选择器
+        // Add a product quantity selector
         JSpinner productNumber = new JSpinner(new SpinnerNumberModel(1, 1, null, 1));
+        productNumber.setPreferredSize(new Dimension(50, 23));
         purchasePanel.add(productNumber);
 
-        // 添加添加到购物车按钮
-        JButton addButton = new JButton("Add");
+        // Add "Add" to Cart button
+        JButton addButton = new JButton("ADD");
         addButton.setBackground(new Color(0x55a15a));
         addButton.setForeground(new Color(0xe0e2e8));
+        addButton.setPreferredSize(new Dimension(70, 30));
+        addButton.setFont(addButton.getFont().deriveFont(addButton.getFont().getSize() + 1f));
         purchasePanel.add(addButton);
 
-        // 添加更多信息按钮
-        JButton moreButton = new JButton("More");
+        // Add More Info button
+        JButton moreButton = new JButton("MORE");
         moreButton.setBackground(new Color(0x3da2e7));
         moreButton.setForeground(new Color(0xe0e2e8));
+        moreButton.setPreferredSize(new Dimension(70, 30));
+        moreButton.setFont(moreButton.getFont().deriveFont(moreButton.getFont().getSize() + 1f));
         purchasePanel.add(moreButton);
 
-        // 将购买面板添加到卡片面板
-        gbc.gridy = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.insets = new Insets(0, 10, 0, 10);
-        productCardPanel.add(purchasePanel, gbc);
+        // Add the Purchase Panel to the Card Panel
+        productCardPanel.add(purchasePanel, new GridBagConstraints
+                (0, 2, 1, 1, 0.0, 1.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 10, 0, 10), 0, 0));
 
         return productCardPanel;
     }
