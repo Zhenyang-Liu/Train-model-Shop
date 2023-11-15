@@ -1,10 +1,31 @@
+CREATE TABLE Roles (
+    RoleID INT AUTO_INCREMENT PRIMARY KEY,
+    RoleName VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE Permissions (
+    PermissionID INT AUTO_INCREMENT PRIMARY KEY,
+    PermissionName VARCHAR(255) NOT NULL UNIQUE,
+    Description VARCHAR(255)
+);
+
+CREATE TABLE Role_Permissions (
+    RoleID INT,
+    PermissionID INT,
+    PRIMARY KEY (RoleID, PermissionID),
+    FOREIGN KEY (RoleID) REFERENCES Roles(RoleID),
+    FOREIGN KEY (PermissionID) REFERENCES Permissions(PermissionID)
+);
+
+
 CREATE TABLE User (
     UserID INT AUTO_INCREMENT PRIMARY KEY,
     Email VARCHAR(255) NOT NULL,
     Password VARCHAR(255) NOT NULL, -- Should Add Encryption Method
     Forename VARCHAR(255),
     Surname VARCHAR(255),
-    Role ENUM('Customer', 'Staff', 'Manager')
+    RoleID INT,
+    FOREIGN KEY (RoleID) REFERENCES Roles(RoleID)
 );
 
 CREATE TABLE Address (
@@ -26,22 +47,13 @@ CREATE TABLE BankDetails (
     FOREIGN KEY (UserID) REFERENCES User(UserID)
 );
 
-CREATE TABLE Order (
+CREATE TABLE Orders (
     OrderNumber INT AUTO_INCREMENT PRIMARY KEY,
     Date DATE,
     TotalCost FLOAT,
     Status ENUM('Confirmed', 'Fulfilled', 'Declined'),
     UserID INT,
     FOREIGN KEY (UserID) REFERENCES User(UserID)
-);
-
-CREATE TABLE OrderLine (
-    ProductID INT,
-    Quantity INT,
-    LineCost FLOAT,
-    OrderNumber INT,
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
-    FOREIGN KEY (OrderNumber) REFERENCES Order(OrderNumber)
 );
 
 CREATE TABLE Brand (
@@ -61,6 +73,20 @@ CREATE TABLE Product (
     FOREIGN KEY (BrandID) REFERENCES Brand(BrandID)
 );
 
+CREATE TABLE OrderLines (
+    ProductID INT,
+    Quantity INT,
+    LineCost FLOAT,
+    OrderNumber INT,
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
+    FOREIGN KEY (OrderNumber) REFERENCES Orders(OrderNumber)
+);
+
+CREATE TABLE Era (
+    EraCode INT PRIMARY KEY,
+    Description VARCHAR(255)
+);
+
 CREATE TABLE ProductEra (
     EraCode INT,
     ProductID INT,
@@ -69,21 +95,17 @@ CREATE TABLE ProductEra (
     FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
-CREATE TABLE Era (
-    EraCode INT PRIMARY KEY,
-    Description VARCHAR(255)
-);
 
 CREATE TABLE Track (
     ProductID INT,
-    TrackType ENUM('Straight', 'Curve', 'Points', 'Crossovers'),
+    TrackType VARCHAR(255),
     Gauge VARCHAR(255),
     FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
 CREATE TABLE Controller (
     ProductID INT,
-    DigitalType BOOLEAN,
+    DigitalType TINYINT(1),
     FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
@@ -91,18 +113,14 @@ CREATE TABLE Locomotive (
     ProductID INT,
     Gauge VARCHAR(255),
     DCCType ENUM('Analogue', 'Ready', 'Fitted', 'Sound'),
-    EraCode INT,
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
-    FOREIGN KEY (EraCode) REFERENCES Era(EraCode)
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
 CREATE TABLE RollingStock (
     ProductID INT,
-    Type ENUM('Carriages', 'Wagons'),
+    Type ENUM('Carriage', 'Wagon'),
     Gauge VARCHAR(255),
-    EraCode INT,
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
-    FOREIGN KEY (EraCode) REFERENCES Era(EraCode)
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
 CREATE TABLE BoxedSet (
@@ -111,29 +129,11 @@ CREATE TABLE BoxedSet (
     FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
-CREATE TABLE BoxedSet_Locomotive (
+CREATE TABLE BoxedSet_Item (
     BoxedSetID INT,
-    LocomotiveID INT,
+    ItemID INT,
     Quantity INT,
-    PRIMARY KEY (BoxedSetID, LocomotiveID),
+    PRIMARY KEY (BoxedSetID, ItemID),
     FOREIGN KEY (BoxedSetID) REFERENCES BoxedSet(ProductID),
-    FOREIGN KEY (LocomotiveID) REFERENCES Locomotive(ProductID)
-);
-
-CREATE TABLE BoxedSet_RollingStock (
-    BoxedSetID INT,
-    RollingStockID INT,
-    Quantity INT,
-    PRIMARY KEY (BoxedSetID, RollingStockID),
-    FOREIGN KEY (BoxedSetID) REFERENCES BoxedSet(ProductID),
-    FOREIGN KEY (RollingStockID) REFERENCES RollingStock(ProductID)
-);
-
-CREATE TABLE BoxedSet_Track (
-    BoxedSetID INT,
-    TrackID INT,
-    Quantity INT,
-    PRIMARY KEY (BoxedSetID, TrackID),
-    FOREIGN KEY (BoxedSetID) REFERENCES BoxedSet(ProductID),
-    FOREIGN KEY (TrackID) REFERENCES Track(ProductID)
+    FOREIGN KEY (ItemID) REFERENCES Product(ProductID)
 );

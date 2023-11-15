@@ -1,352 +1,306 @@
-JFDML JFormDesigner: "8.2.0.0.331" Java: "17.0.5" encoding: "UTF-8"
+JFDML JFormDesigner: "8.2.0.0.331" Java: "17.0.6" encoding: "UTF-8"
 
 new FormModel {
 	"i18n.autoExternalize": true
-	"i18n.bundlePackage": "src"
 	"i18n.bundleName": "form"
 	"i18n.keyPrefix": "MainPage"
+	"i18n.bundlePackage": "gui"
 	contentType: "form/swing"
 	root: new FormRoot {
-		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 			name: "this"
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "label1"
-				"text": new FormMessage( null, "MainPage.label1.text" )
-				"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 20, false )
-				"foreground": new java.awt.Color( 0, 51, 102, 255 )
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 275
-				"y": 35
-				"width": 260
-				"height": 45
+			"$locationPolicy": 1
+			"preferredSize": new java.awt.Dimension( 1080, 720 )
+			"font": new java.awt.Font( "Arial", 0, 12 )
+			auxiliary() {
+				"JavaCodeGenerator.customCreate": true
+			}
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+				"axis": 1
+			} ) {
+				name: "topPanel"
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+					name: "accountPanel"
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "button_account"
+						"icon": new com.jformdesigner.model.SwingIcon( 1, "D:\\TrainShop\\src\\main\\images\\person_black_24dp.svg" )
+						"background": new java.awt.Color( 242, 242, 242, 255 )
+						addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_accountMouseClicked", true ) )
+					}, new FormLayoutConstraints( class java.lang.String ) {
+						"value": "West"
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "button_cart"
+						"selectedIcon": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"icon": new com.jformdesigner.model.SwingIcon( 1, "D:\\TrainShop\\src\\main\\images\\shopping_cart_black_24dp.svg" )
+						"background": new java.awt.Color( 242, 242, 242, 255 )
+						"horizontalAlignment": 4
+					}, new FormLayoutConstraints( class java.lang.String ) {
+						"value": "East"
+					} )
+				} )
+				add( new FormComponent( "com.jformdesigner.designer.wrapper.JGoodiesFormsSeparator" ) {
+					name: "separatorForAccount"
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
+					"columns": 1
+					"rows": 2
+					"hgap": 5
+				} ) {
+					name: "titlePanel"
+					"minimumSize": new java.awt.Dimension( 251, 90 )
+					"preferredSize": new java.awt.Dimension( 251, 80 )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "mainTitle"
+						"text": new FormMessage( null, "MainPage.mainTitle.text" )
+						"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 26, false )
+						"foreground": new java.awt.Color( 0, 51, 102, 255 )
+						"horizontalAlignment": 0
+						"maximumSize": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"border": new javax.swing.border.EmptyBorder( 10, 0, 0, 0 )
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "subTitle"
+						"text": new FormMessage( null, "MainPage.subTitle.text" )
+						"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 5, false )
+						"horizontalAlignment": 0
+						"maximumSize": new java.awt.Dimension( 163, 12 )
+						"minimumSize": new java.awt.Dimension( 163, 12 )
+						"preferredSize": new java.awt.Dimension( 163, 12 )
+					} )
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+					"$columnSpecs": "0, 0, 0"
+					"$rowSpecs": "center:0:1.0"
+					"$alignTop": true
+					"$alignLeft": true
+					"$hGap": 5
+				} ) {
+					name: "searchPanel"
+					"maximumSize": new java.awt.Dimension( 305, 30 )
+					"preferredSize": new java.awt.Dimension( 305, 30 )
+					"minimumSize": new java.awt.Dimension( 305, 30 )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "searchLabel"
+						"text": new FormMessage( null, "MainPage.searchLabel.text" )
+						"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 2, false )
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
+					add( new FormComponent( "javax.swing.JTextField" ) {
+						name: "searchKeywordField"
+						"preferredSize": new java.awt.Dimension( 160, 23 )
+						"maximumSize": new java.awt.Dimension( 160, 23 )
+						"minimumSize": new java.awt.Dimension( 160, 23 )
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridx": 1
+						"insets": new java.awt.Insets( 0, 5, 0, 0 )
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "searchButton"
+						"text": new FormMessage( null, "MainPage.searchButton.text" )
+						"background": new java.awt.Color( 32, 70, 136, 255 )
+						"foreground": new java.awt.Color( 224, 226, 232, 255 )
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridx": 2
+						"insets": new java.awt.Insets( 0, 5, 0, 0 )
+					} )
+				} )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "North"
 			} )
-			add( new FormComponent( "javax.swing.JButton" ) {
-				name: "button3"
-				"icon": new com.jformdesigner.model.SwingIcon( 1, "D:\\TrainShop\\src\\main\\images\\person_black_24dp.svg" )
-				"background": new java.awt.Color( 242, 242, 242, 255 )
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 5
-				"y": 0
-				"width": 30
-				"height": 30
+			add( new FormContainer( "javax.swing.JSplitPane", new FormLayoutManager( class javax.swing.JSplitPane ) ) {
+				name: "mainPageSplitPane"
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+					"$columnSpecs": "left:0:1.0"
+					"$rowSpecs": "0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
+					"$alignTop": true
+					"$alignLeft": true
+					"$vGap": 5
+				} ) {
+					name: "filterPanel"
+					"alignmentX": -0.6949153f
+					"border": new javax.swing.border.EmptyBorder( 10, 10, 0, 10 )
+					"preferredSize": sfield com.jformdesigner.model.FormObject NULL_VALUE
+					"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 2, false )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "filterLabel1"
+						"text": new FormMessage( null, "MainPage.filterLabel1.text" )
+						"horizontalTextPosition": 2
+						"horizontalAlignment": 11
+						"preferredSize": sfield com.jformdesigner.model.FormObject NULL_VALUE
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"weightx": 1.0
+					} )
+					add( new FormComponent( "javax.swing.JComboBox" ) {
+						name: "filterBox1"
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 1
+						"weightx": 1.0
+						"hAlign": 5
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "filterLabel2"
+						"text": new FormMessage( null, "MainPage.filterLabel2.text" )
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 2
+						"insets": new java.awt.Insets( 5, 0, 0, 0 )
+						"weightx": 1.0
+					} )
+					add( new FormComponent( "javax.swing.JComboBox" ) {
+						name: "filterBox2"
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 3
+						"weightx": 1.0
+						"hAlign": 5
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "filterLabel3"
+						"text": new FormMessage( null, "MainPage.filterLabel3.text" )
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 4
+						"insets": new java.awt.Insets( 5, 0, 0, 0 )
+						"weightx": 1.0
+					} )
+					add( new FormComponent( "javax.swing.JComboBox" ) {
+						name: "filterBox3"
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 5
+						"weightx": 1.0
+						"hAlign": 5
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "filterLabel4"
+						"text": new FormMessage( null, "MainPage.filterLabel4.text" )
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 6
+						"insets": new java.awt.Insets( 5, 0, 0, 0 )
+						"weightx": 1.0
+					} )
+					add( new FormComponent( "javax.swing.JComboBox" ) {
+						name: "filterBox4"
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 7
+						"weightx": 1.0
+						"hAlign": 5
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "filterLabel5"
+						"text": new FormMessage( null, "MainPage.filterLabel5.text" )
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 8
+						"insets": new java.awt.Insets( 5, 0, 0, 0 )
+						"weightx": 1.0
+					} )
+					add( new FormComponent( "javax.swing.JComboBox" ) {
+						name: "filterBox5"
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 9
+						"weightx": 1.0
+						"hAlign": 5
+					} )
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "left"
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) {
+					"alignment": 3
+				} ) {
+					name: "productPanel"
+					"maximumSize": new java.awt.Dimension( 300, 32767 )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+						"$columnSpecs": "left:0:1.0"
+						"$rowSpecs": "0, 0, 0"
+						"$alignTop": true
+						"$alignLeft": true
+					} ) {
+						name: "productCardPanel1"
+						"border": new javax.swing.border.LineBorder( new java.awt.Color( 0, 44, 123, 255 ), 2, true )
+						"preferredSize": new java.awt.Dimension( 260, 280 )
+						"maximumSize": new java.awt.Dimension( 230, 240 )
+						"minimumSize": new java.awt.Dimension( 230, 240 )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "productImage1"
+							"icon": new com.jformdesigner.model.SwingIcon( 1, "D:\\TrainShop\\src\\main\\images\\tgv.jpeg" )
+							"preferredSize": new java.awt.Dimension( 216, 120 )
+							"alignmentY": 0.0f
+							"maximumSize": new java.awt.Dimension( 216, 120 )
+							"minimumSize": new java.awt.Dimension( 216, 120 )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+							"hAlign": 5
+							"vAlign": 5
+							"weighty": 1.0
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "productName1"
+							"text": new FormMessage( null, "MainPage.productName1.text" )
+							"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 4, false )
+							"horizontalAlignment": 0
+							"border": new javax.swing.border.MatteBorder( 3, 0, 3, 0, sfield java.awt.Color black )
+							"preferredSize": new java.awt.Dimension( 220, 30 )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+							"gridy": 1
+							"hAlign": 5
+							"weighty": 0.4
+							"insets": new java.awt.Insets( 1, 0, 0, 0 )
+						} )
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
+							"columns": 2
+							"rows": 2
+							"hgap": 20
+							"vgap": 10
+						} ) {
+							name: "purchasePanel1"
+							"border": new javax.swing.border.EmptyBorder( 10, 5, 5, 5 )
+							"maximumSize": new java.awt.Dimension( 190, 85 )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "productPrice1"
+								"text": new FormMessage( null, "MainPage.productPrice1.text" )
+								"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 7, false )
+								"preferredSize": new java.awt.Dimension( 80, 25 )
+							} )
+							add( new FormComponent( "javax.swing.JSpinner" ) {
+								name: "productNumber1"
+								"model": new javax.swing.SpinnerNumberModel {
+									minimum: 1
+									value: 1
+								}
+								"preferredSize": new java.awt.Dimension( 50, 23 )
+								"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 4, false )
+							} )
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "addButton1"
+								"text": new FormMessage( null, "MainPage.addButton1.text" )
+								"background": new java.awt.Color( 85, 161, 90, 255 )
+								"foreground": new java.awt.Color( 224, 226, 232, 255 )
+								"preferredSize": new java.awt.Dimension( 70, 30 )
+							} )
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "moreButton1"
+								"text": new FormMessage( null, "MainPage.moreButton1.text" )
+								"background": new java.awt.Color( 61, 162, 231, 255 )
+								"foreground": new java.awt.Color( 224, 226, 232, 255 )
+								"preferredSize": new java.awt.Dimension( 70, 30 )
+							} )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+							"gridy": 2
+							"hAlign": 5
+							"vAlign": 5
+							"weighty": 1.0
+							"insets": new java.awt.Insets( 0, 10, 0, 10 )
+						} )
+					} )
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "right"
+				} )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "Center"
 			} )
 			add( new FormComponent( "com.jformdesigner.designer.wrapper.JGoodiesFormsSeparator" ) {
-				name: "separator1"
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 0
-				"y": 30
-				"width": 805
-				"height": 15
-			} )
-			add( new FormComponent( "javax.swing.JButton" ) {
-				name: "button4"
-				"selectedIcon": sfield com.jformdesigner.model.FormObject NULL_VALUE
-				"icon": new com.jformdesigner.model.SwingIcon( 1, "D:\\TrainShop\\src\\main\\images\\shopping_cart_black_24dp.svg" )
-				"background": new java.awt.Color( 242, 242, 242, 255 )
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 760
-				"y": 0
-				"width": 35
-				"height": 30
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "label2"
-				"text": new FormMessage( null, "MainPage.label2.text" )
-				"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 2, false )
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 315
-				"y": 85
-			} )
-			add( new FormComponent( "javax.swing.JComboBox" ) {
-				name: "comboBox1"
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 20
-				"y": 145
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "label3"
-				"text": new FormMessage( null, "MainPage.label3.text" )
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 20
-				"y": 125
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "label4"
-				"text": new FormMessage( null, "MainPage.label4.text" )
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 20
-				"y": 185
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "label5"
-				"text": new FormMessage( null, "MainPage.label5.text" )
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 20
-				"y": 245
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "label6"
-				"text": new FormMessage( null, "MainPage.label6.text" )
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 20
-				"y": 300
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "label7"
-				"text": new FormMessage( null, "MainPage.label7.text" )
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 20
-				"y": 355
-			} )
-			add( new FormComponent( "javax.swing.JComboBox" ) {
-				name: "comboBox2"
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 20
-				"y": 205
-			} )
-			add( new FormComponent( "javax.swing.JComboBox" ) {
-				name: "comboBox3"
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 20
-				"y": 265
-			} )
-			add( new FormComponent( "javax.swing.JComboBox" ) {
-				name: "comboBox4"
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 20
-				"y": 320
-			} )
-			add( new FormComponent( "javax.swing.JComboBox" ) {
-				name: "comboBox5"
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 20
-				"y": 375
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "label8"
-				"text": new FormMessage( null, "MainPage.label8.text" )
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 170
-				"y": 125
-				"height": 15
-			} )
-			add( new FormComponent( "javax.swing.JTextField" ) {
-				name: "textField1"
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 170
-				"y": 145
-				"width": 195
-			} )
-			add( new FormComponent( "javax.swing.JButton" ) {
-				name: "button1"
-				"text": new FormMessage( null, "MainPage.button1.text" )
-				"background": new java.awt.Color( 32, 70, 136, 255 )
-				"foreground": new java.awt.Color( 224, 226, 232, 255 )
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 375
-				"y": 145
-				"width": 65
-			} )
-			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
-				name: "panel8"
-				"border": &LineBorder0 new javax.swing.border.LineBorder( new java.awt.Color( 0, 44, 123, 255 ), 2, true )
-				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label9"
-					"text": new FormMessage( null, "MainPage.label9.text" )
-					"font": &SwingDerivedFont0 new com.jformdesigner.model.SwingDerivedFont( null, 0, 4, false )
-					"horizontalAlignment": 0
-					"border": &LineBorder1 new javax.swing.border.LineBorder( sfield java.awt.Color black, 2, false )
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"x": 0
-					"y": 105
-					"width": 190
-					"height": 30
-				} )
-				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label10"
-					"text": new FormMessage( null, "MainPage.label10.text" )
-					"font": &SwingDerivedFont1 new com.jformdesigner.model.SwingDerivedFont( null, 0, 7, false )
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"x": 20
-					"y": 140
-				} )
-				add( new FormComponent( "javax.swing.JSpinner" ) {
-					name: "spinner1"
-					"model": &SpinnerNumberModel0 new javax.swing.SpinnerNumberModel {
-						minimum: 1
-						value: 1
-					}
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"x": 105
-					"y": 140
-					"width": 65
-					"height": 25
-				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "button2"
-					"font": &SwingDerivedFont2 new com.jformdesigner.model.SwingDerivedFont( null, 0, -1, false )
-					"text": new FormMessage( null, "MainPage.button2.text" )
-					"background": &Color0 new java.awt.Color( 85, 161, 90, 255 )
-					"foreground": &Color1 new java.awt.Color( 224, 226, 232, 255 )
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"height": 35
-					"x": 20
-					"y": 175
-					"width": 65
-				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "button5"
-					"font": #SwingDerivedFont2
-					"text": new FormMessage( null, "MainPage.button5.text" )
-					"background": &Color2 new java.awt.Color( 61, 162, 231, 255 )
-					"foreground": &Color3 new java.awt.Color( 224, 226, 232, 255 )
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"width": 65
-					"height": 35
-					"x": 105
-					"y": 175
-				} )
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 170
-				"y": 190
-				"height": 220
-				"width": 190
-			} )
-			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
-				name: "panel9"
-				"border": #LineBorder0
-				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label11"
-					"text": new FormMessage( null, "MainPage.label11.text" )
-					"font": #SwingDerivedFont0
-					"horizontalAlignment": 0
-					"border": #LineBorder1
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"x": 0
-					"y": 105
-					"width": 190
-					"height": 30
-				} )
-				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label12"
-					"text": new FormMessage( null, "MainPage.label12.text" )
-					"font": #SwingDerivedFont1
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"x": 20
-					"y": 140
-				} )
-				add( new FormComponent( "javax.swing.JSpinner" ) {
-					name: "spinner2"
-					"model": #SpinnerNumberModel0
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"x": 105
-					"y": 140
-					"width": 65
-					"height": 25
-				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "button6"
-					"font": #SwingDerivedFont2
-					"text": new FormMessage( null, "MainPage.button6.text" )
-					"background": #Color0
-					"foreground": #Color1
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"height": 35
-					"x": 20
-					"y": 175
-					"width": 65
-				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "button7"
-					"font": #SwingDerivedFont2
-					"text": new FormMessage( null, "MainPage.button7.text" )
-					"background": #Color2
-					"foreground": #Color3
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"width": 65
-					"height": 35
-					"x": 105
-					"y": 175
-				} )
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"width": 190
-				"height": 220
-				"x": 380
-				"y": 190
-			} )
-			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
-				name: "panel10"
-				"border": #LineBorder0
-				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label13"
-					"text": new FormMessage( null, "MainPage.label13.text" )
-					"font": #SwingDerivedFont0
-					"horizontalAlignment": 0
-					"border": #LineBorder1
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"x": 0
-					"y": 105
-					"width": 190
-					"height": 30
-				} )
-				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label14"
-					"text": new FormMessage( null, "MainPage.label14.text" )
-					"font": #SwingDerivedFont1
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"x": 20
-					"y": 140
-				} )
-				add( new FormComponent( "javax.swing.JSpinner" ) {
-					name: "spinner3"
-					"model": #SpinnerNumberModel0
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"x": 105
-					"y": 140
-					"width": 65
-					"height": 25
-				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "button8"
-					"font": #SwingDerivedFont2
-					"text": new FormMessage( null, "MainPage.button8.text" )
-					"background": #Color0
-					"foreground": #Color1
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"height": 35
-					"x": 20
-					"y": 175
-					"width": 65
-				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "button9"
-					"font": #SwingDerivedFont2
-					"text": new FormMessage( null, "MainPage.button9.text" )
-					"background": #Color2
-					"foreground": #Color3
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"width": 65
-					"height": 35
-					"x": 105
-					"y": 175
-				} )
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"width": 190
-				"height": 220
-				"x": 590
-				"y": 190
-			} )
-			add( new FormComponent( "com.jformdesigner.designer.wrapper.JGoodiesFormsSeparator" ) {
-				name: "separator2"
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 0
-				"y": 540
-				"width": 805
-				"height": 30
+				name: "bottomSeparator"
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "South"
 			} )
 		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 300, 0 )
-			"size": new java.awt.Dimension( 805, 600 )
+			"location": new java.awt.Point( 15, 0 )
+			"size": new java.awt.Dimension( 1080, 720 )
 		} )
 	}
 }
