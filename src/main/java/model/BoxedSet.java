@@ -1,10 +1,11 @@
 package model;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BoxedSet extends Product{
     private BoxedType boxedType;
-    private ArrayList<Product> contain;
+    private Map<Product, Integer> contain;
 
     public enum BoxedType {
         TRAINSET("Train Set"),
@@ -30,10 +31,20 @@ public class BoxedSet extends Product{
         }
     }
 
-    public BoxedSet(Brand brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String boxedType, ArrayList<Product> contain) {
+    public BoxedSet() {
+
+    }
+
+    public BoxedSet(Brand brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String boxedType) {
         super(brand, productName, productCode, retailPrice, description, stockQuantity);
         this.setBoxedType(boxedType);
-        this.setContain(contain);
+        this.contain = new HashMap<>();
+    }
+
+    public BoxedSet(Product product, String boxedType) {
+        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity());
+        this.setBoxedType(boxedType);
+        this.contain = new HashMap<>();
     }
 
     public String getBoxedType() {
@@ -44,11 +55,11 @@ public class BoxedSet extends Product{
         this.boxedType = BoxedType.fromName(typeName);
     }
 
-    public ArrayList<Product> getContain() {
+    public Map<Product, Integer> getContain() {
         return contain;
     }
 
-    public void setContain(ArrayList<Product> productList) {
-        this.contain = productList;
+    public void addProduct(Product product, int quantity) {
+        this.contain.put(product, quantity);
     }
 }

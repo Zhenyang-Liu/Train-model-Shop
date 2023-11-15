@@ -129,29 +129,11 @@ CREATE TABLE BoxedSet (
     FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
-CREATE TABLE BoxedSet_Locomotive (
+CREATE TABLE BoxedSet_Item (
     BoxedSetID INT,
-    LocomotiveID INT,
+    ItemID INT,
     Quantity INT,
-    PRIMARY KEY (BoxedSetID, LocomotiveID),
+    PRIMARY KEY (BoxedSetID, ItemID),
     FOREIGN KEY (BoxedSetID) REFERENCES BoxedSet(ProductID),
-    FOREIGN KEY (LocomotiveID) REFERENCES Locomotive(ProductID)
-);
-
-CREATE TABLE BoxedSet_RollingStock (
-    BoxedSetID INT,
-    RollingStockID INT,
-    Quantity INT,
-    PRIMARY KEY (BoxedSetID, RollingStockID),
-    FOREIGN KEY (BoxedSetID) REFERENCES BoxedSet(ProductID),
-    FOREIGN KEY (RollingStockID) REFERENCES RollingStock(ProductID)
-);
-
-CREATE TABLE BoxedSet_Track (
-    BoxedSetID INT,
-    TrackID INT,
-    Quantity INT,
-    PRIMARY KEY (BoxedSetID, TrackID),
-    FOREIGN KEY (BoxedSetID) REFERENCES BoxedSet(ProductID),
-    FOREIGN KEY (TrackID) REFERENCES Track(ProductID)
+    FOREIGN KEY (ItemID) REFERENCES Product(ProductID)
 );

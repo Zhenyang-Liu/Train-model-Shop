@@ -59,6 +59,8 @@ This is a folder with Data Access Object (DAO) java files, contributing directly
 
 ### BoxedSetDAO.java (Extends ProductDAO) (Unfinished)
 
+### ControllerDAO.java (Extends ProductDAO) (Unfinished)
+
 ### OrderDAO.java (Unfinished)
 
 - `createOrder(Order order)`: Create a new order.

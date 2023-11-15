@@ -1,3 +1,4 @@
+import model.BoxedSet;
 import model.Brand;
 import model.Gauge;
 import model.Locomotive;
@@ -5,6 +6,7 @@ import model.Product;
 import model.RollingStock;
 import model.Locomotive.DCCType;
 import model.RollingStock.RollingStockType;
+import model.BoxedSet;
 
 import java.sql.Connection;
 import java.sql.SQLException;
