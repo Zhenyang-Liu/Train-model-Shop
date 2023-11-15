@@ -1,11 +1,21 @@
 package model;
 
 public class Controller extends Product {
-    private boolean digitalType;
+    private boolean isDigital;
 
-    public Controller(Brand brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, Boolean digitalType) {
+    public Controller() {
+
+    }
+
+    public Controller(Brand brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, boolean isDigital) {
         super(brand, productName, productCode, retailPrice, description, stockQuantity);
-        this.digitalType = digitalType;
+        this.setDigitalType(isDigital);
+    }
+
+    public Controller(Product product, boolean isDigital) {
+        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity());
+        this.setDigitalType(isDigital);
+        this.setProductID(product.getProductID());
     }
 
     //Getter and Setter
@@ -14,8 +24,8 @@ public class Controller extends Product {
      *
      * @return whether the type of controller is digital.
      */
-    public Boolean getDigitalType() {
-        return digitalType;
+    public boolean getDigitalType() {
+        return isDigital;
     }
 
     /**
@@ -23,8 +33,8 @@ public class Controller extends Product {
      *
      * @param digitakType the boolean value whether the controller is digital.
      */
-    public void setDigitalType(Boolean digitalType) {
-        this.digitalType = digitalType;
+    public void setDigitalType(boolean isDigital) {
+        this.isDigital = isDigital;
     }
 
 

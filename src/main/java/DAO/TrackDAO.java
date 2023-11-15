@@ -20,7 +20,7 @@ public class TrackDAO extends ProductDAO {
      * @param track The Track object to be inserted.
      * @throws SQLException If a database error occurs.
      */
-    public void insertTrack(Track track) throws SQLException {
+    public static void insertTrack(Track track) throws SQLException {
         int productID = insertProduct(track);
         String insertSQL = "INSERT INTO Track (productID, TrackType, Gauge) VALUES (?, ?, ?);";
         
@@ -52,9 +52,9 @@ public class TrackDAO extends ProductDAO {
      * @param track The Track object with updated information.
      * @throws SQLException If a database error occurs.
      */
-    public void updateTrack(Track track) throws SQLException{
+    public static void updateTrack(Track track) throws SQLException{
         ProductDAO.updateProduct(track);
-        String updateSQL = "UPDATE Track SET TrackType = ?, Gauge = ? WHERE productID = ?;";
+        String updateSQL = "UPDATE Track SET TrackType = ?, Gauge = ? WHERE ProductID = ?;";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -83,7 +83,7 @@ public class TrackDAO extends ProductDAO {
      * @param productId The ID of the track product to be deleted.
      * @throws SQLException If a database error occurs.
      */
-    public void deleteTrack(int productId) throws SQLException{
+    public static void deleteTrack(int productId) throws SQLException{
         String deleteSQL = "DELETE FROM Track WHERE ProductID = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -111,8 +111,8 @@ public class TrackDAO extends ProductDAO {
      * @return A Track object representing the retrieved Track record | null if can't find.
      * @throws SQLException If a database error occurs.
      */
-    public Track findTrackByID(int productID) throws SQLException {
-        String selectSQL = "SELECT * FROM RollingStock WHERE productID = ?";
+    public static Track findTrackByID(int productID) throws SQLException {
+        String selectSQL = "SELECT * FROM RollingStock WHERE productID = ?;";
         Track track = new Track();
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -142,8 +142,8 @@ public class TrackDAO extends ProductDAO {
      * @return An ArrayList of track objects that match the specified gauge | null if can't find.
      * @throws SQLException If a database error occurs.
      */
-    public ArrayList<Track> findTracksByGauge(Gauge gauge) throws SQLException{
-        String selectSQL = "SELECT * FROM Track WHERE Gauge = ?";
+    public static ArrayList<Track> findTracksByGauge(Gauge gauge) throws SQLException{
+        String selectSQL = "SELECT * FROM Track WHERE Gauge = ?;";
         ArrayList<Track> tracks = new ArrayList<Track>();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -169,14 +169,14 @@ public class TrackDAO extends ProductDAO {
     }
     
     /**
-     * Retrieves a list of rollingstocks from the database that match the specified type.
+     * Retrieves a list of tracks from the database that match the specified type.
      *
-     * @param type The type (Carriage|Wagon) to filter rollingstocks by.
-     * @return An ArrayList of RollingStock objects that match the specified type | null if can't find.
+     * @param type The track type to filter rollingstocks by.
+     * @return An ArrayList of Track objects that match the specified type | null if can't find.
      * @throws SQLException If a database error occurs.
      */
-    public ArrayList<Track> findRollingStocksByType(TrackType type) throws SQLException{
-        String selectSQL = "SELECT * FROM Track WHERE TrackType = ?";
+    public static ArrayList<Track> findTracksByType(TrackType type) throws SQLException{
+        String selectSQL = "SELECT * FROM Track WHERE TrackType = ?;";
         ArrayList<Track> tracks = new ArrayList<Track>();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -199,6 +199,39 @@ public class TrackDAO extends ProductDAO {
             e.printStackTrace();
             throw e;
         }
+    }
+
+     /**
+     * Retrieves a list of all tracks from the database.
+     *
+     * @return An ArrayList of all Track objects in the database | null if can't find.
+     * @throws SQLException If a database error occurs.
+     */
+    public static ArrayList<Track> findAllControllers() throws SQLException {
+        ArrayList<Track> tracks = new ArrayList<Track>();
+        String selectSQL = "SELECT * FROM Track;";
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+            
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int productId = resultSet.getInt("ProductID");
+                Product newProduct = ProductDAO.findProductByID(productId);
+                String newGauge = resultSet.getString("Gauge");
+                String newType = resultSet.getString("TrackType");
+
+                Track track = new Track(newProduct, newType, newGauge);
+                tracks.add(track);
+            }
+            return tracks;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+
     }
     
 }

@@ -220,11 +220,11 @@ public class Product {
      * @param productCode The product code to analyze.
      * @return The product type as a string, or null if the product code is invalid.
      */
-    public static String getProductType(String productCode) {
+    public String getProductType() {
         // Validate the product code
-        if (isValidProductCode(productCode)) {
-            return null; // Invalid product code
-        }
+        // if (isValidProductCode(productCode)) {
+        //     return null; // Invalid product code
+        // }
 
         char typeIndicator = productCode.charAt(0);
 

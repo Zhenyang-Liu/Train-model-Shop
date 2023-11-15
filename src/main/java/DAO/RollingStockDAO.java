@@ -21,7 +21,7 @@ public class RollingStockDAO extends ProductDAO {
      * @param rollingStock The rollingstock object to be inserted.
      * @throws SQLException If a database error occurs.
      */
-    public void insertRollingStock(RollingStock rollingStock) throws SQLException {
+    public static void insertRollingStock(RollingStock rollingStock) throws SQLException {
         int productID = insertProduct(rollingStock);
         String insertSQL = "INSERT INTO RollingStock (productID, Type, Gauge) VALUES (?, ?, ?);";
         
@@ -54,9 +54,9 @@ public class RollingStockDAO extends ProductDAO {
      * @param rollingStock The rollingstock object with updated information.
      * @throws SQLException If a database error occurs.
      */
-    public void updateRollingStock(RollingStock rollingStock) throws SQLException{
+    public static void updateRollingStock(RollingStock rollingStock) throws SQLException{
         ProductDAO.updateProduct(rollingStock);
-        String updateSQL = "UPDATE RollingStock SET Type = ?, Gauge = ? WHERE productID = ?;";
+        String updateSQL = "UPDATE RollingStock SET Type = ?, Gauge = ? WHERE ProductID = ?;";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -85,7 +85,7 @@ public class RollingStockDAO extends ProductDAO {
      * @param productId The ID of the rollingstock product to be deleted.
      * @throws SQLException If a database error occurs.
      */
-    public void deleteRollingStock(int productId) throws SQLException{
+    public static void deleteRollingStock(int productId) throws SQLException{
         String deleteSQL = "DELETE FROM RollingStock WHERE ProductID = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -115,8 +115,8 @@ public class RollingStockDAO extends ProductDAO {
      * @return A RollingStock object representing the retrieved rollingstock record | null if can't find.
      * @throws SQLException If a database error occurs.
      */
-    public RollingStock findRollingStockByID(int productID) throws SQLException {
-        String selectSQL = "SELECT * FROM RollingStock WHERE productID = ?";
+    public static RollingStock findRollingStockByID(int productID) throws SQLException {
+        String selectSQL = "SELECT * FROM RollingStock WHERE ProductID = ?;";
         RollingStock rollingStock = new RollingStock();
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -147,8 +147,8 @@ public class RollingStockDAO extends ProductDAO {
      * @return An ArrayList of RollingStock objects that match the specified gauge | null if can't find.
      * @throws SQLException If a database error occurs.
      */
-    public ArrayList<RollingStock> findRollingStocksByGauge(Gauge gauge) throws SQLException{
-        String selectSQL = "SELECT * FROM RollingStock WHERE Gauge = ?";
+    public static ArrayList<RollingStock> findRollingStocksByGauge(Gauge gauge) throws SQLException{
+        String selectSQL = "SELECT * FROM RollingStock WHERE Gauge = ?;";
         ArrayList<RollingStock> rollingStocks = new ArrayList<RollingStock>();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -181,14 +181,14 @@ public class RollingStockDAO extends ProductDAO {
      * @return An ArrayList of RollingStock objects that match the specified era(s) | null if can't find.
      * @throws SQLException If a database error occurs.
      */
-    public ArrayList<RollingStock> findRollingStocksByEra(int[] eraList) throws SQLException {
+    public static ArrayList<RollingStock> findRollingStocksByEra(int[] eraList) throws SQLException {
         ArrayList<RollingStock> rollingStocks = new ArrayList<RollingStock>();
     
         try (Connection connection = DatabaseConnectionHandler.getConnection()) {
             int[] productIDs = EraDAO.findIDByEra(eraList);
     
             String selectSQL = "SELECT * FROM RollingStock WHERE ProductID IN (" +
-                               String.join(",", Collections.nCopies(productIDs.length, "?")) + ")";
+                               String.join(",", Collections.nCopies(productIDs.length, "?")) + ");";
     
             try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
                 for (int i = 0; i < productIDs.length; i++) {
@@ -223,14 +223,46 @@ public class RollingStockDAO extends ProductDAO {
      * @return An ArrayList of RollingStock objects that match the specified type | null if can't find.
      * @throws SQLException If a database error occurs.
      */
-    public ArrayList<RollingStock> findRollingStocksByType(RollingStockType type) throws SQLException{
-        String selectSQL = "SELECT * FROM RollingStock WHERE Type = ?";
+    public static ArrayList<RollingStock> findRollingStocksByType(RollingStockType type) throws SQLException{
+        String selectSQL = "SELECT * FROM RollingStock WHERE Type = ?;";
         ArrayList<RollingStock> rollingStocks = new ArrayList<RollingStock>();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
 
             preparedStatement.setString(1, type.getType());
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int productId = resultSet.getInt("ProductID");
+                Product newProduct = ProductDAO.findProductByID(productId);
+                String newGauge = resultSet.getString("Gauge");
+                String newType = resultSet.getString("Type");
+                int[] newEra = EraDAO.findEraByID(productId);
+
+                RollingStock rollingStock = new RollingStock(newProduct, newType, newGauge, newEra);
+                rollingStocks.add(rollingStock);
+            }
+            return rollingStocks;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    /**
+     * Retrieves a list of all rollingstocks from the database.
+     *
+     * @return An ArrayList of all RollingStock objects in the database | null if can't find.
+     * @throws SQLException If a database error occurs.
+     */
+    public static ArrayList<RollingStock> findAllRollingStocks() throws SQLException{
+        String selectSQL = "SELECT * FROM RollingStock;";
+        ArrayList<RollingStock> rollingStocks = new ArrayList<RollingStock>();
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
