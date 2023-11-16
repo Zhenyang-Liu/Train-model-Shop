@@ -5,6 +5,7 @@
 package gui;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -17,9 +18,16 @@ public class RegistrationPage extends JFrame {
         initComponents();
     }
 
+    private void backButtonMouseClicked(MouseEvent e) {
+        // TODO add your code here
+        this.dispose();
+        LoginPage loginPage = new LoginPage();
+        loginPage.setVisible(true);
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
-        ResourceBundle bundle = ResourceBundle.getBundle("gui.registrationPage");
+        ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
         dialogPane = new JPanel();
         contentPanel = new JPanel();
         panel1 = new JPanel();
@@ -36,7 +44,7 @@ public class RegistrationPage extends JFrame {
 
         //======== this ========
         var contentPane = getContentPane();
-        contentPane.setLayout(new BorderLayout());
+        contentPane.setLayout(null);
 
         //======== dialogPane ========
         {
@@ -91,7 +99,7 @@ public class RegistrationPage extends JFrame {
                     }
                 }
                 contentPanel.add(panel1);
-                panel1.setBounds(90, 10, 280, 220);
+                panel1.setBounds(95, 10, 280, 220);
 
                 {
                     // compute preferred size
@@ -118,13 +126,19 @@ public class RegistrationPage extends JFrame {
                 ((GridBagLayout)buttonBar.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0};
 
                 //---- okButton ----
-                okButton.setText(bundle.getString("RegistrationPage.okButton.text"));
+                okButton.setText("Submit");
                 buttonBar.add(okButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 5), 0, 0));
 
                 //---- cancelButton ----
-                cancelButton.setText(bundle.getString("RegistrationPage.cancelButton.text"));
+                cancelButton.setText("Back");
+                cancelButton.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        backButtonMouseClicked(e);
+                    }
+                });
                 buttonBar.add(cancelButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 0), 0, 0));
@@ -138,7 +152,23 @@ public class RegistrationPage extends JFrame {
             label4.setIconTextGap(6);
             dialogPane.add(label4, BorderLayout.PAGE_START);
         }
-        contentPane.add(dialogPane, BorderLayout.CENTER);
+        contentPane.add(dialogPane);
+        dialogPane.setBounds(0, 0, 478, 329);
+
+        {
+            // compute preferred size
+            Dimension preferredSize = new Dimension();
+            for(int i = 0; i < contentPane.getComponentCount(); i++) {
+                Rectangle bounds = contentPane.getComponent(i).getBounds();
+                preferredSize.width = Math.max(bounds.x + bounds.width, preferredSize.width);
+                preferredSize.height = Math.max(bounds.y + bounds.height, preferredSize.height);
+            }
+            Insets insets = contentPane.getInsets();
+            preferredSize.width += insets.right;
+            preferredSize.height += insets.bottom;
+            contentPane.setMinimumSize(preferredSize);
+            contentPane.setPreferredSize(preferredSize);
+        }
         pack();
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on

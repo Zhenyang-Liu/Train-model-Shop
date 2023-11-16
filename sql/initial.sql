@@ -98,14 +98,14 @@ CREATE TABLE ProductEra (
 
 CREATE TABLE Track (
     ProductID INT,
-    TrackType ENUM('Straight', 'Curve', 'Points', 'Crossovers'),
+    TrackType VARCHAR(255),
     Gauge VARCHAR(255),
     FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
 CREATE TABLE Controller (
     ProductID INT,
-    DigitalType BOOLEAN,
+    DigitalType TINYINT(1),
     FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
@@ -113,18 +113,14 @@ CREATE TABLE Locomotive (
     ProductID INT,
     Gauge VARCHAR(255),
     DCCType ENUM('Analogue', 'Ready', 'Fitted', 'Sound'),
-    EraCode INT,
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
-    FOREIGN KEY (EraCode) REFERENCES Era(EraCode)
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
 CREATE TABLE RollingStock (
     ProductID INT,
-    Type ENUM('Carriages', 'Wagons'),
+    Type ENUM('Carriage', 'Wagon'),
     Gauge VARCHAR(255),
-    EraCode INT,
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
-    FOREIGN KEY (EraCode) REFERENCES Era(EraCode)
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
 CREATE TABLE BoxedSet (
@@ -133,29 +129,11 @@ CREATE TABLE BoxedSet (
     FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
 
-CREATE TABLE BoxedSet_Locomotive (
+CREATE TABLE BoxedSet_Item (
     BoxedSetID INT,
-    LocomotiveID INT,
+    ItemID INT,
     Quantity INT,
-    PRIMARY KEY (BoxedSetID, LocomotiveID),
+    PRIMARY KEY (BoxedSetID, ItemID),
     FOREIGN KEY (BoxedSetID) REFERENCES BoxedSet(ProductID),
-    FOREIGN KEY (LocomotiveID) REFERENCES Locomotive(ProductID)
-);
-
-CREATE TABLE BoxedSet_RollingStock (
-    BoxedSetID INT,
-    RollingStockID INT,
-    Quantity INT,
-    PRIMARY KEY (BoxedSetID, RollingStockID),
-    FOREIGN KEY (BoxedSetID) REFERENCES BoxedSet(ProductID),
-    FOREIGN KEY (RollingStockID) REFERENCES RollingStock(ProductID)
-);
-
-CREATE TABLE BoxedSet_Track (
-    BoxedSetID INT,
-    TrackID INT,
-    Quantity INT,
-    PRIMARY KEY (BoxedSetID, TrackID),
-    FOREIGN KEY (BoxedSetID) REFERENCES BoxedSet(ProductID),
-    FOREIGN KEY (TrackID) REFERENCES Track(ProductID)
+    FOREIGN KEY (ItemID) REFERENCES Product(ProductID)
 );

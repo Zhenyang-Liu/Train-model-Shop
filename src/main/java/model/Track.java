@@ -6,15 +6,37 @@ public class Track extends Product {
 
     //Represents the type of a track.
     public enum TrackType {
-        SINGLE_STRAIGHT,
-        DOUBLE_STRAIGHT,
-        FIRST_RADIUS_CURVE,
-        SECOND_RADIUS_CURVE,
-        THIRD_RADIUS_CURVE,
-        LEFT_HAND_POINT,
-        RIGHT_HAND_POINT,
-        LEFT_HAND_CROSSOVER,
-        RIGHT_HAND_CROSSOVER
+        SINGLE_STRAIGHT("single straight"),
+        DOUBLE_STRAIGHT("double straight"),
+        FIRST_RADIUS_CURVE("first radius curve"),
+        SECOND_RADIUS_CURVE("second radius curve"),
+        THIRD_RADIUS_CURVE("third radius curve"),
+        LEFT_HAND_POINT("left hand point"),
+        RIGHT_HAND_POINT("right hand point"),
+        LEFT_HAND_CROSSOVER("left hand crossover"),
+        RIGHT_HAND_CROSSOVER("right hand crossover");
+
+        private final String type;
+    
+        TrackType(String type) {
+            this.type = type;
+        }
+    
+        public String getType() {
+            return type;
+        }
+
+        public static TrackType fromName(String typeName) {
+            for (TrackType type : TrackType.values()) {
+                if (type.getType().equalsIgnoreCase(typeName)) {
+                    return type;
+                }
+            }
+            throw new IllegalArgumentException("Invalid Rolling Stock classification: " + typeName);
+        }
+    }
+
+    public Track() {
     }
 
     /**
@@ -36,10 +58,11 @@ public class Track extends Product {
         this.setGauge(gauge);
     }
 
-    public Track(Brand brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String trackType, Gauge gauge) {
-        super(brand, productName, productCode, retailPrice, description, stockQuantity);
-        this.setTrackType(trackType);
+    public Track(Product product, String trackType, String gauge) {
+        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity());
         this.setGauge(gauge);
+        this.setTrackType(trackType);
+        this.setProductID(product.getProductID());
     }
 
     // Getters and setters
@@ -49,17 +72,8 @@ public class Track extends Product {
      *
      * @return the type of the track.
      */
-    public TrackType getTrackType() {
-        return trackType;
-    }
-
-    /**
-     * Retrieves the type of the track as a string.
-     *
-     * @return the string representation of the type of the track.
-     */
-    public String getTrackTypeString() {
-        return trackType.name();
+    public String getTrackType() {
+        return trackType.getType();
     }
 
     /**
@@ -85,8 +99,8 @@ public class Track extends Product {
      *
      * @return the gauge of the track.
      */
-    public Gauge getGauge() {
-        return gauge;
+    public String getGauge() {
+        return gauge.getName();
     }
 
     /**

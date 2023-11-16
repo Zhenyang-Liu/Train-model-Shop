@@ -1,3 +1,4 @@
+.gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
@@ -26,6 +27,9 @@ out/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+
+### Gradle ###
+.gradle/
 
 ### NetBeans ###
 /nbproject/private/
@@ -64,5 +68,9 @@ bin/
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+<<<<<<< HEAD
 .idea/
 .gradle/
+=======
+.idea/
+>>>>>>> dev

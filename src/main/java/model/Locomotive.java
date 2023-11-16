@@ -3,20 +3,58 @@ package model;
 public class Locomotive extends Product {
     private Gauge gauge;
     private DCCType dccType;
-    private Era[] era;
+    private int[] era;
 
     /**
      * Represents the Digital Command Control (DCC) type of a locomotive.
      * DCC is a standard for a system to operate model railways digitally.
      */
     public enum DCCType {
-        ANALOGUE,
-        READY,
-        FITTED,
-        SOUND
+        ANALOGUE("Analogue"),
+        READY("Ready"),
+        FITTED("Fitted"),
+        SOUND("Sound");
+
+        private final String name;
+        
+        /**
+         * Constructs a new DCC type with the specified name and scale.
+         *
+         * @param name  The name of the DCC type.
+         */
+        DCCType(String name) {
+            this.name = name;
+        }
+
+        /**
+         * Retrieves the name of the DCC type.
+         *
+         * @return The name of the DCC type.
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * Returns the DCC type corresponding to the given name.
+         *
+         * @param typeName The name of the DCC type to find.
+         * @return The DCC type corresponding to the given name.
+         * @throws IllegalArgumentException If the DCC type name does not match any DCC type.
+         */
+        public static DCCType fromName(String typeName) {
+            for (DCCType dccType : DCCType.values()) {
+                if (dccType.getName().equalsIgnoreCase(typeName)) {
+                    return dccType;
+                }
+            }
+            throw new IllegalArgumentException("Invalid DCC type name: " + typeName);
+        }
     }
 
-
+    public Locomotive() {
+    }
+    
     /**
      * Constructs a new Track instance with the specified details.
      *
@@ -31,20 +69,29 @@ public class Locomotive extends Product {
      * @param dccType      The Digital Command Control type of the locomotive.
      * @param era          The era classification of the locomotive.
      */
-    public Locomotive(Brand brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String gauge, String dccType, Era era) {
+    public Locomotive(Brand brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String gauge, String dccType, int[] era) {
         super(brand, productName, productCode, retailPrice, description, stockQuantity);
         this.setGauge(gauge);
         this.setDCCType(dccType);
         this.setEra(era);
     }
+    
+    public Locomotive(Product product, String gauge, String dccType, int[] era) {
+        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity());
+        this.setGauge(gauge);
+        this.setDCCType(dccType);
+        this.setEra(era);
+        this.setProductID(product.getProductID());
+    }
+    
 
     /**
      * Retrieves the gauge of the locomotive.
      *
      * @return the gauge of the locomotive.
      */
-    public Gauge getGauge() {
-        return gauge;
+    public String getGauge() {
+        return gauge.getName();
     }
 
     /**
@@ -77,16 +124,6 @@ public class Locomotive extends Product {
     }
 
     /**
-     * Retrieves the DCC type of the locomotive as a string.
-     *
-     * @return the string representation of the DCC type of the locomotive.
-     */
-    public String getDCCTypeString() {
-        return dccType.name();
-    }
-
-
-    /**
      * Sets the DCC type of this locomotive by converting a string to its corresponding {@code DCCType} enum constant,
      * ignoring case considerations. If the string does not match any {@code DCCType}, an exception is thrown.
      *
@@ -104,16 +141,13 @@ public class Locomotive extends Product {
         throw new IllegalArgumentException("No constant with text " + text + " found");
     }
 
-
-    // Unfinished
-
     /**
      * Retrieves the era associated with the locomotive.
      *
      * @return the era associated with the locomotive.
      */
-    public Era[] getEra() {
-        return null;
+    public int[] getEra() {
+        return era;
     }
 
     
@@ -122,9 +156,8 @@ public class Locomotive extends Product {
      *
      * @param era 
      */
-    public void setEra(Era era){
-        Era[] set;
-        //this.era = set;
+    public void setEra(int[] era){
+       this.era = era;
     }
      
 }

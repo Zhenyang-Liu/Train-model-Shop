@@ -10,14 +10,14 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
     implementation 'com.formdev:flatlaf:3.2.5'
     implementation 'com.formdev:flatlaf-extras:3.2.5'
     implementation 'com.jgoodies:jgoodies-forms:1.9.0'
     implementation 'mysql:mysql-connector-java:8.0.27'
+    implementation 'com.zaxxer:HikariCP:5.1.0'
+    testImplementation 'junit:junit:4.13.2'
 }
 
 test {
-    useJUnitPlatform()
+    useJUnit()
 }

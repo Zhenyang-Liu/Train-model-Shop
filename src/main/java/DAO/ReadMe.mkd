@@ -1,0 +1,90 @@
+## Introduction
+This is a folder with Data Access Object (DAO) java files, contributing directly to interact with MySQL database. Every action later in Services layer (such as login(), placeOrder()) may be depended on these functions.
+
+## DAO Function Lists
+
+### BrandDAO.java (Finished)
+
+- `insertBrand(Brand brand)`: Add a new brand to the database.
+- `updateBrand(Brand brand)`: Update existing brand information.
+- `deleteBrand(int brandId)`: Delete a brand based on its ID.
+- `findBrandById(int brandId)`: Find a brand by its ID.
+- `findAllBrands()`: Get a list of all brands.
+- `brandExists(String brandName)`: Check if a brand with a given name exists in the database.
+
+### EraDAO.java (Finished)
+
+- `insertEra(int productID, int[] eraList)`: Insert era codes associated with a product to the database.
+- `deleteEra(int productID)`: Delete era codes associated with a product from the database.
+- `findEraByID(int productID)`: Retrieve a list of era codes associated with a product by its product ID.
+- `findIDByEra(int[] eraList)`: Retrieve a list of product IDs associated with one or more era codes.
+
+### ProductDAO.java (unFinished)
+
+- `insertProduct(Product product)`: Add a new product to the database. (a exception waited to be finished)
+- `updateProduct(Product product)`: Update existing product information. (a exception waited to be finished)
+- `deleteProduct(int productId)`: Delete a product based on its ID.
+- `findProductById(int productId)`: Find a product by its ID.
+- `findProductByCode(String productCode)`: Find a product by its code.
+- `findAllProducts()`: Get a list of all products.
+- `productCodeExist()`: Check if a product with a code exists in the database.
+
+### LocomotiveDAO.java (Extends ProductDAO) (Finished)
+
+- `insertLocomotive(Locomotive locomotive)`: Add a new locomotive to the database.
+- `updateLocomotive(Locomotive locomotive)`: Update existing locomotive information.
+- `deleteLocomotive(int ProductID)`: Delete a locomotive based on its ID.
+- `findLocomotivesByID(int ProductID)`: Find locomotives based on its ID.
+- `findLocomotivesByEra(int[] eraList)`: Find locomotives based on era.
+- `findLocomotivesByGauge(Gauge gauge)`: Find locomotives based on gauge.
+- `findLocomotivesByDCCType(DCCType dccType)`: Find locomotives based on DCC type.
+- `findAllLocomotives()`: Find all Locomotives.
+
+
+### RollingStockDAO.java (Extends ProductDAO) (Finished)
+
+- `insertRollingStock(RollingStock rollingStock)`: Add a new rollingstock to the database.
+- `updateRollingStock(RollingStock rollingStock)`: Update existing rollingstock information.
+- `deleteRollingStock(int ProductID)`: Delete a rollingstock based on its ID.
+- `findRollingStocksByID(int ProductID)`: Find rollingstocks based on its ID.
+- `findRollingStocksByEra(int[] eraList)`: Find rollingstocks based on era.
+- `findRollingStocksByGauge(Gauge gauge)`: Find rollingstocks based on gauge.
+- `findRollingStocksByType(RollingStockType type)`: Find rollingstocks based on type.
+
+### TrackDAO.java (Extends ProductDAO) (Finished)
+
+- `insertTrack(Track track)`: Add new tracks to the database.
+- `updateTrack(Track track)`: Update existing track information.
+- `deleteTrack(int ProductID)`: Delete a track based on its ID.
+- `findTrackByID(int productID)`: Find track based on its ID.
+- `findTracksByGauge(Gauge gauge)`: Find tracks based on gauge.
+- `findTrackByType(TrackType type)`: Find tracks based on type.
+- `findAllTracks()`: Find all tracks.
+
+### BoxedSetDAO.java (Extends ProductDAO) (Finished)
+- `insertBoxedSet(BoxedSet set)`: Add a new BoxedSet to the database.
+- `insertBoxedSetItems(BoxedSet boxedSet)`: Add a BoxedSet's contains to the database.
+- `updateBoxedSetItems(BoxedSet boxedSet)`: Update existing boxset information.
+- `deleteBoxedSet(int productId)`: Delete a boxset based on its ID.
+- `deleteItem(int productId)`: Delete a boxset's contains based.
+- `findBoxedSetByID(int setID)`: Find boxedset based on its ID.
+- `findBoxedSetItem(int setID)`: Find boxedset's contains.
+- `findBoxedSetByType(BoxedType type)`: Find boxedset based on its type.
+- `findAllBoxedSet()`: Find all boxedsets.
+
+### ControllerDAO.java (Extends ProductDAO) (Finished)
+- `insertController(Controller controller)`: Add new controller to the database.
+- `updateController(Controller controller)`: Update existing controller information.
+- `deleteController(int productId)`: Delete a controller based on its ID.
+- `findControllerByID(int productID)`: Find controller based on its ID.
+- `findControllersByType(boolean isDigital)`: Find controllers based on whether it is digital.
+- `findAllControllers()`: Find all controllers.
+
+### OrderDAO.java (Unfinished)
+
+- `createOrder(Order order)`: Create a new order.
+- `updateOrder(Order order)`: Update existing order information.
+- `deleteOrder(int orderId)`: Delete an order based on its ID.
+- `findOrderById(int orderId)`: Find an order by its ID.
+- `findAllOrdersByCustomer(Customer customer)`: Find all orders associated with a customer.
+

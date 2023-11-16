@@ -2,9 +2,9 @@ package model;
 
 public enum Gauge {
 
-    OO("OO Gauge", "1/76th scale"),
-    TT("TT Gauge", "1/120th scale"),
-    N("N Gauge", "1/148th scale");
+    OO("OO", "1/76th scale"),
+    TT("TT", "1/120th scale"),
+    N("N", "1/148th scale");
 
     private final String name;
     private final String scale;
