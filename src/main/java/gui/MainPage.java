@@ -373,11 +373,13 @@ public class MainPage extends JFrame {
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
     private void customizeComponents() {
-        // 在这里添加自定义组件设置代码
-//        ImageIcon originalIcon = new ImageIcon("TrainShop\\src\\main\\images\\tgv.jpeg");
-//        Image originalImage = originalIcon.getImage();
-//        Image resizedImage = originalImage.getScaledInstance(productImage1.getWidth(), productImage1.getHeight(), Image.SCALE_SMOOTH);
-//        productImage1.setIcon(new ImageIcon(resizedImage));
+        // Add custom component setting code here
+        String originalIconPath = new File("src\\main\\images\\tgv.jpeg").getAbsolutePath();
+        ImageIcon originalIcon = new ImageIcon(originalIconPath);
+        Image originalImage = originalIcon.getImage();
+        Image resizedImage = originalImage.getScaledInstance(productImage1.getWidth(), productImage1.getHeight(), Image.SCALE_SMOOTH);
+        productImage1.setIcon(new ImageIcon(resizedImage));
+
 
         //Image resizedImage18 = originalImage.getScaledInstance(label18.getWidth(), label18.getHeight(), Image.SCALE_SMOOTH);
         //label18.setIcon(new ImageIcon(resizedImage18));
