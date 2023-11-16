@@ -22,7 +22,7 @@ public class TrackDAO extends ProductDAO {
      */
     public static void insertTrack(Track track) throws SQLException {
         int productID = insertProduct(track);
-        String insertSQL = "INSERT INTO Track (productID, TrackType, Gauge) VALUES (?, ?, ?);";
+        String insertSQL = "INSERT INTO Track (product_id, track_type, gauge) VALUES (?, ?, ?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -54,7 +54,7 @@ public class TrackDAO extends ProductDAO {
      */
     public static void updateTrack(Track track) throws SQLException{
         ProductDAO.updateProduct(track);
-        String updateSQL = "UPDATE Track SET TrackType = ?, Gauge = ? WHERE ProductID = ?;";
+        String updateSQL = "UPDATE Track SET track_type = ?, gauge = ? WHERE product_id = ?;";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -84,7 +84,7 @@ public class TrackDAO extends ProductDAO {
      * @throws SQLException If a database error occurs.
      */
     public static void deleteTrack(int productId) throws SQLException{
-        String deleteSQL = "DELETE FROM Track WHERE ProductID = ?;";
+        String deleteSQL = "DELETE FROM Track WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -112,7 +112,7 @@ public class TrackDAO extends ProductDAO {
      * @throws SQLException If a database error occurs.
      */
     public static Track findTrackByID(int productID) throws SQLException {
-        String selectSQL = "SELECT * FROM RollingStock WHERE productID = ?;";
+        String selectSQL = "SELECT * FROM RollingStock WHERE product_id = ?;";
         Track track = new Track();
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -121,10 +121,10 @@ public class TrackDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                String newGauge = resultSet.getString("Gauge");
-                String newType = resultSet.getString("TrackType");
+                String newGauge = resultSet.getString("gauge");
+                String newType = resultSet.getString("track_type");
 
                 track = new Track(newProduct, newType, newGauge);
             }
@@ -143,7 +143,7 @@ public class TrackDAO extends ProductDAO {
      * @throws SQLException If a database error occurs.
      */
     public static ArrayList<Track> findTracksByGauge(Gauge gauge) throws SQLException{
-        String selectSQL = "SELECT * FROM Track WHERE Gauge = ?;";
+        String selectSQL = "SELECT * FROM Track WHERE gauge = ?;";
         ArrayList<Track> tracks = new ArrayList<Track>();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -153,10 +153,10 @@ public class TrackDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                String newGauge = resultSet.getString("Gauge");
-                String newType = resultSet.getString("TrackType");
+                String newGauge = resultSet.getString("gauge");
+                String newType = resultSet.getString("track_type");
 
                 Track track = new Track(newProduct, newType, newGauge);
                 tracks.add(track);
@@ -176,7 +176,7 @@ public class TrackDAO extends ProductDAO {
      * @throws SQLException If a database error occurs.
      */
     public static ArrayList<Track> findTracksByType(TrackType type) throws SQLException{
-        String selectSQL = "SELECT * FROM Track WHERE TrackType = ?;";
+        String selectSQL = "SELECT * FROM Track WHERE track_type = ?;";
         ArrayList<Track> tracks = new ArrayList<Track>();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -186,10 +186,10 @@ public class TrackDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                String newGauge = resultSet.getString("Gauge");
-                String newType = resultSet.getString("TrackType");
+                String newGauge = resultSet.getString("gauge");
+                String newType = resultSet.getString("track_type");
 
                 Track track = new Track(newProduct, newType, newGauge);
                 tracks.add(track);
@@ -217,10 +217,10 @@ public class TrackDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                String newGauge = resultSet.getString("Gauge");
-                String newType = resultSet.getString("TrackType");
+                String newGauge = resultSet.getString("gauge");
+                String newType = resultSet.getString("track_type");
 
                 Track track = new Track(newProduct, newType, newGauge);
                 tracks.add(track);

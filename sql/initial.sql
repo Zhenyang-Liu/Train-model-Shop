@@ -1,139 +1,173 @@
-CREATE TABLE Roles (
-    RoleID INT AUTO_INCREMENT PRIMARY KEY,
-    RoleName VARCHAR(255) NOT NULL UNIQUE
-);
-
-CREATE TABLE Permissions (
-    PermissionID INT AUTO_INCREMENT PRIMARY KEY,
-    PermissionName VARCHAR(255) NOT NULL UNIQUE,
-    Description VARCHAR(255)
-);
-
-CREATE TABLE Role_Permissions (
-    RoleID INT,
-    PermissionID INT,
-    PRIMARY KEY (RoleID, PermissionID),
-    FOREIGN KEY (RoleID) REFERENCES Roles(RoleID),
-    FOREIGN KEY (PermissionID) REFERENCES Permissions(PermissionID)
-);
-
-
 CREATE TABLE User (
-    UserID INT AUTO_INCREMENT PRIMARY KEY,
-    Email VARCHAR(255) NOT NULL,
-    Password VARCHAR(255) NOT NULL, -- Should Add Encryption Method
-    Forename VARCHAR(255),
-    Surname VARCHAR(255),
-    RoleID INT,
-    FOREIGN KEY (RoleID) REFERENCES Roles(RoleID)
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    forename VARCHAR(100),
+    surname VARCHAR(100),
+    address_id INT
+);
+
+CREATE TABLE Login (
+    login_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    username VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    password_salt VARCHAR(255),
+    failed_attempts INT DEFAULT 0,
+    last_login_attempt DATETIME,
+    lockout_enabled BOOLEAN DEFAULT FALSE,
+    lockout_end DATETIME,
+    FOREIGN KEY (user_id) REFERENCES User(user_id)
+);
+
+CREATE TABLE Role (
+    role_id INT AUTO_INCREMENT PRIMARY KEY,
+    role_name VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE User_Role (
+    user_id INT,
+    role_id INT,
+    PRIMARY KEY (user_id, role_id),
+    FOREIGN KEY (user_id) REFERENCES User(user_id),
+    FOREIGN KEY (role_id) REFERENCES Role(role_id)
+);
+
+CREATE TABLE Permission (
+    permission_id INT AUTO_INCREMENT PRIMARY KEY,
+    permission_name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Role_Permission (
+    role_id INT,
+    permission_id INT,
+    PRIMARY KEY (role_id, permission_id),
+    FOREIGN KEY (role_id) REFERENCES Role(role_id),
+    FOREIGN KEY (permission_id) REFERENCES Permission(permission_id)
 );
 
 CREATE TABLE Address (
-    HouseNumber VARCHAR(255),
-    RoadName VARCHAR(255),
-    CityName VARCHAR(255),
-    Postcode VARCHAR(10),
-    UserID INT,
-    FOREIGN KEY (UserID) REFERENCES User(UserID)
+    house_number VARCHAR(255),
+    road_name VARCHAR(255),
+    city_name VARCHAR(255),
+    postcode VARCHAR(10),
+    user_id INT,
+    FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
-CREATE TABLE BankDetails (
-    CardName VARCHAR(255),
-    CardHolderName VARCHAR(255),
-    CardNumber VARCHAR(255), -- Should Add Encryption Method
-    ExpiryDate DATE,
-    SecurityCode VARCHAR(255), -- Should Add Encryption Method
-    UserID INT,
-    FOREIGN KEY (UserID) REFERENCES User(UserID)
+CREATE TABLE Bank_Detail (
+    card_name VARCHAR(255),
+    card_holder_name VARCHAR(255),
+    card_number VARCHAR(255), 
+    expiry_date DATE,
+    security_code VARCHAR(255),
+    user_id INT,
+    FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
 CREATE TABLE Orders (
-    OrderNumber INT AUTO_INCREMENT PRIMARY KEY,
-    Date DATE,
-    TotalCost FLOAT,
-    Status ENUM('Confirmed', 'Fulfilled', 'Declined'),
-    UserID INT,
-    FOREIGN KEY (UserID) REFERENCES User(UserID)
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    total_cost FLOAT,
+    status ENUM('Pending', 'Confirmed', 'Fulfilled','Declined') NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES User(user_id)
+);
+
+CREATE TABLE Cart (
+    cart_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    creation_date TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
 CREATE TABLE Brand (
-    BrandID INT AUTO_INCREMENT PRIMARY KEY,
-    BrandName VARCHAR(255),
-    Country VARCHAR(255)
+    brand_id INT AUTO_INCREMENT PRIMARY KEY,
+    brand_name VARCHAR(255) NOT NULL,
+    country VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE Product (
-    ProductID INT AUTO_INCREMENT PRIMARY KEY,
-    BrandID INT,
-    ProductName VARCHAR(255),
-    ProductCode VARCHAR(255),
-    RetailPrice FLOAT,
-    Description TEXT,
-    StockQuantity INT,
-    FOREIGN KEY (BrandID) REFERENCES Brand(BrandID)
+    product_id INT AUTO_INCREMENT PRIMARY KEY,
+    brand_id INT NOT NULL,
+    product_name VARCHAR(255) NOT NULL,
+    product_code VARCHAR(8) NOT NULL,
+    retail_price FLOAT NOT NULL,
+    description TEXT NOT NULL,
+    stock_quantity INT NOT NULL,
+    FOREIGN KEY (brand_id) REFERENCES Brand(brand_id)
 );
 
-CREATE TABLE OrderLines (
-    ProductID INT,
-    Quantity INT,
-    LineCost FLOAT,
-    OrderNumber INT,
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
-    FOREIGN KEY (OrderNumber) REFERENCES Orders(OrderNumber)
+CREATE TABLE Order_Line (
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
+    line_cost FLOAT,
+    order_id INT NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES Product(product_id),
+    FOREIGN KEY (order_id) REFERENCES Orders(order_id)
+);
+
+CREATE TABLE Cart_Item (
+    cart_item_id INT AUTO_INCREMENT PRIMARY KEY,
+    cart_id INT,
+    product_id INT,
+    quantity INT,
+    added_date TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES Product(product_id),
+    FOREIGN KEY (cart_id) REFERENCES Cart(cart_id)
 );
 
 CREATE TABLE Era (
-    EraCode INT PRIMARY KEY,
-    Description VARCHAR(255)
+    era_code INT PRIMARY KEY,
+    description VARCHAR(255)
 );
 
 CREATE TABLE ProductEra (
-    EraCode INT,
-    ProductID INT,
-    PRIMARY KEY (EraCode, ProductID),
-    FOREIGN KEY (EraCode) REFERENCES Era(EraCode),
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
+    era_code INT,
+    product_id INT,
+    PRIMARY KEY (era_code, product_id),
+    FOREIGN KEY (era_code) REFERENCES Era(era_code),
+    FOREIGN KEY (product_id) REFERENCES Product(product_id)
 );
 
-
 CREATE TABLE Track (
-    ProductID INT,
-    TrackType VARCHAR(255),
-    Gauge VARCHAR(255),
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
+    product_id INT,
+    track_type VARCHAR(255),
+    gauge VARCHAR(255),
+    FOREIGN KEY (product_id) REFERENCES Product(product_id)
 );
 
 CREATE TABLE Controller (
-    ProductID INT,
-    DigitalType TINYINT(1),
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
+    product_id INT,
+    digital_type TINYINT(1),
+    FOREIGN KEY (product_id) REFERENCES Product(product_id)
 );
 
 CREATE TABLE Locomotive (
-    ProductID INT,
-    Gauge VARCHAR(255),
-    DCCType ENUM('Analogue', 'Ready', 'Fitted', 'Sound'),
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
+    product_id INT,
+    gauge VARCHAR(255),
+    dcc_type ENUM('Analogue', 'Ready', 'Fitted', 'Sound'),
+    FOREIGN KEY (product_id) REFERENCES Product(product_id)
 );
 
 CREATE TABLE RollingStock (
-    ProductID INT,
-    Type ENUM('Carriage', 'Wagon'),
-    Gauge VARCHAR(255),
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
+    product_id INT,
+    type ENUM('Carriage', 'Wagon'),
+    gauge VARCHAR(255),
+    FOREIGN KEY (product_id) REFERENCES Product(product_id)
 );
 
 CREATE TABLE BoxedSet (
-    ProductID INT,
-    PackType VARCHAR(255),
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
+    product_id INT,
+    pack_type VARCHAR(255),
+    FOREIGN KEY (product_id) REFERENCES Product(product_id)
 );
 
 CREATE TABLE BoxedSet_Item (
-    BoxedSetID INT,
-    ItemID INT,
-    Quantity INT,
-    PRIMARY KEY (BoxedSetID, ItemID),
-    FOREIGN KEY (BoxedSetID) REFERENCES BoxedSet(ProductID),
-    FOREIGN KEY (ItemID) REFERENCES Product(ProductID)
+    boxed_set_id INT,
+    item_id INT,
+    quantity INT,
+    PRIMARY KEY (boxed_set_id, item_id),
+    FOREIGN KEY (boxed_set_id) REFERENCES BoxedSet(product_id),
+    FOREIGN KEY (item_id) REFERENCES Product(product_id)
 );

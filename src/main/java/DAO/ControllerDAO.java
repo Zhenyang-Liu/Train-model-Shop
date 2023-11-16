@@ -14,7 +14,7 @@ public class ControllerDAO extends ProductDAO {
 
     public static void insertController(Controller controller) throws SQLException {
         int productID = insertProduct(controller);
-        String insertSQL = "INSERT INTO Controller (productID, DigitalType) VALUES (?, ?);";
+        String insertSQL = "INSERT INTO Controller (product_id, digital_type) VALUES (?, ?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -43,7 +43,7 @@ public class ControllerDAO extends ProductDAO {
 
     public static void updateController(Controller controller) throws SQLException{
         ProductDAO.updateProduct(controller);
-        String updateSQL = "UPDATE Controller SET DigitalType = ? WHERE ProductID = ?;";
+        String updateSQL = "UPDATE Controller SET digital_type = ? WHERE product_id = ?;";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
@@ -62,7 +62,7 @@ public class ControllerDAO extends ProductDAO {
     }
 
     public static void deleteController(int productId) throws SQLException{
-        String deleteSQL = "DELETE FROM Controller WHERE ProductID = ?;";
+        String deleteSQL = "DELETE FROM Controller WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
@@ -85,7 +85,7 @@ public class ControllerDAO extends ProductDAO {
     }
 
     public static Controller findControllerByID(int productID) throws SQLException {
-        String selectSQL = "SELECT * FROM Controller WHERE ProductID = ?";
+        String selectSQL = "SELECT * FROM Controller WHERE product_id = ?";
         Controller controller = new Controller();
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -94,9 +94,9 @@ public class ControllerDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                boolean isDigital = resultSet.getInt("DigitalType") == 1;
+                boolean isDigital = resultSet.getInt("digital_type") == 1;
 
                 controller = new Controller(newProduct, isDigital);
             }
@@ -109,7 +109,7 @@ public class ControllerDAO extends ProductDAO {
     
     public static ArrayList<Controller> findControllersByType(boolean isDigital) throws SQLException {
         ArrayList<Controller> controllers = new ArrayList<Controller>();
-        String  selectSQL = "SELECT * FROM Controller WHERE DigitalType = ?;";
+        String  selectSQL = "SELECT * FROM Controller WHERE digital_type = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -123,9 +123,9 @@ public class ControllerDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                boolean digital = resultSet.getInt("DigitalType") == 1;
+                boolean digital = resultSet.getInt("digital_type") == 1;
 
                 Controller controller = new Controller(newProduct, digital);
                 controllers.add(controller);
@@ -149,9 +149,9 @@ public class ControllerDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                boolean digital = resultSet.getInt("DigitalType") == 1;
+                boolean digital = resultSet.getInt("digital_type") == 1;
 
                 Controller controller = new Controller(newProduct, digital);
                 controllers.add(controller);

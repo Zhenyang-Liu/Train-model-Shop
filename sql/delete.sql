@@ -1,22 +1,27 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
-Drop TABLE Address;
-Drop TABLE BankDetails;
-Drop TABLE BoxedSet;
-Drop TABLE BoxedSet_Item;
-Drop TABLE Brand;
-Drop TABLE Controller;
-Drop TABLE Era;
-Drop TABLE Locomotive;
-Drop TABLE OrderLines;
-Drop TABLE Orders;
-Drop TABLE Permissions;
-Drop TABLE Product;
-Drop TABLE ProductEra;
-Drop TABLE Role_Permissions;
-Drop TABLE Roles;
-Drop TABLE RollingStock;
-Drop TABLE Track;
-Drop TABLE User;
+DROP TABLE IF EXISTS BoxedSet_Item;
+DROP TABLE IF EXISTS BoxedSet;
+DROP TABLE IF EXISTS RollingStock;
+DROP TABLE IF EXISTS Locomotive;
+DROP TABLE IF EXISTS Controller;
+DROP TABLE IF EXISTS Track;
+DROP TABLE IF EXISTS ProductEra;
+DROP TABLE IF EXISTS Era;
+DROP TABLE IF EXISTS Cart_Item;
+DROP TABLE IF EXISTS Order_Line;
+DROP TABLE IF EXISTS Product;
+DROP TABLE IF EXISTS Brand;
+DROP TABLE IF EXISTS Cart;
+DROP TABLE IF EXISTS Orders;
+DROP TABLE IF EXISTS Bank_Detail;
+DROP TABLE IF EXISTS Address;
+DROP TABLE IF EXISTS Permission;
+DROP TABLE IF EXISTS Role_Permission;
+DROP TABLE IF EXISTS Role;
+DROP TABLE IF EXISTS User_Role;
+DROP TABLE IF EXISTS Login;
+DROP TABLE IF EXISTS User;
+
 
 SET FOREIGN_KEY_CHECKS = 1;

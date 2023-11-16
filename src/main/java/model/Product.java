@@ -1,7 +1,6 @@
 package model;
 
-import java.io.File;
-import java.net.MalformedURLException;
+import java.net.URL;
 
 public class Product {
     private int productID;
@@ -251,7 +250,7 @@ public class Product {
      *
      * @return Returns the URL of the product image if the image path is valid; otherwise, returns null.
      */
-    public String getProductImage() {
+    public URL getProductImage() {
         /**
         if (imagePath != null && !imagePath.isEmpty()) {
             try {
@@ -262,7 +261,11 @@ public class Product {
             }
         }
          */
-        return "D:\\TrainShop\\src\\main\\images\\tgv.jpeg";  // or return a URL for a default image
+
+        URL imageUrl = getClass().getResource("/images/tgv.jpeg");
+
+// 如果你需要将 URL 转换为字符串
+        return imageUrl;
     }
 
 

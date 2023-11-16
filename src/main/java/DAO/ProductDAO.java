@@ -20,8 +20,8 @@ public class ProductDAO {
      */  
     public static int insertProduct(Product product) throws SQLException {
         int productId = 0;
-        String insertSQL = "INSERT INTO Product (BrandID, ProductName, ProductCode, "
-                + "RetailPrice, Description, StockQuantity) "
+        String insertSQL = "INSERT INTO Product (brand_id, product_name, product_code, "
+                + "retail_price, description, stock_quantity) "
                 + "VALUES (?,?,?,?,?,?)";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -71,8 +71,8 @@ public class ProductDAO {
      * @throws SQLException If there is a problem executing the update.
      */ 
     public static void updateProduct(Product product) throws SQLException {
-        String updateSQL = "UPDATE Product SET BrandID = ?, ProductName = ?, ProductCode = ?, RetailPrice = ?, "
-            + "Description = ?, StockQuantity = ? WHERE ProductID = ?;"; 
+        String updateSQL = "UPDATE Product SET brand_id = ?, product_name = ?, product_code = ?, retail_price = ?, "
+            + "description = ?, stock_quantity = ? WHERE product_id = ?;"; 
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -100,7 +100,7 @@ public class ProductDAO {
      * @throws SQLException If a database access error occurs or this method is called on a closed connection.
      */
     public static void deleteProduct(int productId) throws SQLException {
-        String deleteSQL = "DELETE FROM Product WHERE ProductID = ?;";
+        String deleteSQL = "DELETE FROM Product WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
@@ -128,7 +128,7 @@ public class ProductDAO {
      * @throws SQLException If there is a problem executing the select.
      */
     public static Product findProductByID(int productID) throws SQLException {
-        String selectSQL = "SELECT * FROM Product WHERE ProductID = ?;";
+        String selectSQL = "SELECT * FROM Product WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -137,14 +137,14 @@ public class ProductDAO {
             Product product = new Product();
 
             while (resultSet.next()) {
-                product.setProductID(resultSet.getInt("ProductID"));
-                Brand brand = BrandDAO.findBrand(resultSet.getInt("BrandID"));
+                product.setProductID(resultSet.getInt("product_id"));
+                Brand brand = BrandDAO.findBrand(resultSet.getInt("brand_id"));
                 product.setBrand(brand);
-                product.setProductName(resultSet.getString("ProductName"));
-                product.setProductCode(resultSet.getString("ProductCode"));
-                product.setDescription(resultSet.getString("Description"));
-                product.setRetailPrice(resultSet.getFloat("RetailPrice"));
-                product.setStockQuantity(resultSet.getInt("StockQuantity"));
+                product.setProductName(resultSet.getString("product_name"));
+                product.setProductCode(resultSet.getString("product_code"));
+                product.setDescription(resultSet.getString("description"));
+                product.setRetailPrice(resultSet.getFloat("retail_price"));
+                product.setStockQuantity(resultSet.getInt("stock_quantity"));
             }
 
             // //Print for test
@@ -169,7 +169,7 @@ public class ProductDAO {
      * @throws SQLException If there is a problem executing the select.
      */
     public static Product findProductByCode(String productCode) throws SQLException {
-        String selectSQL = "SELECT * FROM Product WHERE ProductCode = ?;";
+        String selectSQL = "SELECT * FROM Product WHERE product_code = ?;";
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
 
@@ -178,14 +178,14 @@ public class ProductDAO {
             Product product = new Product();
 
             while (resultSet.next()) {
-                product.setProductID(resultSet.getInt("ProductID"));
-                Brand brand = BrandDAO.findBrand(resultSet.getInt("BrandID"));
+                product.setProductID(resultSet.getInt("product_id"));
+                Brand brand = BrandDAO.findBrand(resultSet.getInt("brand_id"));
                 product.setBrand(brand);
-                product.setProductName(resultSet.getString("ProductName"));
-                product.setProductCode(resultSet.getString("ProductCode"));
-                product.setDescription(resultSet.getString("Description"));
-                product.setRetailPrice(resultSet.getFloat("RetailPrice"));
-                product.setStockQuantity(resultSet.getInt("StockQuantity"));
+                product.setProductName(resultSet.getString("product_name"));
+                product.setProductCode(resultSet.getString("product_code"));
+                product.setDescription(resultSet.getString("description"));
+                product.setRetailPrice(resultSet.getFloat("retail_price"));
+                product.setStockQuantity(resultSet.getInt("stock_quantity"));
             }
 
             // Print for test
@@ -218,24 +218,24 @@ public class ProductDAO {
 
             while (resultSet.next()) {
                 Product product = new Product();
-                product.setProductID(resultSet.getInt("ProductID"));
-                Brand brand = BrandDAO.findBrand(resultSet.getInt("BrandID"));
+                product.setProductID(resultSet.getInt("product_id"));
+                Brand brand = BrandDAO.findBrand(resultSet.getInt("brand_id"));
                 product.setBrand(brand);
-                product.setProductName(resultSet.getString("ProductName"));
-                product.setProductCode(resultSet.getString("ProductCode"));
-                product.setDescription(resultSet.getString("Description"));
-                product.setRetailPrice(resultSet.getFloat("RetailPrice"));
-                product.setStockQuantity(resultSet.getInt("StockQuantity"));
+                product.setProductName(resultSet.getString("product_name"));
+                product.setProductCode(resultSet.getString("product_code"));
+                product.setDescription(resultSet.getString("description"));
+                product.setRetailPrice(resultSet.getFloat("retail_price"));
+                product.setStockQuantity(resultSet.getInt("stock_quantity"));
                 productList.add(product);
             }
 
             
-             //Print for test
-             System.out.println("<=================== GET ALL PRODUCTS ====================>");
-             for (Product obj : productList) {
-                 System.out.println(obj.toString());
-             }
-             System.out.println("<======================================================>");
+            //  //Print for test
+            //  System.out.println("<=================== GET ALL PRODUCTS ====================>");
+            //  for (Product obj : productList) {
+            //      System.out.println(obj.toString());
+            //  }
+            //  System.out.println("<======================================================>");
              
             return productList;
             
@@ -253,7 +253,7 @@ public class ProductDAO {
      * @throws SQLException If a database error occurs.
      */
     public static int findIDByName(String productName) throws SQLException {
-        String selectSQL = "SELECT ProductID FROM Product WHERE ProductName = ?";
+        String selectSQL = "SELECT product_id FROM Product WHERE product_name = ?";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -264,7 +264,7 @@ public class ProductDAO {
             int productId = 0;
 
             while (resultSet.next()) {
-                productId = resultSet.getInt("ProductID");
+                productId = resultSet.getInt("product_id");
             }
             return productId;
         } catch (SQLException e) {
@@ -281,7 +281,7 @@ public class ProductDAO {
      * @throws SQLException If there is an error during the database query operation.
      */
     public static Boolean productCodeExist(String productCode) throws SQLException {
-        String selectSQL = "SELECT COUNT(*) FROM Product WHERE ProductCode = ?";
+        String selectSQL = "SELECT COUNT(*) FROM Product WHERE product_code = ?";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
