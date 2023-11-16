@@ -102,7 +102,7 @@ public class MainPage extends JFrame {
                 accountPanel.setLayout(new BorderLayout());
 
                 //---- button_account ----
-                button_account.setIcon(new FlatSVGIcon(new File("D:\\TrainShop\\src\\main\\images\\person_black_24dp.svg")));
+                button_account.setIcon(new FlatSVGIcon("images/person_black_24dp.svg"));
                 button_account.setBackground(new Color(0xf2f2f2));
                 button_account.addMouseListener(new MouseAdapter() {
                     @Override
@@ -114,7 +114,7 @@ public class MainPage extends JFrame {
 
                 //---- button_cart ----
                 button_cart.setSelectedIcon(null);
-                button_cart.setIcon(new FlatSVGIcon(new File("D:\\TrainShop\\src\\main\\images\\shopping_cart_black_24dp.svg")));
+                button_cart.setIcon(new FlatSVGIcon("images/shopping_cart_black_24dp.svg"));
                 button_cart.setBackground(new Color(0xf2f2f2));
                 button_cart.setHorizontalAlignment(SwingConstants.RIGHT);
                 accountPanel.add(button_cart, BorderLayout.EAST);
@@ -269,7 +269,7 @@ public class MainPage extends JFrame {
                     ((GridBagLayout)productCardPanel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
 
                     //---- productImage1 ----
-                    productImage1.setIcon(new ImageIcon("D:\\TrainShop\\src\\main\\images\\tgv.jpeg"));
+                    productImage1.setIcon(new ImageIcon(getClass().getResource("/images/tgv.jpeg")));
                     productImage1.setPreferredSize(new Dimension(216, 120));
                     productImage1.setAlignmentY(0.0F);
                     productImage1.setMaximumSize(new Dimension(216, 120));
@@ -379,6 +379,7 @@ public class MainPage extends JFrame {
         Image originalImage = originalIcon.getImage();
         Image resizedImage = originalImage.getScaledInstance(productImage1.getWidth(), productImage1.getHeight(), Image.SCALE_SMOOTH);
         productImage1.setIcon(new ImageIcon(resizedImage));
+
 
         //Image resizedImage18 = originalImage.getScaledInstance(label18.getWidth(), label18.getHeight(), Image.SCALE_SMOOTH);
         //label18.setIcon(new ImageIcon(resizedImage18));

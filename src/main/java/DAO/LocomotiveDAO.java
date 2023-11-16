@@ -23,7 +23,7 @@ public class LocomotiveDAO extends ProductDAO {
      */
     public static void insertLocomotive(Locomotive locomotive) throws SQLException {
         int productID = insertProduct(locomotive);
-        String insertSQL = "INSERT INTO Locomotive (productID, Gauge, DCCType) VALUES (?, ?, ?);";
+        String insertSQL = "INSERT INTO Locomotive (product_id, gauge, dcc_type) VALUES (?, ?, ?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -57,7 +57,7 @@ public class LocomotiveDAO extends ProductDAO {
      */
     public static void updateLocomotive(Locomotive locomotive) throws SQLException{
         ProductDAO.updateProduct(locomotive);
-        String updateSQL = "UPDATE Locomotive SET Gauge = ?, DCCType = ? WHERE productID = ?;";
+        String updateSQL = "UPDATE Locomotive SET gauge = ?, dcc_type = ? WHERE product_id = ?;";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
@@ -83,7 +83,7 @@ public class LocomotiveDAO extends ProductDAO {
      * @throws SQLException If a database error occurs.
      */
     public static void deleteLocomotive(int productId) throws SQLException{
-        String deleteSQL = "DELETE FROM Locomotive WHERE ProductID = ?;";
+        String deleteSQL = "DELETE FROM Locomotive WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
@@ -115,7 +115,7 @@ public class LocomotiveDAO extends ProductDAO {
      * @throws SQLException If a database error occurs.
      */
     public static Locomotive findLocomotiveByID(int productID) throws SQLException {
-        String selectSQL = "SELECT * FROM Locomotive WHERE ProductID = ?;";
+        String selectSQL = "SELECT * FROM Locomotive WHERE product_id = ?;";
         Locomotive locomotive = new Locomotive();
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -124,10 +124,10 @@ public class LocomotiveDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                String newGauge = resultSet.getString("Gauge");
-                String newDCCType = resultSet.getString("DCCType");
+                String newGauge = resultSet.getString("gauge");
+                String newDCCType = resultSet.getString("dcc_type");
                 int[] newEra = EraDAO.findEraByID(productId);
 
                 locomotive = new Locomotive(newProduct, newGauge, newDCCType, newEra);
@@ -147,7 +147,7 @@ public class LocomotiveDAO extends ProductDAO {
      * @throws SQLException If a database error occurs.
      */
     public static ArrayList<Locomotive> findLocomotivesByGauge(Gauge gauge) throws SQLException{
-        String selectSQL = "SELECT * FROM Locomotive WHERE Gauge = ?;";
+        String selectSQL = "SELECT * FROM Locomotive WHERE gauge = ?;";
         ArrayList<Locomotive> locomotives = new ArrayList<Locomotive>();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -157,10 +157,10 @@ public class LocomotiveDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                String newGauge = resultSet.getString("Gauge");
-                String newDCCType = resultSet.getString("DCCType");
+                String newGauge = resultSet.getString("gauge");
+                String newDCCType = resultSet.getString("dcc_type");
                 int[] newEra = EraDAO.findEraByID(productId);
 
                 Locomotive locomotive = new Locomotive(newProduct, newGauge, newDCCType, newEra);
@@ -186,7 +186,7 @@ public class LocomotiveDAO extends ProductDAO {
         try (Connection connection = DatabaseConnectionHandler.getConnection()) {
             int[] productIDs = EraDAO.findIDByEra(eraList);
     
-            String selectSQL = "SELECT * FROM Locomotive WHERE ProductID IN (" +
+            String selectSQL = "SELECT * FROM Locomotive WHERE product_id IN (" +
                                String.join(",", Collections.nCopies(productIDs.length, "?")) + ");";
     
             try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -196,10 +196,10 @@ public class LocomotiveDAO extends ProductDAO {
     
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
-                        int productId = resultSet.getInt("ProductID");
+                        int productId = resultSet.getInt("product_id");
                         Product newProduct = ProductDAO.findProductByID(productId);
-                        String newGauge = resultSet.getString("Gauge");
-                        String newDCCType = resultSet.getString("DCCType");
+                        String newGauge = resultSet.getString("gauge");
+                        String newDCCType = resultSet.getString("dcc_type");
                         int[] newEra = EraDAO.findEraByID(productId);
     
                         Locomotive locomotive = new Locomotive(newProduct, newGauge, newDCCType, newEra);
@@ -223,7 +223,7 @@ public class LocomotiveDAO extends ProductDAO {
      * @throws SQLException If a database error occurs.
      */
     public static ArrayList<Locomotive> findLocomotivesByDCCType(DCCType dccType) throws SQLException{
-        String selectSQL = "SELECT * FROM Locomotive WHERE DCCType = ?;";
+        String selectSQL = "SELECT * FROM Locomotive WHERE dcc_type = ?;";
         ArrayList<Locomotive> locomotives = new ArrayList<Locomotive>();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -233,10 +233,10 @@ public class LocomotiveDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                String newGauge = resultSet.getString("Gauge");
-                String newDCCType = resultSet.getString("DCCType");
+                String newGauge = resultSet.getString("gauge");
+                String newDCCType = resultSet.getString("dcc_type");
                 int[] newEra = EraDAO.findEraByID(productId);
 
                 Locomotive locomotive = new Locomotive(newProduct, newGauge, newDCCType, newEra);
@@ -265,10 +265,10 @@ public class LocomotiveDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                String newGauge = resultSet.getString("Gauge");
-                String newDCCType = resultSet.getString("DCCType");
+                String newGauge = resultSet.getString("gauge");
+                String newDCCType = resultSet.getString("dcc_type");
                 int[] newEra = EraDAO.findEraByID(productId);
 
                 Locomotive locomotive = new Locomotive(newProduct, newGauge, newDCCType, newEra);
