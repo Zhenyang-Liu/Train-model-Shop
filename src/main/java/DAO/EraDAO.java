@@ -18,7 +18,7 @@ public class EraDAO {
      * @throws SQLException If a database error occurs.
      */
     public static void insertEra(int productID, int[] eraList) throws SQLException {
-        String insertSQL = "INSERT INTO ProductEra (EraCode, ProductID) VALUES (?, ?);";
+        String insertSQL = "INSERT INTO ProductEra (era_code, product_id) VALUES (?, ?);";
         try (Connection connection = DatabaseConnectionHandler.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
             connection.setAutoCommit(false);
@@ -30,6 +30,7 @@ public class EraDAO {
             }
 
             int[] batchResults = preparedStatement.executeBatch();
+            
             // print to Test
             for (int i = 0; i < batchResults.length; i++) {
                 if (batchResults[i] == PreparedStatement.EXECUTE_FAILED) {
@@ -55,7 +56,7 @@ public class EraDAO {
      * @throws SQLException If a database error occurs.
      */
     public static void deleteEra(int productID) throws SQLException {
-        String deleteSQL = "DELETE FROM ProductEra WHERE ProductID = ?;";
+        String deleteSQL = "DELETE FROM ProductEra WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
@@ -76,7 +77,7 @@ public class EraDAO {
      * @throws SQLException If a database error occurs.
      */
     public static int[] findEraByID(int productID) throws SQLException {
-        String selectSQL = "SELECT EraCode FROM ProductEra WHERE ProductID = ?;";
+        String selectSQL = "SELECT era_code FROM ProductEra WHERE product_id = ?;";
         List<Integer> eraList = new ArrayList<>();
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -85,7 +86,7 @@ public class EraDAO {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    int eraCode = resultSet.getInt("EraCode");
+                    int eraCode = resultSet.getInt("era_code");
                     eraList.add(eraCode);
                 }
             }
@@ -107,7 +108,7 @@ public class EraDAO {
      * @throws SQLException If a database error occurs.
      */
     public static int[] findIDByEra(int[] eraList) throws SQLException {
-        String selectSQL = "SELECT DISTINCT ProductID FROM ProductEra WHERE EraCode IN (" + 
+        String selectSQL = "SELECT DISTINCT product_id FROM ProductEra WHERE era_code IN (" + 
                                       String.join(",", Collections.nCopies(eraList.length, "?")) + ")";
         List<Integer> productIDs = new ArrayList<>();
 
@@ -120,7 +121,7 @@ public class EraDAO {
     
             try (ResultSet productIDsResult = preparedStatement.executeQuery()) {
                 while (productIDsResult.next()) {
-                    int productID = productIDsResult.getInt("ProductID");
+                    int productID = productIDsResult.getInt("product_id");
                     productIDs.add(productID);
                 }
             }

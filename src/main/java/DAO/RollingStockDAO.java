@@ -23,7 +23,7 @@ public class RollingStockDAO extends ProductDAO {
      */
     public static void insertRollingStock(RollingStock rollingStock) throws SQLException {
         int productID = insertProduct(rollingStock);
-        String insertSQL = "INSERT INTO RollingStock (productID, Type, Gauge) VALUES (?, ?, ?);";
+        String insertSQL = "INSERT INTO RollingStock (product_id, type, gauge) VALUES (?, ?, ?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -56,7 +56,7 @@ public class RollingStockDAO extends ProductDAO {
      */
     public static void updateRollingStock(RollingStock rollingStock) throws SQLException{
         ProductDAO.updateProduct(rollingStock);
-        String updateSQL = "UPDATE RollingStock SET Type = ?, Gauge = ? WHERE ProductID = ?;";
+        String updateSQL = "UPDATE RollingStock SET type = ?, gauge = ? WHERE product_id = ?;";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -86,7 +86,7 @@ public class RollingStockDAO extends ProductDAO {
      * @throws SQLException If a database error occurs.
      */
     public static void deleteRollingStock(int productId) throws SQLException{
-        String deleteSQL = "DELETE FROM RollingStock WHERE ProductID = ?;";
+        String deleteSQL = "DELETE FROM RollingStock WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -116,7 +116,7 @@ public class RollingStockDAO extends ProductDAO {
      * @throws SQLException If a database error occurs.
      */
     public static RollingStock findRollingStockByID(int productID) throws SQLException {
-        String selectSQL = "SELECT * FROM RollingStock WHERE ProductID = ?;";
+        String selectSQL = "SELECT * FROM RollingStock WHERE product_id = ?;";
         RollingStock rollingStock = new RollingStock();
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -125,10 +125,10 @@ public class RollingStockDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                String newGauge = resultSet.getString("Gauge");
-                String newType = resultSet.getString("Type");
+                String newGauge = resultSet.getString("gauge");
+                String newType = resultSet.getString("type");
                 int[] newEra = EraDAO.findEraByID(productId);
 
                 rollingStock = new RollingStock(newProduct, newType, newGauge, newEra);
@@ -148,7 +148,7 @@ public class RollingStockDAO extends ProductDAO {
      * @throws SQLException If a database error occurs.
      */
     public static ArrayList<RollingStock> findRollingStocksByGauge(Gauge gauge) throws SQLException{
-        String selectSQL = "SELECT * FROM RollingStock WHERE Gauge = ?;";
+        String selectSQL = "SELECT * FROM RollingStock WHERE gauge = ?;";
         ArrayList<RollingStock> rollingStocks = new ArrayList<RollingStock>();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -158,10 +158,10 @@ public class RollingStockDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                String newGauge = resultSet.getString("Gauge");
-                String newType = resultSet.getString("Type");
+                String newGauge = resultSet.getString("gauge");
+                String newType = resultSet.getString("type");
                 int[] newEra = EraDAO.findEraByID(productId);
 
                 RollingStock rollingStock = new RollingStock(newProduct, newType, newGauge, newEra);
@@ -187,7 +187,7 @@ public class RollingStockDAO extends ProductDAO {
         try (Connection connection = DatabaseConnectionHandler.getConnection()) {
             int[] productIDs = EraDAO.findIDByEra(eraList);
     
-            String selectSQL = "SELECT * FROM RollingStock WHERE ProductID IN (" +
+            String selectSQL = "SELECT * FROM RollingStock WHERE product_id IN (" +
                                String.join(",", Collections.nCopies(productIDs.length, "?")) + ");";
     
             try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -197,10 +197,10 @@ public class RollingStockDAO extends ProductDAO {
     
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
-                        int productId = resultSet.getInt("ProductID");
+                        int productId = resultSet.getInt("product_id");
                         Product newProduct = ProductDAO.findProductByID(productId);
-                        String newGauge = resultSet.getString("Gauge");
-                        String newType = resultSet.getString("Type");
+                        String newGauge = resultSet.getString("gauge");
+                        String newType = resultSet.getString("type");
                         int[] newEra = EraDAO.findEraByID(productId);
 
                         RollingStock rollingStock = new RollingStock(newProduct, newType, newGauge, newEra);
@@ -224,7 +224,7 @@ public class RollingStockDAO extends ProductDAO {
      * @throws SQLException If a database error occurs.
      */
     public static ArrayList<RollingStock> findRollingStocksByType(RollingStockType type) throws SQLException{
-        String selectSQL = "SELECT * FROM RollingStock WHERE Type = ?;";
+        String selectSQL = "SELECT * FROM RollingStock WHERE type = ?;";
         ArrayList<RollingStock> rollingStocks = new ArrayList<RollingStock>();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -234,10 +234,10 @@ public class RollingStockDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                String newGauge = resultSet.getString("Gauge");
-                String newType = resultSet.getString("Type");
+                String newGauge = resultSet.getString("gauge");
+                String newType = resultSet.getString("type");
                 int[] newEra = EraDAO.findEraByID(productId);
 
                 RollingStock rollingStock = new RollingStock(newProduct, newType, newGauge, newEra);
@@ -266,10 +266,10 @@ public class RollingStockDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                String newGauge = resultSet.getString("Gauge");
-                String newType = resultSet.getString("Type");
+                String newGauge = resultSet.getString("gauge");
+                String newType = resultSet.getString("type");
                 int[] newEra = EraDAO.findEraByID(productId);
 
                 RollingStock rollingStock = new RollingStock(newProduct, newType, newGauge, newEra);

@@ -17,7 +17,7 @@ public class BrandDAO {
      * @throws SQLException If there is an error during the database insert operation.
      */
     public static void insertBrand(Brand newBrand) throws SQLException {
-        String insertSQL = "INSERT INTO Brand (BrandName, Country) VALUES (?, ?)";
+        String insertSQL = "INSERT INTO Brand (brand_name, country) VALUES (?, ?)";
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);) {
             preparedStatement.setString(1, newBrand.getBrandName());
@@ -38,7 +38,7 @@ public class BrandDAO {
      * @throws SQLException If there is a problem executing the update.
      */ 
     public static void updateBrand(Brand brand) throws SQLException {
-        String updateSQL = "UPDATE Brand SET BrandName = ?, Country = ? WHERE BrandID = ?;"; 
+        String updateSQL = "UPDATE Brand SET brand_name = ?, country = ? WHERE brand_id = ?;"; 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
             preparedStatement.setString(1, brand.getBrandName());
@@ -61,7 +61,7 @@ public class BrandDAO {
      * @throws SQLException If a database access error occurs or this method is called on a closed connection.
      */
     public static void deleteBrand(int brandId) throws SQLException {
-        String deleteSQL = "DELETE FROM Brand WHERE BrandID = ?;";
+        String deleteSQL = "DELETE FROM Brand WHERE brand_id = ?;";
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
             // Set the parameters for the prepared statement
@@ -91,7 +91,7 @@ public class BrandDAO {
      * @throws SQLException If a SQLException occurs while executing the database operation.
      */
     public static Brand findBrand(int brandID) throws SQLException {
-        String selectSQL = "SELECT * FROM Brand WHERE BrandID = ?;";
+        String selectSQL = "SELECT * FROM Brand WHERE brand_id = ?;";
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
             preparedStatement.setInt(1, brandID);
@@ -100,8 +100,8 @@ public class BrandDAO {
             Brand brand = new Brand();
             while (resultSet.next()) {
                     brand.setBrandID(brandID);
-                    brand.setBrandName(resultSet.getString("BrandName"));
-                    brand.setCountry(resultSet.getString("Country"));
+                    brand.setBrandName(resultSet.getString("brand_name"));
+                    brand.setCountry(resultSet.getString("country"));
                 }
 
             return brand;
@@ -128,18 +128,18 @@ public class BrandDAO {
             
             while (resultSet.next()) {
                 Brand brand = new Brand();
-                brand.setBrandID(resultSet.getInt("BrandID"));
-                brand.setBrandName(resultSet.getString("BrandName"));
-                brand.setCountry(resultSet.getString("Country"));
+                brand.setBrandID(resultSet.getInt("brand_id"));
+                brand.setBrandName(resultSet.getString("brand_name"));
+                brand.setCountry(resultSet.getString("country"));
                 brandList.add(brand);
             }
 
             // Print for test
-            System.out.println("<=================== GET ALL BRANDS ====================>");
-            for (Brand obj : brandList) {
-                System.out.println(obj.toString());
-            }
-            System.out.println("<======================================================>");
+            // System.out.println("<=================== GET ALL BRANDS ====================>");
+            // for (Brand obj : brandList) {
+            //     System.out.println(obj.toString());
+            // }
+            // System.out.println("<======================================================>");
 
             return brandList;
 
@@ -158,7 +158,7 @@ public class BrandDAO {
      * @throws SQLException If there is an error during the database query operation.
      */
     public static boolean brandExists(String brandName) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM Brand WHERE BrandName = ?";
+        String sql = "SELECT COUNT(*) FROM Brand WHERE brand_name = ?";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql)) {
