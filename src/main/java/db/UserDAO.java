@@ -47,6 +47,8 @@ public class UserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        // Default return false as nothing above matched
         return false;
     }
 
@@ -68,6 +70,31 @@ public class UserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        // Default return false as nothing above matched
+        return false;
+    }
+
+    public boolean isPasswordCorrect(int userID, String password) throws SQLException {
+        // Check if the user exists before doing anything
+        if (!doesUserExist(userID)) {
+            System.out.println("User was not found!");
+            return false;
+        }
+
+        // Get the password and match
+        String passwordSQL = "SELECT password FROM User WHERE userID = ?";
+        try (PreparedStatement passwordStatement = conn.prepareStatement(passwordSQL)) {
+            passwordStatement.setInt(1, userID);
+            try (ResultSet results = passwordStatement.executeQuery()) {
+                if (results.next())
+                    return results.getString(1) == password;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Default return false as nothing above matched
         return false;
     }
 }
