@@ -216,6 +216,7 @@ new FormModel {
 						"preferredSize": new java.awt.Dimension( 260, 280 )
 						"maximumSize": new java.awt.Dimension( 230, 240 )
 						"minimumSize": new java.awt.Dimension( 230, 240 )
+						"visible": false
 						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "productImage1"
 							"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/tgv.jpeg" )
@@ -258,7 +259,7 @@ new FormModel {
 								"horizontalAlignment": 0
 							} )
 							add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
-								name: "panel1"
+								name: "buttonPanel1"
 								"preferredSize": new java.awt.Dimension( 240, 40 )
 								add( new FormComponent( "javax.swing.JButton" ) {
 									name: "moreButton1"
@@ -273,6 +274,39 @@ new FormModel {
 									"background": new java.awt.Color( 85, 161, 90, 255 )
 									"foreground": new java.awt.Color( 224, 226, 232, 255 )
 									"preferredSize": new java.awt.Dimension( 100, 30 )
+								} )
+								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+									"$columnSpecs": "0, 0, 0"
+									"$rowSpecs": "0"
+									"$hGap": 5
+									"$vGap": 5
+									"$alignLeft": true
+									"$alignTop": true
+								} ) {
+									name: "adjustNumPanel1"
+									add( new FormComponent( "javax.swing.JButton" ) {
+										name: "removeButton"
+										"background": new java.awt.Color( 177, 52, 55, 255 )
+										"foreground": new java.awt.Color( 224, 226, 232, 255 )
+										"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 7, false )
+										"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/remove_white_18dp.svg" )
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
+									add( new FormComponent( "javax.swing.JButton" ) {
+										name: "NumButton"
+										"text": "NUM"
+										"preferredSize": new java.awt.Dimension( 50, 23 )
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+										"gridx": 1
+									} )
+									add( new FormComponent( "javax.swing.JButton" ) {
+										name: "addButton"
+										"background": new java.awt.Color( 85, 161, 90, 255 )
+										"foreground": new java.awt.Color( 224, 226, 232, 255 )
+										"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 7, false )
+										"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/add_white_18dp.svg" )
+									}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+										"gridx": 2
+									} )
 								} )
 							} )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {

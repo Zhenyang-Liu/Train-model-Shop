@@ -6,10 +6,6 @@ package gui;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.io.*;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
@@ -82,9 +78,13 @@ public class MainPage extends JFrame {
         productName1 = new JLabel();
         purchasePanel1 = new JPanel();
         productPrice1 = new JLabel();
-        panel1 = new JPanel();
+        buttonPanel1 = new JPanel();
         moreButton1 = new JButton();
         addButton1 = new JButton();
+        adjustNumPanel1 = new JPanel();
+        removeButton = new JButton();
+        NumButton = new JButton();
+        addButton = new JButton();
         bottomSeparator = compFactory.createSeparator("");
 
         //======== this ========
@@ -262,6 +262,7 @@ public class MainPage extends JFrame {
                     productCardPanel1.setPreferredSize(new Dimension(260, 280));
                     productCardPanel1.setMaximumSize(new Dimension(230, 240));
                     productCardPanel1.setMinimumSize(new Dimension(230, 240));
+                    productCardPanel1.setVisible(false);
                     productCardPanel1.setLayout(new GridBagLayout());
                     ((GridBagLayout)productCardPanel1.getLayout()).columnWidths = new int[] {0, 0};
                     ((GridBagLayout)productCardPanel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
@@ -301,26 +302,61 @@ public class MainPage extends JFrame {
                         productPrice1.setHorizontalAlignment(SwingConstants.CENTER);
                         purchasePanel1.add(productPrice1);
 
-                        //======== panel1 ========
+                        //======== buttonPanel1 ========
                         {
-                            panel1.setPreferredSize(new Dimension(240, 40));
-                            panel1.setLayout(new FlowLayout());
+                            buttonPanel1.setPreferredSize(new Dimension(240, 40));
+                            buttonPanel1.setLayout(new FlowLayout());
 
                             //---- moreButton1 ----
                             moreButton1.setText("Detail");
                             moreButton1.setBackground(new Color(0x4e748d));
                             moreButton1.setForeground(new Color(0xe0e2e8));
                             moreButton1.setPreferredSize(new Dimension(100, 30));
-                            panel1.add(moreButton1);
+                            buttonPanel1.add(moreButton1);
 
                             //---- addButton1 ----
                             addButton1.setText(bundle.getString("MainPage.addButton1.text"));
                             addButton1.setBackground(new Color(0x55a15a));
                             addButton1.setForeground(new Color(0xe0e2e8));
                             addButton1.setPreferredSize(new Dimension(100, 30));
-                            panel1.add(addButton1);
+                            buttonPanel1.add(addButton1);
+
+                            //======== adjustNumPanel1 ========
+                            {
+                                adjustNumPanel1.setLayout(new GridBagLayout());
+                                ((GridBagLayout)adjustNumPanel1.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+                                ((GridBagLayout)adjustNumPanel1.getLayout()).rowHeights = new int[] {0, 0};
+                                ((GridBagLayout)adjustNumPanel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+                                ((GridBagLayout)adjustNumPanel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+                                //---- removeButton ----
+                                removeButton.setBackground(new Color(0xb13437));
+                                removeButton.setForeground(new Color(0xe0e2e8));
+                                removeButton.setFont(removeButton.getFont().deriveFont(removeButton.getFont().getSize() + 7f));
+                                removeButton.setIcon(new FlatSVGIcon("images/remove_white_18dp.svg"));
+                                adjustNumPanel1.add(removeButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                                    new Insets(0, 0, 0, 5), 0, 0));
+
+                                //---- NumButton ----
+                                NumButton.setText("NUM");
+                                NumButton.setPreferredSize(new Dimension(50, 23));
+                                adjustNumPanel1.add(NumButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+                                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                                    new Insets(0, 0, 0, 5), 0, 0));
+
+                                //---- addButton ----
+                                addButton.setBackground(new Color(0x55a15a));
+                                addButton.setForeground(new Color(0xe0e2e8));
+                                addButton.setFont(addButton.getFont().deriveFont(addButton.getFont().getSize() + 7f));
+                                addButton.setIcon(new FlatSVGIcon("images/add_white_18dp.svg"));
+                                adjustNumPanel1.add(addButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+                                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                                    new Insets(0, 0, 0, 0), 0, 0));
+                            }
+                            buttonPanel1.add(adjustNumPanel1);
                         }
-                        purchasePanel1.add(panel1);
+                        purchasePanel1.add(buttonPanel1);
                     }
                     productCardPanel1.add(purchasePanel1, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
                         GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -368,25 +404,23 @@ public class MainPage extends JFrame {
     private JLabel productName1;
     private JPanel purchasePanel1;
     private JLabel productPrice1;
-    private JPanel panel1;
+    private JPanel buttonPanel1;
     private JButton moreButton1;
     private JButton addButton1;
+    private JPanel adjustNumPanel1;
+    private JButton removeButton;
+    private JButton NumButton;
+    private JButton addButton;
     private JComponent bottomSeparator;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
     private void customizeComponents() {
-        // 在这里添加自定义组件设置代码
-//        ImageIcon originalIcon = new ImageIcon("TrainShop\\src\\main\\images\\tgv.jpeg");
-//        Image originalImage = originalIcon.getImage();
-//        Image resizedImage = originalImage.getScaledInstance(productImage1.getWidth(), productImage1.getHeight(), Image.SCALE_SMOOTH);
-//        productImage1.setIcon(new ImageIcon(resizedImage));
-
-        //Image resizedImage18 = originalImage.getScaledInstance(label18.getWidth(), label18.getHeight(), Image.SCALE_SMOOTH);
-        //label18.setIcon(new ImageIcon(resizedImage18));
-
-        //Image resizedImage19 = originalImage.getScaledInstance(label19.getWidth(), label19.getHeight(), Image.SCALE_SMOOTH);
-        //label19.setIcon(new ImageIcon(resizedImage19));
-
+        /**
+       ImageIcon originalIcon = new ImageIcon("TrainShop\\src\\main\\images\\tgv.jpeg");
+       Image originalImage = originalIcon.getImage();
+       Image resizedImage = originalImage.getScaledInstance(productImage1.getWidth(), productImage1.getHeight(), Image.SCALE_SMOOTH);
+       productImage1.setIcon(new ImageIcon(resizedImage));
+         */
     }
 
     public void loadProducts() {
@@ -457,51 +491,124 @@ public class MainPage extends JFrame {
         productName.setBorder(new MatteBorder(3, 0, 3, 0, Color.black));
         productName.setPreferredSize(new Dimension(260, 70));
         productCardPanel.add(productName, new GridBagConstraints
-                (0, 1, 1, 1, 0.0, 0.7,
+                (0, 1, 1, 1, 0.0, 0.8,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                 new Insets(1, 0, 0, 0), 0, 0));
 
-        // 创建价格显示标签
+        // Create price display labels
         JLabel productPrice = new JLabel();
-        productPrice.setText(String.format("£%.2f", product.getRetailPrice()));
+        productPrice.setText("\u00A3" + String.format("%.2f", product.getRetailPrice()));
         productPrice.setFont(productPrice.getFont().deriveFont(productPrice.getFont().getSize() + 7f));
         productPrice.setHorizontalAlignment(SwingConstants.CENTER);
 
-        // 创建详情按钮
+        // Create Detail Button
         JButton moreButton = new JButton("Detail");
         moreButton.setBackground(new Color(0x4e748d));
         moreButton.setForeground(new Color(0xe0e2e8));
         moreButton.setPreferredSize(new Dimension(100, 30));
 
-        // 创建添加到购物车按钮
-        JButton addButton = new JButton("Add");
+
+        // Create Add button
+        JButton addButton = new JButton("ADD");
         addButton.setBackground(new Color(0x55a15a));
         addButton.setForeground(new Color(0xe0e2e8));
         addButton.setPreferredSize(new Dimension(100, 30));
 
-        // 创建购买面板，并添加价格和按钮
+        // "-"
+        JButton minusButton = new JButton();
+        minusButton.setBackground(new Color(0xb13437));
+        minusButton.setForeground(new Color(0xe0e2e8));
+        minusButton.setIcon(new FlatSVGIcon("images/remove_white_18dp.svg"));
+        minusButton.setPreferredSize(new Dimension(30, 30));
+
+        // "NUM"
+        JButton numberButton = new JButton("1");
+        numberButton.setHorizontalAlignment(SwingConstants.CENTER);
+        numberButton.setPreferredSize(new Dimension(50, 30));
+
+        // "+"
+        JButton plusButton = new JButton();
+        plusButton.setBackground(new Color(0x55a15a));
+        plusButton.setForeground(new Color(0xe0e2e8));
+        plusButton.setIcon(new FlatSVGIcon("images/add_white_18dp.svg"));
+        plusButton.setPreferredSize(new Dimension(30, 30));
+
+        JPanel adjustNumPanel = new JPanel(new GridBagLayout());
+        adjustNumPanel.setPreferredSize(new Dimension(120, 30));
+        ((GridBagLayout)adjustNumPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+        ((GridBagLayout)adjustNumPanel.getLayout()).rowHeights = new int[] {0, 0};
+        ((GridBagLayout)adjustNumPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+        ((GridBagLayout)adjustNumPanel.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+        adjustNumPanel.add(minusButton, new GridBagConstraints
+                (0, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 0, 0, 5), 0, 0));
+        adjustNumPanel.add(numberButton, new GridBagConstraints
+                (1, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 0, 0, 5), 0, 0));
+        adjustNumPanel.add(plusButton, new GridBagConstraints
+                (2, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 0, 0, 0), 0, 0));
+        adjustNumPanel.setVisible(false);
+
+        // Adding event listeners to the "Add" button
+        addButton.addActionListener(e -> {
+            addButton.setVisible(false);
+            adjustNumPanel.setVisible(true);
+
+        });
+
+        // Adding event listeners to the "-" button
+        minusButton.addActionListener(e -> {
+            int num = Integer.parseInt(numberButton.getText());
+            num--;
+            if (num < 1) {
+                // If the number is less than 1, go back to the initial state.
+                adjustNumPanel.setVisible(false);
+                addButton.setVisible(true);
+                // ... Here you can add code to update the number of products in the cart
+            } else {
+                numberButton.setText(String.valueOf(num));
+                // ... Here you can add code to update the number of products in the cart
+            }
+        });
+
+        // Adding event listeners to the "+" button
+        plusButton.addActionListener(e -> {
+            int num = Integer.parseInt(numberButton.getText());
+            num += 1;
+            numberButton.setText(String.valueOf(num));
+            // ... Here you can add code to update the number of products in the cart
+        });
+
+        // Create a purchase panel and add price
         JPanel purchasePanel = new JPanel();
         purchasePanel.setBorder(new EmptyBorder(10, 5, 5, 5));
         purchasePanel.setMaximumSize(new Dimension(190, 85));
-        purchasePanel.setLayout(new GridLayout(2, 1, 20, 10));
+        purchasePanel.setLayout(new GridLayout(2, 1, 20, 0));
         purchasePanel.add(productPrice);
 
-        // 创建按钮面板，并添加详情按钮和添加到购物车按钮
+        // Create button panel and add buttons
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setPreferredSize(new Dimension(240, 40));
+        moreButton.setPreferredSize(new Dimension(115, 30));
+        addButton.setPreferredSize(new Dimension(115, 30));
         buttonPanel.add(moreButton);
         buttonPanel.add(addButton);
+        buttonPanel.add(adjustNumPanel);
 
-        // 添加按钮面板到购买面板
+        // Add button panel to purchase panel
         purchasePanel.add(buttonPanel);
 
-        // 将购买面板添加到商品卡片面板
+        // Adding the Purchase Panel to the Card Panel
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.weightx = 1.0;
+        gbc.weightx = 1.2;
         gbc.weighty = 0.0;
         gbc.insets = new Insets(0, 0, 0, 0);
         productCardPanel.add(purchasePanel, gbc);
