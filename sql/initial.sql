@@ -1,6 +1,5 @@
 CREATE TABLE User (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(255) NOT NULL,
     forename VARCHAR(100),
     surname VARCHAR(100),
     address_id INT
@@ -9,13 +8,13 @@ CREATE TABLE User (
 CREATE TABLE Login (
     login_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
-    username VARCHAR(255) NOT NULL,
+    session_code VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     password_salt VARCHAR(255),
     failed_attempts INT DEFAULT 0,
-    last_login_attempt DATETIME,
+    last_login_attempt TIMESTAMP,
     lockout_enabled BOOLEAN DEFAULT FALSE,
-    lockout_end DATETIME,
+    lockout_end TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
@@ -67,8 +66,8 @@ CREATE TABLE Bank_Detail (
 CREATE TABLE Orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     total_cost FLOAT,
     status ENUM('Pending', 'Confirmed', 'Fulfilled','Declined') NOT NULL,
     FOREIGN KEY (user_id) REFERENCES User(user_id)
