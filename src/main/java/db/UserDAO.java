@@ -31,7 +31,7 @@ public class UserDAO {
             }
 
             // Insert user into database as they have not already been added
-            String insertSQL = "INSERT INTO User (UserID, Email, Password, Forename, Surname, RoleID) VALUES (?, ?, ?, ?, ?, ?)";
+            String insertSQL = "INSERT INTO User (UserID, Email, Password, Forename, Surname, Address) VALUES (?, ?, ?, ?, ?, ?)";
 
             PreparedStatement preparedStatement = conn.prepareStatement(insertSQL);
             preparedStatement.setInt(1, newUser.getUserID());
@@ -39,7 +39,7 @@ public class UserDAO {
             preparedStatement.setString(3, newUser.getPassword());
             preparedStatement.setString(4, newUser.getForename());
             preparedStatement.setString(5, newUser.getSurname());
-            preparedStatement.setInt(6, newUser.getRoleID());
+            preparedStatement.setString(6, newUser.getEmail());
 
             preparedStatement.executeUpdate();
             System.out.println("Successfully added user into database!");
