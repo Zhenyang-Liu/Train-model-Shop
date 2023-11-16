@@ -242,7 +242,7 @@ new FormModel {
 							"insets": new java.awt.Insets( 1, 0, 0, 0 )
 						} )
 						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
-							"columns": 2
+							"columns": 1
 							"rows": 2
 							"hgap": 20
 							"vgap": 10
@@ -255,36 +255,30 @@ new FormModel {
 								"text": new FormMessage( null, "MainPage.productPrice1.text" )
 								"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 7, false )
 								"preferredSize": new java.awt.Dimension( 80, 25 )
+								"horizontalAlignment": 0
 							} )
-							add( new FormComponent( "javax.swing.JSpinner" ) {
-								name: "productNumber1"
-								"model": new javax.swing.SpinnerNumberModel {
-									minimum: 1
-									value: 1
-								}
-								"preferredSize": new java.awt.Dimension( 50, 23 )
-								"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 4, false )
-							} )
-							add( new FormComponent( "javax.swing.JButton" ) {
-								name: "addButton1"
-								"text": new FormMessage( null, "MainPage.addButton1.text" )
-								"background": new java.awt.Color( 85, 161, 90, 255 )
-								"foreground": new java.awt.Color( 224, 226, 232, 255 )
-								"preferredSize": new java.awt.Dimension( 70, 30 )
-							} )
-							add( new FormComponent( "javax.swing.JButton" ) {
-								name: "moreButton1"
-								"text": new FormMessage( null, "MainPage.moreButton1.text" )
-								"background": new java.awt.Color( 61, 162, 231, 255 )
-								"foreground": new java.awt.Color( 224, 226, 232, 255 )
-								"preferredSize": new java.awt.Dimension( 70, 30 )
+							add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+								name: "panel1"
+								"preferredSize": new java.awt.Dimension( 240, 40 )
+								add( new FormComponent( "javax.swing.JButton" ) {
+									name: "moreButton1"
+									"text": "Detail"
+									"background": new java.awt.Color( 78, 116, 141, 255 )
+									"foreground": new java.awt.Color( 224, 226, 232, 255 )
+									"preferredSize": new java.awt.Dimension( 100, 30 )
+								} )
+								add( new FormComponent( "javax.swing.JButton" ) {
+									name: "addButton1"
+									"text": new FormMessage( null, "MainPage.addButton1.text" )
+									"background": new java.awt.Color( 85, 161, 90, 255 )
+									"foreground": new java.awt.Color( 224, 226, 232, 255 )
+									"preferredSize": new java.awt.Dimension( 100, 30 )
+								} )
 							} )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 							"gridy": 2
+							"weightx": 1.0
 							"hAlign": 5
-							"vAlign": 5
-							"weighty": 1.0
-							"insets": new java.awt.Insets( 0, 10, 0, 10 )
 						} )
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {

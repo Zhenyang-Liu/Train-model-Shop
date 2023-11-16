@@ -82,9 +82,9 @@ public class MainPage extends JFrame {
         productName1 = new JLabel();
         purchasePanel1 = new JPanel();
         productPrice1 = new JLabel();
-        productNumber1 = new JSpinner();
-        addButton1 = new JButton();
+        panel1 = new JPanel();
         moreButton1 = new JButton();
+        addButton1 = new JButton();
         bottomSeparator = compFactory.createSeparator("");
 
         //======== this ========
@@ -292,37 +292,39 @@ public class MainPage extends JFrame {
                     {
                         purchasePanel1.setBorder(new EmptyBorder(10, 5, 5, 5));
                         purchasePanel1.setMaximumSize(new Dimension(190, 85));
-                        purchasePanel1.setLayout(new GridLayout(2, 2, 20, 10));
+                        purchasePanel1.setLayout(new GridLayout(2, 1, 20, 10));
 
                         //---- productPrice1 ----
                         productPrice1.setText(bundle.getString("MainPage.productPrice1.text"));
                         productPrice1.setFont(productPrice1.getFont().deriveFont(productPrice1.getFont().getSize() + 7f));
                         productPrice1.setPreferredSize(new Dimension(80, 25));
+                        productPrice1.setHorizontalAlignment(SwingConstants.CENTER);
                         purchasePanel1.add(productPrice1);
 
-                        //---- productNumber1 ----
-                        productNumber1.setModel(new SpinnerNumberModel(1, 1, null, 1));
-                        productNumber1.setPreferredSize(new Dimension(50, 23));
-                        productNumber1.setFont(productNumber1.getFont().deriveFont(productNumber1.getFont().getSize() + 4f));
-                        purchasePanel1.add(productNumber1);
+                        //======== panel1 ========
+                        {
+                            panel1.setPreferredSize(new Dimension(240, 40));
+                            panel1.setLayout(new FlowLayout());
 
-                        //---- addButton1 ----
-                        addButton1.setText(bundle.getString("MainPage.addButton1.text"));
-                        addButton1.setBackground(new Color(0x55a15a));
-                        addButton1.setForeground(new Color(0xe0e2e8));
-                        addButton1.setPreferredSize(new Dimension(70, 30));
-                        purchasePanel1.add(addButton1);
+                            //---- moreButton1 ----
+                            moreButton1.setText("Detail");
+                            moreButton1.setBackground(new Color(0x4e748d));
+                            moreButton1.setForeground(new Color(0xe0e2e8));
+                            moreButton1.setPreferredSize(new Dimension(100, 30));
+                            panel1.add(moreButton1);
 
-                        //---- moreButton1 ----
-                        moreButton1.setText(bundle.getString("MainPage.moreButton1.text"));
-                        moreButton1.setBackground(new Color(0x3da2e7));
-                        moreButton1.setForeground(new Color(0xe0e2e8));
-                        moreButton1.setPreferredSize(new Dimension(70, 30));
-                        purchasePanel1.add(moreButton1);
+                            //---- addButton1 ----
+                            addButton1.setText(bundle.getString("MainPage.addButton1.text"));
+                            addButton1.setBackground(new Color(0x55a15a));
+                            addButton1.setForeground(new Color(0xe0e2e8));
+                            addButton1.setPreferredSize(new Dimension(100, 30));
+                            panel1.add(addButton1);
+                        }
+                        purchasePanel1.add(panel1);
                     }
-                    productCardPanel1.add(purchasePanel1, new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0,
+                    productCardPanel1.add(purchasePanel1, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
                         GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                        new Insets(0, 10, 0, 10), 0, 0));
+                        new Insets(0, 0, 0, 0), 0, 0));
                 }
                 productPanel.add(productCardPanel1);
             }
@@ -366,9 +368,9 @@ public class MainPage extends JFrame {
     private JLabel productName1;
     private JPanel purchasePanel1;
     private JLabel productPrice1;
-    private JSpinner productNumber1;
-    private JButton addButton1;
+    private JPanel panel1;
     private JButton moreButton1;
+    private JButton addButton1;
     private JComponent bottomSeparator;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
@@ -432,7 +434,6 @@ public class MainPage extends JFrame {
 
         // adjust the maximum and minimum sizes as needed.
         productCardPanel.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
 
         // Add a product image
         JLabel productImage = new JLabel();
@@ -460,46 +461,50 @@ public class MainPage extends JFrame {
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                 new Insets(1, 0, 0, 0), 0, 0));
 
-        // Create a purchase panel with prices and buttons
-        JPanel purchasePanel = new JPanel(new GridLayout(2, 2, 20, 10));
-        purchasePanel.setBorder(new EmptyBorder(10, 5, 5, 5));
-        purchasePanel.setMaximumSize(new Dimension(190, 85));
-
-        // Add product price
+        // 创建价格显示标签
         JLabel productPrice = new JLabel();
         productPrice.setText(String.format("£%.2f", product.getRetailPrice()));
-        Font newFont = new Font("Airal", Font.PLAIN, 12);
-        productPrice.setFont(newFont);
         productPrice.setFont(productPrice.getFont().deriveFont(productPrice.getFont().getSize() + 7f));
-        productPrice.setPreferredSize(new Dimension(80, 25));
-        purchasePanel.add(productPrice);
+        productPrice.setHorizontalAlignment(SwingConstants.CENTER);
 
-        // Add a product quantity selector
-        JSpinner productNumber = new JSpinner(new SpinnerNumberModel(1, 1, null, 1));
-        productNumber.setPreferredSize(new Dimension(50, 23));
-        purchasePanel.add(productNumber);
+        // 创建详情按钮
+        JButton moreButton = new JButton("Detail");
+        moreButton.setBackground(new Color(0x4e748d));
+        moreButton.setForeground(new Color(0xe0e2e8));
+        moreButton.setPreferredSize(new Dimension(100, 30));
 
-        // Add "Add" to Cart button
-        JButton addButton = new JButton("ADD");
+        // 创建添加到购物车按钮
+        JButton addButton = new JButton("Add");
         addButton.setBackground(new Color(0x55a15a));
         addButton.setForeground(new Color(0xe0e2e8));
-        addButton.setPreferredSize(new Dimension(70, 30));
-        addButton.setFont(addButton.getFont().deriveFont(addButton.getFont().getSize() + 1f));
-        purchasePanel.add(addButton);
+        addButton.setPreferredSize(new Dimension(100, 30));
 
-        // Add More Info button
-        JButton moreButton = new JButton("MORE");
-        moreButton.setBackground(new Color(0x3da2e7));
-        moreButton.setForeground(new Color(0xe0e2e8));
-        moreButton.setPreferredSize(new Dimension(70, 30));
-        moreButton.setFont(moreButton.getFont().deriveFont(moreButton.getFont().getSize() + 1f));
-        purchasePanel.add(moreButton);
+        // 创建购买面板，并添加价格和按钮
+        JPanel purchasePanel = new JPanel();
+        purchasePanel.setBorder(new EmptyBorder(10, 5, 5, 5));
+        purchasePanel.setMaximumSize(new Dimension(190, 85));
+        purchasePanel.setLayout(new GridLayout(2, 1, 20, 10));
+        purchasePanel.add(productPrice);
 
-        // Add the Purchase Panel to the Card Panel
-        productCardPanel.add(purchasePanel, new GridBagConstraints
-                (0, 2, 1, 1, 0.0, 1.0,
-                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                new Insets(0, 10, 0, 10), 0, 0));
+        // 创建按钮面板，并添加详情按钮和添加到购物车按钮
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        buttonPanel.setPreferredSize(new Dimension(240, 40));
+        buttonPanel.add(moreButton);
+        buttonPanel.add(addButton);
+
+        // 添加按钮面板到购买面板
+        purchasePanel.add(buttonPanel);
+
+        // 将购买面板添加到商品卡片面板
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.0;
+        gbc.insets = new Insets(0, 0, 0, 0);
+        productCardPanel.add(purchasePanel, gbc);
 
         return productCardPanel;
     }
