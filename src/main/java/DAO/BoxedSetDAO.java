@@ -17,7 +17,7 @@ import model.BoxedSet.BoxedType;
 public class BoxedSetDAO extends ProductDAO {
 
     public static void insertBoxedSet(BoxedSet set) throws SQLException {
-        String insertSQL = "INSERT INTO BoxedSet (ProductID, PackType) VALUES (?, ?);";
+        String insertSQL = "INSERT INTO BoxedSet (product_id, pack_type) VALUES (?, ?);";
         int productID = insertProduct(set);
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -32,7 +32,7 @@ public class BoxedSetDAO extends ProductDAO {
                 set.setProductID(productID);
                 insertBoxedSetItems(set);
             } else {
-                throw new SQLException("Creating Locomotive failed, no rows affected.");
+                throw new SQLException("Creating Boxed Set failed, no rows affected.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -42,7 +42,7 @@ public class BoxedSetDAO extends ProductDAO {
     }
 
     public static void insertBoxedSetItems(BoxedSet boxedSet) throws SQLException {
-        String insertSQL = "INSERT INTO BoxedSet_Item (BoxedSetID, ItemID, Quantity) VALUES (?, ?, ?);";
+        String insertSQL = "INSERT INTO BoxedSet_Item (boxed_set_id, item_id, quantity) VALUES (?, ?, ?);";
     
         try (Connection connection = DatabaseConnectionHandler.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
@@ -67,7 +67,7 @@ public class BoxedSetDAO extends ProductDAO {
 
     public static void updateBoxedSetItems(BoxedSet boxedSet) throws SQLException {
         ProductDAO.updateProduct(boxedSet);
-        String updateSQL = "UPDATE BoxedSet SET PackType = ? WHERE ProductID = ?;";
+        String updateSQL = "UPDATE BoxedSet SET pack_type = ? WHERE product_id = ?;";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -85,7 +85,7 @@ public class BoxedSetDAO extends ProductDAO {
     }
 
     public static void deleteBoxedSet(int productId) throws SQLException{
-        String deleteSQL = "DELETE FROM BoxedSet WHERE ProductID = ?;";
+        String deleteSQL = "DELETE FROM BoxedSet WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -107,7 +107,7 @@ public class BoxedSetDAO extends ProductDAO {
     }
 
     public static void deleteItem(int productId) throws SQLException{
-        String deleteSQL = "DELETE FROM BoxedSet_Item WHERE BoxedSetID = ?;";
+        String deleteSQL = "DELETE FROM BoxedSet_Item WHERE boxed_set_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -127,7 +127,7 @@ public class BoxedSetDAO extends ProductDAO {
     }
 
     public static BoxedSet findBoxedSetByID(int setID) throws SQLException {
-        String selectSQL = "SELECT * FROM BoxedSet WHERE ProductID = ?;";
+        String selectSQL = "SELECT * FROM BoxedSet WHERE product_id = ?;";
         BoxedSet set = new BoxedSet();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -136,9 +136,9 @@ public class BoxedSetDAO extends ProductDAO {
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                String newType = resultSet.getString("PackType");
+                String newType = resultSet.getString("pack_type");
                 set = new BoxedSet(newProduct,newType,findBoxedSetItem(productId));
             }
             return set;
@@ -150,7 +150,7 @@ public class BoxedSetDAO extends ProductDAO {
     }
 
     public static Map<Product, Integer> findBoxedSetItem(int setID) throws SQLException {
-        String selectSQL = "SELECT * FROM BoxedSet_Item WHERE BoxedSetID = ?;";
+        String selectSQL = "SELECT * FROM BoxedSet_Item WHERE boxed_set_id = ?;";
         Map<Product, Integer> contain = new HashMap<>();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -159,8 +159,8 @@ public class BoxedSetDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int itemID = resultSet.getInt("ItemID");
-                int quantity = resultSet.getInt("Quantity");
+                int itemID = resultSet.getInt("item_id");
+                int quantity = resultSet.getInt("quantity");
 
                 Product item = ProductDAO.findProductByID(itemID);
 
@@ -194,9 +194,9 @@ public class BoxedSetDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                String newType = resultSet.getString("PackType");
+                String newType = resultSet.getString("pack_type");
                 
                 BoxedSet set = new BoxedSet(newProduct,newType,findBoxedSetItem(productId));
                 setList.add(set);
@@ -210,7 +210,7 @@ public class BoxedSetDAO extends ProductDAO {
     }
     
     public static ArrayList<BoxedSet> findBoxedSetByType(BoxedType type) throws SQLException {
-        String selectSQL = "SELECT * FROM BoxedSet WHERE PackType = ?;";
+        String selectSQL = "SELECT * FROM BoxedSet WHERE pack_type = ?;";
         ArrayList<BoxedSet> setList = new ArrayList<>();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -219,9 +219,9 @@ public class BoxedSetDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                int productId = resultSet.getInt("ProductID");
+                int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
-                String newType = resultSet.getString("PackType");
+                String newType = resultSet.getString("pack_type");
                 
                 BoxedSet set = new BoxedSet(newProduct,newType,findBoxedSetItem(productId));
                 setList.add(set);
