@@ -71,7 +71,7 @@ public class Order {
         this.itemList = itemList;
     }
 
-    public Order(int userID, int addressID, double totalCost, Map<Product, Integer> itemList) {
+    public Order(int userID, int addressID, Map<Product, Integer> itemList) {
         this.userID = userID;
         this.addressID = addressID;
         this.createTime = Timestamp.from(Instant.now());

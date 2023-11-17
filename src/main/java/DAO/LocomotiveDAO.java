@@ -4,9 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import exception.ConnectionException;
+import exception.DatabaseException;
 import model.Gauge;
 import model.Locomotive;
 import model.Locomotive.*;
@@ -18,9 +21,9 @@ public class LocomotiveDAO extends ProductDAO {
      * Inserts a new locomotive record into the database.
      *
      * @param locomotive The locomotive object to be inserted.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static void insertLocomotive(Locomotive locomotive) throws SQLException {
+    public static void insertLocomotive(Locomotive locomotive) throws DatabaseException {
         int productID = insertProduct(locomotive);
         String insertSQL = "INSERT INTO Locomotive (product_id, gauge, dcc_type) VALUES (?, ?, ?);";
         
@@ -39,22 +42,20 @@ public class LocomotiveDAO extends ProductDAO {
             } else {
                 throw new SQLException("Creating Locomotive failed, no rows affected.");
             }
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("Error SQL query: " + insertSQL);
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
-
-       
     }
 
     /**
      * Updates an existing locomotive record in the database.
      *
      * @param locomotive The locomotive object with updated information.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static void updateLocomotive(Locomotive locomotive) throws SQLException{
+    public static void updateLocomotive(Locomotive locomotive) throws DatabaseException{
         ProductDAO.updateProduct(locomotive);
         String updateSQL = "UPDATE Locomotive SET gauge = ?, dcc_type = ? WHERE product_id = ?;";
         
@@ -64,46 +65,38 @@ public class LocomotiveDAO extends ProductDAO {
             preparedStatement.setString(1, locomotive.getGauge());
             preparedStatement.setString(2, locomotive.getDCCType().toString());
             preparedStatement.setInt(3, locomotive.getProductID());
-
             preparedStatement.executeUpdate();
+
+            EraDAO.deleteEra(locomotive.getProductID());
+            EraDAO.insertEra(locomotive.getProductID(), locomotive.getEra());
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
-        
-        EraDAO.deleteEra(locomotive.getProductID());
-        EraDAO.insertEra(locomotive.getProductID(), locomotive.getEra());
     }
 
     /**
      * Deletes a locomotive record from the database by product ID.
      *
      * @param productId The ID of the locomotive product to be deleted.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static void deleteLocomotive(int productId) throws SQLException{
+    public static void deleteLocomotive(int productId) throws DatabaseException{
         String deleteSQL = "DELETE FROM Locomotive WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
             preparedStatement.setInt(1, productId);
-
-            int rowsAffected = preparedStatement.executeUpdate();
+            preparedStatement.executeUpdate();
             
-            // Print to Test
-            if (rowsAffected > 0) {
-                System.out.println("Locomotive with ID " + productId + " was deleted successfully.");
-            } else {
-                System.out.println("No Locomotive was found with ID " + productId + " to delete.");
-            }
+            EraDAO.deleteEra(productId);
+            ProductDAO.deleteProduct(productId);
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        }   
-        
-        EraDAO.deleteEra(productId);
-        ProductDAO.deleteProduct(productId);
-
+            throw new DatabaseException(e.getMessage(),e);
+        }
     }
 
     /**
@@ -111,9 +104,9 @@ public class LocomotiveDAO extends ProductDAO {
      *
      * @param productID The ID of the locomotive product to be retrieved.
      * @return A Locomotive object representing the retrieved locomotive record | null if can't find.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static Locomotive findLocomotiveByID(int productID) throws SQLException {
+    public static Locomotive findLocomotiveByID(int productID) throws DatabaseException {
         String selectSQL = "SELECT * FROM Locomotive WHERE product_id = ?;";
         Locomotive locomotive = new Locomotive();
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -131,11 +124,12 @@ public class LocomotiveDAO extends ProductDAO {
 
                 locomotive = new Locomotive(newProduct, newGauge, newDCCType, newEra);
             }
-            return locomotive;
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
+        return locomotive;
     }
 
     /**
@@ -143,9 +137,9 @@ public class LocomotiveDAO extends ProductDAO {
      *
      * @param gauge The gauge to filter locomotives by.
      * @return An ArrayList of Locomotive objects that match the specified gauge | null if can't find.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Locomotive> findLocomotivesByGauge(Gauge gauge) throws SQLException{
+    public static ArrayList<Locomotive> findLocomotivesByGauge(Gauge gauge) throws DatabaseException{
         String selectSQL = "SELECT * FROM Locomotive WHERE gauge = ?;";
         ArrayList<Locomotive> locomotives = new ArrayList<Locomotive>();
 
@@ -165,11 +159,12 @@ public class LocomotiveDAO extends ProductDAO {
                 Locomotive locomotive = new Locomotive(newProduct, newGauge, newDCCType, newEra);
                 locomotives.add(locomotive);
             }
-            return locomotives;
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
+        return locomotives;
     }
     
     /**
@@ -177,9 +172,9 @@ public class LocomotiveDAO extends ProductDAO {
      *
      * @param eraList An array of era IDs to filter locomotives by.
      * @return An ArrayList of Locomotive objects that match the specified era(s) | null if can't find.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Locomotive> findLocomotivesByEra(int[] eraList) throws SQLException {
+    public static ArrayList<Locomotive> findLocomotivesByEra(int[] eraList) throws DatabaseException {
         ArrayList<Locomotive> locomotives = new ArrayList<Locomotive>();
     
         try (Connection connection = DatabaseConnectionHandler.getConnection()) {
@@ -206,11 +201,11 @@ public class LocomotiveDAO extends ProductDAO {
                     }
                 }
             }
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
-    
         return locomotives;
     }
     
@@ -219,9 +214,9 @@ public class LocomotiveDAO extends ProductDAO {
      *
      * @param dccType The DCC type to filter locomotives by.
      * @return An ArrayList of Locomotive objects that match the specified DCC type | null if can't find.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Locomotive> findLocomotivesByDCCType(DCCType dccType) throws SQLException{
+    public static ArrayList<Locomotive> findLocomotivesByDCCType(DCCType dccType) throws DatabaseException{
         String selectSQL = "SELECT * FROM Locomotive WHERE dcc_type = ?;";
         ArrayList<Locomotive> locomotives = new ArrayList<Locomotive>();
 
@@ -241,20 +236,21 @@ public class LocomotiveDAO extends ProductDAO {
                 Locomotive locomotive = new Locomotive(newProduct, newGauge, newDCCType, newEra);
                 locomotives.add(locomotive);
             }
-            return locomotives;
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
+        return locomotives;
     }
 
     /**
      * Retrieves a list of all locomotives from the database.
      *
      * @return An ArrayList of all Locomotive objects in the database | null if can't find.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Locomotive> findAllLocomotives() throws SQLException{
+    public static ArrayList<Locomotive> findAllLocomotives() throws DatabaseException{
         String selectSQL = "SELECT * FROM Locomotive;";
         ArrayList<Locomotive> locomotives = new ArrayList<Locomotive>();
 
@@ -273,11 +269,12 @@ public class LocomotiveDAO extends ProductDAO {
                 Locomotive locomotive = new Locomotive(newProduct, newGauge, newDCCType, newEra);
                 locomotives.add(locomotive);
             }
-            return locomotives;
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
+        return locomotives;
     }
     
 }

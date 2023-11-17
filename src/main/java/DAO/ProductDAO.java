@@ -4,9 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import exception.ConnectionException;
+import exception.DatabaseException;
 import model.*;
 
 public class ProductDAO {
@@ -16,9 +19,9 @@ public class ProductDAO {
      *
      * @param product The product to insert.
      * @return The productID of this product in database
-     * @throws SQLException If there is a problem executing the insert.
+     * @throws DatabaseException If there is a problem executing the insert.
      */  
-    public static int insertProduct(Product product) throws SQLException {
+    public static int insertProduct(Product product) throws DatabaseException {
         int productId = 0;
         String insertSQL = "INSERT INTO Product (brand_id, product_name, product_code, "
                 + "retail_price, description, stock_quantity) "
@@ -56,9 +59,10 @@ public class ProductDAO {
             } else {
                 throw new SQLException("Creating product failed, no rows affected.");
             }
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
     
         return productId;
@@ -68,9 +72,9 @@ public class ProductDAO {
      * Update a product information into the database.
      *
      * @param product The product to update.
-     * @throws SQLException If there is a problem executing the update.
+     * @throws DatabaseException If there is a problem executing the update.
      */ 
-    public static void updateProduct(Product product) throws SQLException {
+    public static void updateProduct(Product product) throws DatabaseException {
         String updateSQL = "UPDATE Product SET brand_id = ?, product_name = ?, product_code = ?, retail_price = ?, "
             + "description = ?, stock_quantity = ? WHERE product_id = ?;"; 
 
@@ -87,9 +91,10 @@ public class ProductDAO {
 
             preparedStatement.executeUpdate();
             
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
     }
 
@@ -97,9 +102,9 @@ public class ProductDAO {
      * Deletes a product from the database by its ID.
      *
      * @param productId The ID of the product to be deleted.
-     * @throws SQLException If a database access error occurs or this method is called on a closed connection.
+     * @throws DatabaseException If a database access error occurs or this method is called on a closed connection.
      */
-    public static void deleteProduct(int productId) throws SQLException {
+    public static void deleteProduct(int productId) throws DatabaseException {
         String deleteSQL = "DELETE FROM Product WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -114,9 +119,10 @@ public class ProductDAO {
             } else {
                 System.out.println("No product was found with ID " + productId + " to delete.");
             }
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }        
     }
 
@@ -125,9 +131,9 @@ public class ProductDAO {
      * 
      * @param productID the product ID of the product to be found.
      * @return The selected Product object in database.
-     * @throws SQLException If there is a problem executing the select.
+     * @throws DatabaseException If there is a problem executing the select.
      */
-    public static Product findProductByID(int productID) throws SQLException {
+    public static Product findProductByID(int productID) throws DatabaseException {
         String selectSQL = "SELECT * FROM Product WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -146,19 +152,16 @@ public class ProductDAO {
                 product.setRetailPrice(resultSet.getFloat("retail_price"));
                 product.setStockQuantity(resultSet.getInt("stock_quantity"));
             }
-
             // //Print for test
             // System.out.println("<=================== GET SPECIFIC PRODUCTS By ID====================>");
             // System.out.println(product.toString());
             // System.out.println("<======================================================>");
-
             return product;
-            
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
-        
     }
 
     /**
@@ -166,9 +169,9 @@ public class ProductDAO {
      * 
      * @param productCode the product code of the product to be found.
      * @return The selected Product object in database.
-     * @throws SQLException If there is a problem executing the select.
+     * @throws DatabaseException If there is a problem executing the select.
      */
-    public static Product findProductByCode(String productCode) throws SQLException {
+    public static Product findProductByCode(String productCode) throws DatabaseException {
         String selectSQL = "SELECT * FROM Product WHERE product_code = ?;";
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -195,9 +198,10 @@ public class ProductDAO {
 
             return product;
             
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
         
     }
@@ -206,9 +210,9 @@ public class ProductDAO {
      * Retrieve all products in the database.
      * 
      * @return An ArrayList<Product> with all Product in database.
-     * @throws SQLException If there is a problem executing the select.
+     * @throws DatabaseException If there is a problem executing the select.
      */
-    public static ArrayList<Product> getAllProduct() throws SQLException {
+    public static ArrayList<Product> getAllProduct() throws DatabaseException {
         String selectSQL = "SELECT * FROM Product";
         ArrayList<Product> productList = new ArrayList<>();
 
@@ -239,9 +243,10 @@ public class ProductDAO {
              
             return productList;
             
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
     }
 
@@ -250,9 +255,9 @@ public class ProductDAO {
      *
      * @param productName The name of the product for which to retrieve the ID.
      * @return The product ID corresponding to the given product name, or 0 if not found.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static int findIDByName(String productName) throws SQLException {
+    public static int findIDByName(String productName) throws DatabaseException {
         String selectSQL = "SELECT product_id FROM Product WHERE product_name = ?";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -267,9 +272,10 @@ public class ProductDAO {
                 productId = resultSet.getInt("product_id");
             }
             return productId;
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
     }
 
@@ -278,9 +284,9 @@ public class ProductDAO {
      * 
      * @param productCode The code of the product to check in the database.
      * @return {@code True} if the code exists, {@code False} otherwise.
-     * @throws SQLException If there is an error during the database query operation.
+     * @throws DatabaseException If there is an error during the database query operation.
      */
-    public static Boolean productCodeExist(String productCode) throws SQLException {
+    public static Boolean productCodeExist(String productCode) throws DatabaseException {
         String selectSQL = "SELECT COUNT(*) FROM Product WHERE product_code = ?";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -292,9 +298,10 @@ public class ProductDAO {
                     return resultSet.getInt(1) > 0;
                 }
             }
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
         return false;
     }

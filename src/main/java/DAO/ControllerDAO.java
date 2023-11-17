@@ -4,14 +4,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
 
+import exception.ConnectionException;
+import exception.DatabaseException;
 import model.Controller;
 import model.Product;
 
 public class ControllerDAO extends ProductDAO {
 
-    public static void insertController(Controller controller) throws SQLException {
+    public static void insertController(Controller controller) throws DatabaseException {
         int productID = insertProduct(controller);
         String insertSQL = "INSERT INTO Controller (product_id, digital_type) VALUES (?, ?);";
         
@@ -31,16 +34,16 @@ public class ControllerDAO extends ProductDAO {
             if (rowsAffected == 0) {
                 throw new SQLException("Creating Controller failed, no rows affected.");
             } 
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("Error SQL query: " + insertSQL);
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
 
        
     }
 
-    public static void updateController(Controller controller) throws SQLException{
+    public static void updateController(Controller controller) throws DatabaseException {
         ProductDAO.updateProduct(controller);
         String updateSQL = "UPDATE Controller SET digital_type = ? WHERE product_id = ?;";
         
@@ -54,13 +57,14 @@ public class ControllerDAO extends ProductDAO {
             }
 
             preparedStatement.executeUpdate();
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
     }
 
-    public static void deleteController(int productId) throws SQLException{
+    public static void deleteController(int productId) throws DatabaseException {
         String deleteSQL = "DELETE FROM Controller WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -76,43 +80,43 @@ public class ControllerDAO extends ProductDAO {
             } else {
                 System.out.println("No Locomotive was found with ID " + productId + " to delete.");
             }
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        }   
+            throw new DatabaseException(e.getMessage(),e);
+        }  
     
     }
 
-    public static Controller findControllerByID(int productID) throws SQLException {
+    public static Controller findControllerByID(int productID) throws DatabaseException {
         String selectSQL = "SELECT * FROM Controller WHERE product_id = ?";
         Controller controller = new Controller();
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
-
             preparedStatement.setInt(1, productID);
-            ResultSet resultSet = preparedStatement.executeQuery();
 
+            ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
                 boolean isDigital = resultSet.getInt("digital_type") == 1;
-
                 controller = new Controller(newProduct, isDigital);
             }
-            return controller;
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
+        return controller;
     }
     
-    public static ArrayList<Controller> findControllersByType(boolean isDigital) throws SQLException {
+    public static ArrayList<Controller> findControllersByType(boolean isDigital) throws DatabaseException {
         ArrayList<Controller> controllers = new ArrayList<Controller>();
         String  selectSQL = "SELECT * FROM Controller WHERE digital_type = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
-            
+        
             if (isDigital){
                 preparedStatement.setString(1, "Digital");
             } else {
@@ -120,7 +124,6 @@ public class ControllerDAO extends ProductDAO {
             }
             
             ResultSet resultSet = preparedStatement.executeQuery();
-
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
@@ -129,16 +132,15 @@ public class ControllerDAO extends ProductDAO {
                 Controller controller = new Controller(newProduct, digital);
                 controllers.add(controller);
             }
-            return controllers;
-
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
-
+        return controllers;
     }
     
-    public static ArrayList<Controller> findAllControllers() throws SQLException {
+    public static ArrayList<Controller> findAllControllers() throws DatabaseException {
         ArrayList<Controller> controllers = new ArrayList<Controller>();
         String  selectSQL = "SELECT * FROM Controller;";
 
@@ -155,13 +157,12 @@ public class ControllerDAO extends ProductDAO {
                 Controller controller = new Controller(newProduct, digital);
                 controllers.add(controller);
             }
-            return controllers;
-            
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
-
+        return controllers;
     }
     
 }

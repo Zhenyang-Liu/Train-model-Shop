@@ -4,17 +4,20 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
+import exception.ConnectionException;
+import exception.DatabaseException;
 import model.Order;
 import model.Product;
 
 public class OrderDAO {
 
-    public static void insertOrder(Order order) throws SQLException { 
+    public static void insertOrder(Order order) throws DatabaseException { 
         String insertSQL = "INSERT INTO Orders (user_id, delivery_address_id, create_time, update_time, total_cost, status) "
             + "VALUES (?,?,?,?,?,?);";
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -41,10 +44,14 @@ public class OrderDAO {
             } else {
                 throw new SQLException("Creating cart failed, no rows affected.");
             }
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(),e);
         }
     }
 
-    public static void insertOrderLine(int orderID, Map<Product, Integer> orderList) throws SQLException { 
+    public static void insertOrderLine(int orderID, Map<Product, Integer> orderList) throws DatabaseException { 
         String insertSQL =  "INSERT INTO Order_Line (order_id, product_id, quantity, line_cost) VALUES (?,?,?,?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -65,13 +72,14 @@ public class OrderDAO {
     
             preparedStatement.executeBatch();
 
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
     }
 
-    public static void updateOrderStatus(int orderId, String newStatus) throws SQLException {
+    public static void updateOrderStatus(int orderId, String newStatus) throws DatabaseException {
         String updateSQL = "UPDATE Orders SET status = ? WHERE order_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -84,14 +92,15 @@ public class OrderDAO {
             if (affectedRows == 0) {
                 throw new SQLException("Updating order failed, no rows affected.");
             }
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
     }
 
 
-    public static Order findOrderByID(int orderID) throws SQLException {
+    public static Order findOrderByID(int orderID) throws DatabaseException {
         String selectSQL = "SELECT * FROM Orders WHERE order_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -112,16 +121,16 @@ public class OrderDAO {
 
                 return new Order(orderID, userID, addressID, createTime, updateTime, total_cost, status,itemList);
             }
-            return null;
 
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
-
+        return null;
     }
     
-    public static Map<Product,Integer> findOrderItems(int orderID) throws SQLException {
+    public static Map<Product,Integer> findOrderItems(int orderID) throws DatabaseException {
         String selectSQL = "SELECT * FROM Order_Line WHERE order_id = ?;";
         Map<Product,Integer> itemList = new HashMap<>();
 
@@ -137,12 +146,13 @@ public class OrderDAO {
 
                 itemList.put(ProductDAO.findProductByID(productID),quantity);
             }
-            return itemList;
+            
 
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
-
+        return itemList;
     }
 }
