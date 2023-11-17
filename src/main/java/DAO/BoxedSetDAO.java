@@ -70,7 +70,7 @@ public class BoxedSetDAO extends ProductDAO {
         String updateSQL = "UPDATE BoxedSet SET pack_type = ? WHERE product_id = ?;";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
             
             preparedStatement.setString(1, boxedSet.getBoxedType());
             preparedStatement.setInt(3, boxedSet.getProductID());
@@ -88,7 +88,7 @@ public class BoxedSetDAO extends ProductDAO {
         String deleteSQL = "DELETE FROM BoxedSet WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
             preparedStatement.setInt(1, productId);
             deleteItem(productId);
 
@@ -110,7 +110,7 @@ public class BoxedSetDAO extends ProductDAO {
         String deleteSQL = "DELETE FROM BoxedSet_Item WHERE boxed_set_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
             preparedStatement.setInt(1, productId);
 
             int rowsAffected = preparedStatement.executeUpdate();

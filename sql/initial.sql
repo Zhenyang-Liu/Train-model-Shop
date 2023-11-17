@@ -1,8 +1,7 @@
 CREATE TABLE User (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     forename VARCHAR(100),
-    surname VARCHAR(100),
-    address_id INT
+    surname VARCHAR(100)
 );
 
 CREATE TABLE Login (
@@ -45,11 +44,12 @@ CREATE TABLE Role_Permission (
 );
 
 CREATE TABLE Address (
+    address_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
     house_number VARCHAR(255),
     road_name VARCHAR(255),
     city_name VARCHAR(255),
     postcode VARCHAR(10),
-    user_id INT,
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
@@ -66,11 +66,13 @@ CREATE TABLE Bank_Detail (
 CREATE TABLE Orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
+    delivery_address_id INT NOT NULL,
     create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    total_cost FLOAT,
-    status ENUM('Pending', 'Confirmed', 'Fulfilled','Declined') NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES User(user_id)
+    total_cost DECIMAL(10, 2) NOT NULL,
+    status ENUM('Pending', 'Confirmed', 'Fulfilled') NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES User(user_id),
+    FOREIGN KEY (delivery_address_id) REFERENCES Address(address_id)
 );
 
 CREATE TABLE Cart (
@@ -91,27 +93,26 @@ CREATE TABLE Product (
     brand_id INT NOT NULL,
     product_name VARCHAR(255) NOT NULL,
     product_code VARCHAR(8) NOT NULL,
-    retail_price FLOAT NOT NULL,
+    retail_price DECIMAL(10, 2) NOT NULL,
     description TEXT NOT NULL,
     stock_quantity INT NOT NULL,
     FOREIGN KEY (brand_id) REFERENCES Brand(brand_id)
 );
 
 CREATE TABLE Order_Line (
+    order_id INT NOT NULL,
     product_id INT NOT NULL,
     quantity INT NOT NULL,
-    line_cost FLOAT,
-    order_id INT NOT NULL,
+    line_cost DECIMAL(10, 2) NOT NULL,
     FOREIGN KEY (product_id) REFERENCES Product(product_id),
     FOREIGN KEY (order_id) REFERENCES Orders(order_id)
 );
 
 CREATE TABLE Cart_Item (
     cart_item_id INT AUTO_INCREMENT PRIMARY KEY,
-    cart_id INT,
-    product_id INT,
-    quantity INT,
-    added_date TIMESTAMP,
+    cart_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
     FOREIGN KEY (product_id) REFERENCES Product(product_id),
     FOREIGN KEY (cart_id) REFERENCES Cart(cart_id)
 );

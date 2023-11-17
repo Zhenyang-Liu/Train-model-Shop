@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -26,7 +25,7 @@ public class RollingStockDAO extends ProductDAO {
         String insertSQL = "INSERT INTO RollingStock (product_id, type, gauge) VALUES (?, ?, ?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             
             preparedStatement.setInt(1, productID);
             preparedStatement.setString(2, rollingStock.getRollingStockType());
@@ -59,7 +58,7 @@ public class RollingStockDAO extends ProductDAO {
         String updateSQL = "UPDATE RollingStock SET type = ?, gauge = ? WHERE product_id = ?;";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
             
             preparedStatement.setString(1, rollingStock.getRollingStockType());
             preparedStatement.setString(2, rollingStock.getGauge());
@@ -89,7 +88,7 @@ public class RollingStockDAO extends ProductDAO {
         String deleteSQL = "DELETE FROM RollingStock WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
             preparedStatement.setInt(1, productId);
 
             int rowsAffected = preparedStatement.executeUpdate();

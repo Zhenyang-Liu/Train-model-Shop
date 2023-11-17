@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -26,7 +25,7 @@ public class LocomotiveDAO extends ProductDAO {
         String insertSQL = "INSERT INTO Locomotive (product_id, gauge, dcc_type) VALUES (?, ?, ?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             
             preparedStatement.setInt(1, productID);
             preparedStatement.setString(2, locomotive.getGauge());

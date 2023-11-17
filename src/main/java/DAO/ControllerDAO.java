@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 import model.Controller;
@@ -17,7 +16,7 @@ public class ControllerDAO extends ProductDAO {
         String insertSQL = "INSERT INTO Controller (product_id, digital_type) VALUES (?, ?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             
             preparedStatement.setInt(1, productID);
             if (controller.getDigitalType()) {
