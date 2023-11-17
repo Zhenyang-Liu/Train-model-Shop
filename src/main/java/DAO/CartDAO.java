@@ -74,30 +74,11 @@ public class CartDAO {
         }
     }
 
-    public static void deleteCart(int cartID) throws SQLException {
-        // Delete Cart Item from database first
+    public static void clearCart(int cartID) throws SQLException {
         ArrayList<CartItem> itemList = findCartItems(cartID);
         for (CartItem item : itemList) {
             deleteCartItem(item.getItemID());
         }
-        
-        String deleteSQL = "DELETE FROM Cart WHERE cart_id = ?;";
-
-        try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
-            preparedStatement.setInt(1, cartID);
-
-            int rowsAffected = preparedStatement.executeUpdate();
-            
-            if (rowsAffected > 0) {
-                System.out.println("Cart with ID " + cartID + " was deleted successfully.");
-            } else {
-                System.out.println("No cart was found in set ID " + cartID + " to delete.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        }  
     }
 
     public static void deleteCartItem(int itemID) throws SQLException {
@@ -109,11 +90,11 @@ public class CartDAO {
 
             int rowsAffected = preparedStatement.executeUpdate();
             
-            if (rowsAffected > 0) {
-                System.out.println("Cart Item with ID " + itemID + " was deleted successfully.");
-            } else {
-                System.out.println("No cart item was found in set ID " + itemID + " to delete.");
-            }
+            // if (rowsAffected > 0) {
+            //     System.out.println("Cart Item with ID " + itemID + " was deleted successfully.");
+            // } else {
+            //     System.out.println("No cart item was found in set ID " + itemID + " to delete.");
+            // }
         } catch (SQLException e) {
             e.printStackTrace();
             throw e;
@@ -146,7 +127,33 @@ public class CartDAO {
 
     }
     
-    private static ArrayList<CartItem> findCartItems(int cartID) throws SQLException {
+    public static CartItem findCartItem(int itemID) throws SQLException {
+        String selectSQL = "SELECT * FROM Cart_Item WHERE cart_item_id = ?;";
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+
+            preparedStatement.setInt(1, itemID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                itemID = resultSet.getInt("cart_item_id");
+                int productID = resultSet.getInt("product_id");
+                int quantity = resultSet.getInt("quantity");
+
+               CartItem item = new CartItem(itemID, ProductDAO.findProductByID(productID), quantity);
+               return item;
+            }
+            return null;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+
+    }
+
+    public static ArrayList<CartItem> findCartItems(int cartID) throws SQLException {
         String selectSQL = "SELECT * FROM Cart_Item WHERE cart_id = ?;";
         ArrayList<CartItem> itemList = new ArrayList<CartItem>();
 
@@ -171,5 +178,26 @@ public class CartDAO {
             throw e;
         }
 
+    }
+
+    public static int findCartID(int userID) throws SQLException {
+        String selectSQL = "SELECT cart_id FROM Cart WHERE user_id = ?;";
+        int cartID = -1;
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+
+            preparedStatement.setInt(1, userID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                cartID = resultSet.getInt("cart_id");
+            }
+            return cartID;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 }
