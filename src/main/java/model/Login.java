@@ -1,9 +1,11 @@
 package model;
 
+import java.sql.Timestamp;
+
 public class Login{
 
-    private final int loginID;
-    private final int userID;
+    private int loginID;
+    private int userID;
 
     private String username;
     private String passwordHash;
@@ -15,10 +17,17 @@ public class Login{
     private boolean lockoutEnabled;
     private Timestamp lockoutEnd;
 
+
+    public Login(int userID, String username, String passwordHash, String passwordSalt){
+        this.setUserID(userID);
+        this.setUsername(username);
+        this.setPassword(passwordHash, passwordSalt);
+    }
+
     /**
      * Sets the loginID
      *
-     * @param loginID the id of the login information
+     * @param loginID the id of the login information. Autoincrements in the table so dont set this unless needed :D
      */
     public void setLoginID(int loginID){
         this.loginID = loginID;
@@ -173,7 +182,7 @@ public class Login{
      *
      * @return whether lockout is enabled for this login
      */
-    public void isLockoutEnabled(){
+    public boolean isLockoutEnabled(){
         return this.lockoutEnabled;
     }
 
