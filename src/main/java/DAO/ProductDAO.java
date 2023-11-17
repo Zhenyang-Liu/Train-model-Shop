@@ -75,7 +75,7 @@ public class ProductDAO {
             + "description = ?, stock_quantity = ? WHERE product_id = ?;"; 
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
             // Set the parameters for the product
             preparedStatement.setInt(1, product.getBrand().getBrandID());
             preparedStatement.setString(2, product.getProductName());

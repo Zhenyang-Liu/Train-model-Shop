@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 import model.Gauge;
@@ -25,7 +24,7 @@ public class TrackDAO extends ProductDAO {
         String insertSQL = "INSERT INTO Track (product_id, track_type, gauge) VALUES (?, ?, ?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             
             preparedStatement.setInt(1, productID);
             preparedStatement.setString(2, track.getTrackType());
@@ -57,7 +56,7 @@ public class TrackDAO extends ProductDAO {
         String updateSQL = "UPDATE Track SET track_type = ?, gauge = ? WHERE product_id = ?;";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
             
             preparedStatement.setString(1, track.getTrackType());
             preparedStatement.setString(2, track.getGauge());
@@ -87,7 +86,7 @@ public class TrackDAO extends ProductDAO {
         String deleteSQL = "DELETE FROM Track WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
             preparedStatement.setInt(1, productId);
 
             int rowsAffected = preparedStatement.executeUpdate();
