@@ -7,35 +7,106 @@ new FormModel {
 	"i18n.keyPrefix": "LoginPage"
 	contentType: "form/swing"
 	root: new FormRoot {
-		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 			name: "this"
+			"preferredSize": new java.awt.Dimension( 600, 450 )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
-				name: "dialogPane"
+				name: "LoginDialogPanel"
 				"border": new javax.swing.border.EmptyBorder( 12, 12, 12, 12 )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+					"$columnSpecs": "0"
+					"$rowSpecs": "0, 0"
+					"$hGap": 5
+					"$vGap": 5
+					"$alignTop": true
+					"$alignLeft": true
+				} ) {
+					name: "LoginContentPanel"
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+						"axis": 1
+					} ) {
+						name: "LoginTitlePanel"
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "LoginTitleLabel"
+							"text": new FormMessage( null, "LoginPage.LoginTitleLabel.text" )
+							"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 11, false )
+							"border": new javax.swing.border.EmptyBorder( 5, 5, 5, 5 )
+							"foreground": new java.awt.Color( 0, 51, 102, 255 )
+						} )
+						add( new FormComponent( "javax.swing.JSeparator" ) {
+							name: "LoginTitleSeparator"
+						} )
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
+						"columns": 1
+						"rows": 4
+					} ) {
+						name: "LoginFormPanel"
+						"preferredSize": new java.awt.Dimension( 200, 130 )
+						"minimumSize": new java.awt.Dimension( 50, 92 )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "LoginLabel_email"
+							"text": "Email"
+							"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 4, false )
+							"preferredSize": new java.awt.Dimension( 42, 11 )
+							"minimumSize": new java.awt.Dimension( 42, 16 )
+							"maximumSize": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						} )
+						add( new FormComponent( "javax.swing.JTextField" ) {
+							name: "LoginTextField_email"
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "LoginLabel_password"
+							"text": new FormMessage( null, "LoginPage.LoginLabel_password.text" )
+							"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 4, false )
+						} )
+						add( new FormComponent( "javax.swing.JPasswordField" ) {
+							name: "LoginPasswordField"
+						} )
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"hAlign": 0
+						"vAlign": 0
+						"weightx": 1.0
+						"weighty": 1.0
+						"gridy": 1
+					} )
+				}, new FormLayoutConstraints( class java.lang.String ) {
+					"value": "Center"
+				} )
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
 					"$columnSpecs": "0, 0:1.0, 80, 80"
 					"$rowSpecs": "0"
 					"$hGap": 5
 					"$vGap": 5
 				} ) {
-					name: "buttonBar"
+					name: "LoginButtonBar"
 					"border": new javax.swing.border.EmptyBorder( 12, 0, 0, 0 )
 					add( new FormComponent( "javax.swing.JButton" ) {
 						name: "button_register"
 						"text": new FormMessage( null, "LoginPage.button_register.text" )
+						"background": new java.awt.Color( 85, 161, 90, 255 )
+						"foreground": new java.awt.Color( 233, 229, 229, 255 )
+						"preferredSize": new java.awt.Dimension( 95, 28 )
+						"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 1, false )
 						addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_to_registerPageMouseClicked", true ) )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
 					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "okButton"
+						name: "LoginButton"
 						"text": "Login"
 						"actionCommand": "Login"
+						"background": new java.awt.Color( 0, 51, 102, 255 )
+						"foreground": new java.awt.Color( 233, 229, 229, 255 )
+						"preferredSize": new java.awt.Dimension( 78, 28 )
+						"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 1, false )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridx": 2
 						"gridy": 0
 					} )
 					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "cancelButton"
+						name: "LoginCancelButton"
 						"text": "Back"
+						"preferredSize": new java.awt.Dimension( 78, 28 )
+						"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 1, false )
 						addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "backButtonMouseClicked", true ) )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridx": 3
@@ -44,67 +115,12 @@ new FormModel {
 				}, new FormLayoutConstraints( class java.lang.String ) {
 					"value": "South"
 				} )
-				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label1"
-					"text": new FormMessage( null, "LoginPage.label1.text" )
-					"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 11, false )
-				}, new FormLayoutConstraints( class java.lang.String ) {
-					"value": "North"
-				} )
-				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
-					name: "panel2"
-					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
-						name: "panel3"
-						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "label4"
-							"text": "Email"
-							"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 4, false )
-						}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-							"x": 15
-							"y": 15
-							"width": 160
-						} )
-						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "label5"
-							"text": new FormMessage( null, "LoginPage.label5.text" )
-							"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 4, false )
-						}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-							"x": 15
-							"y": 90
-							"width": 160
-						} )
-						add( new FormComponent( "javax.swing.JTextField" ) {
-							name: "textField1"
-						}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-							"x": 15
-							"y": 45
-							"width": 160
-							"height": 25
-						} )
-						add( new FormComponent( "javax.swing.JPasswordField" ) {
-							name: "passwordField1"
-						}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-							"x": 15
-							"y": 120
-							"width": 160
-							"height": 25
-						} )
-					}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-						"x": 125
-						"y": 25
-						"width": 200
-						"height": 190
-					} )
-				}, new FormLayoutConstraints( class java.lang.String ) {
-					"value": "Center"
-				} )
-			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"width": 478
-				"height": 329
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "Center"
 			} )
 		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 0, 5 )
-			"size": new java.awt.Dimension( 480, 360 )
+			"location": new java.awt.Point( 25, 55 )
+			"size": new java.awt.Dimension( 600, 450 )
 		} )
 	}
 }
