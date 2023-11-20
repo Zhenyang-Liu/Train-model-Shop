@@ -3,6 +3,7 @@ package service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import DAO.CartDAO;
 import DAO.ProductDAO;
@@ -51,7 +52,7 @@ public class CartService {
 
     /**
      * Removes an item from a cart.
-     * 
+     *
      * This method checks if the current user is authorized to access the cart containing the item.
      * If authorized, it proceeds to remove the specified item from the cart.
      *
@@ -60,6 +61,39 @@ public class CartService {
      */
     public static void removeFromCart(int itemID) throws DatabaseException {
         try {
+            int itemHolderID = CartDAO.findCartBelongedTo(CartDAO.findItemBelongedTo(itemID));
+            if (!Validation.isCurrentUser(itemHolderID)){
+                throw new AuthorizationException("Access denied. Users can only access their own carts.");
+            }
+            CartDAO.deleteCartItem(itemID);
+
+        } catch (DatabaseException e) {
+            ExceptionHandler.printErrorMessage(e);
+            throw e;
+        }
+    }
+
+    /**
+     * Removes a product from a shopping cart.
+     * <p>
+     * This method removes a specified product from a given cart. It first checks if the specified product
+     * exists in the cart. If the product is found, the method then verifies that the current user
+     * has authorization to modify the cart. If the user is authorized, the product is removed from the cart.
+     * </p>
+     *
+     * @param cartID    The ID of the cart from which the product is to be removed.
+     * @param productID The ID of the product to be removed from the cart.
+     * @throws DatabaseException       If there is any issue with database connectivity or operations.
+     * @throws AuthorizationException  If the current user does not have access to the cart.
+     *
+     * <p>
+     * The method throws an {@code AuthorizationException} if the current user is not the owner of the cart.
+     * Any database-related issues encountered during the operation will result in a {@code DatabaseException}.
+     * </p>
+     */
+    public static void removeFromCart(int cartID, int productID) throws DatabaseException {
+        try {
+            int itemID = CartDAO.checkProductInCart(productID, cartID);
             int itemHolderID = CartDAO.findCartBelongedTo(CartDAO.findItemBelongedTo(itemID));
             if (!Validation.isCurrentUser(itemHolderID)){
                 throw new AuthorizationException("Access denied. Users can only access their own carts.");
@@ -96,6 +130,52 @@ public class CartService {
             throw e;   
         }
     }
+
+    /**
+     * Updates the quantity of a product in a shopping cart.
+     * <p>
+     * This method first checks if the current user has the authorization to access the specified cart.
+     * If the user is authorized, it then verifies whether the specified product is in the cart.
+     * If the product is found, the method updates the quantity of the product in the cart.
+     * </p>
+     *
+     * @param cartID    The ID of the cart to be updated.
+     * @param productID The ID of the product in the cart whose quantity is to be updated.
+     * @param quantity  The new quantity to set for the product in the cart.
+     * @throws DatabaseException       If there is any issue with database connectivity or operations.
+     * @throws AuthorizationException  If the current user does not have access to the cart or the cart item.
+     *
+     * <p>
+     * The method throws an {@code AuthorizationException} if the current user is not the owner of the cart
+     * or tries to access an item not in their cart.
+     * Any database-related issues during the process result in a {@code DatabaseException}.
+     * </p>
+     */
+    public static void updateCartItem(int cartID, int productID, int quantity) throws DatabaseException {
+        try {
+            if (!Validation.isCurrentUser(CartDAO.findCartBelongedTo(cartID))){
+                throw new AuthorizationException("Access denied. Users can only access their own carts.");
+            }
+
+            int itemID = CartDAO.checkProductInCart(productID, cartID);
+            try {
+                int itemHolderID = CartDAO.findCartBelongedTo(CartDAO.findItemBelongedTo(itemID));
+                if (!Validation.isCurrentUser(itemHolderID)){
+                    throw new AuthorizationException("Access denied. User cannot access item " + itemID + ".");
+                }
+                CartItem item = CartDAO.findCartItem(itemID);
+                item.setQuantity(quantity);
+                CartDAO.updateCartItem(item);
+
+            } catch (DatabaseException e) {
+                ExceptionHandler.printErrorMessage(e);
+                throw e;
+            }
+        } catch (DatabaseException e) {
+            ExceptionHandler.printErrorMessage(e);
+            throw e;
+        }
+    }
     
     /**
      * Updates the quantity of an existing cart item.
@@ -110,6 +190,7 @@ public class CartService {
         public static void updateCartItem(int itemID, int quantity) throws DatabaseException {
         try {
             int itemHolderID = CartDAO.findCartBelongedTo(CartDAO.findItemBelongedTo(itemID));
+            System.out.println(itemHolderID);
             if (!Validation.isCurrentUser(itemHolderID)){
                 throw new AuthorizationException("Access denied. User cannot access item " + itemID + ".");
             }
@@ -180,6 +261,24 @@ public class CartService {
             Order order = new Order(holderID, -1, itemList);
 
             return order;
+        } catch (DatabaseException e) {
+            ExceptionHandler.printErrorMessage(e);
+            throw e;
+        }
+    }
+
+    public static int findItemID(int cartID, int productID) throws DatabaseException {
+        try {
+            return CartDAO.checkProductInCart(productID, cartID);
+        } catch (DatabaseException e) {
+            ExceptionHandler.printErrorMessage(e);
+            throw e;
+        }
+    }
+
+    public static int findItemNUM(int itemID) throws DatabaseException {
+        try {
+            return Objects.requireNonNull(CartDAO.findCartItem(itemID)).getQuantity();
         } catch (DatabaseException e) {
             ExceptionHandler.printErrorMessage(e);
             throw e;

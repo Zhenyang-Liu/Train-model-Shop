@@ -1,4 +1,4 @@
-JFDML JFormDesigner: "8.2.0.0.331" Java: "17.0.5" encoding: "UTF-8"
+JFDML JFormDesigner: "8.2.0.0.331" Java: "17.0.6" encoding: "UTF-8"
 
 new FormModel {
 	"i18n.autoExternalize": true
@@ -35,6 +35,7 @@ new FormModel {
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/shopping_cart_black_24dp.svg" )
 						"background": new java.awt.Color( 242, 242, 242, 255 )
 						"horizontalAlignment": 4
+						addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_cartMouseClicked", true ) )
 					}, new FormLayoutConstraints( class java.lang.String ) {
 						"value": "East"
 					} )

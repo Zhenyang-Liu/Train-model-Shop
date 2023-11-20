@@ -17,7 +17,8 @@ public class Login{
     private boolean lockoutEnabled;
     private Timestamp lockoutEnd;
 
-
+    public Login() {
+    }
     public Login(int userID, String username, String passwordHash, String passwordSalt){
         this.setUserID(userID);
         this.setUsername(username);

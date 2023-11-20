@@ -6,6 +6,7 @@ package gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
@@ -13,12 +14,20 @@ import javax.swing.border.*;
 import com.formdev.flatlaf.extras.*;
 import com.jgoodies.forms.factories.*;
 import controller.GlobalState;
+import exception.DatabaseException;
+import helper.UserSession;
+import listeners.ReloadListener;
+import model.Cart;
 import model.Product;
 import DAO.ProductDAO;
+import model.User;
+import helper.UserSession;
+import service.CartService;
+
 /**
  * @author Zhenyang Liu
  */
-public class MainPage extends JFrame {
+public class MainPage extends JFrame implements ReloadListener {
     private ProductDAO productDAO;
 
     public MainPage() {
@@ -32,16 +41,38 @@ public class MainPage extends JFrame {
         // TODO: add custom component creation code here
     }
 
+    public void reloadProducts() {
+        loadProducts();
+    }
+
     private void button_accountMouseClicked(MouseEvent e) {
         // TODO add your code here
         SwingUtilities.invokeLater(() -> {
             if (!GlobalState.isLoggedIn()) {
-                LoginPage loginPage = new LoginPage();
+                LoginPage loginPage = new LoginPage();;
                 loginPage.setVisible(true);
+                loginPage.setLoginSuccessListener(this::loadProducts);
             } else {
                 // User logged in
             }
         });
+    }
+
+    private void button_cartMouseClicked(MouseEvent e) {
+        User currentUser = UserSession.getInstance().getCurrentUser();
+
+        if (currentUser != null) {
+            int userID = currentUser.getUserID();
+            System.out.println(userID);
+            BasketPage basketPage = new BasketPage(userID);
+            basketPage.setVisible(true);
+            basketPage.setReloadListener(this::loadProducts);
+        } else {
+            // USER NOT LOGIN
+            LoginPage loginPage = new LoginPage();
+            loginPage.setVisible(true);
+        }
+
     }
 
     private void initComponents() {
@@ -117,6 +148,12 @@ public class MainPage extends JFrame {
                 button_cart.setIcon(new FlatSVGIcon("images/shopping_cart_black_24dp.svg"));
                 button_cart.setBackground(new Color(0xf2f2f2));
                 button_cart.setHorizontalAlignment(SwingConstants.RIGHT);
+                button_cart.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        button_cartMouseClicked(e);
+                    }
+                });
                 accountPanel.add(button_cart, BorderLayout.EAST);
             }
             topPanel.add(accountPanel);
@@ -421,9 +458,10 @@ public class MainPage extends JFrame {
        Image resizedImage = originalImage.getScaledInstance(productImage1.getWidth(), productImage1.getHeight(), Image.SCALE_SMOOTH);
        productImage1.setIcon(new ImageIcon(resizedImage));
          */
+
     }
 
-    public void loadProducts() {
+    private void loadProducts() {
         new SwingWorker<ArrayList<Product>, Void>() {
             @Override
             protected ArrayList<Product> doInBackground() throws Exception {
@@ -434,6 +472,7 @@ public class MainPage extends JFrame {
             @Override
             protected void done() {
                 try {
+                    productPanel.removeAll();
                     // Get the result of doInBackground
                     ArrayList<Product> productList = get();
                     // Updating the GUI with a Product List
@@ -450,12 +489,28 @@ public class MainPage extends JFrame {
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                     // Handling exceptions
+                } catch (DatabaseException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }.execute();
     }
 
-    public JPanel createProductCard(Product product) {
+    public JPanel createProductCard(Product product) throws DatabaseException {
+        User currentUser = UserSession.getInstance().getCurrentUser();
+        int itemID;
+        int userID;
+
+        if ( currentUser != null){
+            userID = currentUser.getUserID();
+            Cart cart = CartService.getCartDetails(userID);
+            itemID = CartService.findItemID(cart.getCartID(), product.getProductID());
+        }else {
+            itemID = -1;
+            userID = -1;
+        }
+
+
         // Create the outer panel of the card
         JPanel productCardPanel = new JPanel(new GridBagLayout());
         productCardPanel.setBorder(new LineBorder(new Color(0x002c7b), 2, true));
@@ -551,12 +606,32 @@ public class MainPage extends JFrame {
                 (2, 0, 1, 1, 0.0, 0.0,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                 new Insets(0, 0, 0, 0), 0, 0));
-        adjustNumPanel.setVisible(false);
+        if (itemID != -1) {
+            adjustNumPanel.setVisible(true);
+            addButton.setVisible(false);
+            numberButton.setText(String.valueOf(CartService.findItemNUM(itemID)));
+        }else {
+            adjustNumPanel.setVisible(false);
+        }
 
         // Adding event listeners to the "Add" button
         addButton.addActionListener(e -> {
-            addButton.setVisible(false);
-            adjustNumPanel.setVisible(true);
+            try {
+                if (currentUser != null) {
+                    addButton.setVisible(false);
+                    adjustNumPanel.setVisible(true);
+                    Cart cart = CartService.getCartDetails(userID);
+                    int cartID = cart.getCartID();
+                    int productID = product.getProductID();
+                    CartService.addToCart(cartID, productID, 1);
+                }else {
+                    // USER NOT LOGIN
+                    LoginPage loginPage = new LoginPage();
+                    loginPage.setVisible(true);
+                }
+            } catch (DatabaseException ex) {
+                ex.printStackTrace();
+            }
 
         });
 
@@ -565,13 +640,24 @@ public class MainPage extends JFrame {
             int num = Integer.parseInt(numberButton.getText());
             num--;
             if (num < 1) {
-                // If the number is less than 1, go back to the initial state.
                 adjustNumPanel.setVisible(false);
                 addButton.setVisible(true);
-                // ... Here you can add code to update the number of products in the cart
+                try {
+                    int cartID = CartService.getCartDetails(userID).getCartID();
+                    int productID = product.getProductID();
+                    CartService.removeFromCart(cartID,productID);
+                } catch (DatabaseException ex) {
+                    ex.printStackTrace();
+                }
             } else {
                 numberButton.setText(String.valueOf(num));
-                // ... Here you can add code to update the number of products in the cart
+                try {
+                    int cartID = CartService.getCartDetails(userID).getCartID();
+                    int productID = product.getProductID();
+                    CartService.updateCartItem(cartID, productID, num);
+                } catch (DatabaseException ex) {
+                    ex.printStackTrace();
+                }
             }
         });
 
@@ -580,7 +666,13 @@ public class MainPage extends JFrame {
             int num = Integer.parseInt(numberButton.getText());
             num += 1;
             numberButton.setText(String.valueOf(num));
-            // ... Here you can add code to update the number of products in the cart
+            try {
+                int cartID = CartService.getCartDetails(userID).getCartID();
+                int productID = product.getProductID();
+                CartService.updateCartItem(cartID, productID, num);
+            } catch (DatabaseException ex) {
+                ex.printStackTrace();
+            }
         });
 
         // Create a purchase panel and add price

@@ -96,7 +96,7 @@ public class LoginDAO{
 
             preparedStatement.setInt(1, userID);
             ResultSet resultSet = preparedStatement.executeQuery();
-            Login login = new Login(userID);
+            Login login = new Login();
 
             while (resultSet.next()) {
                 login.setLoginID(resultSet.getInt("login_id"));

@@ -72,6 +72,10 @@ public class RegistrationPage extends JFrame {
                 lRegisterTitleLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
                 lRegisterTitleLabel.setForeground(new Color(0x003366));
                 RegisterTitlePanel.add(lRegisterTitleLabel);
+
+                //---- RegisterTitleSeparator ----
+                RegisterTitleSeparator.setForeground(new Color(0x7f7272));
+                RegisterTitleSeparator.setBackground(new Color(0x7f7272));
                 RegisterTitlePanel.add(RegisterTitleSeparator);
             }
             RegisterDialogPane.add(RegisterTitlePanel, BorderLayout.PAGE_START);

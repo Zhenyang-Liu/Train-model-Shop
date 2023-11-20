@@ -4,6 +4,10 @@
 
 package gui;
 
+import helper.UserSession;
+import listeners.ReloadListener;
+import model.User;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -18,6 +22,11 @@ public class LoginPage extends JFrame {
         initComponents();
     }
 
+    private ReloadListener loginSuccessListener;
+    public void setLoginSuccessListener(ReloadListener listener) {
+        this.loginSuccessListener = listener;
+    }
+
     private void button_to_registerPageMouseClicked(MouseEvent e) {
         // TODO add your code here
         RegistrationPage registrationPage = new RegistrationPage();
@@ -29,6 +38,15 @@ public class LoginPage extends JFrame {
     private void backButtonMouseClicked(MouseEvent e) {
         // TODO add your code here
         this.dispose();
+    }
+
+    private void LoginButtonMouseClicked(MouseEvent e) {
+        // TODO add your code here TO deal with login
+         User loggedInUser = new User(1,"zhenyang","liu");
+         UserSession.getInstance().setCurrentUser(loggedInUser);
+        if (loginSuccessListener != null) {
+            loginSuccessListener.reloadProducts();
+        }
     }
 
     private void initComponents() {
@@ -77,6 +95,10 @@ public class LoginPage extends JFrame {
                     LoginTitleLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
                     LoginTitleLabel.setForeground(new Color(0x003366));
                     LoginTitlePanel.add(LoginTitleLabel);
+
+                    //---- LoginTitleSeparator ----
+                    LoginTitleSeparator.setForeground(new Color(0x7f7272));
+                    LoginTitleSeparator.setBackground(new Color(0x7f7272));
                     LoginTitlePanel.add(LoginTitleSeparator);
                 }
                 LoginContentPanel.add(LoginTitlePanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
@@ -140,6 +162,12 @@ public class LoginPage extends JFrame {
                 LoginButton.setForeground(new Color(0xe9e5e5));
                 LoginButton.setPreferredSize(new Dimension(78, 28));
                 LoginButton.setFont(LoginButton.getFont().deriveFont(LoginButton.getFont().getSize() + 1f));
+                LoginButton.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        LoginButtonMouseClicked(e);
+                    }
+                });
                 LoginButtonBar.add(LoginButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 5), 0, 0));
