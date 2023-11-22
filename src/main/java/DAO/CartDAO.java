@@ -45,7 +45,7 @@ public class CartDAO {
                     }
                 }
             } else {
-                throw new DatabaseException("Creating cart failed, no rows affected.");
+                throw new ActionFailedException("Creating cart failed, no rows affected.");
             }
         } catch (SQLTimeoutException e){
             throw new ConnectionException("Database connect failed",e);
