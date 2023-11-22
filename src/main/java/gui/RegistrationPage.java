@@ -38,11 +38,14 @@ public class RegistrationPage extends JFrame {
      * Button handler for submit button to validate user and attempt to create a new user
      * @param e the mouse button event, this isn't used
      */
-    private void submitButtonClicked(MouseEvent e) {
+    private void submitButtonClicked() {
         try {
-            if (UserDAO.doesUserExist("test@gmail.com")) {
+            if (!UserDAO.doesUserExist("test@gmail.com")) {
                 User newUser = new User("test@gmail.com", "Julian", "Jones", "s14gn");
-                // Login userLogin = new Login(newUser.getUserID(), newUser.getForename(), "a", "a");  // TODO Make hasing
+                boolean hasCreatedUser = UserDAO.insertUser(newUser);
+                if (hasCreatedUser) {
+                    // Tell user they have been created and log them in
+                }
             }
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -117,15 +120,15 @@ public class RegistrationPage extends JFrame {
                 RegisterSubmitButton.setForeground(new Color(0xe9e5e5));
                 RegisterSubmitButton.setPreferredSize(new Dimension(78, 28));
                 RegisterSubmitButton.setFont(RegisterSubmitButton.getFont().deriveFont(RegisterSubmitButton.getFont().getSize() + 1f));
-                RegisterButtonBar.add(RegisterSubmitButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                    new Insets(0, 0, 0, 5), 0, 0));
                 RegisterSubmitButton.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        submitButtonClicked(e);
+                        submitButtonClicked();
                     }
                 });
+                RegisterButtonBar.add(RegisterSubmitButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 0, 5), 0, 0));
 
                 //---- RegisterBacklButton ----
                 RegisterBacklButton.setText("Back");

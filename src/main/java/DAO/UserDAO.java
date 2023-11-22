@@ -18,7 +18,7 @@ public class UserDAO {
      */
     public static boolean insertUser(User newUser) throws SQLException {
         // Insert user into database as they have not already been added
-        String insertSQL = "INSERT INTO User (user_id, forename, surname) VALUES (?, ?, ?)";
+        String insertSQL = "INSERT INTO User (user_id, forename, surname, email, address) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
@@ -28,10 +28,14 @@ public class UserDAO {
                 return false;
             }
             
+            // Set the variables in SQL command
             preparedStatement.setInt(1, newUser.getUserID());
             preparedStatement.setString(2, newUser.getForename());
             preparedStatement.setString(3, newUser.getSurname());
+            preparedStatement.setString(4, newUser.getEmail());
+            preparedStatement.setString(5, newUser.getAddress());
 
+            // Run SQL command
             preparedStatement.executeUpdate();
             System.out.println("Successfully added user into database!");
             return true;

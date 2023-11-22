@@ -46,7 +46,6 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     private void button_accountMouseClicked(MouseEvent e) {
-        // TODO add your code here
         SwingUtilities.invokeLater(() -> {
             if (!GlobalState.isLoggedIn()) {
                 LoginPage loginPage = new LoginPage();;
