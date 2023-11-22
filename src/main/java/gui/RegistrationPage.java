@@ -10,19 +10,33 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import model.Login;
+
 /**
  * @author LIU ZHENYANG
+ * @author JULIAN JONES
  */
 public class RegistrationPage extends JFrame {
     public RegistrationPage() {
         initComponents();
     }
 
+    /**
+     * Button handler to go back to loginPage
+     * @param e the mouse button event, this isn't used
+     */
     private void backButtonMouseClicked(MouseEvent e) {
-        // TODO add your code here
         this.dispose();
         LoginPage loginPage = new LoginPage();
         loginPage.setVisible(true);
+    }
+
+    /**
+     * Button handler for submit button to validate user and attempt to create a new user
+     * @param e the mouse button event, this isn't used
+     */
+    private void submitButtonClicked(MouseEvent e) {
+        // Login newUser = new Login();
     }
 
     private void initComponents() {
@@ -96,6 +110,12 @@ public class RegistrationPage extends JFrame {
                 RegisterButtonBar.add(RegisterSubmitButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 5), 0, 0));
+                RegisterSubmitButton.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        submitButtonClicked(e);
+                    }
+                });
 
                 //---- RegisterBacklButton ----
                 RegisterBacklButton.setText("Back");

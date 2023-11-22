@@ -28,7 +28,7 @@ public class UserSession {
         this.currentUser = null;
     }
 
-    // // After loggin successful
+    // // After login successful
     // UserSession.getInstance().setCurrentUser(loggedInUser);
 
     // // when need user information

@@ -2,13 +2,17 @@ package model;
 
 public class User {
     private int userID;
+    private String email;
     private String forename;
     private String surname;
+    private String address;
 
-    public User(int id, String forename, String surname) {
+    public User(int id, String email, String forename, String surname, String address) {
         this.userID = id;
+        this.email = email;
         this.forename = forename;
         this.surname = surname;
+        this.address = address;
     }
 
     // Getters and Setters
@@ -29,6 +33,24 @@ public class User {
      */
     public void setUserID(int id) {
         this.userID = id;
+    }
+
+    /**
+     * Gets email
+     * 
+     * @return the user's private ID
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * Sets email
+     * 
+     * @param email the user's email
+     */
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     /**
@@ -67,4 +89,21 @@ public class User {
         this.surname = surname;
     }
 
+    /**
+     * Gets the users current address
+     * 
+     * @return the users current address
+     */
+    public String getAddress() {
+        return address;
+    }
+
+    /**
+     * Sets user address
+     * 
+     * @param address the new address
+     */
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }

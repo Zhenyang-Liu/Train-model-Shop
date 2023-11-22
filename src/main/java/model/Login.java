@@ -204,5 +204,4 @@ public class Login{
     public Timestamp getLockoutEnd(){
         return this.lockoutEnd;
     }
-
 }
