@@ -38,13 +38,17 @@ public class RegistrationPage extends JFrame {
 
     /**
      * Button handler for submit button to validate user and attempt to create a new user
-     * @param e the mouse button event, this isn't used
+     * @param email the email of the user
+     * @param forename the first name of the user
+     * @param surname the last name of the user
+     * @param address the address of the user
+     * @param password the password of the login account, different to user
      */
-    private void submitButtonClicked() {
+    private void submitButtonClicked(String email, String forename, String surname, String address, String password) {
         try {
-            if (!UserDAO.doesUserExist("test@gmail.com")) {
-                User newUser = new User("test@gmail.com", "Julian", "Jones", "s14gn");
-                boolean hasCreatedUser = UserDAO.insertUser(newUser);
+            if (!UserDAO.doesUserExist(email)) {
+                User newUser = new User(email, forename, surname, address);
+                boolean hasCreatedUser = UserDAO.insertUser(newUser);  // TODO Add password field
                 if (hasCreatedUser) {
                     UserSession.getInstance().setCurrentUser(newUser);
                     GlobalState.setLoggedIn(true);
@@ -127,7 +131,10 @@ public class RegistrationPage extends JFrame {
                 RegisterSubmitButton.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        submitButtonClicked();
+                        if (passwordField_create.getPassword() == passwordField_confirm.getPassword())
+                            submitButtonClicked(emailTextField.getText(), firstNameTextField.getText(), lastNameTextField.getText(), "", passwordField_confirm.getPassword().toString());
+                        else
+                            System.out.println("Passwords do not match"); // TODO Fix this!
                     }
                 });
                 RegisterButtonBar.add(RegisterSubmitButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
