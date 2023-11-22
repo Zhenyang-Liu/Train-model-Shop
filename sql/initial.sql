@@ -45,15 +45,23 @@ CREATE TABLE Role_Permission (
 
 CREATE TABLE Address (
     address_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    house_number VARCHAR(255),
-    road_name VARCHAR(255),
-    city_name VARCHAR(255),
-    postcode VARCHAR(10),
-    FOREIGN KEY (user_id) REFERENCES User(user_id)
+    house_number VARCHAR(255) NOT NULL,
+    road_name VARCHAR(255) NOT NULL,
+    city_name VARCHAR(255) NOT NULL,
+    postcode VARCHAR(10) NOT NULL,
+    UNIQUE INDEX unique_address (house_number, postcode)
+);
+
+CREATE TABLE User_Address (
+    user_id INT NOT NULL,
+    address_id INT NOT NULL,
+    PRIMARY KEY (user_id, address_id),
+    FOREIGN KEY (user_id) REFERENCES User(user_id),
+    FOREIGN KEY (address_id) REFERENCES Address(address_id)
 );
 
 CREATE TABLE Bank_Detail (
+    bank_detail_id INT AUTO_INCREMENT PRIMARY KEY,
     card_name VARCHAR(255),
     card_holder_name VARCHAR(255),
     card_number VARCHAR(255), 
