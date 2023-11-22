@@ -11,6 +11,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import model.Login;
+import model.User;
 
 /**
  * @author LIU ZHENYANG
@@ -36,7 +37,8 @@ public class RegistrationPage extends JFrame {
      * @param e the mouse button event, this isn't used
      */
     private void submitButtonClicked(MouseEvent e) {
-        // Login newUser = new Login();
+        User newUser = new User("test@gmail.com", "Julian", "Jones", "s14gn");
+        // Check users email doesn't exist BEFORE THIS TODO
     }
 
     private void initComponents() {

@@ -44,7 +44,7 @@ public class UserDAO {
     }
 
     /**
-     * Checks to see if a user is already in the database
+     * Checks to see if a user is already in the database using userID
      * 
      * @param userID the userID we are checking against
      * @return {@code true} if the user exists, {@code false} otherwise
@@ -69,4 +69,29 @@ public class UserDAO {
         return false;
     }
 
+    /**
+     * Checks to see if a user is already in the database using email
+     * 
+     * @param email the email we are checking against
+     * @return {@code true} if the user exists, {@code false} otherwise
+     * @throws SQLException If there was an error during query
+     */
+    public static boolean doesUserExist(String email) throws SQLException {
+        String checkSQL = "SELECT COUNT(*) FROM User WHERE email = ?";
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+        PreparedStatement checkStatement = connection.prepareStatement(checkSQL)) {
+
+            checkStatement.setString(1, email);
+            try (ResultSet results = checkStatement.executeQuery()) {
+                if (results.next())
+                    return results.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Default return false as nothing above matched
+        return false;
+    }
 }
