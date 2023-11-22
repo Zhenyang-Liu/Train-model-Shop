@@ -11,6 +11,8 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import java.util.regex.*;
+
 import DAO.UserDAO;
 import controller.GlobalState;
 import helper.UserSession;
@@ -58,6 +60,44 @@ public class RegistrationPage extends JFrame {
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
+    }
+
+    /**
+     * Checks the inputs to make sure they're valid before adding to database
+     * @param email inputted email
+     * @param forename inputted forename (first name)
+     * @param surname inputted surname (last name)
+     * @param password inputted password
+     * @param passwordValidate inputted password confirm, will be checked against password
+     * @return a string for the error message or "OK" if everything is good
+     */
+    private String checkInputs(String email, String forename, String surname, String password, String passwordValidate) {
+        // Emails
+        Pattern emailPattern = Pattern.compile("[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+(?:\\\\.[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+)*@(?:[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?\\\\.)+[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?", Pattern.CASE_INSENSITIVE);
+        if (!emailPattern.matcher(password).matches())
+            return "Email field(s) are not valid emails";
+
+        // Forename
+        if (forename.length() < 3)
+            return "First name is too short, it must be greater than 2 letters";
+        if (forename.length() > 16)
+            return "First name is too long, it must be less than 16 letters";
+
+        // Surname
+        if (surname.length() < 3)
+            return "Last name is too short, it must be greater than 2 letters";
+        if (surname.length() > 16)
+            return "Last name is too long, it must be less than 16 letters";
+
+        // Passwords
+        Pattern passwordPattern = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$", Pattern.CASE_INSENSITIVE);
+        if (password != passwordValidate)
+            return "Passwords do not match";
+        if (!passwordPattern.matcher(passwordValidate).matches())
+            return "Password must be of length 8 or more and contain at least 1 character and 1 digit";
+
+        // Everything passed!
+        return "OK";
     }
 
     private void initComponents() {
@@ -131,10 +171,14 @@ public class RegistrationPage extends JFrame {
                 RegisterSubmitButton.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        if (passwordField_create.getPassword() == passwordField_confirm.getPassword())
+                        String fieldsError = checkInputs(emailTextField.getText(), firstNameTextField.getText(), lastNameTextField.getText(), passwordField_create.getPassword().toString(), passwordField_confirm.getPassword().toString());
+                        if (fieldsError == "OK")
                             submitButtonClicked(emailTextField.getText(), firstNameTextField.getText(), lastNameTextField.getText(), "", passwordField_confirm.getPassword().toString());
-                        else
-                            System.out.println("Passwords do not match"); // TODO Fix this!
+                        else {
+                            System.out.println("Inputs were not valid: " + fieldsError);
+                            // TODO Show output on GUI!
+                        }
+
                     }
                 });
                 RegisterButtonBar.add(RegisterSubmitButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
