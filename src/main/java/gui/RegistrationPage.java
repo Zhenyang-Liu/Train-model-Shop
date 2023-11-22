@@ -6,10 +6,12 @@ package gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.SQLException;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import DAO.UserDAO;
 import model.Login;
 import model.User;
 
@@ -37,8 +39,14 @@ public class RegistrationPage extends JFrame {
      * @param e the mouse button event, this isn't used
      */
     private void submitButtonClicked(MouseEvent e) {
-        User newUser = new User("test@gmail.com", "Julian", "Jones", "s14gn");
-        // Check users email doesn't exist BEFORE THIS TODO
+        try {
+            if (UserDAO.doesUserExist("test@gmail.com")) {
+                User newUser = new User("test@gmail.com", "Julian", "Jones", "s14gn");
+                // Login userLogin = new Login(newUser.getUserID(), newUser.getForename(), "a", "a");  // TODO Make hasing
+            }
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
     }
 
     private void initComponents() {

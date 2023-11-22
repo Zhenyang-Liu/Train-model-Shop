@@ -42,7 +42,7 @@ public class LoginPage extends JFrame {
 
     private void LoginButtonMouseClicked(MouseEvent e) {
         // TODO add your code here TO deal with login
-         User loggedInUser = new User(1,"zhenyang","liu");
+         User loggedInUser = new User("test@gmail.com", "Julian", "Jones", "s14gn");
          UserSession.getInstance().setCurrentUser(loggedInUser);
         if (loginSuccessListener != null) {
             loginSuccessListener.reloadProducts();
