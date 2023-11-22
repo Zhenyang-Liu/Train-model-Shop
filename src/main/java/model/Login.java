@@ -1,5 +1,9 @@
 package model;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 
 public class Login{
@@ -124,6 +128,50 @@ public class Login{
     public void setPassword(String hash, String salt){
         this.setPasswordHash(hash);
         this.setPasswordSalt(salt);
+    }
+
+    /**
+     * Sets all password information given a plaintext password
+     * Hashes the password using SHA-512, generates a salt using SecureRandom and stores
+     * 
+     * @param password plaintext password to store
+     */
+    public void setPassword(String password){
+        byte[] salt = new byte[16];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(salt);
+        this.setPasswordSalt(salt.toString());
+        this.setPassword(hash(password, getPasswordSalt()));
+    }
+
+    /**
+     * Hashes a string given a salt
+     * 
+     * @param toHash string to hash using SHA-512
+     * @param salt salt to use in hashing
+     * @return
+     */
+    private String hash(String toHash, String salt){
+        MessageDigest md;
+        try{
+            md = MessageDigest.getInstance("SHA-512");
+        }catch(NoSuchAlgorithmException e){
+            System.out.println("Could not use SHA-512 uh oh");
+            return "";
+        };
+        
+        md.update(salt.getBytes(StandardCharsets.UTF_8));
+        return md.digest(toHash.getBytes(StandardCharsets.UTF_8)).toString();
+    }
+
+    /**
+     * Check if a given password matches the password stored by this login information
+     * 
+     * @param password the UNHASHED password of the user
+     * @return True if the password matches the hashed password stored else False
+     */
+    public boolean doesPasswordMatch(String password){
+        return hash(password, getPasswordSalt()).equals(password);
     }
 
     /**
