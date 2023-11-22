@@ -1,5 +1,10 @@
 package model;
 
+import java.sql.SQLException;
+import java.util.Random;
+
+import DAO.UserDAO;
+
 public class User {
     private int userID;
     private String email;
@@ -7,12 +12,48 @@ public class User {
     private String surname;
     private String address;
 
+
+    public User(String email, String forename, String surname, String address) {
+        this.userID = generateUserID();
+        this.email = email;
+        this.forename = forename;
+        this.surname = surname;
+        this.address = address;
+    }
+
     public User(int id, String email, String forename, String surname, String address) {
         this.userID = id;
         this.email = email;
         this.forename = forename;
         this.surname = surname;
         this.address = address;
+    }
+
+    /**
+     * Create a userID for a new user
+     * @return the users newID
+     */
+    public int generateUserID() {
+        boolean valid = false;
+        while (!valid) {
+            // Generate ID
+            Random r = new Random();
+            int id = r.nextInt(65536);  // 16-bit random ID
+    
+            // Validate ID
+            
+            try {
+                boolean doesUserExist = UserDAO.doesUserExist(id);
+                if (!doesUserExist) {
+                    valid = true;
+                    return id;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return -1;
+            }
+        }
+        return -1;
     }
 
     // Getters and Setters
