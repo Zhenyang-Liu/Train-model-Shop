@@ -12,6 +12,8 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import DAO.UserDAO;
+import controller.GlobalState;
+import helper.UserSession;
 import model.Login;
 import model.User;
 
@@ -44,7 +46,9 @@ public class RegistrationPage extends JFrame {
                 User newUser = new User("test@gmail.com", "Julian", "Jones", "s14gn");
                 boolean hasCreatedUser = UserDAO.insertUser(newUser);
                 if (hasCreatedUser) {
-                    // Tell user they have been created and log them in
+                    UserSession.getInstance().setCurrentUser(newUser);
+                    GlobalState.setLoggedIn(true);
+                    System.out.println("User has logged in (id = " + newUser.getUserID() + ")");
                 }
             }
         } catch (SQLException exception) {
