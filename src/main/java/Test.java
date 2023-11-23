@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import DAO.*;
+import exception.DatabaseException;
 
 public class Test {
     public static void main(String[] args) {
@@ -145,7 +146,9 @@ public class Test {
             RollingStockDAO.deleteRollingStock(roID);
             LocomotiveDAO.deleteLocomotive(loID);
             ControllerDAO.deleteController(cID);
-
+            
+        } catch (DatabaseException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {

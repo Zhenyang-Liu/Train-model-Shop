@@ -4,8 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.sql.Statement;
 import java.util.Map;
+
+import exception.ConnectionException;
+import exception.DatabaseException;
 
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -16,7 +20,7 @@ import model.BoxedSet.BoxedType;
 
 public class BoxedSetDAO extends ProductDAO {
 
-    public static void insertBoxedSet(BoxedSet set) throws SQLException {
+    public static void insertBoxedSet(BoxedSet set) throws DatabaseException {
         String insertSQL = "INSERT INTO BoxedSet (product_id, pack_type) VALUES (?, ?);";
         int productID = insertProduct(set);
         
@@ -34,43 +38,41 @@ public class BoxedSetDAO extends ProductDAO {
             } else {
                 throw new SQLException("Creating Boxed Set failed, no rows affected.");
             }
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("Error SQL query: " + insertSQL);
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
     }
 
-    public static void insertBoxedSetItems(BoxedSet boxedSet) throws SQLException {
+    public static void insertBoxedSetItems(BoxedSet boxedSet) throws DatabaseException{
         String insertSQL = "INSERT INTO BoxedSet_Item (boxed_set_id, item_id, quantity) VALUES (?, ?, ?);";
     
         try (Connection connection = DatabaseConnectionHandler.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
-    
             for (Map.Entry<Product, Integer> entry : boxedSet.getContain().entrySet()) {
                 Product product = entry.getKey();
                 int quantity = entry.getValue();
-    
                 preparedStatement.setInt(1, boxedSet.getProductID());
                 preparedStatement.setInt(2, product.getProductID());
                 preparedStatement.setInt(3, quantity);
-    
                 preparedStatement.addBatch();
             }
     
             preparedStatement.executeBatch();
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
     }
 
-    public static void updateBoxedSetItems(BoxedSet boxedSet) throws SQLException {
+    public static void updateBoxedSetItems(BoxedSet boxedSet) throws DatabaseException {
         ProductDAO.updateProduct(boxedSet);
         String updateSQL = "UPDATE BoxedSet SET pack_type = ? WHERE product_id = ?;";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
             
             preparedStatement.setString(1, boxedSet.getBoxedType());
             preparedStatement.setInt(3, boxedSet.getProductID());
@@ -78,17 +80,18 @@ public class BoxedSetDAO extends ProductDAO {
             
             deleteItem(boxedSet.getProductID());
             insertBoxedSetItems(boxedSet);
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
     }
 
-    public static void deleteBoxedSet(int productId) throws SQLException{
+    public static void deleteBoxedSet(int productId) throws DatabaseException {
         String deleteSQL = "DELETE FROM BoxedSet WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
             preparedStatement.setInt(1, productId);
             deleteItem(productId);
 
@@ -100,17 +103,18 @@ public class BoxedSetDAO extends ProductDAO {
             } else {
                 System.out.println("No set was found with ID " + productId + " to delete.");
             }
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        }  
+            throw new DatabaseException(e.getMessage(),e);
+        } 
     }
 
-    public static void deleteItem(int productId) throws SQLException{
+    public static void deleteItem(int productId) throws DatabaseException{
         String deleteSQL = "DELETE FROM BoxedSet_Item WHERE boxed_set_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
             preparedStatement.setInt(1, productId);
 
             int rowsAffected = preparedStatement.executeUpdate();
@@ -120,13 +124,14 @@ public class BoxedSetDAO extends ProductDAO {
             } else {
                 System.out.println("No item was found in set ID " + productId + " to delete.");
             }
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        }  
+            throw new DatabaseException(e.getMessage(),e);
+        } 
     }
 
-    public static BoxedSet findBoxedSetByID(int setID) throws SQLException {
+    public static BoxedSet findBoxedSetByID(int setID) throws DatabaseException {
         String selectSQL = "SELECT * FROM BoxedSet WHERE product_id = ?;";
         BoxedSet set = new BoxedSet();
 
@@ -141,15 +146,15 @@ public class BoxedSetDAO extends ProductDAO {
                 String newType = resultSet.getString("pack_type");
                 set = new BoxedSet(newProduct,newType,findBoxedSetItem(productId));
             }
-            return set;
-
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
+        return set;
     }
 
-    public static Map<Product, Integer> findBoxedSetItem(int setID) throws SQLException {
+    public static Map<Product, Integer> findBoxedSetItem(int setID) throws DatabaseException {
         String selectSQL = "SELECT * FROM BoxedSet_Item WHERE boxed_set_id = ?;";
         Map<Product, Integer> contain = new HashMap<>();
 
@@ -175,17 +180,15 @@ public class BoxedSetDAO extends ProductDAO {
                         contain.put(RollingStockDAO.findProductByID(itemID),quantity);
                 }
             }
-
-            return contain;
-
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
-
+        return contain;
     }
 
-    public static ArrayList<BoxedSet> findAllBoxedSet() throws SQLException {
+    public static ArrayList<BoxedSet> findAllBoxedSet() throws DatabaseException {
         String selectSQL = "SELECT * FROM BoxedSet;";
         ArrayList<BoxedSet> setList = new ArrayList<>();
 
@@ -203,13 +206,14 @@ public class BoxedSetDAO extends ProductDAO {
             }
             return setList;
 
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
     }
     
-    public static ArrayList<BoxedSet> findBoxedSetByType(BoxedType type) throws SQLException {
+    public static ArrayList<BoxedSet> findBoxedSetByType(BoxedType type) throws DatabaseException {
         String selectSQL = "SELECT * FROM BoxedSet WHERE pack_type = ?;";
         ArrayList<BoxedSet> setList = new ArrayList<>();
 
@@ -228,9 +232,10 @@ public class BoxedSetDAO extends ProductDAO {
             }
             return setList;
 
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
     }
 

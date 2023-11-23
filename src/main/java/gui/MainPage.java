@@ -6,9 +6,6 @@ package gui;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.io.*;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -17,34 +14,153 @@ import javax.swing.border.*;
 import com.formdev.flatlaf.extras.*;
 import com.jgoodies.forms.factories.*;
 import controller.GlobalState;
+import exception.DatabaseException;
+import helper.Filter;
+import helper.UserSession;
+import listeners.ReloadListener;
+import model.Cart;
+import model.Gauge;
 import model.Product;
+import model.Brand;
+import DAO.BrandDAO;
 import DAO.ProductDAO;
+import model.User;
+import model.Locomotive.DCCType;
+import helper.UserSession;
+import helper.Filter;
+import service.CartService;
+
 /**
  * @author Zhenyang Liu
  */
-public class MainPage extends JFrame {
-    private ProductDAO productDAO;
-
+public class MainPage extends JFrame implements ReloadListener {
+    private Filter f;
     public MainPage() {
-        productDAO = new ProductDAO();  // Instantiating ProductDAO
         initComponents();
+        f = new Filter();
+        populateFilterBoxes();
         loadProducts();
         customizeComponents();
+        button_accountMouseClicked();
     }
 
     private void createUIComponents() {
         // TODO: add custom component creation code here
     }
 
-    private void button_accountMouseClicked(MouseEvent e) {
-        // TODO add your code here
+    public void reloadProducts() {
+        loadProducts();
+    }
+
+    private void button_accountMouseClicked() {
         SwingUtilities.invokeLater(() -> {
             if (!GlobalState.isLoggedIn()) {
-                LoginPage loginPage = new LoginPage();
+                LoginPage loginPage = new LoginPage();;
                 loginPage.setVisible(true);
+                loginPage.setLoginSuccessListener(this::loadProducts);
             } else {
                 // User logged in
             }
+        });
+    }
+
+    private void button_cartMouseClicked(MouseEvent e) {
+        User currentUser = UserSession.getInstance().getCurrentUser();
+
+        if (currentUser != null) {
+            int userID = currentUser.getUserID();
+            System.out.println(userID);
+            BasketPage basketPage = new BasketPage(userID);
+            basketPage.setVisible(true);
+            basketPage.setReloadListener(this::loadProducts);
+        } else {
+            // USER NOT LOGIN
+            LoginPage loginPage = new LoginPage();
+            loginPage.setVisible(true);
+        }
+
+    }
+
+    private void populatePriceRangeFilters(){
+        priceFilterBox.addItem(f.new PriceRange(0f, 1e10f, "All"));
+        priceFilterBox.addItem(f.new PriceRange(0.0f, 15.0f));
+        priceFilterBox.addItem(f.new PriceRange(15.0f, 30.0f));
+        priceFilterBox.addItem(f.new PriceRange(30.0f, 50.0f));
+        priceFilterBox.addItem(f.new PriceRange(50.0f, 100.0f));
+        priceFilterBox.addItem(f.new PriceRange(100.0f, 500.0f));
+        priceFilterBox.addItem(f.new PriceRange(500.0f, 1e10f, "£500<"));
+
+        priceFilterBox.addItemListener(e -> {
+            loadProducts();
+        });
+    }
+
+    private void populateSubFilters(){
+        subTypeFilterBox.removeAllItems();
+        String table = ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).getDbTable();
+        if(table.equals("Locomotive")){
+            System.out.println("Adding items :D");
+            subTypeFilterBox.addItem(DCCType.ANALOGUE);
+            subTypeFilterBox.addItem(DCCType.FITTED);
+            subTypeFilterBox.addItem(DCCType.READY);
+            subTypeFilterBox.addItem(DCCType.SOUND);
+        }else if(table.equals("Track")){
+            subTypeFilterBox.addItem(Gauge.OO);
+            subTypeFilterBox.addItem(Gauge.TT);
+            subTypeFilterBox.addItem(Gauge.N);
+        }
+        else{
+            subTypeFilterBox.addItem("No sub-filters");
+        }
+    }
+
+    private void populateTypeFilters(){
+        typeFilterBox.addItem(f.new TypeFilter("", "All", ""));
+        typeFilterBox.addItem(f.new TypeFilter("Locomotive", "Locomotives", "dcc_type"));
+        typeFilterBox.addItem(f.new TypeFilter("Track", "Tracks", "track_type"));
+        typeFilterBox.addItem(f.new TypeFilter("BoxedSet", "Box Sets", "pack_type"));
+
+        typeFilterBox.addItemListener(e -> {
+            System.out.println("Loading filters: " + e.getItem().toString());
+            populateSubFilters();
+            loadProducts();
+        });
+        subTypeFilterBox.addItemListener(e -> {
+            ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).setSubFilter(e.getItem().toString());
+            loadProducts();
+        });
+    }
+
+    private void populateSortOptions(){
+        sortOptions.addItem(f.new SortBy("None", ""));
+        sortOptions.addItem(f.new SortBy("Price", "retail_price"));
+        sortOptions.addItem(f.new SortBy("Name", "product_name"));
+
+        sortOptions.addItemListener(e -> {
+            loadProducts();
+        });
+    }
+
+    private void populateBrandFilters(){
+        ArrayList<Brand> toAdd = BrandDAO.findAllBrand();
+        filterBox4.addItem(f.new BrandFilter(null, "All"));
+        for(Brand b: toAdd)
+            filterBox4.addItem(f.new BrandFilter(b));
+        filterBox4.addItemListener(e -> {
+            loadProducts();
+        });
+    }
+
+    private void populateFilterBoxes()
+    {
+        System.out.println("Filter boxes");
+        populatePriceRangeFilters();
+        populateBrandFilters();
+        populateSortOptions();
+        populateTypeFilters();
+
+        searchButton.addActionListener(e -> {
+            loadProducts();
         });
     }
 
@@ -66,25 +182,29 @@ public class MainPage extends JFrame {
         searchButton = new JButton();
         mainPageSplitPane = new JSplitPane();
         filterPanel = new JPanel();
-        filterLabel1 = new JLabel();
-        filterBox1 = new JComboBox();
-        filterLabel2 = new JLabel();
-        filterBox2 = new JComboBox();
-        filterLabel3 = new JLabel();
-        filterBox3 = new JComboBox();
-        filterLabel4 = new JLabel();
+        sortLabel = new JLabel();
+        sortOptions = new JComboBox();
+        priceFilterLabel = new JLabel();
+        priceFilterBox = new JComboBox();
+        typeFilterLabel = new JLabel();
+        typeFilterBox = new JComboBox();
+        brandFilterLabel = new JLabel();
         filterBox4 = new JComboBox();
-        filterLabel5 = new JLabel();
-        filterBox5 = new JComboBox();
+        subTypeFilterLabel = new JLabel();
+        subTypeFilterBox = new JComboBox();
         productPanel = new JPanel();
         productCardPanel1 = new JPanel();
         productImage1 = new JLabel();
         productName1 = new JLabel();
         purchasePanel1 = new JPanel();
         productPrice1 = new JLabel();
-        productNumber1 = new JSpinner();
-        addButton1 = new JButton();
+        buttonPanel1 = new JPanel();
         moreButton1 = new JButton();
+        addButton1 = new JButton();
+        adjustNumPanel1 = new JPanel();
+        removeButton = new JButton();
+        NumButton = new JButton();
+        addButton = new JButton();
         bottomSeparator = compFactory.createSeparator("");
 
         //======== this ========
@@ -107,7 +227,7 @@ public class MainPage extends JFrame {
                 button_account.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        button_accountMouseClicked(e);
+                        button_accountMouseClicked();
                     }
                 });
                 accountPanel.add(button_account, BorderLayout.WEST);
@@ -117,6 +237,12 @@ public class MainPage extends JFrame {
                 button_cart.setIcon(new FlatSVGIcon("images/shopping_cart_black_24dp.svg"));
                 button_cart.setBackground(new Color(0xf2f2f2));
                 button_cart.setHorizontalAlignment(SwingConstants.RIGHT);
+                button_cart.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        button_cartMouseClicked(e);
+                    }
+                });
                 accountPanel.add(button_cart, BorderLayout.EAST);
             }
             topPanel.add(accountPanel);
@@ -201,51 +327,52 @@ public class MainPage extends JFrame {
                 ((GridBagLayout)filterPanel.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
                 ((GridBagLayout)filterPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
-                //---- filterLabel1 ----
-                filterLabel1.setText(bundle.getString("MainPage.filterLabel1.text"));
-                filterLabel1.setHorizontalTextPosition(SwingConstants.LEFT);
-                filterLabel1.setHorizontalAlignment(SwingConstants.TRAILING);
-                filterLabel1.setPreferredSize(null);
-                filterPanel.add(filterLabel1, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+                //---- sortLabel ----
+                sortLabel.setText(bundle.getString("MainPage.sortLabel.text"));
+                sortLabel.setHorizontalTextPosition(SwingConstants.LEFT);
+                sortLabel.setHorizontalAlignment(SwingConstants.TRAILING);
+                sortLabel.setPreferredSize(null);
+                filterPanel.add(sortLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(0, 0, 5, 0), 0, 0));
-                filterPanel.add(filterBox1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+                filterPanel.add(sortOptions, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
 
-                //---- filterLabel2 ----
-                filterLabel2.setText(bundle.getString("MainPage.filterLabel2.text"));
-                filterPanel.add(filterLabel2, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
-                    GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-                    new Insets(5, 0, 5, 0), 0, 0));
-                filterPanel.add(filterBox2, new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
-                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                    new Insets(0, 0, 5, 0), 0, 0));
+                //---- priceFilterLabel ----
+                priceFilterLabel.setText(bundle.getString("MainPage.priceFilterLabel.text"));
+                filterPanel.add(priceFilterLabel, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
 
-                //---- filterLabel3 ----
-                filterLabel3.setText(bundle.getString("MainPage.filterLabel3.text"));
-                filterPanel.add(filterLabel3, new GridBagConstraints(0, 4, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
-                filterPanel.add(filterBox3, new GridBagConstraints(0, 5, 1, 1, 1.0, 0.0,
+                filterPanel.add(priceFilterBox, new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
 
-                //---- filterLabel4 ----
-                filterLabel4.setText(bundle.getString("MainPage.filterLabel4.text"));
-                filterPanel.add(filterLabel4, new GridBagConstraints(0, 6, 1, 1, 1.0, 0.0,
+                //---- typeFilterLabel ----
+                typeFilterLabel.setText(bundle.getString("MainPage.typeFilterLabel.text"));
+                filterPanel.add(typeFilterLabel, new GridBagConstraints(0, 4, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                    new Insets(5, 0, 5, 0), 0, 0));
+                filterPanel.add(typeFilterBox, new GridBagConstraints(0, 5, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 5, 0), 0, 0));
+
+                //---- brandFilterLabel ----
+                brandFilterLabel.setText("BRAND");
+                filterPanel.add(brandFilterLabel, new GridBagConstraints(0, 6, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
                 filterPanel.add(filterBox4, new GridBagConstraints(0, 7, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
 
-                //---- filterLabel5 ----
-                filterLabel5.setText(bundle.getString("MainPage.filterLabel5.text"));
-                filterPanel.add(filterLabel5, new GridBagConstraints(0, 8, 1, 1, 1.0, 0.0,
+                //---- subTypeFilterLabel ----
+                subTypeFilterLabel.setText(bundle.getString("MainPage.subTypeFilterLabel.text"));
+                filterPanel.add(subTypeFilterLabel, new GridBagConstraints(0, 8, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
-                filterPanel.add(filterBox5, new GridBagConstraints(0, 9, 1, 1, 1.0, 0.0,
+                filterPanel.add(subTypeFilterBox, new GridBagConstraints(0, 9, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
             }
@@ -262,6 +389,7 @@ public class MainPage extends JFrame {
                     productCardPanel1.setPreferredSize(new Dimension(260, 280));
                     productCardPanel1.setMaximumSize(new Dimension(230, 240));
                     productCardPanel1.setMinimumSize(new Dimension(230, 240));
+                    productCardPanel1.setVisible(false);
                     productCardPanel1.setLayout(new GridBagLayout());
                     ((GridBagLayout)productCardPanel1.getLayout()).columnWidths = new int[] {0, 0};
                     ((GridBagLayout)productCardPanel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
@@ -292,37 +420,74 @@ public class MainPage extends JFrame {
                     {
                         purchasePanel1.setBorder(new EmptyBorder(10, 5, 5, 5));
                         purchasePanel1.setMaximumSize(new Dimension(190, 85));
-                        purchasePanel1.setLayout(new GridLayout(2, 2, 20, 10));
+                        purchasePanel1.setLayout(new GridLayout(2, 1, 20, 10));
 
                         //---- productPrice1 ----
                         productPrice1.setText(bundle.getString("MainPage.productPrice1.text"));
                         productPrice1.setFont(productPrice1.getFont().deriveFont(productPrice1.getFont().getSize() + 7f));
                         productPrice1.setPreferredSize(new Dimension(80, 25));
+                        productPrice1.setHorizontalAlignment(SwingConstants.CENTER);
                         purchasePanel1.add(productPrice1);
 
-                        //---- productNumber1 ----
-                        productNumber1.setModel(new SpinnerNumberModel(1, 1, null, 1));
-                        productNumber1.setPreferredSize(new Dimension(50, 23));
-                        productNumber1.setFont(productNumber1.getFont().deriveFont(productNumber1.getFont().getSize() + 4f));
-                        purchasePanel1.add(productNumber1);
+                        //======== buttonPanel1 ========
+                        {
+                            buttonPanel1.setPreferredSize(new Dimension(240, 40));
+                            buttonPanel1.setLayout(new FlowLayout());
 
-                        //---- addButton1 ----
-                        addButton1.setText(bundle.getString("MainPage.addButton1.text"));
-                        addButton1.setBackground(new Color(0x55a15a));
-                        addButton1.setForeground(new Color(0xe0e2e8));
-                        addButton1.setPreferredSize(new Dimension(70, 30));
-                        purchasePanel1.add(addButton1);
+                            //---- moreButton1 ----
+                            moreButton1.setText("Detail");
+                            moreButton1.setBackground(new Color(0x4e748d));
+                            moreButton1.setForeground(new Color(0xe0e2e8));
+                            moreButton1.setPreferredSize(new Dimension(100, 30));
+                            buttonPanel1.add(moreButton1);
 
-                        //---- moreButton1 ----
-                        moreButton1.setText(bundle.getString("MainPage.moreButton1.text"));
-                        moreButton1.setBackground(new Color(0x3da2e7));
-                        moreButton1.setForeground(new Color(0xe0e2e8));
-                        moreButton1.setPreferredSize(new Dimension(70, 30));
-                        purchasePanel1.add(moreButton1);
+                            //---- addButton1 ----
+                            addButton1.setText(bundle.getString("MainPage.addButton1.text"));
+                            addButton1.setBackground(new Color(0x55a15a));
+                            addButton1.setForeground(new Color(0xe0e2e8));
+                            addButton1.setPreferredSize(new Dimension(100, 30));
+                            buttonPanel1.add(addButton1);
+
+                            //======== adjustNumPanel1 ========
+                            {
+                                adjustNumPanel1.setLayout(new GridBagLayout());
+                                ((GridBagLayout)adjustNumPanel1.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+                                ((GridBagLayout)adjustNumPanel1.getLayout()).rowHeights = new int[] {0, 0};
+                                ((GridBagLayout)adjustNumPanel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+                                ((GridBagLayout)adjustNumPanel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+                                //---- removeButton ----
+                                removeButton.setBackground(new Color(0xb13437));
+                                removeButton.setForeground(new Color(0xe0e2e8));
+                                removeButton.setFont(removeButton.getFont().deriveFont(removeButton.getFont().getSize() + 7f));
+                                removeButton.setIcon(new FlatSVGIcon("images/remove_white_18dp.svg"));
+                                adjustNumPanel1.add(removeButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                                    new Insets(0, 0, 0, 5), 0, 0));
+
+                                //---- NumButton ----
+                                NumButton.setText("NUM");
+                                NumButton.setPreferredSize(new Dimension(50, 23));
+                                adjustNumPanel1.add(NumButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+                                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                                    new Insets(0, 0, 0, 5), 0, 0));
+
+                                //---- addButton ----
+                                addButton.setBackground(new Color(0x55a15a));
+                                addButton.setForeground(new Color(0xe0e2e8));
+                                addButton.setFont(addButton.getFont().deriveFont(addButton.getFont().getSize() + 7f));
+                                addButton.setIcon(new FlatSVGIcon("images/add_white_18dp.svg"));
+                                adjustNumPanel1.add(addButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+                                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                                    new Insets(0, 0, 0, 0), 0, 0));
+                            }
+                            buttonPanel1.add(adjustNumPanel1);
+                        }
+                        purchasePanel1.add(buttonPanel1);
                     }
-                    productCardPanel1.add(purchasePanel1, new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0,
+                    productCardPanel1.add(purchasePanel1, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
                         GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                        new Insets(0, 10, 0, 10), 0, 0));
+                        new Insets(0, 0, 0, 0), 0, 0));
                 }
                 productPanel.add(productCardPanel1);
             }
@@ -350,56 +515,58 @@ public class MainPage extends JFrame {
     private JButton searchButton;
     private JSplitPane mainPageSplitPane;
     private JPanel filterPanel;
-    private JLabel filterLabel1;
-    private JComboBox filterBox1;
-    private JLabel filterLabel2;
-    private JComboBox filterBox2;
-    private JLabel filterLabel3;
-    private JComboBox filterBox3;
-    private JLabel filterLabel4;
+    private JLabel sortLabel;
+    private JComboBox sortOptions;
+    private JLabel priceFilterLabel;
+    private JComboBox priceFilterBox;
+    private JLabel typeFilterLabel;
+    private JComboBox typeFilterBox;
+    private JLabel brandFilterLabel;
     private JComboBox filterBox4;
-    private JLabel filterLabel5;
-    private JComboBox filterBox5;
+    private JLabel subTypeFilterLabel;
+    private JComboBox subTypeFilterBox;
     private JPanel productPanel;
     private JPanel productCardPanel1;
     private JLabel productImage1;
     private JLabel productName1;
     private JPanel purchasePanel1;
     private JLabel productPrice1;
-    private JSpinner productNumber1;
-    private JButton addButton1;
+    private JPanel buttonPanel1;
     private JButton moreButton1;
+    private JButton addButton1;
+    private JPanel adjustNumPanel1;
+    private JButton removeButton;
+    private JButton NumButton;
+    private JButton addButton;
     private JComponent bottomSeparator;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
     private void customizeComponents() {
-        // Add custom component setting code here
-        String originalIconPath = new File("src\\main\\images\\tgv.jpeg").getAbsolutePath();
-        ImageIcon originalIcon = new ImageIcon(originalIconPath);
-        Image originalImage = originalIcon.getImage();
-        Image resizedImage = originalImage.getScaledInstance(productImage1.getWidth(), productImage1.getHeight(), Image.SCALE_SMOOTH);
-        productImage1.setIcon(new ImageIcon(resizedImage));
-
-
-        //Image resizedImage18 = originalImage.getScaledInstance(label18.getWidth(), label18.getHeight(), Image.SCALE_SMOOTH);
-        //label18.setIcon(new ImageIcon(resizedImage18));
-
-        //Image resizedImage19 = originalImage.getScaledInstance(label19.getWidth(), label19.getHeight(), Image.SCALE_SMOOTH);
-        //label19.setIcon(new ImageIcon(resizedImage19));
+        /**
+       ImageIcon originalIcon = new ImageIcon("TrainShop\\src\\main\\images\\tgv.jpeg");
+       Image originalImage = originalIcon.getImage();
+       Image resizedImage = originalImage.getScaledInstance(productImage1.getWidth(), productImage1.getHeight(), Image.SCALE_SMOOTH);
+       productImage1.setIcon(new ImageIcon(resizedImage));
+         */
 
     }
 
-    public void loadProducts() {
+    private void loadProducts() {
         new SwingWorker<ArrayList<Product>, Void>() {
             @Override
             protected ArrayList<Product> doInBackground() throws Exception {
                 // Get products from the database in the background thread
-                return productDAO.getAllProduct();
+                Filter.PriceRange pr = (Filter.PriceRange)priceFilterBox.getSelectedItem();
+                Filter.BrandFilter br = (Filter.BrandFilter)filterBox4.getSelectedItem();
+                Filter.SortBy sb = (Filter.SortBy)sortOptions.getSelectedItem();
+                Filter.TypeFilter tp = (Filter.TypeFilter)typeFilterBox.getSelectedItem();
+                return ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax(), br.getBrand(), sb.getDbHandle(), sb.isAscending(), tp.getDbTable());
             }
 
             @Override
             protected void done() {
                 try {
+                    productPanel.removeAll();
                     // Get the result of doInBackground
                     ArrayList<Product> productList = get();
                     // Updating the GUI with a Product List
@@ -416,12 +583,28 @@ public class MainPage extends JFrame {
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                     // Handling exceptions
+                } catch (DatabaseException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }.execute();
     }
 
-    public JPanel createProductCard(Product product) {
+    public JPanel createProductCard(Product product) throws DatabaseException {
+        User currentUser = UserSession.getInstance().getCurrentUser();
+        int itemID;
+        int userID;
+
+        if ( currentUser != null){
+            userID = currentUser.getUserID();
+            Cart cart = CartService.getCartDetails(userID);
+            itemID = CartService.findItemID(cart.getCartID(), product.getProductID());
+        }else {
+            itemID = -1;
+            userID = -1;
+        }
+
+
         // Create the outer panel of the card
         JPanel productCardPanel = new JPanel(new GridBagLayout());
         productCardPanel.setBorder(new LineBorder(new Color(0x002c7b), 2, true));
@@ -434,7 +617,6 @@ public class MainPage extends JFrame {
 
         // adjust the maximum and minimum sizes as needed.
         productCardPanel.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
 
         // Add a product image
         JLabel productImage = new JLabel();
@@ -458,50 +640,164 @@ public class MainPage extends JFrame {
         productName.setBorder(new MatteBorder(3, 0, 3, 0, Color.black));
         productName.setPreferredSize(new Dimension(260, 70));
         productCardPanel.add(productName, new GridBagConstraints
-                (0, 1, 1, 1, 0.0, 0.7,
+                (0, 1, 1, 1, 0.0, 0.8,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                 new Insets(1, 0, 0, 0), 0, 0));
 
-        // Create a purchase panel with prices and buttons
-        JPanel purchasePanel = new JPanel(new GridLayout(2, 2, 20, 10));
-        purchasePanel.setBorder(new EmptyBorder(10, 5, 5, 5));
-        purchasePanel.setMaximumSize(new Dimension(190, 85));
-
-        // Add product price
+        // Create price display labels
         JLabel productPrice = new JLabel();
-        productPrice.setText(String.format("£%.2f", product.getRetailPrice()));
-        Font newFont = new Font("Airal", Font.PLAIN, 12);
-        productPrice.setFont(newFont);
+        productPrice.setText("\u00A3" + String.format("%.2f", product.getRetailPrice()));
         productPrice.setFont(productPrice.getFont().deriveFont(productPrice.getFont().getSize() + 7f));
-        productPrice.setPreferredSize(new Dimension(80, 25));
-        purchasePanel.add(productPrice);
+        productPrice.setHorizontalAlignment(SwingConstants.CENTER);
 
-        // Add a product quantity selector
-        JSpinner productNumber = new JSpinner(new SpinnerNumberModel(1, 1, null, 1));
-        productNumber.setPreferredSize(new Dimension(50, 23));
-        purchasePanel.add(productNumber);
+        // Create Detail Button
+        JButton moreButton = new JButton("Detail");
+        moreButton.setBackground(new Color(0x4e748d));
+        moreButton.setForeground(new Color(0xe0e2e8));
+        moreButton.setPreferredSize(new Dimension(100, 30));
 
-        // Add "Add" to Cart button
+
+        // Create Add button
         JButton addButton = new JButton("ADD");
         addButton.setBackground(new Color(0x55a15a));
         addButton.setForeground(new Color(0xe0e2e8));
-        addButton.setPreferredSize(new Dimension(70, 30));
-        addButton.setFont(addButton.getFont().deriveFont(addButton.getFont().getSize() + 1f));
-        purchasePanel.add(addButton);
+        addButton.setPreferredSize(new Dimension(100, 30));
 
-        // Add More Info button
-        JButton moreButton = new JButton("MORE");
-        moreButton.setBackground(new Color(0x3da2e7));
-        moreButton.setForeground(new Color(0xe0e2e8));
-        moreButton.setPreferredSize(new Dimension(70, 30));
-        moreButton.setFont(moreButton.getFont().deriveFont(moreButton.getFont().getSize() + 1f));
-        purchasePanel.add(moreButton);
+        // "-"
+        JButton minusButton = new JButton();
+        minusButton.setBackground(new Color(0xb13437));
+        minusButton.setForeground(new Color(0xe0e2e8));
+        minusButton.setIcon(new FlatSVGIcon("images/remove_white_18dp.svg"));
+        minusButton.setPreferredSize(new Dimension(30, 30));
 
-        // Add the Purchase Panel to the Card Panel
-        productCardPanel.add(purchasePanel, new GridBagConstraints
-                (0, 2, 1, 1, 0.0, 1.0,
+        // "NUM"
+        JButton numberButton = new JButton("1");
+        numberButton.setHorizontalAlignment(SwingConstants.CENTER);
+        numberButton.setPreferredSize(new Dimension(50, 30));
+
+        // "+"
+        JButton plusButton = new JButton();
+        plusButton.setBackground(new Color(0x55a15a));
+        plusButton.setForeground(new Color(0xe0e2e8));
+        plusButton.setIcon(new FlatSVGIcon("images/add_white_18dp.svg"));
+        plusButton.setPreferredSize(new Dimension(30, 30));
+
+        JPanel adjustNumPanel = new JPanel(new GridBagLayout());
+        adjustNumPanel.setPreferredSize(new Dimension(120, 30));
+        ((GridBagLayout)adjustNumPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+        ((GridBagLayout)adjustNumPanel.getLayout()).rowHeights = new int[] {0, 0};
+        ((GridBagLayout)adjustNumPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+        ((GridBagLayout)adjustNumPanel.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+        adjustNumPanel.add(minusButton, new GridBagConstraints
+                (0, 0, 1, 1, 0.0, 0.0,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                new Insets(0, 10, 0, 10), 0, 0));
+                new Insets(0, 0, 0, 5), 0, 0));
+        adjustNumPanel.add(numberButton, new GridBagConstraints
+                (1, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 0, 0, 5), 0, 0));
+        adjustNumPanel.add(plusButton, new GridBagConstraints
+                (2, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 0, 0, 0), 0, 0));
+        if (itemID != -1) {
+            adjustNumPanel.setVisible(true);
+            addButton.setVisible(false);
+            numberButton.setText(String.valueOf(CartService.findItemNUM(itemID)));
+        }else {
+            adjustNumPanel.setVisible(false);
+        }
+
+        // Adding event listeners to the "Add" button
+        addButton.addActionListener(e -> {
+            try {
+                if (currentUser != null) {
+                    addButton.setVisible(false);
+                    adjustNumPanel.setVisible(true);
+                    Cart cart = CartService.getCartDetails(userID);
+                    int cartID = cart.getCartID();
+                    int productID = product.getProductID();
+                    CartService.addToCart(cartID, productID, 1);
+                }else {
+                    // USER NOT LOGIN
+                    LoginPage loginPage = new LoginPage();
+                    loginPage.setVisible(true);
+                }
+            } catch (DatabaseException ex) {
+                ex.printStackTrace();
+            }
+
+        });
+
+        // Adding event listeners to the "-" button
+        minusButton.addActionListener(e -> {
+            int num = Integer.parseInt(numberButton.getText());
+            num--;
+            if (num < 1) {
+                adjustNumPanel.setVisible(false);
+                addButton.setVisible(true);
+                try {
+                    int cartID = CartService.getCartDetails(userID).getCartID();
+                    int productID = product.getProductID();
+                    CartService.removeFromCart(cartID,productID);
+                } catch (DatabaseException ex) {
+                    ex.printStackTrace();
+                }
+            } else {
+                numberButton.setText(String.valueOf(num));
+                try {
+                    int cartID = CartService.getCartDetails(userID).getCartID();
+                    int productID = product.getProductID();
+                    CartService.updateCartItem(cartID, productID, num);
+                } catch (DatabaseException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        // Adding event listeners to the "+" button
+        plusButton.addActionListener(e -> {
+            int num = Integer.parseInt(numberButton.getText());
+            num += 1;
+            numberButton.setText(String.valueOf(num));
+            try {
+                int cartID = CartService.getCartDetails(userID).getCartID();
+                int productID = product.getProductID();
+                CartService.updateCartItem(cartID, productID, num);
+            } catch (DatabaseException ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        // Create a purchase panel and add price
+        JPanel purchasePanel = new JPanel();
+        purchasePanel.setBorder(new EmptyBorder(10, 5, 5, 5));
+        purchasePanel.setMaximumSize(new Dimension(190, 85));
+        purchasePanel.setLayout(new GridLayout(2, 1, 20, 0));
+        purchasePanel.add(productPrice);
+
+        // Create button panel and add buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        buttonPanel.setPreferredSize(new Dimension(240, 40));
+        moreButton.setPreferredSize(new Dimension(115, 30));
+        addButton.setPreferredSize(new Dimension(115, 30));
+        buttonPanel.add(moreButton);
+        buttonPanel.add(addButton);
+        buttonPanel.add(adjustNumPanel);
+
+        // Add button panel to purchase panel
+        purchasePanel.add(buttonPanel);
+
+        // Adding the Purchase Panel to the Card Panel
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.weightx = 1.2;
+        gbc.weighty = 0.0;
+        gbc.insets = new Insets(0, 0, 0, 0);
+        productCardPanel.add(purchasePanel, gbc);
 
         return productCardPanel;
     }

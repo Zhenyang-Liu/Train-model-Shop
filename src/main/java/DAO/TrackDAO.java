@@ -4,9 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
 
+import exception.ConnectionException;
+import exception.DatabaseException;
 import model.Gauge;
 import model.Track;
 import model.Track.TrackType;
@@ -18,14 +20,14 @@ public class TrackDAO extends ProductDAO {
      * Inserts a new track record into the database.
      *
      * @param track The Track object to be inserted.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static void insertTrack(Track track) throws SQLException {
+    public static void insertTrack(Track track) throws DatabaseException {
         int productID = insertProduct(track);
         String insertSQL = "INSERT INTO Track (product_id, track_type, gauge) VALUES (?, ?, ?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             
             preparedStatement.setInt(1, productID);
             preparedStatement.setString(2, track.getTrackType());
@@ -38,10 +40,10 @@ public class TrackDAO extends ProductDAO {
             } else {
                 throw new SQLException("Creating track failed, no rows affected.");
             }
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("Error SQL query: " + insertSQL);
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
 
     }
@@ -50,14 +52,14 @@ public class TrackDAO extends ProductDAO {
      * Updates an existing track record in the database.
      *
      * @param track The Track object with updated information.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static void updateTrack(Track track) throws SQLException{
+    public static void updateTrack(Track track) throws DatabaseException{
         ProductDAO.updateProduct(track);
         String updateSQL = "UPDATE Track SET track_type = ?, gauge = ? WHERE product_id = ?;";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
             
             preparedStatement.setString(1, track.getTrackType());
             preparedStatement.setString(2, track.getGauge());
@@ -71,9 +73,10 @@ public class TrackDAO extends ProductDAO {
             } else {
                 throw new SQLException("Update Track failed, no rows affected.");
             }
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
     }
 
@@ -81,27 +84,25 @@ public class TrackDAO extends ProductDAO {
      * Deletes a track record from the database by product ID.
      *
      * @param productId The ID of the track product to be deleted.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static void deleteTrack(int productId) throws SQLException{
+    public static void deleteTrack(int productId) throws DatabaseException{
         String deleteSQL = "DELETE FROM Track WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
             preparedStatement.setInt(1, productId);
 
             int rowsAffected = preparedStatement.executeUpdate();
             
             if (rowsAffected > 0) {
                 ProductDAO.deleteProduct(productId);
-                System.out.println("Track with ID " + productId + " was deleted successfully.");
-            } else {
-                System.out.println("No Track was found with ID " + productId + " to delete.");
-            }
+            } 
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        }  
+            throw new DatabaseException(e.getMessage(),e);
+        }
     }
 
     /**
@@ -109,9 +110,9 @@ public class TrackDAO extends ProductDAO {
      *
      * @param productID The ID of the Track product to be retrieved.
      * @return A Track object representing the retrieved Track record | null if can't find.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static Track findTrackByID(int productID) throws SQLException {
+    public static Track findTrackByID(int productID) throws DatabaseException {
         String selectSQL = "SELECT * FROM RollingStock WHERE product_id = ?;";
         Track track = new Track();
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -128,11 +129,12 @@ public class TrackDAO extends ProductDAO {
 
                 track = new Track(newProduct, newType, newGauge);
             }
-            return track;
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
+        return track;
     }
 
     /**
@@ -140,9 +142,9 @@ public class TrackDAO extends ProductDAO {
      *
      * @param gauge The gauge to filter tracks by.
      * @return An ArrayList of track objects that match the specified gauge | null if can't find.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Track> findTracksByGauge(Gauge gauge) throws SQLException{
+    public static ArrayList<Track> findTracksByGauge(Gauge gauge) throws DatabaseException{
         String selectSQL = "SELECT * FROM Track WHERE gauge = ?;";
         ArrayList<Track> tracks = new ArrayList<Track>();
 
@@ -161,11 +163,12 @@ public class TrackDAO extends ProductDAO {
                 Track track = new Track(newProduct, newType, newGauge);
                 tracks.add(track);
             }
-            return tracks;
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
+        return tracks;
     }
     
     /**
@@ -173,9 +176,9 @@ public class TrackDAO extends ProductDAO {
      *
      * @param type The track type to filter rollingstocks by.
      * @return An ArrayList of Track objects that match the specified type | null if can't find.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Track> findTracksByType(TrackType type) throws SQLException{
+    public static ArrayList<Track> findTracksByType(TrackType type) throws DatabaseException{
         String selectSQL = "SELECT * FROM Track WHERE track_type = ?;";
         ArrayList<Track> tracks = new ArrayList<Track>();
 
@@ -194,20 +197,21 @@ public class TrackDAO extends ProductDAO {
                 Track track = new Track(newProduct, newType, newGauge);
                 tracks.add(track);
             }
-            return tracks;
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
+        return tracks;
     }
 
      /**
      * Retrieves a list of all tracks from the database.
      *
      * @return An ArrayList of all Track objects in the database | null if can't find.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Track> findAllControllers() throws SQLException {
+    public static ArrayList<Track> findAllControllers() throws DatabaseException {
         ArrayList<Track> tracks = new ArrayList<Track>();
         String selectSQL = "SELECT * FROM Track;";
 
@@ -225,13 +229,12 @@ public class TrackDAO extends ProductDAO {
                 Track track = new Track(newProduct, newType, newGauge);
                 tracks.add(track);
             }
-            return tracks;
-            
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
-
+        return tracks;
     }
     
 }

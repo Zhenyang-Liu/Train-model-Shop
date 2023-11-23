@@ -4,10 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import exception.ConnectionException;
+import exception.DatabaseException;
 import model.Gauge;
 import model.RollingStock;
 import model.RollingStock.RollingStockType;
@@ -19,14 +21,14 @@ public class RollingStockDAO extends ProductDAO {
      * Inserts a new rollingstock record into the database.
      *
      * @param rollingStock The rollingstock object to be inserted.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static void insertRollingStock(RollingStock rollingStock) throws SQLException {
+    public static void insertRollingStock(RollingStock rollingStock) throws DatabaseException {
         int productID = insertProduct(rollingStock);
         String insertSQL = "INSERT INTO RollingStock (product_id, type, gauge) VALUES (?, ?, ?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             
             preparedStatement.setInt(1, productID);
             preparedStatement.setString(2, rollingStock.getRollingStockType());
@@ -38,12 +40,12 @@ public class RollingStockDAO extends ProductDAO {
             if (rowsAffected > 0) {
                 EraDAO.insertEra(productID, rollingStock.getEra());
             } else {
-                throw new SQLException("Creating Rollingstock failed, no rows affected.");
+                throw new DatabaseException("Creating Rollingstock failed, no rows affected.");
             }
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("Error SQL query: " + insertSQL);
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
 
     }
@@ -52,14 +54,14 @@ public class RollingStockDAO extends ProductDAO {
      * Updates an existing rollingstock record in the database.
      *
      * @param rollingStock The rollingstock object with updated information.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static void updateRollingStock(RollingStock rollingStock) throws SQLException{
+    public static void updateRollingStock(RollingStock rollingStock) throws DatabaseException{
         ProductDAO.updateProduct(rollingStock);
         String updateSQL = "UPDATE RollingStock SET type = ?, gauge = ? WHERE product_id = ?;";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
             
             preparedStatement.setString(1, rollingStock.getRollingStockType());
             preparedStatement.setString(2, rollingStock.getGauge());
@@ -71,11 +73,12 @@ public class RollingStockDAO extends ProductDAO {
                 EraDAO.deleteEra(rollingStock.getProductID());
                 EraDAO.insertEra(rollingStock.getProductID(), rollingStock.getEra());
             } else {
-                throw new SQLException("Creating Rollingstock failed, no rows affected.");
+                throw new DatabaseException("Creating Rollingstock failed, no rows affected.");
             }
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
     }
 
@@ -83,13 +86,13 @@ public class RollingStockDAO extends ProductDAO {
      * Deletes a rollingstock record from the database by product ID.
      *
      * @param productId The ID of the rollingstock product to be deleted.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static void deleteRollingStock(int productId) throws SQLException{
+    public static void deleteRollingStock(int productId) throws DatabaseException{
         String deleteSQL = "DELETE FROM RollingStock WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
             preparedStatement.setInt(1, productId);
 
             int rowsAffected = preparedStatement.executeUpdate();
@@ -98,14 +101,12 @@ public class RollingStockDAO extends ProductDAO {
             if (rowsAffected > 0) {
                 EraDAO.deleteEra(productId);
                 ProductDAO.deleteProduct(productId);
-                System.out.println("Locomotive with ID " + productId + " was deleted successfully.");
-            } else {
-                System.out.println("No Locomotive was found with ID " + productId + " to delete.");
             }
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        }  
+            throw new DatabaseException(e.getMessage(),e);
+        }
     }
 
     /**
@@ -113,9 +114,9 @@ public class RollingStockDAO extends ProductDAO {
      *
      * @param productID The ID of the rollingstock product to be retrieved.
      * @return A RollingStock object representing the retrieved rollingstock record | null if can't find.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static RollingStock findRollingStockByID(int productID) throws SQLException {
+    public static RollingStock findRollingStockByID(int productID) throws DatabaseException {
         String selectSQL = "SELECT * FROM RollingStock WHERE product_id = ?;";
         RollingStock rollingStock = new RollingStock();
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -133,11 +134,12 @@ public class RollingStockDAO extends ProductDAO {
 
                 rollingStock = new RollingStock(newProduct, newType, newGauge, newEra);
             }
-            return rollingStock;
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
+        return rollingStock;
     }
 
     /**
@@ -145,9 +147,9 @@ public class RollingStockDAO extends ProductDAO {
      *
      * @param gauge The gauge to filter rollingstocks by.
      * @return An ArrayList of RollingStock objects that match the specified gauge | null if can't find.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<RollingStock> findRollingStocksByGauge(Gauge gauge) throws SQLException{
+    public static ArrayList<RollingStock> findRollingStocksByGauge(Gauge gauge) throws DatabaseException{
         String selectSQL = "SELECT * FROM RollingStock WHERE gauge = ?;";
         ArrayList<RollingStock> rollingStocks = new ArrayList<RollingStock>();
 
@@ -167,11 +169,12 @@ public class RollingStockDAO extends ProductDAO {
                 RollingStock rollingStock = new RollingStock(newProduct, newType, newGauge, newEra);
                 rollingStocks.add(rollingStock);
             }
-            return rollingStocks;
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
+        return rollingStocks;
     }
     
     /**
@@ -179,9 +182,9 @@ public class RollingStockDAO extends ProductDAO {
      *
      * @param eraList An array of era IDs to filter rollingstocks by.
      * @return An ArrayList of RollingStock objects that match the specified era(s) | null if can't find.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<RollingStock> findRollingStocksByEra(int[] eraList) throws SQLException {
+    public static ArrayList<RollingStock> findRollingStocksByEra(int[] eraList) throws DatabaseException {
         ArrayList<RollingStock> rollingStocks = new ArrayList<RollingStock>();
     
         try (Connection connection = DatabaseConnectionHandler.getConnection()) {
@@ -208,11 +211,11 @@ public class RollingStockDAO extends ProductDAO {
                     }
                 }
             }
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
-    
         return rollingStocks;
     }
     
@@ -221,9 +224,9 @@ public class RollingStockDAO extends ProductDAO {
      *
      * @param type The type (Carriage|Wagon) to filter rollingstocks by.
      * @return An ArrayList of RollingStock objects that match the specified type | null if can't find.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<RollingStock> findRollingStocksByType(RollingStockType type) throws SQLException{
+    public static ArrayList<RollingStock> findRollingStocksByType(RollingStockType type) throws DatabaseException{
         String selectSQL = "SELECT * FROM RollingStock WHERE type = ?;";
         ArrayList<RollingStock> rollingStocks = new ArrayList<RollingStock>();
 
@@ -243,20 +246,21 @@ public class RollingStockDAO extends ProductDAO {
                 RollingStock rollingStock = new RollingStock(newProduct, newType, newGauge, newEra);
                 rollingStocks.add(rollingStock);
             }
-            return rollingStocks;
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
+        return rollingStocks;
     }
 
     /**
      * Retrieves a list of all rollingstocks from the database.
      *
      * @return An ArrayList of all RollingStock objects in the database | null if can't find.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<RollingStock> findAllRollingStocks() throws SQLException{
+    public static ArrayList<RollingStock> findAllRollingStocks() throws DatabaseException{
         String selectSQL = "SELECT * FROM RollingStock;";
         ArrayList<RollingStock> rollingStocks = new ArrayList<RollingStock>();
 
@@ -275,11 +279,12 @@ public class RollingStockDAO extends ProductDAO {
                 RollingStock rollingStock = new RollingStock(newProduct, newType, newGauge, newEra);
                 rollingStocks.add(rollingStock);
             }
-            return rollingStocks;
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
+        return rollingStocks;
     }
     
 }
