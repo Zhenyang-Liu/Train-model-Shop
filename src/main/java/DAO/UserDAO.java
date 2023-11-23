@@ -98,4 +98,33 @@ public class UserDAO {
         // Default return false as nothing above matched
         return false;
     }
+
+    public static User findUserByEmail(String email) {
+        String checkSQL = "SELECT * FROM User WHERE email = ?";
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+        PreparedStatement checkStatement = connection.prepareStatement(checkSQL)) {
+
+            checkStatement.setString(1, email);
+            try (ResultSet results = checkStatement.executeQuery()) {
+                User user = new User();
+
+                // Populate new user
+                if (results.next()) {
+                    user.setUserID(results.getInt("user_id"));
+                    user.setEmail(results.getString("email"));
+                    user.setForename(results.getString("forename"));
+                    user.setSurname(results.getString("surname"));
+                    user.setAddress(results.getString("address"));
+                }
+                    
+                // Return the user
+                return user;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return new User();
+    }
 }

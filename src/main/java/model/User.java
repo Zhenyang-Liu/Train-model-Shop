@@ -12,6 +12,7 @@ public class User {
     private String surname;
     private String address;
 
+    public User() {}
 
     public User(String email, String forename, String surname, String address) {
         this.userID = generateUserID();

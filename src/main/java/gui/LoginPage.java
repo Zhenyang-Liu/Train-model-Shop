@@ -6,6 +6,7 @@ package gui;
 
 import helper.UserSession;
 import listeners.ReloadListener;
+import model.Login;
 import model.User;
 
 import java.awt.*;
@@ -13,6 +14,11 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
+import java.sql.SQLException;
+
+import DAO.LoginDAO;
+import DAO.UserDAO;
+import controller.GlobalState;
 
 /**
  * @author LIU ZHENYANG
@@ -28,25 +34,46 @@ public class LoginPage extends JFrame {
     }
 
     private void button_to_registerPageMouseClicked(MouseEvent e) {
-        // TODO add your code here
         RegistrationPage registrationPage = new RegistrationPage();
         registrationPage.setVisible(true);
 
         this.dispose();
     }
 
-    private void backButtonMouseClicked(MouseEvent e) {
-        // TODO add your code here
+    private void backButtonMouseClicked() {
         this.dispose();
     }
 
-    private void LoginButtonMouseClicked(MouseEvent e) {
-        // TODO add your code here TO deal with login
-         User loggedInUser = new User("test@gmail.com", "Julian", "Jones", "s14gn");
-         UserSession.getInstance().setCurrentUser(loggedInUser);
-        if (loginSuccessListener != null) {
-            loginSuccessListener.reloadProducts();
+    private boolean LoginButtonMouseClicked(String email, String password) {
+        // Get user
+        User user = UserDAO.findUserByEmail(email);
+
+        // Try to get and check login details
+        try {
+            Login userLogin = LoginDAO.findLoginByUserID(user.getUserID());
+            if (!GlobalState.isLoggedIn()) {
+                // Compare passwords
+                if (userLogin.doesPasswordMatch(password)) {
+                    UserSession.getInstance().setCurrentUser(user);
+                    GlobalState.setLoggedIn(true);
+
+                    // Reload products for user
+                    if (loginSuccessListener != null) {
+                        loginSuccessListener.reloadProducts();
+                    }
+
+                    // Return true as everything went successful
+                    backButtonMouseClicked();
+                    return true;
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
+        // Assume something went wrong, return false
+        return false;
     }
 
     private void createUIComponents() {
@@ -171,7 +198,7 @@ public class LoginPage extends JFrame {
                 LoginButton.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        LoginButtonMouseClicked(e);
+                        LoginButtonMouseClicked(LoginTextField_email.getText(), new String(LoginPasswordField.getPassword()));
                     }
                 });
                 LoginButtonBar.add(LoginButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
@@ -185,7 +212,7 @@ public class LoginPage extends JFrame {
                 LoginCancelButton.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        backButtonMouseClicked(e);
+                        backButtonMouseClicked();
                     }
                 });
                 LoginButtonBar.add(LoginCancelButton, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
