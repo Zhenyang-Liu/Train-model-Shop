@@ -2,6 +2,8 @@ package controller;
 import gui.MainPage;
 
 import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import DAO.DatabaseConnectionHandler;
 
@@ -14,9 +16,15 @@ public class Main {
             MainPage mainPage = new MainPage();
 
             mainPage.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            mainPage.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    DatabaseConnectionHandler.shutdown();
+                }
+            });
             mainPage.setVisible(true);
-        } finally {
-            DatabaseConnectionHandler.shutdown();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

@@ -145,7 +145,7 @@ public class AuthenticationDAO {
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
             preparedStatement.setString(1, roleName.toUpperCase());
 
-            ResultSet resultSet = preparedStatement.executeQuery(selectSQL);
+            ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getInt("role_id");
             } else {

@@ -59,14 +59,14 @@ public class RegistrationPage extends JFrame {
                 UserSession.getInstance().setCurrentUser(newUser);
                 GlobalState.setLoggedIn(true);
                 System.out.println("User has logged in (id = " + newUser.getUserID() + ")");
-                
+
                 // Attempt to set default role
                 try {
                     AuthenticationDAO.setDefaultRole(newUser.getUserID());
                 } catch (DatabaseException e) {
                     return "Error adding users role";
                 }
-
+                
                 // Create login, and login user
                 Login newLogin = new Login(newUser.getUserID());
                 newLogin.setPassword(password);
@@ -110,7 +110,7 @@ public class RegistrationPage extends JFrame {
             return "Last name is too long, it must be less than 16 letters";
 
         // Passwords
-        Pattern passwordPattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[a-zA-Z])(?=.*[!@£$%^&*?-+=_~`¬]).{8,}");
+        Pattern passwordPattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])(?=.*[@!£$%^&*?]).{8,}");
         if (!password.equals(passwordValidate))
             return "Passwords do not match";
         if (!passwordPattern.matcher(password).matches())
