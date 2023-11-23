@@ -206,6 +206,79 @@ public class ProductDAO {
         
     }
 
+     /**
+     * Takes a resultSet generated from execuing a SELECT command on the product database table and turns it into
+     * an arraylist of product objects
+     *
+     * @param selectQueryResults the resultset generated from calling executeQuery with a SELECT statement
+     * @return an arraylist containing all the products within the result set
+     * @throws SQLException
+     */
+    private static ArrayList<Product> arrayFromResultSet(ResultSet selectQueryResults) throws SQLException{
+        ArrayList<Product> rVal = new ArrayList<>();
+        while (selectQueryResults.next()) {
+            Product product = new Product();
+            product.setProductID(selectQueryResults.getInt("product_id"));
+            product.setBrand(BrandDAO.findBrand(selectQueryResults.getInt("brand_id")));
+            product.setProductName(selectQueryResults.getString("product_name"));
+            product.setProductCode(selectQueryResults.getString("product_code"));
+            product.setDescription(selectQueryResults.getString("description"));
+            product.setRetailPrice(selectQueryResults.getFloat("retail_price"));
+            product.setStockQuantity(selectQueryResults.getInt("stock_quantity"));
+            rVal.add(product);
+        }
+        return rVal;
+    }
+
+    /**
+     * Constructs an SQL PreparedStatement based on all the filters given and the search query used by the user
+     *
+     * @param connection database connection
+     * @param searchQuery the input of the search bar by the user (default "")
+     * @param minPrice the min price the user has selected (default 0)
+     * @param maxPrice the max price the user has selected (default 1e10)
+     * @return
+     * @throws SQLException
+     */
+    private static PreparedStatement constructFilterQuery(Connection connection, String searchQuery, float minPrice, float maxPrice) throws SQLException{
+        String sqlString = "SELECT * FROM Product WHERE product_name LIKE %?% AND ? <= retail_price <= ?";
+        PreparedStatement pStatement = connection.prepareStatement(sqlString);
+        pStatement.setString(1, searchQuery);
+        pStatement.setFloat(2, minPrice);
+        pStatement.setFloat(3, maxPrice == -1 ? 1e10f : maxPrice);
+        return pStatement;
+    }
+
+    /**
+     * Filters products based solely on a given search query
+     *
+     * @param searchQuery the search query entered by the user
+     * @return an array list of the products that match the search query
+     */
+    public static ArrayList<Product> filterProducts(String searchQuery){
+        return filterProducts(searchQuery, 0, -1);
+    }
+
+    /**
+     * Filters products based off of all filters given by the user
+     * Java does not allow default args so unlucky, all must be provided!! :D Shit language!! :D
+     *
+     * @param searchQuery
+     * @param minPrice
+     * @param maxPrice
+     * @return
+     */
+    public static ArrayList<Product> filterProducts(String searchQuery, float minPrice, float maxPrice){
+        try(Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = constructFilterQuery(connection, searchQuery, minPrice, maxPrice)) {
+            // Return the array of products from the result set
+            return arrayFromResultSet(preparedStatement.executeQuery());
+        }catch(SQLException e){
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
     /**
      * Retrieve all products in the database.
      * 
@@ -219,20 +292,8 @@ public class ProductDAO {
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                Product product = new Product();
-                product.setProductID(resultSet.getInt("product_id"));
-                Brand brand = BrandDAO.findBrand(resultSet.getInt("brand_id"));
-                product.setBrand(brand);
-                product.setProductName(resultSet.getString("product_name"));
-                product.setProductCode(resultSet.getString("product_code"));
-                product.setDescription(resultSet.getString("description"));
-                product.setRetailPrice(resultSet.getFloat("retail_price"));
-                product.setStockQuantity(resultSet.getInt("stock_quantity"));
-                productList.add(product);
-            }
-
+            
+            return arrayFromResultSet(resultSet);
             
             //  //Print for test
             //  System.out.println("<=================== GET ALL PRODUCTS ====================>");
@@ -240,8 +301,6 @@ public class ProductDAO {
             //      System.out.println(obj.toString());
             //  }
             //  System.out.println("<======================================================>");
-             
-            return productList;
             
         } catch (SQLTimeoutException e) {
             throw new ConnectionException("Database connect failed",e);
