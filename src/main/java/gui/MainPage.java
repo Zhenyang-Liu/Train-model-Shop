@@ -19,11 +19,13 @@ import helper.Filter;
 import helper.UserSession;
 import listeners.ReloadListener;
 import model.Cart;
+import model.Gauge;
 import model.Product;
 import model.Brand;
 import DAO.BrandDAO;
 import DAO.ProductDAO;
 import model.User;
+import model.Locomotive.DCCType;
 import helper.UserSession;
 import helper.Filter;
 import service.CartService;
@@ -93,13 +95,38 @@ public class MainPage extends JFrame implements ReloadListener {
         });
     }
 
+    private void populateSubFilters(){
+        subTypeFilterBox.removeAllItems();
+        String table = ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).getDbTable();
+        if(table.equals("Locomotive")){
+            System.out.println("Adding items :D");
+            subTypeFilterBox.addItem(DCCType.ANALOGUE);
+            subTypeFilterBox.addItem(DCCType.FITTED);
+            subTypeFilterBox.addItem(DCCType.READY);
+            subTypeFilterBox.addItem(DCCType.SOUND);
+        }else if(table.equals("Track")){
+            subTypeFilterBox.addItem(Gauge.OO);
+            subTypeFilterBox.addItem(Gauge.TT);
+            subTypeFilterBox.addItem(Gauge.N);
+        }
+        else{
+            subTypeFilterBox.addItem("No sub-filters");
+        }
+    }
+
     private void populateTypeFilters(){
-        typeFilterBox.addItem(f.new TypeFilter("", "All"));
-        typeFilterBox.addItem(f.new TypeFilter("Locomotive", "Locomotives"));
-        typeFilterBox.addItem(f.new TypeFilter("Track", "Tracks"));
-        typeFilterBox.addItem(f.new TypeFilter("BoxedSet", "Box Sets"));
+        typeFilterBox.addItem(f.new TypeFilter("", "All", ""));
+        typeFilterBox.addItem(f.new TypeFilter("Locomotive", "Locomotives", "dcc_type"));
+        typeFilterBox.addItem(f.new TypeFilter("Track", "Tracks", "track_type"));
+        typeFilterBox.addItem(f.new TypeFilter("BoxedSet", "Box Sets", "pack_type"));
 
         typeFilterBox.addItemListener(e -> {
+            System.out.println("Loading filters: " + e.getItem().toString());
+            populateSubFilters();
+            loadProducts();
+        });
+        subTypeFilterBox.addItemListener(e -> {
+            ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).setSubFilter(e.getItem().toString());
             loadProducts();
         });
     }

@@ -272,7 +272,6 @@ public class ProductDAO {
             pStatement.setString(4 + cExtraIndex, asc ? "ASC" : "DESC");
             cExtraIndex += 2;
         }
-        System.out.println("Statement executed: " + pStatement.toString());
         return pStatement;
     }
 
