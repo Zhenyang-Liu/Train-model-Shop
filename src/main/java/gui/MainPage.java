@@ -35,6 +35,7 @@ public class MainPage extends JFrame implements ReloadListener {
         initComponents();
         loadProducts();
         customizeComponents();
+        button_accountMouseClicked();
     }
 
     private void createUIComponents() {
@@ -45,7 +46,7 @@ public class MainPage extends JFrame implements ReloadListener {
         loadProducts();
     }
 
-    private void button_accountMouseClicked(MouseEvent e) {
+    private void button_accountMouseClicked() {
         SwingUtilities.invokeLater(() -> {
             if (!GlobalState.isLoggedIn()) {
                 LoginPage loginPage = new LoginPage();;
@@ -137,7 +138,7 @@ public class MainPage extends JFrame implements ReloadListener {
                 button_account.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        button_accountMouseClicked(e);
+                        button_accountMouseClicked();
                     }
                 });
                 accountPanel.add(button_account, BorderLayout.WEST);
