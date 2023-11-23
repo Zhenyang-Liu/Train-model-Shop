@@ -103,6 +103,9 @@ public class RegistrationPage extends JFrame {
         return "OK";
     }
 
+    /**
+     * Creates UI Components that are custom (not from JFormDesigner or need extra tweaking)
+     */
     private void createUIComponents() {
         //---- errorLabel ----
         errorLabel.setText("");
@@ -114,6 +117,9 @@ public class RegistrationPage extends JFrame {
         RegisterTitlePanel.add(errorLabel);
     }
 
+    /**
+     * Closes the registration page
+     */
     private void closeRegistration() {
         this.dispose();
     }
