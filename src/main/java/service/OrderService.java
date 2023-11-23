@@ -11,7 +11,7 @@ import exception.*;
 public class OrderService {
     private static PermissionService permission = new PermissionService();
 
-    public static void confirmOrder(Order order) throws DatabaseException{
+    public static boolean confirmOrder(Order order) {
         // TODO: Unfinished
         try{
             if (!permission.hasPermission(order.getUserID(),"EDIT_OWN_CART")){
@@ -29,9 +29,10 @@ public class OrderService {
                 }
             }
             OrderDAO.insertOrder(order);
+            return true;
         } catch (DatabaseException e) {
             ExceptionHandler.printErrorMessage(e);
-            throw e;
+            return false;
         }
     }
 }

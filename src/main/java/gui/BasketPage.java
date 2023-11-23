@@ -257,12 +257,11 @@ public class BasketPage extends JFrame {
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
     private void loadUserCart(int userID) {
-        try {
-            Cart cart = CartService.getCartDetails(userID); // Get user cart details
+        Cart cart = CartService.getCartDetails(userID);
+        if (cart != null){
             loadTrolleyItems(cart.getCartItems()); // Load cart items into the trolley view
-        } catch (DatabaseException e) {
-            // Exception handling
-            e.printStackTrace();
+        } else{
+            // TODO: Missing logic when action failed
         }
     }
 
@@ -346,13 +345,12 @@ public class BasketPage extends JFrame {
             public void stateChanged(ChangeEvent e) {
                 int currentQuantity = (Integer) itemSpinner.getValue();
 
-                try {
-                    CartService.updateCartItem(cartItem.getItemID(), currentQuantity);
+                if(CartService.updateCartItem(cartItem.getItemID(), currentQuantity)){
                     if (reloadListener != null) {
                         reloadListener.reloadProducts();
                     }
-                } catch (DatabaseException ex) {
-                    throw new RuntimeException(ex);
+                }else{
+                    //TODO: Missing logic if update failed
                 }
             }
         });

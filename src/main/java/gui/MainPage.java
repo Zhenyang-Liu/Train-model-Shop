@@ -8,6 +8,9 @@ import DAO.BrandDAO;
 import DAO.ProductDAO;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.jgoodies.forms.factories.DefaultComponentFactory;
+import java.awt.*;
+import java.util.concurrent.ExecutionException;
+import javax.swing.*;
 import exception.DatabaseException;
 import helper.Filter;
 import helper.UserSession;
@@ -716,23 +719,18 @@ public class MainPage extends JFrame implements ReloadListener {
 
         // Adding event listeners to the "Add" button
         addButton.addActionListener(e -> {
-            try {
-                if (currentUser != null) {
-                    addButton.setVisible(false);
-                    adjustNumPanel.setVisible(true);
-                    Cart cart = CartService.getCartDetails(userID);
-                    int cartID = cart.getCartID();
-                    int productID = product.getProductID();
-                    CartService.addToCart(cartID, productID, 1);
-                }else {
-                    // USER NOT LOGIN
-                    LoginPage loginPage = new LoginPage();
-                    loginPage.setVisible(true);
-                }
-            } catch (DatabaseException ex) {
-                ex.printStackTrace();
+            if (currentUser != null) {
+                addButton.setVisible(false);
+                adjustNumPanel.setVisible(true);
+                Cart cart = CartService.getCartDetails(userID);
+                int cartID = cart.getCartID();
+                int productID = product.getProductID();
+                CartService.addToCart(cartID, productID, 1);
+            }else {
+                // USER NOT LOGIN
+                LoginPage loginPage = new LoginPage();
+                loginPage.setVisible(true);
             }
-
         });
 
         // Adding event listeners to the "-" button
@@ -742,21 +740,17 @@ public class MainPage extends JFrame implements ReloadListener {
             if (num < 1) {
                 adjustNumPanel.setVisible(false);
                 addButton.setVisible(true);
-                try {
-                    int cartID = CartService.getCartDetails(userID).getCartID();
-                    int productID = product.getProductID();
-                    CartService.removeFromCart(cartID,productID);
-                } catch (DatabaseException ex) {
-                    ex.printStackTrace();
+                int cartID = CartService.getCartDetails(userID).getCartID();
+                int productID = product.getProductID();
+                if (!CartService.removeFromCart(cartID,productID)){
+                    //TODO: Add action failed information
                 }
             } else {
                 numberButton.setText(String.valueOf(num));
-                try {
-                    int cartID = CartService.getCartDetails(userID).getCartID();
-                    int productID = product.getProductID();
-                    CartService.updateCartItem(cartID, productID, num);
-                } catch (DatabaseException ex) {
-                    ex.printStackTrace();
+                int cartID = CartService.getCartDetails(userID).getCartID();
+                int productID = product.getProductID();
+                if (!CartService.updateCartItem(cartID, productID, num)){
+                    //TODO: Add action failed information
                 }
             }
         });
@@ -766,13 +760,11 @@ public class MainPage extends JFrame implements ReloadListener {
             int num = Integer.parseInt(numberButton.getText());
             num += 1;
             numberButton.setText(String.valueOf(num));
-            try {
-                int cartID = CartService.getCartDetails(userID).getCartID();
-                int productID = product.getProductID();
-                CartService.updateCartItem(cartID, productID, num);
-            } catch (DatabaseException ex) {
-                ex.printStackTrace();
-            }
+            int cartID = CartService.getCartDetails(userID).getCartID();
+            int productID = product.getProductID();
+                if (!CartService.updateCartItem(cartID, productID, num)){
+                    //TODO: Add action failed information
+                }
         });
 
         // Create a purchase panel and add price
