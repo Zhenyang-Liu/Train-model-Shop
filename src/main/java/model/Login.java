@@ -11,7 +11,6 @@ public class Login{
     private int loginID;
     private int userID;
 
-    private String username;
     private String passwordHash;
     private String passwordSalt;
 
@@ -21,11 +20,14 @@ public class Login{
     private boolean lockoutEnabled;
     private Timestamp lockoutEnd;
 
-    public Login() {
-    }
-    public Login(int userID, String username, String passwordHash, String passwordSalt){
+    public Login() {}
+
+    public Login(int userID) {
         this.setUserID(userID);
-        this.setUsername(username);
+    }
+
+    public Login(int userID, String passwordHash, String passwordSalt){
+        this.setUserID(userID);
         this.setPassword(passwordHash, passwordSalt);
     }
 
@@ -63,24 +65,6 @@ public class Login{
      */
     public int getUserID(){
         return this.userID;
-    }
-
-    /**
-     * Sets the username of the user
-     *
-     * @param username the desired username
-     */
-    public void setUsername(String username){
-        this.username = username;
-    }
-
-    /**
-     * Gets the username of the user that this login relates to
-     *
-     * @return the username
-     */
-    public String getUsername(){
-        return this.username;
     }
 
     /**

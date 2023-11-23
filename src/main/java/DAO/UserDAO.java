@@ -16,7 +16,7 @@ public class UserDAO {
      * @return {@code true} if the user was added, {@code false} otherwise
      * @throws SQLException If there is an error inserting into database (sometimes because user already exists)
      */
-    public static boolean insertUser(User newUser) throws SQLException {
+    public static boolean insertUser(User newUser) {
         // Insert user into database as they have not already been added
         String insertSQL = "INSERT INTO User (user_id, forename, surname, email, address) VALUES (?, ?, ?, ?, ?)";
 
@@ -54,7 +54,7 @@ public class UserDAO {
      * @return {@code true} if the user exists, {@code false} otherwise
      * @throws SQLException If there was an error during query
      */
-    public static boolean doesUserExist(int userID) throws SQLException {
+    public static boolean doesUserExist(int userID) {
         String checkSQL = "SELECT COUNT(*) FROM User WHERE user_id = ?";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -80,7 +80,7 @@ public class UserDAO {
      * @return {@code true} if the user exists, {@code false} otherwise
      * @throws SQLException If there was an error during query
      */
-    public static boolean doesUserExist(String email) throws SQLException {
+    public static boolean doesUserExist(String email) {
         String checkSQL = "SELECT COUNT(*) FROM User WHERE email = ?";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();

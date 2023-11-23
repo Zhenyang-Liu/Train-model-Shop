@@ -15,9 +15,9 @@ public class LoginDAO{
      * @return the loginID of the login inserted
      * @throws SQLException
      */
-    public static boolean insertLoginDetails(Login login) throws SQLException{
-        String stmt = "INSERT INTO Login (user_id, session_code, password_hash, password_salt, failed_attempts," +
-            "last_login_attempt, lockout_enabled, lockout_end) VALUES (?,?,?,?,?,?,?,?)";
+    public static boolean insertLoginDetails(Login login){
+        String stmt = "INSERT INTO Login (user_id, password_hash, password_salt, failed_attempts," +
+            "last_login_attempt, lockout_enabled, lockout_end) VALUES (?,?,?,?,?,?,?)";
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(stmt)) {
 
@@ -26,19 +26,18 @@ public class LoginDAO{
                 return false;
             }
             preparedStatement.setInt(1, login.getUserID());
-            preparedStatement.setString(2, login.getUsername());
-            preparedStatement.setString(3, login.getPasswordHash());
-            preparedStatement.setString(4, login.getPasswordSalt());
-            preparedStatement.setInt(5, login.getFailedAttempts());
-            preparedStatement.setTimestamp(6, login.getLastLoginAttempt());
-            preparedStatement.setBoolean(7, login.isLockoutEnabled());
-            preparedStatement.setTimestamp(8, login.getLockoutEnd());
+            preparedStatement.setString(2, login.getPasswordHash());
+            preparedStatement.setString(3, login.getPasswordSalt());
+            preparedStatement.setInt(4, login.getFailedAttempts());
+            preparedStatement.setTimestamp(5, login.getLastLoginAttempt());
+            preparedStatement.setBoolean(6, login.isLockoutEnabled());
+            preparedStatement.setTimestamp(7, login.getLockoutEnd());
 
             preparedStatement.executeUpdate();
             return true;
         }catch(SQLException e){
             e.printStackTrace();
-            throw e;
+            return false;
         }
     }
 
@@ -49,8 +48,8 @@ public class LoginDAO{
      * @return @code{true} if the details are updated successfully otherwise @code{false}
      * @throws SQLException
      */
-    public static boolean updateLoginDetails(Login login) throws SQLException{
-        String stmt = "UPDATE Login SET session_code = ?, password_hash = ?, password_salt = ?, failed_attempts = ?, " +
+    public static boolean updateLoginDetails(Login login) {
+        String stmt = "UPDATE Login SET password_hash = ?, password_salt = ?, failed_attempts = ?, " +
             "last_login_attempt = ?, lockout_enabled = ?, lockout_end = ? WHERE user_id = ?";
 
         if(!doesLoginExist(login.getUserID())){
@@ -60,14 +59,13 @@ public class LoginDAO{
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(stmt)) {
-            preparedStatement.setString(1, login.getUsername());
-            preparedStatement.setString(2, login.getPasswordHash());
-            preparedStatement.setString(3, login.getPasswordSalt());
-            preparedStatement.setInt(4, login.getFailedAttempts());
-            preparedStatement.setTimestamp(5, login.getLastLoginAttempt());
-            preparedStatement.setBoolean(6, login.isLockoutEnabled());
-            preparedStatement.setTimestamp(7, login.getLockoutEnd());
-            preparedStatement.setInt(8, login.getUserID());
+            preparedStatement.setString(1, login.getPasswordHash());
+            preparedStatement.setString(2, login.getPasswordSalt());
+            preparedStatement.setInt(3, login.getFailedAttempts());
+            preparedStatement.setTimestamp(4, login.getLastLoginAttempt());
+            preparedStatement.setBoolean(5, login.isLockoutEnabled());
+            preparedStatement.setTimestamp(6, login.getLockoutEnd());
+            preparedStatement.setInt(7, login.getUserID());
 
             int affectedRows = preparedStatement.executeUpdate();
 
@@ -77,7 +75,6 @@ public class LoginDAO{
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw e;
         }
     }
 
@@ -88,7 +85,7 @@ public class LoginDAO{
      * @return the login information of the user
      * @throws SQLException
      */
-    public static Login findLoginByUserID(int userID) throws SQLException{
+    public static Login findLoginByUserID(int userID) throws SQLException {
         String stmt = "SELECT * FROM Login WHERE user_id = ?";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -101,7 +98,6 @@ public class LoginDAO{
             while (resultSet.next()) {
                 login.setLoginID(resultSet.getInt("login_id"));
                 login.setUserID(resultSet.getInt("user_id"));
-                login.setUsername(resultSet.getString("session_code"));
                 login.setPassword(resultSet.getString("password_hash"), resultSet.getString("password_salt"));
                 login.setFailedAttempts(resultSet.getInt("failed_attempts"));
                 login.setLastLoginAttempt(resultSet.getTimestamp("last_login_atttempt"));
@@ -128,7 +124,7 @@ public class LoginDAO{
         try{
             Login dbLoginDetails = findLoginByUserID(userID);
             return dbLoginDetails.getPasswordHash().equals(passwordhash);
-        }catch(SQLException e){
+        } catch(SQLException e){
             e.printStackTrace();
             return false;
         }

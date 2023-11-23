@@ -13,9 +13,11 @@ import javax.swing.border.*;
 
 import java.util.regex.*;
 
+import DAO.LoginDAO;
 import DAO.UserDAO;
 import controller.GlobalState;
 import helper.UserSession;
+import model.Login;
 import model.User;
 
 /**
@@ -46,19 +48,24 @@ public class RegistrationPage extends JFrame {
      * @param password the password of the login account, different to user
      */
     private String submitButtonClicked(String email, String forename, String surname, String address, String password) {
-        try {
-            if (!UserDAO.doesUserExist(email)) {
-                User newUser = new User(email, forename, surname, address);
-                boolean hasCreatedUser = UserDAO.insertUser(newUser);  // TODO Add password field
-                if (hasCreatedUser) {
-                    UserSession.getInstance().setCurrentUser(newUser);
-                    GlobalState.setLoggedIn(true);
-                    System.out.println("User has logged in (id = " + newUser.getUserID() + ")");
+        if (!UserDAO.doesUserExist(email)) {
+            User newUser = new User(email, forename, surname, address);
+            boolean hasCreatedUser = UserDAO.insertUser(newUser);
+
+            if (hasCreatedUser) {
+                UserSession.getInstance().setCurrentUser(newUser);
+                GlobalState.setLoggedIn(true);
+                System.out.println("User has logged in (id = " + newUser.getUserID() + ")");
+
+                // Create login, and login user
+                Login newLogin = new Login(newUser.getUserID());
+                newLogin.setPassword(password);
+                boolean loginSuccess = LoginDAO.insertLoginDetails(newLogin);
+                if (loginSuccess)
                     return "OK";
-                }
+                else
+                    return "Error creating user login, they may already exist!";    
             }
-        } catch (SQLException exception) {
-            exception.printStackTrace();
         }
 
         // User was not created because the email already exists
@@ -207,9 +214,9 @@ public class RegistrationPage extends JFrame {
                         String fieldsError = checkInputs(emailTextField.getText(), firstNameTextField.getText(), lastNameTextField.getText(), new String(passwordField_create.getPassword()), new String(passwordField_confirm.getPassword()));
                         if (fieldsError == "OK") {
                             String userCreationError = submitButtonClicked(emailTextField.getText(), firstNameTextField.getText(), lastNameTextField.getText(), "", passwordField_confirm.getPassword().toString());
-                            if (userCreationError == "OK")
+                            if (userCreationError == "OK") {
                                 closeRegistration();
-                            else
+                            } else
                                 errorLabel.setText(userCreationError);
                         }
                         else {
