@@ -100,8 +100,14 @@ public class RegistrationPage extends JFrame {
         return "OK";
     }
 
+    private void createUIComponents() {
+        // TODO: add custom component creation code here
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
+        createUIComponents();
+
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
         RegisterDialogPane = new JPanel();
         RegisterTitlePanel = new JPanel();
@@ -110,7 +116,6 @@ public class RegistrationPage extends JFrame {
         RegisterButtonBar = new JPanel();
         RegisterSubmitButton = new JButton();
         RegisterBacklButton = new JButton();
-        RegisterContentPanel = new JPanel();
         RegisterFormPanel = new JPanel();
         label_Email = new JLabel();
         emailTextField = new JTextField();
@@ -168,19 +173,6 @@ public class RegistrationPage extends JFrame {
                 RegisterSubmitButton.setForeground(new Color(0xe9e5e5));
                 RegisterSubmitButton.setPreferredSize(new Dimension(78, 28));
                 RegisterSubmitButton.setFont(RegisterSubmitButton.getFont().deriveFont(RegisterSubmitButton.getFont().getSize() + 1f));
-                RegisterSubmitButton.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        String fieldsError = checkInputs(emailTextField.getText(), firstNameTextField.getText(), lastNameTextField.getText(), passwordField_create.getPassword().toString(), passwordField_confirm.getPassword().toString());
-                        if (fieldsError == "OK")
-                            submitButtonClicked(emailTextField.getText(), firstNameTextField.getText(), lastNameTextField.getText(), "", passwordField_confirm.getPassword().toString());
-                        else {
-                            System.out.println("Inputs were not valid: " + fieldsError);
-                            // TODO Show output on GUI!
-                        }
-
-                    }
-                });
                 RegisterButtonBar.add(RegisterSubmitButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 5), 0, 0));

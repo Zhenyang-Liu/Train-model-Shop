@@ -13,6 +13,9 @@ new FormModel {
 			"minimumSize": new java.awt.Dimension( 600, 450 )
 			"maximumSize": new java.awt.Dimension( 600, 450 )
 			"$locationPolicy": 1
+			auxiliary() {
+				"JavaCodeGenerator.customCreate": true
+			}
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 				name: "RegisterDialogPane"
 				"border": new javax.swing.border.EmptyBorder( 12, 12, 12, 12 )
@@ -79,6 +82,9 @@ new FormModel {
 					name: "RegisterContentPanel"
 					"minimumSize": new java.awt.Dimension( 1080, 720 )
 					"preferredSize": new java.awt.Dimension( 500, 720 )
+					auxiliary() {
+						"JavaCodeGenerator.customCreate": true
+					}
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
 						"columns": 1
 						"rows": 10
