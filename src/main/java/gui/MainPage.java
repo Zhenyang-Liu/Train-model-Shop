@@ -15,13 +15,17 @@ import com.formdev.flatlaf.extras.*;
 import com.jgoodies.forms.factories.*;
 import controller.GlobalState;
 import exception.DatabaseException;
+import helper.Filter;
 import helper.UserSession;
 import listeners.ReloadListener;
 import model.Cart;
 import model.Product;
+import model.Brand;
+import DAO.BrandDAO;
 import DAO.ProductDAO;
 import model.User;
 import helper.UserSession;
+import helper.Filter;
 import service.CartService;
 
 /**
@@ -33,6 +37,7 @@ public class MainPage extends JFrame implements ReloadListener {
     public MainPage() {
         productDAO = new ProductDAO();  // Instantiating ProductDAO
         initComponents();
+        populateFilterBoxes();
         loadProducts();
         customizeComponents();
     }
@@ -74,6 +79,26 @@ public class MainPage extends JFrame implements ReloadListener {
 
     }
 
+    private void populatePriceRangeFilters(){
+        Filter f = new Filter();
+        filterBox2.addItem(f.new PriceRange(0.0f, 15.0f));
+        filterBox2.addItem(f.new PriceRange(15.0f, 30.0f));
+        filterBox2.addItem(f.new PriceRange(30.0f, 50.0f));
+    }
+
+    private void populateBrandFilters(){
+        ArrayList<Brand> toAdd = BrandDAO.findAllBrand();
+        for(Brand b: toAdd)
+            filterBox4.addItem(b);
+    }
+
+    private void populateFilterBoxes()
+    {
+        System.out.println("Filter boxes");
+        populatePriceRangeFilters();
+        populateBrandFilters();
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
@@ -95,7 +120,7 @@ public class MainPage extends JFrame implements ReloadListener {
         filterLabel1 = new JLabel();
         filterBox1 = new JComboBox();
         filterLabel2 = new JLabel();
-        filterBox2 = new JComboBox();
+        filterBox2 = new JComboBox<Filter.PriceRange>();
         filterLabel3 = new JLabel();
         filterBox3 = new JComboBox();
         filterLabel4 = new JLabel();
@@ -248,7 +273,6 @@ public class MainPage extends JFrame implements ReloadListener {
                 filterPanel.add(filterBox1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
-
                 //---- filterLabel2 ----
                 filterLabel2.setText(bundle.getString("MainPage.filterLabel2.text"));
                 filterPanel.add(filterLabel2, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
