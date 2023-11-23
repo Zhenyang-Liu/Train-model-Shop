@@ -9,6 +9,7 @@ import exception.*;
 import helper.*;
 
 public class AddressService {
+    private static PermissionService permission = new PermissionService();
     
     /**
      * Adds an address for the current user.
@@ -23,7 +24,7 @@ public class AddressService {
     public static void addAddress(Address address) throws DatabaseException {
         try {
             User currentUser = UserSession.getInstance().getCurrentUser();
-            if (!Validation.isCurrentUser(currentUser.getUserID())){
+            if (!permission.hasPermission(currentUser.getUserID(),"EDIT_OWN_ADDRESS")){
                 throw new AuthorizationException("Access denied. Users can only access their own address.");
             }
             // Check whether the address has existed in the database.
@@ -54,7 +55,7 @@ public class AddressService {
     public static void updateAddress(Address newAddress) throws DatabaseException {
         try {
             User currentUser = UserSession.getInstance().getCurrentUser();
-            if (!Validation.isCurrentUser(currentUser.getUserID())){
+            if (!permission.hasPermission(currentUser.getUserID(), "EDIT_OWN_ADDRESS")){
                 throw new AuthorizationException("Access denied. Users can only access their own address.");
             }
 

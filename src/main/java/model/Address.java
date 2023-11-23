@@ -18,10 +18,7 @@ public class Address {
     }
 
     public Address(int id, String houseNumber, String roadName, String city, String postcode) {
-        this.houseNumber = houseNumber;
-        this.roadName = roadName;
-        this.city = city;
-        this.postcode = postcode;
+        this(houseNumber, roadName, city, postcode);
         this.id = id;
     }
 

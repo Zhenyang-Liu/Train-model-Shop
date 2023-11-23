@@ -19,12 +19,12 @@ CREATE TABLE Login (
 
 CREATE TABLE Role (
     role_id INT AUTO_INCREMENT PRIMARY KEY,
-    role_name VARCHAR(100) NOT NULL UNIQUE
+    role_name VARCHAR(10) NOT NULL UNIQUE
 );
 
 CREATE TABLE User_Role (
-    user_id INT,
-    role_id INT,
+    user_id INT NOT NULL,
+    role_id INT NOT NULL,
     PRIMARY KEY (user_id, role_id),
     FOREIGN KEY (user_id) REFERENCES User(user_id),
     FOREIGN KEY (role_id) REFERENCES Role(role_id)
@@ -36,8 +36,8 @@ CREATE TABLE Permission (
 );
 
 CREATE TABLE Role_Permission (
-    role_id INT,
-    permission_id INT,
+    role_id INT NOT NULL,
+    permission_id INT NOT NULL,
     PRIMARY KEY (role_id, permission_id),
     FOREIGN KEY (role_id) REFERENCES Role(role_id),
     FOREIGN KEY (permission_id) REFERENCES Permission(permission_id)
