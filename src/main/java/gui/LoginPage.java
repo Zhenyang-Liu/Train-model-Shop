@@ -70,6 +70,7 @@ public class LoginPage extends JFrame {
         LoginPasswordField = new JPasswordField();
         LoginButtonBar = new JPanel();
         button_register = new JButton();
+        LoginButton = new JButton();
         LoginCancelButton = new JButton();
 
         //======== this ========

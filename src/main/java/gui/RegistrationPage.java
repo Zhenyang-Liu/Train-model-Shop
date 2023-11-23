@@ -16,7 +16,6 @@ import java.util.regex.*;
 import DAO.UserDAO;
 import controller.GlobalState;
 import helper.UserSession;
-import model.Login;
 import model.User;
 
 /**
@@ -118,6 +117,7 @@ public class RegistrationPage extends JFrame {
         RegisterSubmitButton = new JButton();
         RegisterBacklButton = new JButton();
         RegisterFormPanel = new JPanel();
+        RegisterContentPanel = new JPanel();
         label_Email = new JLabel();
         emailTextField = new JTextField();
         label_FN = new JLabel();
@@ -156,7 +156,7 @@ public class RegistrationPage extends JFrame {
 
                 //---- errorLabel ----
                 errorLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-                errorLabel.setFont(errorLabel.getFont().deriveFont(errorLabel.getFont().getStyle() | Font.BOLD, errorLabel.getFont().getSize() + 11f));
+                errorLabel.setFont(errorLabel.getFont().deriveFont(errorLabel.getFont().getStyle() | Font.BOLD, errorLabel.getFont().getSize() - 1f));
                 errorLabel.setIconTextGap(6);
                 errorLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
                 errorLabel.setForeground(Color.red);
