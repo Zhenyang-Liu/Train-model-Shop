@@ -13,9 +13,11 @@ import javax.swing.border.*;
 
 import java.util.regex.*;
 
+import DAO.AuthenticationDAO;
 import DAO.LoginDAO;
 import DAO.UserDAO;
 import controller.GlobalState;
+import exception.DatabaseException;
 import helper.UserSession;
 import model.Login;
 import model.User;
@@ -56,10 +58,16 @@ public class RegistrationPage extends JFrame {
                 UserSession.getInstance().setCurrentUser(newUser);
                 GlobalState.setLoggedIn(true);
                 System.out.println("User has logged in (id = " + newUser.getUserID() + ")");
+                
+                // Attempt to set default role
+                try {
+                    AuthenticationDAO.setDefaultRole(newUser.getUserID());
+                } catch (DatabaseException e) {
+                    return "Error adding users role";
+                }
 
                 // Create login, and login user
                 Login newLogin = new Login(newUser.getUserID());
-                System.out.println("This is definitely correct - Julian " + password);
                 newLogin.setPassword(password);
                 boolean loginSuccess = LoginDAO.insertLoginDetails(newLogin);
                 if (loginSuccess)

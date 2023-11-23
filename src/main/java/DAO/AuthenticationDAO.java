@@ -64,7 +64,7 @@ public class AuthenticationDAO {
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             
             preparedStatement.setInt(1, userID);
-            preparedStatement.setInt(2, getRoleId("CUSTOMOER"));
+            preparedStatement.setInt(2, getRoleId("CUSTOMER"));
 
             int rowsAffected = preparedStatement.executeUpdate();
             
