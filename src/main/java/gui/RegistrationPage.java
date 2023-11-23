@@ -110,7 +110,7 @@ public class RegistrationPage extends JFrame {
             return "Last name is too long, it must be less than 16 letters";
 
         // Passwords
-        Pattern passwordPattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])(?=.*[!£$%^&*?]).{8,}");
+        Pattern passwordPattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[a-zA-Z])(?=.*[!@£$%^&*?-+=_~`¬]).{8,}");
         if (!password.equals(passwordValidate))
             return "Passwords do not match";
         if (!passwordPattern.matcher(password).matches())
