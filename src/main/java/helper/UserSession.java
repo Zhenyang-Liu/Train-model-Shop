@@ -1,9 +1,10 @@
 package helper;
-
-import model.User;
-
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
+
+import DAO.AuthenticationDAO;
+import model.User;
+import service.PermissionService;
 
 public class UserSession {
     private static UserSession instance;
@@ -21,6 +22,8 @@ public class UserSession {
 
     public void setCurrentUser(User user) {
         this.currentUser = user;
+        Set<String> permissions = PermissionService.getUserPermissions(currentUser.getUserID());
+        setPermissions(permissions);
     }
 
     public User getCurrentUser() {
@@ -50,10 +53,8 @@ public class UserSession {
 
 
     // After login successful
-    // Set<String> permissions = AuthenticationDAO.getPermissionsForUser(loggedInUser.getUserID());
-    // UserSession.getInstance().setCurrentUser(loggedInUser);
     // UserSession.getInstance().setPermissions(permissions);
-
+    
     // // when need user information
     // User currentUser = UserSession.getInstance().getCurrentUser();
 

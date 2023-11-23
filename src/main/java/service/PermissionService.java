@@ -1,5 +1,9 @@
 package service;
 
+import java.util.Set;
+
+import DAO.AuthenticationDAO;
+import exception.DatabaseException;
 import helper.UserSession;
 
 public class PermissionService {
@@ -41,5 +45,25 @@ public class PermissionService {
         }
 
         return hasBasicPermission;
+    }
+
+    /**
+     * Retrieves the set of permissions associated with a specific user.
+     *
+     * This method fetches the permissions of a user based on their user ID by calling the getUserPermissions
+     * method from the AuthenticationDAO. It returns a set of permission names. In case of a DatabaseException, 
+     * the method catches the exception, prints the error message, and returns null.
+     *
+     * @param userID The ID of the user whose permissions are to be retrieved.
+     * @return A Set of strings representing the user's permissions, or null if a DatabaseException occurs.
+     */
+    public static Set<String> getUserPermissions(int userID) {
+        try{
+            Set<String> permissions = AuthenticationDAO.getUserPermissions(userID);
+            return permissions;
+        } catch (DatabaseException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 }
