@@ -122,6 +122,7 @@ public class RegistrationPage extends JFrame {
         passwordField_create = new JPasswordField();
         label_confirmPassword = new JLabel();
         passwordField_confirm = new JPasswordField();
+        errorLabel = new JLabel();
 
         //======== this ========
         setPreferredSize(new Dimension(600, 450));
@@ -152,6 +153,15 @@ public class RegistrationPage extends JFrame {
                 RegisterTitleSeparator.setForeground(new Color(0x7f7272));
                 RegisterTitleSeparator.setBackground(new Color(0x7f7272));
                 RegisterTitlePanel.add(RegisterTitleSeparator);
+
+                //---- errorLabel ----
+                errorLabel.setText("");
+                errorLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+                errorLabel.setFont(errorLabel.getFont().deriveFont(errorLabel.getFont().getSize() + 3f));
+                errorLabel.setIconTextGap(6);
+                errorLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+                errorLabel.setForeground(new Color(0xff0000));
+                RegisterTitlePanel.add(errorLabel);
             }
             RegisterDialogPane.add(RegisterTitlePanel, BorderLayout.PAGE_START);
 
@@ -176,7 +186,7 @@ public class RegistrationPage extends JFrame {
                             submitButtonClicked(emailTextField.getText(), firstNameTextField.getText(), lastNameTextField.getText(), "", passwordField_confirm.getPassword().toString());
                         else {
                             System.out.println("Inputs were not valid: " + fieldsError);
-                            // TODO Show output on GUI!
+                            errorLabel.setText(fieldsError);
                         }
 
                     }
@@ -281,5 +291,6 @@ public class RegistrationPage extends JFrame {
     private JPasswordField passwordField_create;
     private JLabel label_confirmPassword;
     private JPasswordField passwordField_confirm;
+    private JLabel errorLabel;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }
