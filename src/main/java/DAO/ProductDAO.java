@@ -8,8 +8,11 @@ import java.sql.SQLTimeoutException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import javax.swing.plaf.TreeUI;
+
 import exception.ConnectionException;
 import exception.DatabaseException;
+import helper.Filter;
 import model.*;
 
 public class ProductDAO {
@@ -230,6 +233,18 @@ public class ProductDAO {
         return rVal;
     }
 
+    private static String constructSQLQuery(String searchQuery, float minPrice, float maxPrice, int brand, String sortBy, boolean asc, String type){
+        String sqlString = "SELECT * FROM Product ";
+        if(type != "")
+            sqlString += " INNER JOIN " + type + " ON Product.product_id = " + type + ".product_id";
+        sqlString += " WHERE product_name LIKE ? AND ? <= retail_price AND retail_price <= ?";
+        if(brand >= 0)
+            sqlString += " AND brand_id = ?";
+        if(sortBy != "")
+            sqlString += " ORDER BY ? ?";
+        return sqlString;
+    }
+
     /**
      * Constructs an SQL PreparedStatement based on all the filters given and the search query used by the user
      *
@@ -240,12 +255,23 @@ public class ProductDAO {
      * @return
      * @throws SQLException
      */
-    private static PreparedStatement constructFilterQuery(Connection connection, String searchQuery, float minPrice, float maxPrice) throws SQLException{
-        String sqlString = "SELECT * FROM Product WHERE product_name LIKE ? AND ? <= retail_price AND retail_price <= ?";
+    private static PreparedStatement construPreparedStatement(Connection connection, String searchQuery, float minPrice, float maxPrice, int brand, String sortBy, boolean asc, String type) throws SQLException{
+        String sqlString = constructSQLQuery(searchQuery, minPrice, maxPrice, brand, sortBy, asc, type);
+        Integer cExtraIndex = 1;
+
         PreparedStatement pStatement = connection.prepareStatement(sqlString);
         pStatement.setString(1, "%" + searchQuery + "%");
         pStatement.setFloat(2, minPrice);
         pStatement.setFloat(3, maxPrice == -1 ? 1e10f : maxPrice);
+        if(brand >= 0){
+            pStatement.setInt(3 + cExtraIndex, brand);
+            cExtraIndex++;
+        }
+        if(sortBy != ""){
+            pStatement.setString(3 + cExtraIndex, sortBy);
+            pStatement.setString(4 + cExtraIndex, asc ? "ASC" : "DESC");
+            cExtraIndex += 2;
+        }
         System.out.println("Statement executed: " + pStatement.toString());
         return pStatement;
     }
@@ -257,7 +283,7 @@ public class ProductDAO {
      * @return an array list of the products that match the search query
      */
     public static ArrayList<Product> filterProducts(String searchQuery){
-        return filterProducts(searchQuery, 0, -1);
+        return filterProducts(searchQuery, 0, -1, -1, "", true, "");
     }
 
     /**
@@ -269,9 +295,9 @@ public class ProductDAO {
      * @param maxPrice
      * @return
      */
-    public static ArrayList<Product> filterProducts(String searchQuery, float minPrice, float maxPrice){
+    public static ArrayList<Product> filterProducts(String searchQuery, float minPrice, float maxPrice, int brand, String sortBy, boolean asc, String type){
         try(Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = constructFilterQuery(connection, searchQuery, minPrice, maxPrice)) {
+            PreparedStatement preparedStatement = construPreparedStatement(connection, searchQuery, minPrice, maxPrice, brand, sortBy, asc, type)) {
             // Return the array of products from the result set
             return arrayFromResultSet(preparedStatement.executeQuery());
         }catch(SQLException e){
