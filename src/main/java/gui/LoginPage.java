@@ -23,6 +23,11 @@ import controller.GlobalState;
 /**
  * @author LIU ZHENYANG
  */
+
+ /**
+  * TODO: ADD ERRORS JULIAN PLEASE ADD ERRORS PLEASE NOTHING WORKS WITHOUT ERRORS
+  * TODO: ERROR MESSAGES ARE EVERYTHING HOW WILL OUR POOR USERS KNOW THEY ARE STUPID WITHOUT BEING TOLD
+  */
 public class LoginPage extends JFrame {
     public LoginPage() {
         initComponents();
