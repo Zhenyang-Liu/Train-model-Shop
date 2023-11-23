@@ -59,6 +59,7 @@ public class RegistrationPage extends JFrame {
 
                 // Create login, and login user
                 Login newLogin = new Login(newUser.getUserID());
+                System.out.println("This is definitely correct - Julian " + password);
                 newLogin.setPassword(password);
                 boolean loginSuccess = LoginDAO.insertLoginDetails(newLogin);
                 if (loginSuccess)
@@ -213,7 +214,7 @@ public class RegistrationPage extends JFrame {
                     public void mouseClicked(MouseEvent e) {
                         String fieldsError = checkInputs(emailTextField.getText(), firstNameTextField.getText(), lastNameTextField.getText(), new String(passwordField_create.getPassword()), new String(passwordField_confirm.getPassword()));
                         if (fieldsError == "OK") {
-                            String userCreationError = submitButtonClicked(emailTextField.getText(), firstNameTextField.getText(), lastNameTextField.getText(), "", passwordField_confirm.getPassword().toString());
+                            String userCreationError = submitButtonClicked(emailTextField.getText(), firstNameTextField.getText(), lastNameTextField.getText(), "", new String(passwordField_confirm.getPassword()));
                             if (userCreationError == "OK") {
                                 closeRegistration();
                             } else

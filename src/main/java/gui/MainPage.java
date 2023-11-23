@@ -135,6 +135,8 @@ public class MainPage extends JFrame implements ReloadListener {
         sortOptions.addItem(f.new SortBy("None", ""));
         sortOptions.addItem(f.new SortBy("Price", "retail_price"));
         sortOptions.addItem(f.new SortBy("Name", "product_name"));
+        sortOptions.addItem(f.new SortBy("Price", "retail_price", false));
+        sortOptions.addItem(f.new SortBy("Name", "product_name", false));
 
         sortOptions.addItemListener(e -> {
             loadProducts();
