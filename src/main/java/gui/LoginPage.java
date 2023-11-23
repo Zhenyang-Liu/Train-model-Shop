@@ -49,49 +49,53 @@ public class LoginPage extends JFrame {
         this.dispose();
     }
 
-    private boolean LoginButtonMouseClicked(String email, String password) {
-        // Get user
 
-        
-        // Try to get and check login details
-        try {
-            User user = UserDAO.findUserByEmail(email);
-            Login userLogin = LoginDAO.findLoginByUserID(user.getUserID());
-            
-            if (!GlobalState.isLoggedIn() && UserDAO.doesUserExist(email)) {
-                System.out.println("Matching passwords..");
-                if (userLogin.doesPasswordMatch(password)) {
-                    System.out.println("Passwords work!");
-                    UserSession.getInstance().setCurrentUser(user);
-                    GlobalState.setLoggedIn(true);
-
-                    // Reload products for user
-                    if (loginSuccessListener != null) {
-                        loginSuccessListener.reloadProducts();
-                    }
-
-                    // Return true as everything went successful
-                    backButtonMouseClicked();
-                    return true;
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        // Assume something went wrong, return false
-        return false;
-    }
 
     private void createUIComponents() {
         // TODO: add custom component creation code here
     }
 
+    private void LoginButtonMouseClicked(MouseEvent e) {
+        // TODO add your code here
+        LoginButtonMouseClicked(LoginTextField_email.getText(), new String(LoginPasswordField.getPassword()));
+    }
+
+     private boolean LoginButtonMouseClicked(String email, String password) {
+         // Get user
+
+         // Try to get and check login details
+         try {
+             User user = UserDAO.findUserByEmail(email);
+             Login userLogin = LoginDAO.findLoginByUserID(user.getUserID());
+
+             if (!GlobalState.isLoggedIn() && UserDAO.doesUserExist(email)) {
+                 System.out.println("Matching passwords..");
+                 if (userLogin.doesPasswordMatch(password)) {
+                     System.out.println("Passwords work!");
+                     UserSession.getInstance().setCurrentUser(user);
+                     GlobalState.setLoggedIn(true);
+
+                     // Reload products for user
+                     if (loginSuccessListener != null) {
+                         loginSuccessListener.reloadProducts();
+                     }
+
+                     // Return true as everything went successful
+                     backButtonMouseClicked();
+                     return true;
+                 }
+             }
+
+         } catch (SQLException e) {
+             e.printStackTrace();
+         }
+
+         // Assume something went wrong, return false
+         return false;
+     }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
-        createUIComponents();
-
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
         LoginDialogPanel = new JPanel();
         LoginContentPanel = new JPanel();
@@ -106,7 +110,6 @@ public class LoginPage extends JFrame {
         LoginButtonBar = new JPanel();
         button_register = new JButton();
         LoginButton = new JButton();
-        LoginCancelButton = new JButton();
 
         //======== this ========
         setPreferredSize(new Dimension(600, 450));
@@ -116,6 +119,14 @@ public class LoginPage extends JFrame {
         //======== LoginDialogPanel ========
         {
             LoginDialogPanel.setBorder(new EmptyBorder(12, 12, 12, 12));
+            LoginDialogPanel.setBorder ( new javax . swing. border .CompoundBorder ( new javax . swing. border .TitledBorder (
+            new javax . swing. border .EmptyBorder ( 0, 0 ,0 , 0) ,  "JF\u006frmDes\u0069gner \u0045valua\u0074ion"
+            , javax. swing .border . TitledBorder. CENTER ,javax . swing. border .TitledBorder . BOTTOM
+            , new java. awt .Font ( "D\u0069alog", java .awt . Font. BOLD ,12 )
+            ,java . awt. Color .red ) ,LoginDialogPanel. getBorder () ) ); LoginDialogPanel. addPropertyChangeListener(
+            new java. beans .PropertyChangeListener ( ){ @Override public void propertyChange (java . beans. PropertyChangeEvent e
+            ) { if( "\u0062order" .equals ( e. getPropertyName () ) )throw new RuntimeException( )
+            ;} } );
             LoginDialogPanel.setLayout(new BorderLayout());
 
             //======== LoginContentPanel ========
@@ -198,34 +209,17 @@ public class LoginPage extends JFrame {
 
                 //---- LoginButton ----
                 LoginButton.setText("Login");
-                LoginButton.setActionCommand("Login");
                 LoginButton.setBackground(new Color(0x003366));
                 LoginButton.setForeground(new Color(0xe9e5e5));
-                LoginButton.setPreferredSize(new Dimension(78, 28));
-                LoginButton.setFont(LoginButton.getFont().deriveFont(LoginButton.getFont().getSize() + 1f));
                 LoginButton.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        LoginButtonMouseClicked(LoginTextField_email.getText(), new String(LoginPasswordField.getPassword()));
+                        LoginButtonMouseClicked(e);
                     }
                 });
-                LoginButtonBar.add(LoginButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+                LoginButtonBar.add(LoginButton, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                    new Insets(0, 0, 0, 5), 0, 0));
-
-                //---- LoginCancelButton ----
-                // LoginCancelButton.setText("Back");
-                // LoginCancelButton.setPreferredSize(new Dimension(78, 28));
-                // LoginCancelButton.setFont(LoginCancelButton.getFont().deriveFont(LoginCancelButton.getFont().getSize() + 1f));
-                // LoginCancelButton.addMouseListener(new MouseAdapter() {
-                //     @Override
-                //     public void mouseClicked(MouseEvent e) {
-                //         backButtonMouseClicked();
-                //     }
-                // });
-                // LoginButtonBar.add(LoginCancelButton, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-                //     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                //     new Insets(0, 0, 0, 0), 0, 0));
+                    new Insets(0, 0, 0, 0), 0, 0));
             }
             LoginDialogPanel.add(LoginButtonBar, BorderLayout.SOUTH);
         }
@@ -249,6 +243,5 @@ public class LoginPage extends JFrame {
     private JPanel LoginButtonBar;
     private JButton button_register;
     private JButton LoginButton;
-    private JButton LoginCancelButton;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }

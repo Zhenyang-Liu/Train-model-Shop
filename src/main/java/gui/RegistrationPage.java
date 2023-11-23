@@ -29,6 +29,7 @@ import model.User;
 public class RegistrationPage extends JFrame {
     public RegistrationPage() {
         initComponents();
+        createUIComponents();
     }
 
     /**
@@ -313,8 +314,6 @@ public class RegistrationPage extends JFrame {
         pack();
         setLocationRelativeTo(null);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
-
-        createUIComponents();
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
