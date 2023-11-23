@@ -1,6 +1,5 @@
 package helper;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 import model.Brand;
@@ -85,9 +84,10 @@ public class Filter {
         private String displayName;
     }
     public class TypeFilter{
-        public TypeFilter(String dbColumn, String displayName){
+        public TypeFilter(String dbColumn, String displayName, String subFilterCol){
             this.dbHandle = dbColumn;
             this.displayName = displayName;
+            this.subFilterDbHandle = subFilterCol;
         }
 
         public String toString(){
@@ -98,7 +98,21 @@ public class Filter {
             return this.dbHandle;
         }
 
+        public void setSubFilter(String subFilter){
+            this.subFilter = subFilter;
+        }
+
+        public String getSubFilter(){
+            return subFilter;
+        }
+
+        public String getSubFilterColumn(){
+            return subFilterDbHandle;
+        }
+
         private String dbHandle;
         private String displayName;
+        private String subFilter;
+        private String subFilterDbHandle;
     }
 }
