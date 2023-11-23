@@ -155,7 +155,7 @@ public class Login{
      * @return True if the password matches the hashed password stored else False
      */
     public boolean doesPasswordMatch(String password){
-        return hash(password, getPasswordSalt()).equals(password);
+        return hash(password, getPasswordSalt()).equals(getPasswordHash());
     }
 
     /**
