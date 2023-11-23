@@ -46,14 +46,17 @@ public class LoginPage extends JFrame {
 
     private boolean LoginButtonMouseClicked(String email, String password) {
         // Get user
-        User user = UserDAO.findUserByEmail(email);
 
+        
         // Try to get and check login details
         try {
+            User user = UserDAO.findUserByEmail(email);
             Login userLogin = LoginDAO.findLoginByUserID(user.getUserID());
-            if (!GlobalState.isLoggedIn()) {
-                // Compare passwords
+            
+            if (!GlobalState.isLoggedIn() && UserDAO.doesUserExist(email)) {
+                System.out.println("Matching passwords..");
                 if (userLogin.doesPasswordMatch(password)) {
+                    System.out.println("Passwords work!");
                     UserSession.getInstance().setCurrentUser(user);
                     GlobalState.setLoggedIn(true);
 
@@ -206,18 +209,18 @@ public class LoginPage extends JFrame {
                     new Insets(0, 0, 0, 5), 0, 0));
 
                 //---- LoginCancelButton ----
-                LoginCancelButton.setText("Back");
-                LoginCancelButton.setPreferredSize(new Dimension(78, 28));
-                LoginCancelButton.setFont(LoginCancelButton.getFont().deriveFont(LoginCancelButton.getFont().getSize() + 1f));
-                LoginCancelButton.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        backButtonMouseClicked();
-                    }
-                });
-                LoginButtonBar.add(LoginCancelButton, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                    new Insets(0, 0, 0, 0), 0, 0));
+                // LoginCancelButton.setText("Back");
+                // LoginCancelButton.setPreferredSize(new Dimension(78, 28));
+                // LoginCancelButton.setFont(LoginCancelButton.getFont().deriveFont(LoginCancelButton.getFont().getSize() + 1f));
+                // LoginCancelButton.addMouseListener(new MouseAdapter() {
+                //     @Override
+                //     public void mouseClicked(MouseEvent e) {
+                //         backButtonMouseClicked();
+                //     }
+                // });
+                // LoginButtonBar.add(LoginCancelButton, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+                //     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                //     new Insets(0, 0, 0, 0), 0, 0));
             }
             LoginDialogPanel.add(LoginButtonBar, BorderLayout.SOUTH);
         }
