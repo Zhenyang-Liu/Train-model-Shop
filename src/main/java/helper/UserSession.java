@@ -46,7 +46,7 @@ public class UserSession {
 
 
     // After login successful
-    // Set<String> permissions = getPermissionsForUser(loggedInUser);
+    // Set<String> permissions = AuthenticationDAO.getPermissionsForUser(loggedInUser.getUserID());
     // UserSession.getInstance().setCurrentUser(loggedInUser);
     // UserSession.getInstance().setPermissions(permissions);
 
