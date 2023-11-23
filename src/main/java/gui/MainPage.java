@@ -4,30 +4,28 @@
 
 package gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import javax.swing.*;
-import javax.swing.border.*;
-import com.formdev.flatlaf.extras.*;
-import com.jgoodies.forms.factories.*;
+import DAO.BrandDAO;
+import DAO.ProductDAO;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
+import com.jgoodies.forms.factories.DefaultComponentFactory;
 import exception.DatabaseException;
 import helper.Filter;
 import helper.UserSession;
 import listeners.ReloadListener;
-import model.Cart;
-import model.Gauge;
-import model.Product;
-import model.Brand;
-import DAO.BrandDAO;
-import DAO.ProductDAO;
-import model.User;
+import model.*;
 import model.Locomotive.DCCType;
-import helper.UserSession;
-import helper.Filter;
 import service.CartService;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.MatteBorder;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Zhenyang Liu
@@ -165,6 +163,10 @@ public class MainPage extends JFrame implements ReloadListener {
         });
     }
 
+    private void button_accountMouseClicked(MouseEvent e) {
+        // TODO add your code here
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
@@ -228,7 +230,7 @@ public class MainPage extends JFrame implements ReloadListener {
                 button_account.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        button_accountMouseClicked();
+                        button_accountMouseClicked(e);
                     }
                 });
                 accountPanel.add(button_account, BorderLayout.WEST);
@@ -343,7 +345,6 @@ public class MainPage extends JFrame implements ReloadListener {
                 //---- priceFilterLabel ----
                 priceFilterLabel.setText(bundle.getString("MainPage.priceFilterLabel.text"));
                 filterPanel.add(priceFilterLabel, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
-
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
                 filterPanel.add(priceFilterBox, new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
@@ -599,7 +600,11 @@ public class MainPage extends JFrame implements ReloadListener {
         if ( currentUser != null){
             userID = currentUser.getUserID();
             Cart cart = CartService.getCartDetails(userID);
-            itemID = CartService.findItemID(cart.getCartID(), product.getProductID());
+            if ( cart != null){
+                itemID = CartService.findItemID(cart.getCartID(), product.getProductID());
+            }else {
+                itemID = -1;
+            }
         }else {
             itemID = -1;
             userID = -1;

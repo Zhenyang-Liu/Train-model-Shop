@@ -23,10 +23,10 @@ import DAO.UserDAO;
  * @author LIU ZHENYANG
  */
 
- /**
-  * TODO: ADD ERRORS JULIAN PLEASE ADD ERRORS PLEASE NOTHING WORKS WITHOUT ERRORS
-  * TODO: ERROR MESSAGES ARE EVERYTHING HOW WILL OUR POOR USERS KNOW THEY ARE STUPID WITHOUT BEING TOLD
-  */
+/**
+ * TODO: ADD ERRORS JULIAN PLEASE ADD ERRORS PLEASE NOTHING WORKS WITHOUT ERRORS
+ * TODO: ERROR MESSAGES ARE EVERYTHING HOW WILL OUR POOR USERS KNOW THEY ARE STUPID WITHOUT BEING TOLD
+ */
 public class LoginPage extends JFrame {
     public LoginPage() {
         initComponents();
@@ -38,6 +38,7 @@ public class LoginPage extends JFrame {
     }
 
     private void button_to_registerPageMouseClicked(MouseEvent e) {
+        // TODO add your code here
         RegistrationPage registrationPage = new RegistrationPage();
         registrationPage.setVisible(true);
 
@@ -48,49 +49,47 @@ public class LoginPage extends JFrame {
         this.dispose();
     }
 
-
-
-    private void createUIComponents() {
-        // TODO: add custom component creation code here
-    }
-
     private void LoginButtonMouseClicked(MouseEvent e) {
         // TODO add your code here
         LoginButtonMouseClicked(LoginTextField_email.getText(), new String(LoginPasswordField.getPassword()));
     }
 
-     private boolean LoginButtonMouseClicked(String email, String password) {
-         // Get user
+    private boolean LoginButtonMouseClicked(String email, String password) {
+        // Get user
 
-         // Try to get and check login details
-         try {
-             User user = UserDAO.findUserByEmail(email);
-             Login userLogin = LoginDAO.findLoginByUserID(user.getUserID());
+        // Try to get and check login details
+        try {
+            User user = UserDAO.findUserByEmail(email);
+            Login userLogin = LoginDAO.findLoginByUserID(user.getUserID());
 
-             if (!UserSession.getInstance().isLoggedIn() && UserDAO.doesUserExist(email)) {
-                 System.out.println("Matching passwords..");
-                 if (userLogin.doesPasswordMatch(password)) {
-                     System.out.println("Passwords work!");
-                     UserSession.getInstance().setCurrentUser(user);
+            if (!UserSession.getInstance().isLoggedIn() && UserDAO.doesUserExist(email)) {
+                System.out.println("Matching passwords..");
+                if (userLogin.doesPasswordMatch(password)) {
+                    System.out.println("Passwords work!");
+                    UserSession.getInstance().setCurrentUser(user);
 
-                     // Reload products for user
-                     if (loginSuccessListener != null) {
-                         loginSuccessListener.reloadProducts();
-                     }
+                    // Reload products for user
+                    if (loginSuccessListener != null) {
+                        loginSuccessListener.reloadProducts();
+                    }
 
-                     // Return true as everything went successful
-                     backButtonMouseClicked();
-                     return true;
-                 }
-             }
+                    // Return true as everything went successful
+                    backButtonMouseClicked();
+                    return true;
+                }
+            }
 
-         } catch (SQLException e) {
-             e.printStackTrace();
-         }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-         // Assume something went wrong, return false
-         return false;
-     }
+        // Assume something went wrong, return false
+        return false;
+    }
+
+    private void createUIComponents() {
+        // TODO: add custom component creation code here
+    }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
@@ -117,14 +116,6 @@ public class LoginPage extends JFrame {
         //======== LoginDialogPanel ========
         {
             LoginDialogPanel.setBorder(new EmptyBorder(12, 12, 12, 12));
-            LoginDialogPanel.setBorder ( new javax . swing. border .CompoundBorder ( new javax . swing. border .TitledBorder (
-            new javax . swing. border .EmptyBorder ( 0, 0 ,0 , 0) ,  "JF\u006frmDes\u0069gner \u0045valua\u0074ion"
-            , javax. swing .border . TitledBorder. CENTER ,javax . swing. border .TitledBorder . BOTTOM
-            , new java. awt .Font ( "D\u0069alog", java .awt . Font. BOLD ,12 )
-            ,java . awt. Color .red ) ,LoginDialogPanel. getBorder () ) ); LoginDialogPanel. addPropertyChangeListener(
-            new java. beans .PropertyChangeListener ( ){ @Override public void propertyChange (java . beans. PropertyChangeEvent e
-            ) { if( "\u0062order" .equals ( e. getPropertyName () ) )throw new RuntimeException( )
-            ;} } );
             LoginDialogPanel.setLayout(new BorderLayout());
 
             //======== LoginContentPanel ========
