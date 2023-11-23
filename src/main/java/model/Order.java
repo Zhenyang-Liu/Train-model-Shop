@@ -8,7 +8,7 @@ import java.util.Map;
 public class Order {
     private int orderID;
     private final int userID;
-    private final int addressID;
+    private int addressID;
     private final Timestamp createTime;
     private Timestamp updateTime;
     private final double totalCost;
@@ -77,6 +77,7 @@ public class Order {
         this.createTime = Timestamp.from(Instant.now());
         this.updateTime = this.createTime; 
         this.totalCost = calculateTotalCost(itemList);
+        this.status = OrderStatus.PENDING;
         this.itemList = itemList;
     }
 
@@ -96,6 +97,9 @@ public class Order {
         return addressID;
     }
 
+    public void setAddressID(int addressID){
+        this.addressID = addressID;
+    }
 
     public Timestamp getCreateTime() {
         return createTime;

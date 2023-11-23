@@ -2,9 +2,13 @@ package helper;
 
 import model.User;
 
+import java.util.Set;
+import java.util.HashSet;
+
 public class UserSession {
     private static UserSession instance;
-    private User currentUser; 
+    private User currentUser;
+    private Set<String> permissions = new HashSet<>();
 
     private UserSession() {}
 
@@ -23,12 +27,28 @@ public class UserSession {
         return this.currentUser;
     }
 
-    public void clear() {
-        this.currentUser = null;
+    public void setPermissions(Set<String> permissions) {
+        this.permissions = permissions;
     }
 
-    // // After login successful
+    public Set<String> getPermissions() {
+        return this.permissions;
+    }
+
+    public boolean hasPermission(String permission) {
+        return this.permissions.contains(permission);
+    }
+
+    public void clear() {
+        this.currentUser = null;
+        this.permissions.clear();
+    }
+
+
+    // After login successful
+    // Set<String> permissions = getPermissionsForUser(loggedInUser);
     // UserSession.getInstance().setCurrentUser(loggedInUser);
+    // UserSession.getInstance().setPermissions(permissions);
 
     // // when need user information
     // User currentUser = UserSession.getInstance().getCurrentUser();

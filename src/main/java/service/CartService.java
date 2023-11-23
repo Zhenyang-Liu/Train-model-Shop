@@ -8,7 +8,6 @@ import java.util.Objects;
 import DAO.CartDAO;
 import DAO.ProductDAO;
 import exception.*;
-import helper.*;
 import model.Cart;
 import model.CartItem;
 import model.Order;
@@ -16,7 +15,7 @@ import model.Product;
 
 
 public class CartService {
-
+    private static PermissionService permission = new PermissionService();
     /**
      * Adds a product to a specified cart.
      * 
@@ -31,7 +30,7 @@ public class CartService {
      */
     public static void addToCart(int cartID, int productID, int quantity) throws DatabaseException {
         try {
-            if (!Validation.isCurrentUser(CartDAO.findCartBelongedTo(cartID))){
+            if (!permission.hasPermission(CartDAO.findCartBelongedTo(cartID),"EDIT_OWN_CART")) {
                 throw new AuthorizationException("Access denied. Users can only access their own carts.");
             }
 
@@ -62,7 +61,7 @@ public class CartService {
     public static void removeFromCart(int itemID) throws DatabaseException {
         try {
             int itemHolderID = CartDAO.findCartBelongedTo(CartDAO.findItemBelongedTo(itemID));
-            if (!Validation.isCurrentUser(itemHolderID)){
+            if (!permission.hasPermission(itemHolderID,"EDIT_OWN_CART")){
                 throw new AuthorizationException("Access denied. Users can only access their own carts.");
             }
             CartDAO.deleteCartItem(itemID);
@@ -95,7 +94,7 @@ public class CartService {
         try {
             int itemID = CartDAO.checkProductInCart(productID, cartID);
             int itemHolderID = CartDAO.findCartBelongedTo(CartDAO.findItemBelongedTo(itemID));
-            if (!Validation.isCurrentUser(itemHolderID)){
+            if (!permission.hasPermission(itemHolderID,"EDIT_OWN_CART")){
                 throw new AuthorizationException("Access denied. Users can only access their own carts.");
             }
             CartDAO.deleteCartItem(itemID);
@@ -118,12 +117,11 @@ public class CartService {
      */  
     public static Cart getCartDetails(int userID) throws DatabaseException {
         try {
-            Cart cart = CartDAO.findCartByUser(userID);
-    
-            if (cart == null || !Validation.isCurrentUser(userID) || !Validation.isCurrentUser(cart.getUserID())) {
+            if (!permission.hasPermission(userID,"EDIT_OWN_CART")) {
                 throw new AuthorizationException("Access denied. Users can only access their own carts.");
             }
-    
+
+            Cart cart = CartDAO.findCartByUser(userID);
             return cart;
         } catch (DatabaseException e) {
             ExceptionHandler.printErrorMessage(e);
@@ -153,14 +151,14 @@ public class CartService {
      */
     public static void updateCartItem(int cartID, int productID, int quantity) throws DatabaseException {
         try {
-            if (!Validation.isCurrentUser(CartDAO.findCartBelongedTo(cartID))){
+            if (!permission.hasPermission(CartDAO.findCartBelongedTo(cartID),"EDIT_OWN_CART")){
                 throw new AuthorizationException("Access denied. Users can only access their own carts.");
             }
 
             int itemID = CartDAO.checkProductInCart(productID, cartID);
             try {
                 int itemHolderID = CartDAO.findCartBelongedTo(CartDAO.findItemBelongedTo(itemID));
-                if (!Validation.isCurrentUser(itemHolderID)){
+                if (!permission.hasPermission(itemHolderID,"EDIT_OWN_CART")){
                     throw new AuthorizationException("Access denied. User cannot access item " + itemID + ".");
                 }
                 CartItem item = CartDAO.findCartItem(itemID);
@@ -191,7 +189,7 @@ public class CartService {
         try {
             int itemHolderID = CartDAO.findCartBelongedTo(CartDAO.findItemBelongedTo(itemID));
             System.out.println(itemHolderID);
-            if (!Validation.isCurrentUser(itemHolderID)){
+            if (!permission.hasPermission(itemHolderID,"EDIT_OWN_CART")){
                 throw new AuthorizationException("Access denied. User cannot access item " + itemID + ".");
             }
             CartItem item = CartDAO.findCartItem(itemID);
@@ -217,7 +215,7 @@ public class CartService {
     public static void clearCart(int cartID) throws DatabaseException {
         try {
             int holderID = CartDAO.findCartBelongedTo(cartID);
-            if (!Validation.isCurrentUser(holderID)){
+            if (!permission.hasPermission(holderID,"EDIT_OWN_CART")){
                 throw new AuthorizationException("Access denied. Users can only access their own carts.");
             }
 
@@ -246,7 +244,7 @@ public class CartService {
         try {
             Cart cart = CartDAO.findCartByID(cartID);
             int holderID = cart.getUserID();
-            if (!Validation.isCurrentUser(holderID)){
+            if (!permission.hasPermission(holderID,"EDIT_OWN_CART")){
                 throw new AuthorizationException("Access denied. Users can only access their own carts.");
             }
             if (cart == null || cart.getUserID() ==-1 ) {
