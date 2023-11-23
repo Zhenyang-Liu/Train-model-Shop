@@ -49,8 +49,14 @@ public class LoginPage extends JFrame {
         }
     }
 
+    private void createUIComponents() {
+        // TODO: add custom component creation code here
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
+        createUIComponents();
+
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
         LoginDialogPanel = new JPanel();
         LoginContentPanel = new JPanel();
@@ -64,7 +70,6 @@ public class LoginPage extends JFrame {
         LoginPasswordField = new JPasswordField();
         LoginButtonBar = new JPanel();
         button_register = new JButton();
-        LoginButton = new JButton();
         LoginCancelButton = new JButton();
 
         //======== this ========

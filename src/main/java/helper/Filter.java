@@ -22,14 +22,20 @@ public class Filter {
         private String dbHandle;
     };
     public class PriceRange{
+        public PriceRange(float low, float high, String displayName){
+            this.minVal = low;
+            this.maxVal = high;
+            this.displayName = displayName;
+        }
         public PriceRange(float low, float high){
             this.minVal = low;
             this.maxVal = high;
+            this.displayName = "£" + low + " - £" + high;
         }
         @Override
         public String toString()
         {
-            return "£" + this.minVal + " - £" + this.maxVal;
+            return displayName;
         }
 
         public float getMin()
@@ -44,5 +50,6 @@ public class Filter {
 
         private float minVal;
         private float maxVal;
+        private String displayName;
     }
 }

@@ -241,11 +241,12 @@ public class ProductDAO {
      * @throws SQLException
      */
     private static PreparedStatement constructFilterQuery(Connection connection, String searchQuery, float minPrice, float maxPrice) throws SQLException{
-        String sqlString = "SELECT * FROM Product WHERE product_name LIKE %?% AND ? <= retail_price <= ?";
+        String sqlString = "SELECT * FROM Product WHERE product_name LIKE ? AND ? <= retail_price AND retail_price <= ?";
         PreparedStatement pStatement = connection.prepareStatement(sqlString);
-        pStatement.setString(1, searchQuery);
+        pStatement.setString(1, "%" + searchQuery + "%");
         pStatement.setFloat(2, minPrice);
         pStatement.setFloat(3, maxPrice == -1 ? 1e10f : maxPrice);
+        System.out.println("Statement executed: " + pStatement.toString());
         return pStatement;
     }
 
@@ -287,7 +288,7 @@ public class ProductDAO {
      */
     public static ArrayList<Product> getAllProduct() throws DatabaseException {
         String selectSQL = "SELECT * FROM Product";
-        
+
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();

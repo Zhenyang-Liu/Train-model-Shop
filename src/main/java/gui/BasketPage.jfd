@@ -15,6 +15,9 @@ new FormModel {
 			"background": sfield java.awt.Color white
 			"preferredSize": new java.awt.Dimension( 900, 600 )
 			"minimumSize": new java.awt.Dimension( 900, 600 )
+			auxiliary() {
+				"JavaCodeGenerator.customCreate": true
+			}
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "trolleyTitleLabel"
 				"text": new FormMessage( null, "BasketPage.trolleyTitleLabel.text" )

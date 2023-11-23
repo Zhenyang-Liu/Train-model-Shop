@@ -100,17 +100,23 @@ public class RegistrationPage extends JFrame {
         return "OK";
     }
 
+    private void createUIComponents() {
+        // TODO: add custom component creation code here
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
+        createUIComponents();
+
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
         RegisterDialogPane = new JPanel();
         RegisterTitlePanel = new JPanel();
         lRegisterTitleLabel = new JLabel();
+        errorLabel = new JLabel();
         RegisterTitleSeparator = new JSeparator();
         RegisterButtonBar = new JPanel();
         RegisterSubmitButton = new JButton();
         RegisterBacklButton = new JButton();
-        RegisterContentPanel = new JPanel();
         RegisterFormPanel = new JPanel();
         label_Email = new JLabel();
         emailTextField = new JTextField();
@@ -122,7 +128,6 @@ public class RegistrationPage extends JFrame {
         passwordField_create = new JPasswordField();
         label_confirmPassword = new JLabel();
         passwordField_confirm = new JPasswordField();
-        errorLabel = new JLabel();
 
         //======== this ========
         setPreferredSize(new Dimension(600, 450));
@@ -149,19 +154,18 @@ public class RegistrationPage extends JFrame {
                 lRegisterTitleLabel.setForeground(new Color(0x003366));
                 RegisterTitlePanel.add(lRegisterTitleLabel);
 
+                //---- errorLabel ----
+                errorLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+                errorLabel.setFont(errorLabel.getFont().deriveFont(errorLabel.getFont().getStyle() | Font.BOLD, errorLabel.getFont().getSize() + 11f));
+                errorLabel.setIconTextGap(6);
+                errorLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+                errorLabel.setForeground(Color.red);
+                RegisterTitlePanel.add(errorLabel);
+
                 //---- RegisterTitleSeparator ----
                 RegisterTitleSeparator.setForeground(new Color(0x7f7272));
                 RegisterTitleSeparator.setBackground(new Color(0x7f7272));
                 RegisterTitlePanel.add(RegisterTitleSeparator);
-
-                //---- errorLabel ----
-                errorLabel.setText("");
-                errorLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-                errorLabel.setFont(errorLabel.getFont().deriveFont(errorLabel.getFont().getSize() + 3f));
-                errorLabel.setIconTextGap(6);
-                errorLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
-                errorLabel.setForeground(new Color(0xff0000));
-                RegisterTitlePanel.add(errorLabel);
             }
             RegisterDialogPane.add(RegisterTitlePanel, BorderLayout.PAGE_START);
 
@@ -178,19 +182,6 @@ public class RegistrationPage extends JFrame {
                 RegisterSubmitButton.setForeground(new Color(0xe9e5e5));
                 RegisterSubmitButton.setPreferredSize(new Dimension(78, 28));
                 RegisterSubmitButton.setFont(RegisterSubmitButton.getFont().deriveFont(RegisterSubmitButton.getFont().getSize() + 1f));
-                RegisterSubmitButton.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        String fieldsError = checkInputs(emailTextField.getText(), firstNameTextField.getText(), lastNameTextField.getText(), passwordField_create.getPassword().toString(), passwordField_confirm.getPassword().toString());
-                        if (fieldsError == "OK")
-                            submitButtonClicked(emailTextField.getText(), firstNameTextField.getText(), lastNameTextField.getText(), "", passwordField_confirm.getPassword().toString());
-                        else {
-                            System.out.println("Inputs were not valid: " + fieldsError);
-                            errorLabel.setText(fieldsError);
-                        }
-
-                    }
-                });
                 RegisterButtonBar.add(RegisterSubmitButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 5), 0, 0));
@@ -275,6 +266,7 @@ public class RegistrationPage extends JFrame {
     private JPanel RegisterDialogPane;
     private JPanel RegisterTitlePanel;
     private JLabel lRegisterTitleLabel;
+    private JLabel errorLabel;
     private JSeparator RegisterTitleSeparator;
     private JPanel RegisterButtonBar;
     private JButton RegisterSubmitButton;
@@ -291,6 +283,5 @@ public class RegistrationPage extends JFrame {
     private JPasswordField passwordField_create;
     private JLabel label_confirmPassword;
     private JPasswordField passwordField_confirm;
-    private JLabel errorLabel;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }
