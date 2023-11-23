@@ -287,8 +287,7 @@ public class ProductDAO {
      */
     public static ArrayList<Product> getAllProduct() throws DatabaseException {
         String selectSQL = "SELECT * FROM Product";
-        ArrayList<Product> productList = new ArrayList<>();
-
+        
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
