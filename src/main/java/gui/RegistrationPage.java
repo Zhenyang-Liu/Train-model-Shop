@@ -100,13 +100,18 @@ public class RegistrationPage extends JFrame {
     }
 
     private void createUIComponents() {
-        // TODO: add custom component creation code here
+        //---- errorLabel ----
+        errorLabel.setText("");
+        errorLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+        errorLabel.setFont(errorLabel.getFont().deriveFont(errorLabel.getFont().getSize() + 1f));
+        errorLabel.setIconTextGap(6);
+        errorLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        errorLabel.setForeground(new Color(0xff0000));
+        RegisterTitlePanel.add(errorLabel);
     }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
-        createUIComponents();
-
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
         RegisterDialogPane = new JPanel();
         RegisterTitlePanel = new JPanel();
@@ -166,15 +171,6 @@ public class RegistrationPage extends JFrame {
                 RegisterTitleSeparator.setForeground(new Color(0x7f7272));
                 RegisterTitleSeparator.setBackground(new Color(0x7f7272));
                 RegisterTitlePanel.add(RegisterTitleSeparator);
-
-                //---- errorLabel ----
-                errorLabel.setText("");
-                errorLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-                errorLabel.setFont(errorLabel.getFont().deriveFont(errorLabel.getFont().getSize() + 1f));
-                errorLabel.setIconTextGap(6);
-                errorLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
-                errorLabel.setForeground(new Color(0xff0000));
-                RegisterTitlePanel.add(errorLabel);
             }
             RegisterDialogPane.add(RegisterTitlePanel, BorderLayout.PAGE_START);
 
@@ -282,6 +278,8 @@ public class RegistrationPage extends JFrame {
         pack();
         setLocationRelativeTo(null);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
+
+        createUIComponents();
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
