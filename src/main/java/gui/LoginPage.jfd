@@ -100,6 +100,9 @@ new FormModel {
 						"foreground": new java.awt.Color( 233, 229, 229, 255 )
 						"preferredSize": new java.awt.Dimension( 78, 28 )
 						"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 1, false )
+						auxiliary() {
+							"JavaCodeGenerator.customCreate": true
+						}
 						addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "LoginButtonMouseClicked", true ) )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridx": 2

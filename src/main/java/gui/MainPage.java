@@ -15,13 +15,17 @@ import com.formdev.flatlaf.extras.*;
 import com.jgoodies.forms.factories.*;
 import controller.GlobalState;
 import exception.DatabaseException;
+import helper.Filter;
 import helper.UserSession;
 import listeners.ReloadListener;
 import model.Cart;
 import model.Product;
+import model.Brand;
+import DAO.BrandDAO;
 import DAO.ProductDAO;
 import model.User;
 import helper.UserSession;
+import helper.Filter;
 import service.CartService;
 
 /**
@@ -33,6 +37,7 @@ public class MainPage extends JFrame implements ReloadListener {
     public MainPage() {
         productDAO = new ProductDAO();  // Instantiating ProductDAO
         initComponents();
+        populateFilterBoxes();
         loadProducts();
         customizeComponents();
         button_accountMouseClicked();
@@ -75,6 +80,26 @@ public class MainPage extends JFrame implements ReloadListener {
 
     }
 
+    private void populatePriceRangeFilters(){
+        Filter f = new Filter();
+        priceFilterBox.addItem(f.new PriceRange(0.0f, 15.0f));
+        priceFilterBox.addItem(f.new PriceRange(15.0f, 30.0f));
+        priceFilterBox.addItem(f.new PriceRange(30.0f, 50.0f));
+    }
+
+    private void populateBrandFilters(){
+        ArrayList<Brand> toAdd = BrandDAO.findAllBrand();
+        for(Brand b: toAdd)
+            filterBox4.addItem(b);
+    }
+
+    private void populateFilterBoxes()
+    {
+        System.out.println("Filter boxes");
+        populatePriceRangeFilters();
+        populateBrandFilters();
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
@@ -93,16 +118,16 @@ public class MainPage extends JFrame implements ReloadListener {
         searchButton = new JButton();
         mainPageSplitPane = new JSplitPane();
         filterPanel = new JPanel();
-        filterLabel1 = new JLabel();
-        filterBox1 = new JComboBox();
-        filterLabel2 = new JLabel();
-        filterBox2 = new JComboBox();
-        filterLabel3 = new JLabel();
-        filterBox3 = new JComboBox();
-        filterLabel4 = new JLabel();
+        sortLabel = new JLabel();
+        sortOptions = new JComboBox();
+        priceFilterLabel = new JLabel();
+        priceFilterBox = new JComboBox();
+        typeFilterLabel = new JLabel();
+        typeFilterBox = new JComboBox();
+        brandFilterLabel = new JLabel();
         filterBox4 = new JComboBox();
-        filterLabel5 = new JLabel();
-        filterBox5 = new JComboBox();
+        subTypeFilterLabel = new JLabel();
+        subTypeFilterBox = new JComboBox();
         productPanel = new JPanel();
         productCardPanel1 = new JPanel();
         productImage1 = new JLabel();
@@ -238,51 +263,52 @@ public class MainPage extends JFrame implements ReloadListener {
                 ((GridBagLayout)filterPanel.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
                 ((GridBagLayout)filterPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
-                //---- filterLabel1 ----
-                filterLabel1.setText(bundle.getString("MainPage.filterLabel1.text"));
-                filterLabel1.setHorizontalTextPosition(SwingConstants.LEFT);
-                filterLabel1.setHorizontalAlignment(SwingConstants.TRAILING);
-                filterLabel1.setPreferredSize(null);
-                filterPanel.add(filterLabel1, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+                //---- sortLabel ----
+                sortLabel.setText(bundle.getString("MainPage.sortLabel.text"));
+                sortLabel.setHorizontalTextPosition(SwingConstants.LEFT);
+                sortLabel.setHorizontalAlignment(SwingConstants.TRAILING);
+                sortLabel.setPreferredSize(null);
+                filterPanel.add(sortLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(0, 0, 5, 0), 0, 0));
-                filterPanel.add(filterBox1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+                filterPanel.add(sortOptions, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
 
-                //---- filterLabel2 ----
-                filterLabel2.setText(bundle.getString("MainPage.filterLabel2.text"));
-                filterPanel.add(filterLabel2, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
-                    GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-                    new Insets(5, 0, 5, 0), 0, 0));
-                filterPanel.add(filterBox2, new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
-                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                    new Insets(0, 0, 5, 0), 0, 0));
+                //---- priceFilterLabel ----
+                priceFilterLabel.setText(bundle.getString("MainPage.priceFilterLabel.text"));
+                filterPanel.add(priceFilterLabel, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
 
-                //---- filterLabel3 ----
-                filterLabel3.setText(bundle.getString("MainPage.filterLabel3.text"));
-                filterPanel.add(filterLabel3, new GridBagConstraints(0, 4, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
-                filterPanel.add(filterBox3, new GridBagConstraints(0, 5, 1, 1, 1.0, 0.0,
+                filterPanel.add(priceFilterBox, new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
 
-                //---- filterLabel4 ----
-                filterLabel4.setText(bundle.getString("MainPage.filterLabel4.text"));
-                filterPanel.add(filterLabel4, new GridBagConstraints(0, 6, 1, 1, 1.0, 0.0,
+                //---- typeFilterLabel ----
+                typeFilterLabel.setText(bundle.getString("MainPage.typeFilterLabel.text"));
+                filterPanel.add(typeFilterLabel, new GridBagConstraints(0, 4, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                    new Insets(5, 0, 5, 0), 0, 0));
+                filterPanel.add(typeFilterBox, new GridBagConstraints(0, 5, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 5, 0), 0, 0));
+
+                //---- brandFilterLabel ----
+                brandFilterLabel.setText("BRAND");
+                filterPanel.add(brandFilterLabel, new GridBagConstraints(0, 6, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
                 filterPanel.add(filterBox4, new GridBagConstraints(0, 7, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
 
-                //---- filterLabel5 ----
-                filterLabel5.setText(bundle.getString("MainPage.filterLabel5.text"));
-                filterPanel.add(filterLabel5, new GridBagConstraints(0, 8, 1, 1, 1.0, 0.0,
+                //---- subTypeFilterLabel ----
+                subTypeFilterLabel.setText(bundle.getString("MainPage.subTypeFilterLabel.text"));
+                filterPanel.add(subTypeFilterLabel, new GridBagConstraints(0, 8, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
-                filterPanel.add(filterBox5, new GridBagConstraints(0, 9, 1, 1, 1.0, 0.0,
+                filterPanel.add(subTypeFilterBox, new GridBagConstraints(0, 9, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
             }
@@ -425,16 +451,16 @@ public class MainPage extends JFrame implements ReloadListener {
     private JButton searchButton;
     private JSplitPane mainPageSplitPane;
     private JPanel filterPanel;
-    private JLabel filterLabel1;
-    private JComboBox filterBox1;
-    private JLabel filterLabel2;
-    private JComboBox filterBox2;
-    private JLabel filterLabel3;
-    private JComboBox filterBox3;
-    private JLabel filterLabel4;
+    private JLabel sortLabel;
+    private JComboBox sortOptions;
+    private JLabel priceFilterLabel;
+    private JComboBox priceFilterBox;
+    private JLabel typeFilterLabel;
+    private JComboBox typeFilterBox;
+    private JLabel brandFilterLabel;
     private JComboBox filterBox4;
-    private JLabel filterLabel5;
-    private JComboBox filterBox5;
+    private JLabel subTypeFilterLabel;
+    private JComboBox subTypeFilterBox;
     private JPanel productPanel;
     private JPanel productCardPanel1;
     private JLabel productImage1;
