@@ -16,7 +16,6 @@ import java.util.regex.*;
 import DAO.AuthenticationDAO;
 import DAO.LoginDAO;
 import DAO.UserDAO;
-import controller.GlobalState;
 import exception.DatabaseException;
 import helper.UserSession;
 import model.Login;
@@ -57,7 +56,6 @@ public class RegistrationPage extends JFrame {
 
             if (hasCreatedUser) {
                 UserSession.getInstance().setCurrentUser(newUser);
-                GlobalState.setLoggedIn(true);
                 System.out.println("User has logged in (id = " + newUser.getUserID() + ")");
 
                 // Attempt to set default role
@@ -74,6 +72,7 @@ public class RegistrationPage extends JFrame {
                 if (loginSuccess)
                     return "OK";
                 else
+                    UserSession.getInstance().clear();
                     return "Error creating user login, they may already exist!";    
             }
         }

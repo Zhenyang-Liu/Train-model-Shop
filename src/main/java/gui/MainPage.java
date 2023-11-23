@@ -13,7 +13,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 import com.formdev.flatlaf.extras.*;
 import com.jgoodies.forms.factories.*;
-import controller.GlobalState;
 import exception.DatabaseException;
 import helper.Filter;
 import helper.UserSession;
@@ -54,7 +53,7 @@ public class MainPage extends JFrame implements ReloadListener {
 
     private void button_accountMouseClicked() {
         SwingUtilities.invokeLater(() -> {
-            if (!GlobalState.isLoggedIn()) {
+            if (!UserSession.getInstance().isLoggedIn()) {
                 LoginPage loginPage = new LoginPage();;
                 loginPage.setVisible(true);
                 loginPage.setLoginSuccessListener(this::loadProducts);

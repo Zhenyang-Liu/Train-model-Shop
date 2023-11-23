@@ -18,7 +18,6 @@ import java.sql.SQLException;
 
 import DAO.LoginDAO;
 import DAO.UserDAO;
-import controller.GlobalState;
 
 /**
  * @author LIU ZHENYANG
@@ -68,12 +67,11 @@ public class LoginPage extends JFrame {
              User user = UserDAO.findUserByEmail(email);
              Login userLogin = LoginDAO.findLoginByUserID(user.getUserID());
 
-             if (!GlobalState.isLoggedIn() && UserDAO.doesUserExist(email)) {
+             if (!UserSession.getInstance().isLoggedIn() && UserDAO.doesUserExist(email)) {
                  System.out.println("Matching passwords..");
                  if (userLogin.doesPasswordMatch(password)) {
                      System.out.println("Passwords work!");
                      UserSession.getInstance().setCurrentUser(user);
-                     GlobalState.setLoggedIn(true);
 
                      // Reload products for user
                      if (loginSuccessListener != null) {

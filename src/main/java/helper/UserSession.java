@@ -27,6 +27,10 @@ public class UserSession {
         return this.currentUser;
     }
 
+    public boolean isLoggedIn() {
+        return this.currentUser != null;
+    }
+
     public void setPermissions(Set<String> permissions) {
         this.permissions = permissions;
     }
