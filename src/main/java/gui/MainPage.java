@@ -32,8 +32,10 @@ import service.CartService;
  * @author Zhenyang Liu
  */
 public class MainPage extends JFrame implements ReloadListener {
+    private Filter f;
     public MainPage() {
         initComponents();
+        f = new Filter();
         populateFilterBoxes();
         loadProducts();
         customizeComponents();
@@ -78,7 +80,6 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     private void populatePriceRangeFilters(){
-        Filter f = new Filter();
         priceFilterBox.addItem(f.new PriceRange(0f, 1e10f, "All"));
         priceFilterBox.addItem(f.new PriceRange(0.0f, 15.0f));
         priceFilterBox.addItem(f.new PriceRange(15.0f, 30.0f));
@@ -92,10 +93,35 @@ public class MainPage extends JFrame implements ReloadListener {
         });
     }
 
+    private void populateTypeFilters(){
+        typeFilterBox.addItem(f.new TypeFilter("", "All"));
+        typeFilterBox.addItem(f.new TypeFilter("Locomotive", "Locomotives"));
+        typeFilterBox.addItem(f.new TypeFilter("Track", "Tracks"));
+        typeFilterBox.addItem(f.new TypeFilter("BoxedSet", "Box Sets"));
+
+        typeFilterBox.addItemListener(e -> {
+            loadProducts();
+        });
+    }
+
+    private void populateSortOptions(){
+        sortOptions.addItem(f.new SortBy("None", ""));
+        sortOptions.addItem(f.new SortBy("Price", "retail_price"));
+        sortOptions.addItem(f.new SortBy("Name", "product_name"));
+
+        sortOptions.addItemListener(e -> {
+            loadProducts();
+        });
+    }
+
     private void populateBrandFilters(){
         ArrayList<Brand> toAdd = BrandDAO.findAllBrand();
+        filterBox4.addItem(f.new BrandFilter(null, "All"));
         for(Brand b: toAdd)
-            filterBox4.addItem(b);
+            filterBox4.addItem(f.new BrandFilter(b));
+        filterBox4.addItemListener(e -> {
+            loadProducts();
+        });
     }
 
     private void populateFilterBoxes()
@@ -103,6 +129,8 @@ public class MainPage extends JFrame implements ReloadListener {
         System.out.println("Filter boxes");
         populatePriceRangeFilters();
         populateBrandFilters();
+        populateSortOptions();
+        populateTypeFilters();
 
         searchButton.addActionListener(e -> {
             loadProducts();
@@ -502,7 +530,10 @@ public class MainPage extends JFrame implements ReloadListener {
             protected ArrayList<Product> doInBackground() throws Exception {
                 // Get products from the database in the background thread
                 Filter.PriceRange pr = (Filter.PriceRange)priceFilterBox.getSelectedItem();
-                return ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax());
+                Filter.BrandFilter br = (Filter.BrandFilter)filterBox4.getSelectedItem();
+                Filter.SortBy sb = (Filter.SortBy)sortOptions.getSelectedItem();
+                Filter.TypeFilter tp = (Filter.TypeFilter)typeFilterBox.getSelectedItem();
+                return ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax(), br.getBrand(), sb.getDbHandle(), sb.isAscending(), tp.getDbTable());
             }
 
             @Override
