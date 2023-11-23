@@ -19,12 +19,12 @@ CREATE TABLE Login (
 
 CREATE TABLE Role (
     role_id INT AUTO_INCREMENT PRIMARY KEY,
-    role_name VARCHAR(100) NOT NULL UNIQUE
+    role_name VARCHAR(10) NOT NULL UNIQUE
 );
 
 CREATE TABLE User_Role (
-    user_id INT,
-    role_id INT,
+    user_id INT NOT NULL,
+    role_id INT NOT NULL,
     PRIMARY KEY (user_id, role_id),
     FOREIGN KEY (user_id) REFERENCES User(user_id),
     FOREIGN KEY (role_id) REFERENCES Role(role_id)
@@ -36,8 +36,8 @@ CREATE TABLE Permission (
 );
 
 CREATE TABLE Role_Permission (
-    role_id INT,
-    permission_id INT,
+    role_id INT NOT NULL,
+    permission_id INT NOT NULL,
     PRIMARY KEY (role_id, permission_id),
     FOREIGN KEY (role_id) REFERENCES Role(role_id),
     FOREIGN KEY (permission_id) REFERENCES Permission(permission_id)
@@ -45,15 +45,23 @@ CREATE TABLE Role_Permission (
 
 CREATE TABLE Address (
     address_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    house_number VARCHAR(255),
-    road_name VARCHAR(255),
-    city_name VARCHAR(255),
-    postcode VARCHAR(10),
-    FOREIGN KEY (user_id) REFERENCES User(user_id)
+    house_number VARCHAR(255) NOT NULL,
+    road_name VARCHAR(255) NOT NULL,
+    city_name VARCHAR(255) NOT NULL,
+    postcode VARCHAR(10) NOT NULL,
+    UNIQUE INDEX unique_address (house_number, postcode)
+);
+
+CREATE TABLE User_Address (
+    user_id INT NOT NULL,
+    address_id INT NOT NULL,
+    PRIMARY KEY (user_id, address_id),
+    FOREIGN KEY (user_id) REFERENCES User(user_id),
+    FOREIGN KEY (address_id) REFERENCES Address(address_id)
 );
 
 CREATE TABLE Bank_Detail (
+    bank_detail_id INT AUTO_INCREMENT PRIMARY KEY,
     card_name VARCHAR(255),
     card_holder_name VARCHAR(255),
     card_number VARCHAR(255), 

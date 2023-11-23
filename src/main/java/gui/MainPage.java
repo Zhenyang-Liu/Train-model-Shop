@@ -6,6 +6,7 @@ package gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
@@ -13,34 +14,155 @@ import javax.swing.border.*;
 import com.formdev.flatlaf.extras.*;
 import com.jgoodies.forms.factories.*;
 import controller.GlobalState;
+import exception.DatabaseException;
+import helper.Filter;
+import helper.UserSession;
+import listeners.ReloadListener;
+import model.Cart;
+import model.Gauge;
 import model.Product;
+import model.Brand;
+import DAO.BrandDAO;
 import DAO.ProductDAO;
+import model.User;
+import model.Locomotive.DCCType;
+import helper.UserSession;
+import helper.Filter;
+import service.CartService;
+
 /**
  * @author Zhenyang Liu
  */
-public class MainPage extends JFrame {
-    private ProductDAO productDAO;
-
+public class MainPage extends JFrame implements ReloadListener {
+    private Filter f;
     public MainPage() {
-        productDAO = new ProductDAO();  // Instantiating ProductDAO
         initComponents();
+        f = new Filter();
+        populateFilterBoxes();
         loadProducts();
         customizeComponents();
+        button_accountMouseClicked();
     }
 
     private void createUIComponents() {
         // TODO: add custom component creation code here
     }
 
-    private void button_accountMouseClicked(MouseEvent e) {
-        // TODO add your code here
+    public void reloadProducts() {
+        loadProducts();
+    }
+
+    private void button_accountMouseClicked() {
         SwingUtilities.invokeLater(() -> {
             if (!GlobalState.isLoggedIn()) {
-                LoginPage loginPage = new LoginPage();
+                LoginPage loginPage = new LoginPage();;
                 loginPage.setVisible(true);
+                loginPage.setLoginSuccessListener(this::loadProducts);
             } else {
                 // User logged in
             }
+        });
+    }
+
+    private void button_cartMouseClicked(MouseEvent e) {
+        User currentUser = UserSession.getInstance().getCurrentUser();
+
+        if (currentUser != null) {
+            int userID = currentUser.getUserID();
+            System.out.println(userID);
+            BasketPage basketPage = new BasketPage(userID);
+            basketPage.setVisible(true);
+            basketPage.setReloadListener(this::loadProducts);
+        } else {
+            // USER NOT LOGIN
+            LoginPage loginPage = new LoginPage();
+            loginPage.setVisible(true);
+        }
+
+    }
+
+    private void populatePriceRangeFilters(){
+        priceFilterBox.addItem(f.new PriceRange(0f, 1e10f, "All"));
+        priceFilterBox.addItem(f.new PriceRange(0.0f, 15.0f));
+        priceFilterBox.addItem(f.new PriceRange(15.0f, 30.0f));
+        priceFilterBox.addItem(f.new PriceRange(30.0f, 50.0f));
+        priceFilterBox.addItem(f.new PriceRange(50.0f, 100.0f));
+        priceFilterBox.addItem(f.new PriceRange(100.0f, 500.0f));
+        priceFilterBox.addItem(f.new PriceRange(500.0f, 1e10f, "£500<"));
+
+        priceFilterBox.addItemListener(e -> {
+            loadProducts();
+        });
+    }
+
+    private void populateSubFilters(){
+        subTypeFilterBox.removeAllItems();
+        String table = ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).getDbTable();
+        if(table.equals("Locomotive")){
+            System.out.println("Adding items :D");
+            subTypeFilterBox.addItem(DCCType.ANALOGUE);
+            subTypeFilterBox.addItem(DCCType.FITTED);
+            subTypeFilterBox.addItem(DCCType.READY);
+            subTypeFilterBox.addItem(DCCType.SOUND);
+        }else if(table.equals("Track")){
+            subTypeFilterBox.addItem(Gauge.OO);
+            subTypeFilterBox.addItem(Gauge.TT);
+            subTypeFilterBox.addItem(Gauge.N);
+        }
+        else{
+            subTypeFilterBox.addItem("No sub-filters");
+        }
+    }
+
+    private void populateTypeFilters(){
+        typeFilterBox.addItem(f.new TypeFilter("", "All", ""));
+        typeFilterBox.addItem(f.new TypeFilter("Locomotive", "Locomotives", "dcc_type"));
+        typeFilterBox.addItem(f.new TypeFilter("Track", "Tracks", "track_type"));
+        typeFilterBox.addItem(f.new TypeFilter("BoxedSet", "Box Sets", "pack_type"));
+
+        typeFilterBox.addItemListener(e -> {
+            System.out.println("Loading filters: " + e.getItem().toString());
+            populateSubFilters();
+            loadProducts();
+        });
+        subTypeFilterBox.addItemListener(e -> {
+            ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).setSubFilter(e.getItem().toString());
+            loadProducts();
+        });
+    }
+
+    private void populateSortOptions(){
+        sortOptions.addItem(f.new SortBy("None", ""));
+        sortOptions.addItem(f.new SortBy("Price", "retail_price"));
+        sortOptions.addItem(f.new SortBy("Name", "product_name"));
+        sortOptions.addItem(f.new SortBy("Price", "retail_price", false));
+        sortOptions.addItem(f.new SortBy("Name", "product_name", false));
+
+        sortOptions.addItemListener(e -> {
+            loadProducts();
+        });
+    }
+
+    private void populateBrandFilters(){
+        ArrayList<Brand> toAdd = BrandDAO.findAllBrand();
+        filterBox4.addItem(f.new BrandFilter(null, "All"));
+        for(Brand b: toAdd)
+            filterBox4.addItem(f.new BrandFilter(b));
+        filterBox4.addItemListener(e -> {
+            loadProducts();
+        });
+    }
+
+    private void populateFilterBoxes()
+    {
+        System.out.println("Filter boxes");
+        populatePriceRangeFilters();
+        populateBrandFilters();
+        populateSortOptions();
+        populateTypeFilters();
+
+        searchButton.addActionListener(e -> {
+            loadProducts();
         });
     }
 
@@ -62,16 +184,16 @@ public class MainPage extends JFrame {
         searchButton = new JButton();
         mainPageSplitPane = new JSplitPane();
         filterPanel = new JPanel();
-        filterLabel1 = new JLabel();
-        filterBox1 = new JComboBox();
-        filterLabel2 = new JLabel();
-        filterBox2 = new JComboBox();
-        filterLabel3 = new JLabel();
-        filterBox3 = new JComboBox();
-        filterLabel4 = new JLabel();
+        sortLabel = new JLabel();
+        sortOptions = new JComboBox();
+        priceFilterLabel = new JLabel();
+        priceFilterBox = new JComboBox();
+        typeFilterLabel = new JLabel();
+        typeFilterBox = new JComboBox();
+        brandFilterLabel = new JLabel();
         filterBox4 = new JComboBox();
-        filterLabel5 = new JLabel();
-        filterBox5 = new JComboBox();
+        subTypeFilterLabel = new JLabel();
+        subTypeFilterBox = new JComboBox();
         productPanel = new JPanel();
         productCardPanel1 = new JPanel();
         productImage1 = new JLabel();
@@ -107,7 +229,7 @@ public class MainPage extends JFrame {
                 button_account.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        button_accountMouseClicked(e);
+                        button_accountMouseClicked();
                     }
                 });
                 accountPanel.add(button_account, BorderLayout.WEST);
@@ -117,6 +239,12 @@ public class MainPage extends JFrame {
                 button_cart.setIcon(new FlatSVGIcon("images/shopping_cart_black_24dp.svg"));
                 button_cart.setBackground(new Color(0xf2f2f2));
                 button_cart.setHorizontalAlignment(SwingConstants.RIGHT);
+                button_cart.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        button_cartMouseClicked(e);
+                    }
+                });
                 accountPanel.add(button_cart, BorderLayout.EAST);
             }
             topPanel.add(accountPanel);
@@ -201,51 +329,52 @@ public class MainPage extends JFrame {
                 ((GridBagLayout)filterPanel.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
                 ((GridBagLayout)filterPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
-                //---- filterLabel1 ----
-                filterLabel1.setText(bundle.getString("MainPage.filterLabel1.text"));
-                filterLabel1.setHorizontalTextPosition(SwingConstants.LEFT);
-                filterLabel1.setHorizontalAlignment(SwingConstants.TRAILING);
-                filterLabel1.setPreferredSize(null);
-                filterPanel.add(filterLabel1, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+                //---- sortLabel ----
+                sortLabel.setText(bundle.getString("MainPage.sortLabel.text"));
+                sortLabel.setHorizontalTextPosition(SwingConstants.LEFT);
+                sortLabel.setHorizontalAlignment(SwingConstants.TRAILING);
+                sortLabel.setPreferredSize(null);
+                filterPanel.add(sortLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(0, 0, 5, 0), 0, 0));
-                filterPanel.add(filterBox1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+                filterPanel.add(sortOptions, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
 
-                //---- filterLabel2 ----
-                filterLabel2.setText(bundle.getString("MainPage.filterLabel2.text"));
-                filterPanel.add(filterLabel2, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
-                    GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-                    new Insets(5, 0, 5, 0), 0, 0));
-                filterPanel.add(filterBox2, new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
-                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                    new Insets(0, 0, 5, 0), 0, 0));
+                //---- priceFilterLabel ----
+                priceFilterLabel.setText(bundle.getString("MainPage.priceFilterLabel.text"));
+                filterPanel.add(priceFilterLabel, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
 
-                //---- filterLabel3 ----
-                filterLabel3.setText(bundle.getString("MainPage.filterLabel3.text"));
-                filterPanel.add(filterLabel3, new GridBagConstraints(0, 4, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
-                filterPanel.add(filterBox3, new GridBagConstraints(0, 5, 1, 1, 1.0, 0.0,
+                filterPanel.add(priceFilterBox, new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
 
-                //---- filterLabel4 ----
-                filterLabel4.setText(bundle.getString("MainPage.filterLabel4.text"));
-                filterPanel.add(filterLabel4, new GridBagConstraints(0, 6, 1, 1, 1.0, 0.0,
+                //---- typeFilterLabel ----
+                typeFilterLabel.setText(bundle.getString("MainPage.typeFilterLabel.text"));
+                filterPanel.add(typeFilterLabel, new GridBagConstraints(0, 4, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                    new Insets(5, 0, 5, 0), 0, 0));
+                filterPanel.add(typeFilterBox, new GridBagConstraints(0, 5, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 5, 0), 0, 0));
+
+                //---- brandFilterLabel ----
+                brandFilterLabel.setText("BRAND");
+                filterPanel.add(brandFilterLabel, new GridBagConstraints(0, 6, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
                 filterPanel.add(filterBox4, new GridBagConstraints(0, 7, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
 
-                //---- filterLabel5 ----
-                filterLabel5.setText(bundle.getString("MainPage.filterLabel5.text"));
-                filterPanel.add(filterLabel5, new GridBagConstraints(0, 8, 1, 1, 1.0, 0.0,
+                //---- subTypeFilterLabel ----
+                subTypeFilterLabel.setText(bundle.getString("MainPage.subTypeFilterLabel.text"));
+                filterPanel.add(subTypeFilterLabel, new GridBagConstraints(0, 8, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
-                filterPanel.add(filterBox5, new GridBagConstraints(0, 9, 1, 1, 1.0, 0.0,
+                filterPanel.add(subTypeFilterBox, new GridBagConstraints(0, 9, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
             }
@@ -388,16 +517,16 @@ public class MainPage extends JFrame {
     private JButton searchButton;
     private JSplitPane mainPageSplitPane;
     private JPanel filterPanel;
-    private JLabel filterLabel1;
-    private JComboBox filterBox1;
-    private JLabel filterLabel2;
-    private JComboBox filterBox2;
-    private JLabel filterLabel3;
-    private JComboBox filterBox3;
-    private JLabel filterLabel4;
+    private JLabel sortLabel;
+    private JComboBox sortOptions;
+    private JLabel priceFilterLabel;
+    private JComboBox priceFilterBox;
+    private JLabel typeFilterLabel;
+    private JComboBox typeFilterBox;
+    private JLabel brandFilterLabel;
     private JComboBox filterBox4;
-    private JLabel filterLabel5;
-    private JComboBox filterBox5;
+    private JLabel subTypeFilterLabel;
+    private JComboBox subTypeFilterBox;
     private JPanel productPanel;
     private JPanel productCardPanel1;
     private JLabel productImage1;
@@ -421,19 +550,25 @@ public class MainPage extends JFrame {
        Image resizedImage = originalImage.getScaledInstance(productImage1.getWidth(), productImage1.getHeight(), Image.SCALE_SMOOTH);
        productImage1.setIcon(new ImageIcon(resizedImage));
          */
+
     }
 
-    public void loadProducts() {
+    private void loadProducts() {
         new SwingWorker<ArrayList<Product>, Void>() {
             @Override
             protected ArrayList<Product> doInBackground() throws Exception {
                 // Get products from the database in the background thread
-                return productDAO.getAllProduct();
+                Filter.PriceRange pr = (Filter.PriceRange)priceFilterBox.getSelectedItem();
+                Filter.BrandFilter br = (Filter.BrandFilter)filterBox4.getSelectedItem();
+                Filter.SortBy sb = (Filter.SortBy)sortOptions.getSelectedItem();
+                Filter.TypeFilter tp = (Filter.TypeFilter)typeFilterBox.getSelectedItem();
+                return ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax(), br.getBrand(), sb.getDbHandle(), sb.isAscending(), tp.getDbTable());
             }
 
             @Override
             protected void done() {
                 try {
+                    productPanel.removeAll();
                     // Get the result of doInBackground
                     ArrayList<Product> productList = get();
                     // Updating the GUI with a Product List
@@ -450,12 +585,28 @@ public class MainPage extends JFrame {
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                     // Handling exceptions
+                } catch (DatabaseException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }.execute();
     }
 
-    public JPanel createProductCard(Product product) {
+    public JPanel createProductCard(Product product) throws DatabaseException {
+        User currentUser = UserSession.getInstance().getCurrentUser();
+        int itemID;
+        int userID;
+
+        if ( currentUser != null){
+            userID = currentUser.getUserID();
+            Cart cart = CartService.getCartDetails(userID);
+            itemID = CartService.findItemID(cart.getCartID(), product.getProductID());
+        }else {
+            itemID = -1;
+            userID = -1;
+        }
+
+
         // Create the outer panel of the card
         JPanel productCardPanel = new JPanel(new GridBagLayout());
         productCardPanel.setBorder(new LineBorder(new Color(0x002c7b), 2, true));
@@ -551,12 +702,32 @@ public class MainPage extends JFrame {
                 (2, 0, 1, 1, 0.0, 0.0,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                 new Insets(0, 0, 0, 0), 0, 0));
-        adjustNumPanel.setVisible(false);
+        if (itemID != -1) {
+            adjustNumPanel.setVisible(true);
+            addButton.setVisible(false);
+            numberButton.setText(String.valueOf(CartService.findItemNUM(itemID)));
+        }else {
+            adjustNumPanel.setVisible(false);
+        }
 
         // Adding event listeners to the "Add" button
         addButton.addActionListener(e -> {
-            addButton.setVisible(false);
-            adjustNumPanel.setVisible(true);
+            try {
+                if (currentUser != null) {
+                    addButton.setVisible(false);
+                    adjustNumPanel.setVisible(true);
+                    Cart cart = CartService.getCartDetails(userID);
+                    int cartID = cart.getCartID();
+                    int productID = product.getProductID();
+                    CartService.addToCart(cartID, productID, 1);
+                }else {
+                    // USER NOT LOGIN
+                    LoginPage loginPage = new LoginPage();
+                    loginPage.setVisible(true);
+                }
+            } catch (DatabaseException ex) {
+                ex.printStackTrace();
+            }
 
         });
 
@@ -565,13 +736,24 @@ public class MainPage extends JFrame {
             int num = Integer.parseInt(numberButton.getText());
             num--;
             if (num < 1) {
-                // If the number is less than 1, go back to the initial state.
                 adjustNumPanel.setVisible(false);
                 addButton.setVisible(true);
-                // ... Here you can add code to update the number of products in the cart
+                try {
+                    int cartID = CartService.getCartDetails(userID).getCartID();
+                    int productID = product.getProductID();
+                    CartService.removeFromCart(cartID,productID);
+                } catch (DatabaseException ex) {
+                    ex.printStackTrace();
+                }
             } else {
                 numberButton.setText(String.valueOf(num));
-                // ... Here you can add code to update the number of products in the cart
+                try {
+                    int cartID = CartService.getCartDetails(userID).getCartID();
+                    int productID = product.getProductID();
+                    CartService.updateCartItem(cartID, productID, num);
+                } catch (DatabaseException ex) {
+                    ex.printStackTrace();
+                }
             }
         });
 
@@ -580,7 +762,13 @@ public class MainPage extends JFrame {
             int num = Integer.parseInt(numberButton.getText());
             num += 1;
             numberButton.setText(String.valueOf(num));
-            // ... Here you can add code to update the number of products in the cart
+            try {
+                int cartID = CartService.getCartDetails(userID).getCartID();
+                int productID = product.getProductID();
+                CartService.updateCartItem(cartID, productID, num);
+            } catch (DatabaseException ex) {
+                ex.printStackTrace();
+            }
         });
 
         // Create a purchase panel and add price

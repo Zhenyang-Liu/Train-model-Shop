@@ -118,7 +118,7 @@ public class BrandDAO {
      * @return An ArrayList<Brand> contains all brands in the database.
      * @throws SQLException If a SQLException occurs while executing the database operation.
      */
-    public static ArrayList<Brand> findAllBrand() throws SQLException {
+    public static ArrayList<Brand> findAllBrand() {
         String selectSQL = "SELECT * FROM Brand;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -145,7 +145,7 @@ public class BrandDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            throw e;
+            return new ArrayList<Brand>();
         }
     }
 

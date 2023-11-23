@@ -12,7 +12,5 @@ public class Main {
 
         mainPage.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainPage.setVisible(true);
-
-
     }
 }

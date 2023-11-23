@@ -1,4 +1,4 @@
-JFDML JFormDesigner: "8.2.0.0.331" Java: "17.0.5" encoding: "UTF-8"
+JFDML JFormDesigner: "8.2.0.0.331" Java: "17.0.6" encoding: "UTF-8"
 
 new FormModel {
 	"i18n.autoExternalize": true
@@ -35,6 +35,7 @@ new FormModel {
 						"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/shopping_cart_black_24dp.svg" )
 						"background": new java.awt.Color( 242, 242, 242, 255 )
 						"horizontalAlignment": 4
+						addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_cartMouseClicked", true ) )
 					}, new FormLayoutConstraints( class java.lang.String ) {
 						"value": "East"
 					} )
@@ -122,8 +123,8 @@ new FormModel {
 					"preferredSize": sfield com.jformdesigner.model.FormObject NULL_VALUE
 					"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 2, false )
 					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "filterLabel1"
-						"text": new FormMessage( null, "MainPage.filterLabel1.text" )
+						name: "sortLabel"
+						"text": new FormMessage( null, "MainPage.sortLabel.text" )
 						"horizontalTextPosition": 2
 						"horizontalAlignment": 11
 						"preferredSize": sfield com.jformdesigner.model.FormObject NULL_VALUE
@@ -131,45 +132,45 @@ new FormModel {
 						"weightx": 1.0
 					} )
 					add( new FormComponent( "javax.swing.JComboBox" ) {
-						name: "filterBox1"
+						name: "sortOptions"
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 1
 						"weightx": 1.0
 						"hAlign": 5
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "filterLabel2"
-						"text": new FormMessage( null, "MainPage.filterLabel2.text" )
+						name: "priceFilterLabel"
+						"text": new FormMessage( null, "MainPage.priceFilterLabel.text" )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 2
 						"insets": new java.awt.Insets( 5, 0, 0, 0 )
 						"weightx": 1.0
 					} )
 					add( new FormComponent( "javax.swing.JComboBox" ) {
-						name: "filterBox2"
+						name: "priceFilterBox"
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 3
 						"weightx": 1.0
 						"hAlign": 5
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "filterLabel3"
-						"text": new FormMessage( null, "MainPage.filterLabel3.text" )
+						name: "typeFilterLabel"
+						"text": new FormMessage( null, "MainPage.typeFilterLabel.text" )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 4
 						"insets": new java.awt.Insets( 5, 0, 0, 0 )
 						"weightx": 1.0
 					} )
 					add( new FormComponent( "javax.swing.JComboBox" ) {
-						name: "filterBox3"
+						name: "typeFilterBox"
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 5
 						"weightx": 1.0
 						"hAlign": 5
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "filterLabel4"
-						"text": new FormMessage( null, "MainPage.filterLabel4.text" )
+						name: "brandFilterLabel"
+						"text": "BRAND"
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 6
 						"insets": new java.awt.Insets( 5, 0, 0, 0 )
@@ -183,15 +184,15 @@ new FormModel {
 						"hAlign": 5
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
-						name: "filterLabel5"
-						"text": new FormMessage( null, "MainPage.filterLabel5.text" )
+						name: "subTypeFilterLabel"
+						"text": new FormMessage( null, "MainPage.subTypeFilterLabel.text" )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 8
 						"insets": new java.awt.Insets( 5, 0, 0, 0 )
 						"weightx": 1.0
 					} )
 					add( new FormComponent( "javax.swing.JComboBox" ) {
-						name: "filterBox5"
+						name: "subTypeFilterBox"
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 9
 						"weightx": 1.0

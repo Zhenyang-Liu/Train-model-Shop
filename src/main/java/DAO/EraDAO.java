@@ -4,7 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.util.List;
+
+import exception.ConnectionException;
+import exception.DatabaseException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -15,9 +20,9 @@ public class EraDAO {
      *
      * @param productID The ID of the product for which era codes are being inserted.
      * @param eraList   An array of era codes to insert.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static void insertEra(int productID, int[] eraList) throws SQLException {
+    public static void insertEra(int productID, int[] eraList) throws DatabaseException {
         String insertSQL = "INSERT INTO ProductEra (era_code, product_id) VALUES (?, ?);";
         try (Connection connection = DatabaseConnectionHandler.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
@@ -43,19 +48,20 @@ public class EraDAO {
             connection.commit();
             preparedStatement.close();        
             connection.setAutoCommit(true);
-        }catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        } 
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(),e);
+        }
     }
 
     /**
      * Deletes era codes associated with a product from the ProductEra table.
      *
      * @param productID The ID of the product for which era codes are being deleted.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static void deleteEra(int productID) throws SQLException {
+    public static void deleteEra(int productID) throws DatabaseException {
         String deleteSQL = "DELETE FROM ProductEra WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -63,10 +69,11 @@ public class EraDAO {
             preparedStatement.setInt(1, productID);
             preparedStatement.executeUpdate();
             
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
-        }       
+            throw new DatabaseException(e.getMessage(),e);
+        }     
     }
 
     /**
@@ -74,9 +81,9 @@ public class EraDAO {
      *
      * @param productID The ID of the product for which era codes are being retrieved.
      * @return An array of era codes associated with the product.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static int[] findEraByID(int productID) throws SQLException {
+    public static int[] findEraByID(int productID) throws DatabaseException {
         String selectSQL = "SELECT era_code FROM ProductEra WHERE product_id = ?;";
         List<Integer> eraList = new ArrayList<>();
         
@@ -90,13 +97,13 @@ public class EraDAO {
                     eraList.add(eraCode);
                 }
             }
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
 
         int[] era = eraList.stream().mapToInt(Integer::intValue).toArray();
-
         return era;
     }
 
@@ -105,9 +112,9 @@ public class EraDAO {
      *
      * @param eraList An array of era codes for which to retrieve associated product IDs.
      * @return An array of product IDs associated with the era codes.
-     * @throws SQLException If a database error occurs.
+     * @throws DatabaseException If a database error occurs.
      */
-    public static int[] findIDByEra(int[] eraList) throws SQLException {
+    public static int[] findIDByEra(int[] eraList) throws DatabaseException {
         String selectSQL = "SELECT DISTINCT product_id FROM ProductEra WHERE era_code IN (" + 
                                       String.join(",", Collections.nCopies(eraList.length, "?")) + ")";
         List<Integer> productIDs = new ArrayList<>();
@@ -125,13 +132,13 @@ public class EraDAO {
                     productIDs.add(productID);
                 }
             }
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
+            throw new DatabaseException(e.getMessage(),e);
         }
 
         int[] idList = productIDs.stream().mapToInt(Integer::intValue).toArray();
-
         return idList;
     }
 }

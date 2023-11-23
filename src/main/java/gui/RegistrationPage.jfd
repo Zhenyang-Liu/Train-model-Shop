@@ -1,4 +1,4 @@
-JFDML JFormDesigner: "8.2.0.0.331" Java: "17.0.5" encoding: "UTF-8"
+JFDML JFormDesigner: "8.2.0.0.331" Java: "17.0.6" encoding: "UTF-8"
 
 new FormModel {
 	"i18n.autoExternalize": true
@@ -13,6 +13,9 @@ new FormModel {
 			"minimumSize": new java.awt.Dimension( 600, 450 )
 			"maximumSize": new java.awt.Dimension( 600, 450 )
 			"$locationPolicy": 1
+			auxiliary() {
+				"JavaCodeGenerator.customCreate": true
+			}
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 				name: "RegisterDialogPane"
 				"border": new javax.swing.border.EmptyBorder( 12, 12, 12, 12 )
@@ -31,6 +34,16 @@ new FormModel {
 					} )
 					add( new FormComponent( "javax.swing.JSeparator" ) {
 						name: "RegisterTitleSeparator"
+						"foreground": new java.awt.Color( 127, 114, 114, 255 )
+						"background": new java.awt.Color( 127, 114, 114, 255 )
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "errorLabel"
+						"horizontalTextPosition": 0
+						"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 1, false )
+						"iconTextGap": 6
+						"border": new javax.swing.border.EmptyBorder( 5, 5, 5, 5 )
+						"foreground": new java.awt.Color( 255, 0, 0, 255 )
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {
 					"value": "First"
@@ -77,6 +90,9 @@ new FormModel {
 					name: "RegisterContentPanel"
 					"minimumSize": new java.awt.Dimension( 1080, 720 )
 					"preferredSize": new java.awt.Dimension( 500, 720 )
+					auxiliary() {
+						"JavaCodeGenerator.customCreate": true
+					}
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
 						"columns": 1
 						"rows": 10
