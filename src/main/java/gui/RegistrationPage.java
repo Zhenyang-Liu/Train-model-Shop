@@ -112,6 +112,7 @@ public class RegistrationPage extends JFrame {
         RegisterDialogPane = new JPanel();
         RegisterTitlePanel = new JPanel();
         lRegisterTitleLabel = new JLabel();
+        errorLabel = new JLabel();
         RegisterTitleSeparator = new JSeparator();
         RegisterButtonBar = new JPanel();
         RegisterSubmitButton = new JButton();
@@ -152,6 +153,14 @@ public class RegistrationPage extends JFrame {
                 lRegisterTitleLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
                 lRegisterTitleLabel.setForeground(new Color(0x003366));
                 RegisterTitlePanel.add(lRegisterTitleLabel);
+
+                //---- errorLabel ----
+                errorLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+                errorLabel.setFont(errorLabel.getFont().deriveFont(errorLabel.getFont().getStyle() | Font.BOLD, errorLabel.getFont().getSize() + 11f));
+                errorLabel.setIconTextGap(6);
+                errorLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+                errorLabel.setForeground(Color.red);
+                RegisterTitlePanel.add(errorLabel);
 
                 //---- RegisterTitleSeparator ----
                 RegisterTitleSeparator.setForeground(new Color(0x7f7272));
@@ -257,6 +266,7 @@ public class RegistrationPage extends JFrame {
     private JPanel RegisterDialogPane;
     private JPanel RegisterTitlePanel;
     private JLabel lRegisterTitleLabel;
+    private JLabel errorLabel;
     private JSeparator RegisterTitleSeparator;
     private JPanel RegisterButtonBar;
     private JButton RegisterSubmitButton;

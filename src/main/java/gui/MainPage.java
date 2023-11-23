@@ -15,13 +15,17 @@ import com.formdev.flatlaf.extras.*;
 import com.jgoodies.forms.factories.*;
 import controller.GlobalState;
 import exception.DatabaseException;
+import helper.Filter;
 import helper.UserSession;
 import listeners.ReloadListener;
 import model.Cart;
 import model.Product;
+import model.Brand;
+import DAO.BrandDAO;
 import DAO.ProductDAO;
 import model.User;
 import helper.UserSession;
+import helper.Filter;
 import service.CartService;
 
 /**
@@ -33,6 +37,7 @@ public class MainPage extends JFrame implements ReloadListener {
     public MainPage() {
         productDAO = new ProductDAO();  // Instantiating ProductDAO
         initComponents();
+        populateFilterBoxes();
         loadProducts();
         customizeComponents();
     }
@@ -72,6 +77,26 @@ public class MainPage extends JFrame implements ReloadListener {
             loginPage.setVisible(true);
         }
 
+    }
+
+    private void populatePriceRangeFilters(){
+        Filter f = new Filter();
+        priceFilterBox.addItem(f.new PriceRange(0.0f, 15.0f));
+        priceFilterBox.addItem(f.new PriceRange(15.0f, 30.0f));
+        priceFilterBox.addItem(f.new PriceRange(30.0f, 50.0f));
+    }
+
+    private void populateBrandFilters(){
+        ArrayList<Brand> toAdd = BrandDAO.findAllBrand();
+        for(Brand b: toAdd)
+            filterBox4.addItem(b);
+    }
+
+    private void populateFilterBoxes()
+    {
+        System.out.println("Filter boxes");
+        populatePriceRangeFilters();
+        populateBrandFilters();
     }
 
     private void initComponents() {
@@ -252,6 +277,7 @@ public class MainPage extends JFrame implements ReloadListener {
                 //---- priceFilterLabel ----
                 priceFilterLabel.setText(bundle.getString("MainPage.priceFilterLabel.text"));
                 filterPanel.add(priceFilterLabel, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
+
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
                 filterPanel.add(priceFilterBox, new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
