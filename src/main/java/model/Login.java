@@ -125,7 +125,7 @@ public class Login{
         SecureRandom random = new SecureRandom();
         random.nextBytes(salt);
         this.setPasswordSalt(salt.toString());
-        this.setPassword(hash(password, getPasswordSalt()));
+        this.setPasswordHash(hash(password, getPasswordSalt()));
     }
 
     /**
