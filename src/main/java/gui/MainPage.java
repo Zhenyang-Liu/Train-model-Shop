@@ -501,7 +501,7 @@ public class MainPage extends JFrame implements ReloadListener {
             @Override
             protected ArrayList<Product> doInBackground() throws Exception {
                 // Get products from the database in the background thread
-                Filter.PriceRange pr = (Filter.PriceRange)filterBox2.getSelectedItem();
+                Filter.PriceRange pr = (Filter.PriceRange)priceFilterBox.getSelectedItem();
                 return ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax());
             }
 
