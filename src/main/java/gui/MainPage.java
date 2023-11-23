@@ -32,10 +32,7 @@ import service.CartService;
  * @author Zhenyang Liu
  */
 public class MainPage extends JFrame implements ReloadListener {
-    private ProductDAO productDAO;
-
     public MainPage() {
-        productDAO = new ProductDAO();  // Instantiating ProductDAO
         initComponents();
         populateFilterBoxes();
         loadProducts();
@@ -81,9 +78,17 @@ public class MainPage extends JFrame implements ReloadListener {
 
     private void populatePriceRangeFilters(){
         Filter f = new Filter();
+        filterBox2.addItem(f.new PriceRange(0f, 1e10f, "All"));
         filterBox2.addItem(f.new PriceRange(0.0f, 15.0f));
         filterBox2.addItem(f.new PriceRange(15.0f, 30.0f));
         filterBox2.addItem(f.new PriceRange(30.0f, 50.0f));
+        filterBox2.addItem(f.new PriceRange(50.0f, 100.0f));
+        filterBox2.addItem(f.new PriceRange(100.0f, 500.0f));
+        filterBox2.addItem(f.new PriceRange(500.0f, 1e10f, "£500<"));
+
+        filterBox2.addItemListener(e -> {
+            loadProducts();
+        });
     }
 
     private void populateBrandFilters(){
@@ -97,6 +102,10 @@ public class MainPage extends JFrame implements ReloadListener {
         System.out.println("Filter boxes");
         populatePriceRangeFilters();
         populateBrandFilters();
+
+        searchButton.addActionListener(e -> {
+            loadProducts();
+        });
     }
 
     private void initComponents() {
@@ -489,7 +498,8 @@ public class MainPage extends JFrame implements ReloadListener {
             @Override
             protected ArrayList<Product> doInBackground() throws Exception {
                 // Get products from the database in the background thread
-                return productDAO.getAllProduct();
+                Filter.PriceRange pr = (Filter.PriceRange)filterBox2.getSelectedItem();
+                return ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax());
             }
 
             @Override
