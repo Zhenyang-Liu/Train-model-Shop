@@ -18,6 +18,7 @@ public class DatabaseConnectionHandler {
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 
         dataSource = new HikariDataSource(config);
+        config.setLeakDetectionThreshold(60000); 
     }
 
     public static Connection getConnection() throws SQLException {
