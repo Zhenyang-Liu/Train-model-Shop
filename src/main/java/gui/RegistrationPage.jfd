@@ -35,7 +35,7 @@ new FormModel {
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "errorLabel"
 						"horizontalTextPosition": 0
-						"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 11, false )
+						"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 1, false )
 						"iconTextGap": 6
 						"border": new javax.swing.border.EmptyBorder( 5, 5, 5, 5 )
 						"foreground": new java.awt.Color( 255, 0, 0, 255 )
