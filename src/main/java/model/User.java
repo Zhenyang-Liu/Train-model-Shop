@@ -41,16 +41,10 @@ public class User {
             int id = r.nextInt(65536);  // 16-bit random ID
     
             // Validate ID
-            
-            try {
-                boolean doesUserExist = UserDAO.doesUserExist(id);
-                if (!doesUserExist) {
-                    valid = true;
-                    return id;
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                return -1;
+            boolean doesUserExist = UserDAO.doesUserExist(id);
+            if (!doesUserExist) {
+                valid = true;
+                return id;
             }
         }
         return -1;

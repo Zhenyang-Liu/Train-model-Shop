@@ -48,7 +48,7 @@ public class LoginDAO{
      * @return @code{true} if the details are updated successfully otherwise @code{false}
      * @throws SQLException
      */
-    public static boolean updateLoginDetails(Login login) {
+    public static boolean updateLoginDetails(Login login) throws SQLException {
         String stmt = "UPDATE Login SET password_hash = ?, password_salt = ?, failed_attempts = ?, " +
             "last_login_attempt = ?, lockout_enabled = ?, lockout_end = ? WHERE user_id = ?";
 
@@ -72,10 +72,13 @@ public class LoginDAO{
             if (affectedRows == 0) {
                 throw new SQLException("Updating login details failed as no order could be found ");
             }
+            
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        return false;
     }
 
     /**
