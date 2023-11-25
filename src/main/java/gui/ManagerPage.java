@@ -39,33 +39,7 @@ public class ManagerPage extends JFrame {
 
         add(topPanel, BorderLayout.NORTH);
 
-        // Left Panel with filter
-        // TODO：Button with filter Unfinished
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-        leftPanel.add(Box.createVerticalGlue());
-
-        Dimension buttonSize = new Dimension(100, 30);
-
-        JButton button1 = new JButton("Customer");
-        button1.setMinimumSize(buttonSize);
-        button1.setMaximumSize(buttonSize);
-        button1.setPreferredSize(buttonSize);
-        leftPanel.add(button1);
-
-        JButton button2 = new JButton("Staff");
-        button2.setMinimumSize(buttonSize);
-        button2.setMaximumSize(buttonSize);
-        button2.setPreferredSize(buttonSize);
-        leftPanel.add(button2);
-
-        JButton button3 = new JButton("All");
-        button3.setMinimumSize(buttonSize);
-        button3.setMaximumSize(buttonSize);
-        button3.setPreferredSize(buttonSize);
-        leftPanel.add(button3);
-
-        leftPanel.add(Box.createVerticalGlue());
+        JPanel leftPanel = createLeftPanel();
 
         // Display the User table
         initializeTable();
@@ -79,6 +53,56 @@ public class ManagerPage extends JFrame {
         add(splitPane, BorderLayout.CENTER);
     }
 
+    // Section for leftPanel
+    private JPanel createLeftPanel() {
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.add(Box.createVerticalGlue());
+
+        Dimension buttonSize = new Dimension(100, 30);
+
+        JButton customerButton = new JButton("Customer");
+        customerButton.setMinimumSize(buttonSize);
+        customerButton.setMaximumSize(buttonSize);
+        customerButton.setPreferredSize(buttonSize);
+        leftPanel.add(customerButton);
+
+        JButton staffButton = new JButton("Staff");
+        staffButton.setMinimumSize(buttonSize);
+        staffButton.setMaximumSize(buttonSize);
+        staffButton.setPreferredSize(buttonSize);
+        leftPanel.add(staffButton);
+
+        JButton allButton = new JButton("All");
+        allButton.setMinimumSize(buttonSize);
+        allButton.setMaximumSize(buttonSize);
+        allButton.setPreferredSize(buttonSize);
+        leftPanel.add(allButton);
+
+        leftPanel.add(Box.createVerticalGlue());
+
+        // Add button listener for left panel
+        customerButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                filterTableData("customer");
+            }
+        });
+
+        staffButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                filterTableData("staff");
+            }
+        });
+
+        allButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                filterTableData(null);
+            }
+        });
+        return leftPanel;
+    }
+
+    // Section for rightPanel
     private void initializeTable() {
         String[] columnNames = {"UserID", "Email Address", "Forename", "Surname", "Role", "Action"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
@@ -96,6 +120,42 @@ public class ManagerPage extends JFrame {
         table = new JTable(model);
         table.getColumnModel().getColumn(5).setCellRenderer(new ButtonRenderer());
         table.getColumnModel().getColumn(5).setCellEditor(new ButtonEditor(new JCheckBox()));
+    }
+
+    private void filterTableData(String roleFilter) {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0); 
+    
+        Map<User, String> userList = RoleService.getAllUserWithRole();
+        if (userList != null && !userList.isEmpty()) {
+            for (Map.Entry<User, String> entry : userList.entrySet()) {
+                User user = entry.getKey();
+                String role = entry.getValue();
+    
+                if (role != null && (roleFilter == null || role.equalsIgnoreCase(roleFilter))) {
+                    Object actionButton = getActionButtonByRole(role);
+                    model.addRow(new Object[]{
+                        user.getUserID(),
+                        user.getEmail(),
+                        user.getForename(),
+                        user.getSurname(),
+                        role,
+                        actionButton
+                    });
+                }
+            }
+        } else {
+            model.addRow(new Object[]{"There is no user", "", "", "", "", ""});
+        }
+    }    
+
+    private JButton getActionButtonByRole(String role) {
+        if ("customer".equalsIgnoreCase(role)) {
+            return new JButton("Assign");
+        } else if ("staff".equalsIgnoreCase(role)) {
+            return new JButton("Dismiss");
+        }
+        return null;
     }
 
     private void loadTableData(DefaultTableModel model) {
@@ -134,32 +194,137 @@ public class ManagerPage extends JFrame {
         for (int i = 0; i < model.getRowCount(); i++) {
             int currentUserId = Integer.parseInt(model.getValueAt(i, 0).toString());
             if (currentUserId == userID) {
-                // Get Updated User
                 Map<User, String> result = RoleService.getUserWithRole(currentUserId);
                 User updatedUser = null;
                 String role = null;
-    
+                
                 if (!result.isEmpty()) {
                     Map.Entry<User, String> entry = result.entrySet().iterator().next();
                     updatedUser = entry.getKey();
                     role = entry.getValue();
                 }
+    
+                // 更新用户信息
                 model.setValueAt(updatedUser.getUserID(), i, 0);
                 model.setValueAt(updatedUser.getEmail(), i, 1);
                 model.setValueAt(updatedUser.getForename(), i, 2);
                 model.setValueAt(updatedUser.getSurname(), i, 3);
                 model.setValueAt(role, i, 4);
-
-                JButton actionButton = null;
-                if ("customer".equalsIgnoreCase(role)) {
-                    actionButton = new JButton("Assign");
-                } else if ("staff".equalsIgnoreCase(role)) {
-                    actionButton = new JButton("Dismiss");
-                }
-                model.setValueAt(actionButton, i, 5);
     
-                break;
+                // 根据新角色更新按钮
+                JButton newButton = getActionButtonByRole(role);
+                model.setValueAt(newButton, i, 5);
+    
+                // 通知模型该行数据已更改
+                model.fireTableRowsUpdated(i, i);
+
+                // 触发表格视图的重新验证和重绘
+                table.revalidate();
+                table.repaint();
             }
+        }
+    }
+     
+      
+    class ButtonRenderer extends JButton implements TableCellRenderer {
+        public ButtonRenderer() {
+            setOpaque(true);
+        }
+    
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
+            if (value instanceof JButton) {
+                JButton button = (JButton) value;
+                setText(button.getText());
+                return this;
+            }
+            return new JLabel("");
+        }
+    }
+    
+    class ButtonEditor extends DefaultCellEditor {
+        protected JButton button;
+        private String label;
+        private boolean isPushed;
+        private int editingRow;
+    
+        public ButtonEditor(JCheckBox checkBox) {
+            super(checkBox);
+            button = new JButton();
+            button.setOpaque(true);
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (isPushed) {
+                        handleButtonClick();
+                    }
+                    fireEditingStopped();
+                }
+            });
+        }
+
+        private void handleButtonClick() {
+            int userId = getUserID(editingRow);
+            if ("Assign".equals(label)) {
+                if (RoleService.assignStaff(userId)) {
+                    ManagerPage.this.refreshLine(userId);
+                }
+            } else if ("Dismiss".equals(label)) {
+                if (RoleService.dismissStaff(userId)) {
+                    ManagerPage.this.refreshLine(userId);
+                }
+            }
+        }
+    
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value,
+                                                     boolean isSelected, int row, int column) {
+            if (value instanceof JButton) {
+                JButton btn = (JButton) value;
+                label = btn.getText();
+                button.setText(label);
+                isPushed = true;
+                editingRow = row;
+                return button;
+            }
+            return new JLabel("");
+        }
+    
+        @Override
+        public Object getCellEditorValue() {
+            if (isPushed) {
+                int userId = getUserID(editingRow);
+                if ("Assign".equals(label)) {
+                    assignStaff(userId);
+                } else if ("Dismiss".equals(label)) {
+                    dismissStaff(userId);
+                }
+                isPushed = false;
+            }
+            return new JButton(label);
+        }
+    
+        private int getUserID(int row) {
+            return Integer.parseInt(ManagerPage.this.table.getModel().getValueAt(row, 0).toString());
+        }
+    
+        public boolean assignStaff(int userID) {
+            return RoleService.assignStaff(userID);
+        }
+    
+        public boolean dismissStaff(int userID) {
+            return RoleService.dismissStaff(userID);
+        }
+    
+        @Override
+        public boolean stopCellEditing() {
+            isPushed = false;
+            return super.stopCellEditing();
+        }
+    
+        @Override
+        protected void fireEditingStopped() {
+            super.fireEditingStopped();
         }
     }    
 
@@ -171,77 +336,5 @@ public class ManagerPage extends JFrame {
             ManagerPage frame = new ManagerPage();
             frame.setVisible(true);
         });
-    }
-    
-    class ButtonRenderer extends JButton implements TableCellRenderer {
-        public ButtonRenderer() {
-            setOpaque(true);
-        }
-    
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
-        boolean isSelected, boolean hasFocus, int row, int column) {
-            if (value instanceof JButton) {
-            return (JButton) value;
-            }
-            return new JLabel(""); 
-            }
-
-    }
-
-    class ButtonEditor extends DefaultCellEditor {
-        protected JButton button;
-        private int editingRow;
-    
-        public ButtonEditor(JCheckBox checkBox) {
-            super(checkBox);
-            button = new JButton();
-            button.setOpaque(true);
-            button.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    boolean success = false;
-                    int userId = getUserID(editingRow);
-                    if (button.getText().equals("Assign")) {
-                        success = assignStaff(userId);
-                    } else if (button.getText().equals("Dismiss")) {
-                        success = dismissStaff(userId);
-                    }
-                    if (!success) {
-                        JOptionPane.showMessageDialog(button, "Operation failed!");
-                    } else {
-                        ManagerPage.this.refreshLine(userId);
-                    }
-                    fireEditingStopped();
-                }             
-            });
-        }
-    
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value,
-                                                     boolean isSelected, int row, int column) {
-            if (value instanceof JButton) {
-                JButton btn = (JButton) value;
-                button.setText(btn.getText());
-                editingRow = row;
-                return button;
-            }
-            return new JLabel("");
-        }
-    
-        public boolean assignStaff(int userID) {
-            return RoleService.assignStaff(userID);
-        }
-        
-        public boolean dismissStaff(int userID) {
-            return RoleService.dismissStaff(userID);
-        }
-
-        private int getUserID(int row) {
-            return Integer.parseInt(ManagerPage.this.table.getModel().getValueAt(row, 0).toString());
-        }
-
-        protected void fireEditingStopped() {
-            super.fireEditingStopped();
-        }
     }
 }
