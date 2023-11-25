@@ -1,6 +1,7 @@
 package service;
 
-import java.util.HashMap;
+
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ArrayList;
 
@@ -73,7 +74,7 @@ public class RoleService {
             if (!permission.hasPermission("ASSIGN_STAFF_ROLE")){
                 throw new AuthorizationException("Access denied. Only Manager can assign staff.");
             }
-            Map<User,String> list = new HashMap<>();
+            Map<User,String> list = new LinkedHashMap<>();
             ArrayList<User> users = UserDAO.findAllUser();
 
             for (User user : users) {
@@ -102,7 +103,7 @@ public class RoleService {
             if (!permission.hasPermission("ASSIGN_STAFF_ROLE")){
                 throw new AuthorizationException("Access denied. Only Manager can assign staff.");
             }
-            Map<User,String> list = new HashMap<>();
+            Map<User,String> list = new LinkedHashMap<>();
             User user = UserDAO.findUserByID(userID);
             String role = AuthenticationDAO.findRoleByID(user.getUserID());
             list.put(user, role);
