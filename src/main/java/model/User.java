@@ -1,6 +1,5 @@
 package model;
 
-import java.sql.SQLException;
 import java.util.Random;
 
 import DAO.UserDAO;

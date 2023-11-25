@@ -10,17 +10,21 @@ import model.Locomotive.DCCType;
 import model.RollingStock.RollingStockType;
 import model.BoxedSet;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import javax.swing.JFrame;
+
 import DAO.*;
 import exception.DatabaseException;
+import gui.ManagerPage;
 
 public class Test {
     public static void main(String[] args) {
         performDatabaseOperations();
-
     }
 
     private static void performDatabaseOperations() {
@@ -146,7 +150,8 @@ public class Test {
             // RollingStockDAO.deleteRollingStock(roID);
             // LocomotiveDAO.deleteLocomotive(loID);
             // ControllerDAO.deleteController(cID);
-            AuthenticationDAO.setDefaultRole(5615);
+            AuthenticationDAO.dismissStaff(5615);
+            // AuthenticationDAO.dismissStaff();
             
         } catch (DatabaseException e) {
             e.printStackTrace();

@@ -2,7 +2,6 @@ package helper;
 import java.util.HashSet;
 import java.util.Set;
 
-import DAO.AuthenticationDAO;
 import model.User;
 import service.PermissionService;
 

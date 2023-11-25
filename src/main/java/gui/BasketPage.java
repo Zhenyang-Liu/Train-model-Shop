@@ -12,16 +12,11 @@ import javax.swing.border.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.jgoodies.forms.factories.*;
-import exception.AuthorizationException;
-import exception.DatabaseException;
 import listeners.ReloadListener;
 import model.CartItem;
 import model.Product;
 import service.CartService;
 import model.Cart;
-import helper.UserSession;
-
 
 /**
  * @author Zhenyang Liu
