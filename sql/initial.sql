@@ -17,6 +17,19 @@ CREATE TABLE Login (
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
+CREATE TABLE EncryptionKeys (
+    key_id INT AUTO_INCREMENT PRIMARY KEY,
+    key_value VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE User_Key (
+    user_id INT UNIQUE,
+    key_id INT,
+    PRIMARY KEY (user_id, key_id),
+    FOREIGN KEY (user_id) REFERENCES User(user_id),
+    FOREIGN KEY (key_id) REFERENCES EncryptionKeys(key_id)
+);
+
 CREATE TABLE Role (
     role_id INT AUTO_INCREMENT PRIMARY KEY,
     role_name VARCHAR(10) NOT NULL UNIQUE
@@ -89,12 +102,6 @@ CREATE TABLE Cart (
     creation_date TIMESTAMP NOT NULL,
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
-
--- CREATE TABLE Brand (
---     brand_id INT AUTO_INCREMENT PRIMARY KEY,
---     brand_name VARCHAR(255) NOT NULL,
---     country VARCHAR(255) NOT NULL
--- );
 
 CREATE TABLE Product (
     product_id INT AUTO_INCREMENT PRIMARY KEY,

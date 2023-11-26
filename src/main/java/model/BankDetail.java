@@ -75,6 +75,10 @@ public class BankDetail {
         this.expiryDate = expiryDate;
     }
 
+    public void setExpiryDate(int month, int year) {
+        this.expiryDate = Integer.toString(month) + "/" + Integer.toString(year);
+    }
+
     public String getSecurityCode() {
         return securityCode;
     }
