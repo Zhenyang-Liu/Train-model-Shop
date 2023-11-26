@@ -11,8 +11,6 @@ INSERT INTO Era (era_code, description) VALUES
     (10, 'Era 10'),
     (11, 'Era 11');
 
-INSERT INTO Brand (country, brand_name) VALUES ('UK','Bachmann');
-
 INSERT INTO Role (role_name) VALUES
     ('CUSTOMER'),
     ('STAFF'),
@@ -30,6 +28,7 @@ INSERT INTO Permission (permission_name) VALUES
     ('UPDATE_PRODUCT'),
     ('VIEW_CUSTOMER_DETAILS'),
     ('MANAGE_ORDERS'),
+    ('MANAGE_PRODUCTS'),
     ('ASSIGN_STAFF_ROLE');
 
 INSERT INTO Role_Permission (role_id, permission_id) VALUES
@@ -52,6 +51,7 @@ INSERT INTO Role_Permission (role_id, permission_id) VALUES
     (2,9),
     (2,10),
     (2,11),
+    (2,12),
     (3,1),
     (3,2),
     (3,3),
@@ -63,4 +63,5 @@ INSERT INTO Role_Permission (role_id, permission_id) VALUES
     (3,9),
     (3,10),
     (3,11),
-    (3,12);
+    (3,12),
+    (3,13);

@@ -7,7 +7,7 @@ public class Controller extends Product {
 
     }
 
-    public Controller(Brand brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, boolean isDigital) {
+    public Controller(String brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, boolean isDigital) {
         super(brand, productName, productCode, retailPrice, description, stockQuantity);
         this.setDigitalType(isDigital);
     }

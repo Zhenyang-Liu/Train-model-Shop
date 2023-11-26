@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
 
 import model.Brand;
@@ -115,38 +116,26 @@ public class BrandDAO {
     /**
      * Finds brand information based on the brand ID.
      *
-     * @return An ArrayList<Brand> contains all brands in the database.
+     * @return An ArrayList<String> contains all brands in the database.
      * @throws SQLException If a SQLException occurs while executing the database operation.
      */
-    public static ArrayList<Brand> findAllBrand() {
-        String selectSQL = "SELECT * FROM Brand;";
+    public static ArrayList<String> findAllBrand() {
+        String selectSQL = "SELECT DISTINCT brand_name FROM Product;";
+        ArrayList<String> brandList = new ArrayList<>();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
-            ResultSet resultSet = preparedStatement.executeQuery();
-            ArrayList<Brand> brandList = new ArrayList<Brand>();
-            
-            while (resultSet.next()) {
-                Brand brand = new Brand();
-                brand.setBrandID(resultSet.getInt("brand_id"));
-                brand.setBrandName(resultSet.getString("brand_name"));
-                brand.setCountry(resultSet.getString("country"));
-                brandList.add(brand);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    brandList.add(resultSet.getString("brand_name"));
+                }
             }
-
-            // Print for test
-            // System.out.println("<=================== GET ALL BRANDS ====================>");
-            // for (Brand obj : brandList) {
-            //     System.out.println(obj.toString());
-            // }
-            // System.out.println("<======================================================>");
-
-            return brandList;
-
         } catch (SQLException e) {
             e.printStackTrace();
-            return new ArrayList<Brand>();
+            return new ArrayList<>();
         }
+        return brandList;
     }
 
     

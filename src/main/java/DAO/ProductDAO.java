@@ -8,11 +8,8 @@ import java.sql.SQLTimeoutException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import javax.swing.plaf.TreeUI;
-
 import exception.ConnectionException;
 import exception.DatabaseException;
-import helper.Filter;
 import model.*;
 
 public class ProductDAO {
@@ -26,7 +23,7 @@ public class ProductDAO {
      */  
     public static int insertProduct(Product product) throws DatabaseException {
         int productId = 0;
-        String insertSQL = "INSERT INTO Product (brand_id, product_name, product_code, "
+        String insertSQL = "INSERT INTO Product (brand_name, product_name, product_code, "
                 + "retail_price, description, stock_quantity) "
                 + "VALUES (?,?,?,?,?,?)";
         
@@ -41,7 +38,7 @@ public class ProductDAO {
             }
             
             // Set the parameters for the product
-            preparedStatement.setInt(1, product.getBrand().getBrandID());
+            preparedStatement.setString(1, product.getBrand());
             preparedStatement.setString(2, product.getProductName());
             preparedStatement.setString(3, product.getProductCode());
             preparedStatement.setDouble(4, product.getRetailPrice());
@@ -78,13 +75,13 @@ public class ProductDAO {
      * @throws DatabaseException If there is a problem executing the update.
      */ 
     public static void updateProduct(Product product) throws DatabaseException {
-        String updateSQL = "UPDATE Product SET brand_id = ?, product_name = ?, product_code = ?, retail_price = ?, "
+        String updateSQL = "UPDATE Product SET brand_name = ?, product_name = ?, product_code = ?, retail_price = ?, "
             + "description = ?, stock_quantity = ? WHERE product_id = ?;"; 
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
             // Set the parameters for the product
-            preparedStatement.setInt(1, product.getBrand().getBrandID());
+            preparedStatement.setString(1, product.getBrand());
             preparedStatement.setString(2, product.getProductName());
             preparedStatement.setString(3, product.getProductCode());
             preparedStatement.setDouble(4, product.getRetailPrice());
@@ -147,8 +144,7 @@ public class ProductDAO {
 
             while (resultSet.next()) {
                 product.setProductID(resultSet.getInt("product_id"));
-                Brand brand = BrandDAO.findBrand(resultSet.getInt("brand_id"));
-                product.setBrand(brand);
+                product.setBrand(resultSet.getString("brand_name"));
                 product.setProductName(resultSet.getString("product_name"));
                 product.setProductCode(resultSet.getString("product_code"));
                 product.setDescription(resultSet.getString("description"));
@@ -185,8 +181,7 @@ public class ProductDAO {
 
             while (resultSet.next()) {
                 product.setProductID(resultSet.getInt("product_id"));
-                Brand brand = BrandDAO.findBrand(resultSet.getInt("brand_id"));
-                product.setBrand(brand);
+                product.setBrand(resultSet.getString("brand_name"));
                 product.setProductName(resultSet.getString("product_name"));
                 product.setProductCode(resultSet.getString("product_code"));
                 product.setDescription(resultSet.getString("description"));
@@ -222,7 +217,7 @@ public class ProductDAO {
         while (selectQueryResults.next()) {
             Product product = new Product();
             product.setProductID(selectQueryResults.getInt("product_id"));
-            product.setBrand(BrandDAO.findBrand(selectQueryResults.getInt("brand_id")));
+            product.setBrand(selectQueryResults.getString("brand_name"));
             product.setProductName(selectQueryResults.getString("product_name"));
             product.setProductCode(selectQueryResults.getString("product_code"));
             product.setDescription(selectQueryResults.getString("description"));
@@ -233,13 +228,13 @@ public class ProductDAO {
         return rVal;
     }
 
-    private static String constructSQLQuery(String searchQuery, float minPrice, float maxPrice, int brand, String sortBy, boolean asc, String type){
+    private static String constructSQLQuery(String searchQuery, float minPrice, float maxPrice, String brand, String sortBy, boolean asc, String type){
         String sqlString = "SELECT * FROM Product ";
         if(type != "")
             sqlString += " INNER JOIN " + type + " ON Product.product_id = " + type + ".product_id";
         sqlString += " WHERE product_name LIKE ? AND ? <= retail_price AND retail_price <= ?";
-        if(brand >= 0)
-            sqlString += " AND brand_id = ?";
+        if(brand != null && !brand.isEmpty() && !brand.equals("All"))
+            sqlString += " AND brand_name = ?";
         if(sortBy != "")
             sqlString += " ORDER BY ? ?";
         return sqlString;
@@ -255,7 +250,7 @@ public class ProductDAO {
      * @return
      * @throws SQLException
      */
-    private static PreparedStatement construPreparedStatement(Connection connection, String searchQuery, float minPrice, float maxPrice, int brand, String sortBy, boolean asc, String type) throws SQLException{
+    private static PreparedStatement construPreparedStatement(Connection connection, String searchQuery, float minPrice, float maxPrice, String brand, String sortBy, boolean asc, String type) throws SQLException{
         String sqlString = constructSQLQuery(searchQuery, minPrice, maxPrice, brand, sortBy, asc, type);
         Integer cExtraIndex = 1;
 
@@ -263,8 +258,8 @@ public class ProductDAO {
         pStatement.setString(1, "%" + searchQuery + "%");
         pStatement.setFloat(2, minPrice);
         pStatement.setFloat(3, maxPrice == -1 ? 1e10f : maxPrice);
-        if(brand >= 0){
-            pStatement.setInt(3 + cExtraIndex, brand);
+        if(brand != null && !brand.isEmpty() && !brand.equals("All")){
+            pStatement.setString(3 + cExtraIndex, brand);
             cExtraIndex++;
         }
         if(sortBy != ""){
@@ -282,7 +277,7 @@ public class ProductDAO {
      * @return an array list of the products that match the search query
      */
     public static ArrayList<Product> filterProducts(String searchQuery){
-        return filterProducts(searchQuery, 0, -1, -1, "", true, "");
+        return filterProducts(searchQuery, 0, -1, "", "", true, "");
     }
 
     /**
@@ -294,7 +289,7 @@ public class ProductDAO {
      * @param maxPrice
      * @return
      */
-    public static ArrayList<Product> filterProducts(String searchQuery, float minPrice, float maxPrice, int brand, String sortBy, boolean asc, String type){
+    public static ArrayList<Product> filterProducts(String searchQuery, float minPrice, float maxPrice, String brand, String sortBy, boolean asc, String type){
         try(Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = construPreparedStatement(connection, searchQuery, minPrice, maxPrice, brand, sortBy, asc, type)) {
             // Return the array of products from the result set

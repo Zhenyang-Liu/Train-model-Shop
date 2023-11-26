@@ -90,21 +90,20 @@ CREATE TABLE Cart (
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
-CREATE TABLE Brand (
-    brand_id INT AUTO_INCREMENT PRIMARY KEY,
-    brand_name VARCHAR(255) NOT NULL,
-    country VARCHAR(255) NOT NULL
-);
+-- CREATE TABLE Brand (
+--     brand_id INT AUTO_INCREMENT PRIMARY KEY,
+--     brand_name VARCHAR(255) NOT NULL,
+--     country VARCHAR(255) NOT NULL
+-- );
 
 CREATE TABLE Product (
     product_id INT AUTO_INCREMENT PRIMARY KEY,
-    brand_id INT NOT NULL,
+    brand_name VARCHAR(255) NOT NULL,
     product_name VARCHAR(255) NOT NULL,
     product_code VARCHAR(8) NOT NULL,
     retail_price DECIMAL(10, 2) NOT NULL,
     description TEXT NOT NULL,
-    stock_quantity INT NOT NULL,
-    FOREIGN KEY (brand_id) REFERENCES Brand(brand_id)
+    stock_quantity INT NOT NULL
 );
 
 CREATE TABLE Order_Line (
@@ -140,7 +139,6 @@ CREATE TABLE ProductEra (
 
 CREATE TABLE Track (
     product_id INT,
-    track_type VARCHAR(255),
     gauge VARCHAR(255),
     FOREIGN KEY (product_id) REFERENCES Product(product_id)
 );

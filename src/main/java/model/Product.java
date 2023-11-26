@@ -4,7 +4,7 @@ import java.net.URL;
 
 public class Product {
     private int productID;
-    private Brand brand; // Association to Brand
+    private String brand;
     private String productName;
     private String productCode;
     private double retailPrice;
@@ -26,7 +26,7 @@ public class Product {
      * @param description  The description of the product.
      * @param stockQuantity The stock quantity of the product.
      */
-    public Product(Brand brand, String productName, String productCode,
+    public Product(String brand, String productName, String productCode,
                    double d, String description, int stockQuantity) {
         this.setBrand(brand);
         this.setProductName(productName);
@@ -43,7 +43,7 @@ public class Product {
      *
      * @return the brand name associated with this product
      */
-    public Brand getBrand() {
+    public String getBrand() {
         return brand;
     }
 
@@ -52,7 +52,7 @@ public class Product {
      *
      * @param brand the Brand object to associate with this product
      */
-    public void setBrand(Brand brand) {
+    public void setBrand(String brand) {
         this.brand = brand;
     }
 
@@ -220,11 +220,6 @@ public class Product {
      * @return The product type as a string, or null if the product code is invalid.
      */
     public String getProductType() {
-        // Validate the product code
-        // if (isValidProductCode(productCode)) {
-        //     return null; // Invalid product code
-        // }
-
         char typeIndicator = productCode.charAt(0);
 
         switch (typeIndicator) {
@@ -264,7 +259,6 @@ public class Product {
 
         URL imageUrl = getClass().getResource("/images/tgv.jpeg");
 
-// 如果你需要将 URL 转换为字符串
         return imageUrl;
     }
 
@@ -296,7 +290,7 @@ public class Product {
     //Test use
     @Override
     public String toString() {
-        return "ID: " + this.productID + "; Brand: " + this.getBrand().getBrandName() + "; ProductName: " + this.getProductName();
+        return "ID: " + this.productID + "; Brand: " + this.getBrand() + "; ProductName: " + this.getProductName();
     }
 
 

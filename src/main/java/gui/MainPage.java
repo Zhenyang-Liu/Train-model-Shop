@@ -144,9 +144,9 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     private void populateBrandFilters(){
-        ArrayList<Brand> toAdd = BrandDAO.findAllBrand();
+        ArrayList<String> toAdd = BrandDAO.findAllBrand();
         filterBox4.addItem(f.new BrandFilter(null, "All"));
-        for(Brand b: toAdd)
+        for(String b: toAdd)
             filterBox4.addItem(f.new BrandFilter(b));
         filterBox4.addItemListener(e -> {
             loadProducts();
