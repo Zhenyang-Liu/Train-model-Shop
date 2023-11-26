@@ -1,0 +1,226 @@
+JFDML JFormDesigner: "8.2.0.0.331" Java: "17.0.6" encoding: "UTF-8"
+
+new FormModel {
+	"i18n.autoExternalize": true
+	"i18n.bundlePackage": "gui"
+	"i18n.bundleName": "form"
+	"i18n.keyPrefix": "pendingOrderPage"
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+			name: "this"
+			"preferredSize": new java.awt.Dimension( 900, 700 )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "pendingOrderTitleLabel"
+				"text": new FormMessage( null, "pendingOrderPage.pendingOrderTitleLabel.text" )
+				"horizontalAlignment": 0
+				"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 13, false )
+				"foreground": new java.awt.Color( 0, 51, 102, 255 )
+				"border": new javax.swing.border.EmptyBorder( 10, 5, 10, 5 )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "North"
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+				"$columnSpecs": "0, 0, 0, 0"
+				"$hGap": 5
+				"$vGap": 5
+				"$alignTop": true
+				"$alignLeft": true
+				"$rowSpecs": "0"
+			} ) {
+				name: "pendingOrderContentPanel"
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+					"$columnSpecs": "0"
+					"$rowSpecs": "0, 0"
+					"$hGap": 5
+					"$vGap": 5
+					"$alignLeft": true
+					"$alignTop": true
+				} ) {
+					name: "customerInfoPanel"
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
+						"columns": 1
+						"rows": 3
+						"hgap": 5
+						"vgap": 5
+					} ) {
+						name: "addressPanel"
+						"maximumSize": new java.awt.Dimension( 300, 200 )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "addressLabel"
+							"text": "Address"
+							"foreground": &Color0 new java.awt.Color( 0, 51, 102, 255 )
+							"font": &SwingDerivedFont0 new com.jformdesigner.model.SwingDerivedFont( null, 1, 5, false )
+						} )
+						add( new FormComponent( "javax.swing.JTextField" ) {
+							name: "addressTextField"
+							"editable": false
+						} )
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+							name: "addressEditPanel"
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "addressAddButton"
+								"text": "Add"
+								"foreground": &Color1 new java.awt.Color( 233, 228, 227, 255 )
+								"background": &Color2 new java.awt.Color( 85, 161, 90, 255 )
+								"font": &SwingDerivedFont1 new com.jformdesigner.model.SwingDerivedFont( null, 65536, 0, false )
+							} )
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "addressEditButton"
+								"text": "Edit"
+								"background": &Color3 new java.awt.Color( 0, 165, 243, 255 )
+								"foreground": &Color4 new java.awt.Color( 233, 228, 227, 255 )
+							} )
+						} )
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"hAlign": 4
+					} )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
+						"columns": 1
+						"rows": 3
+						"hgap": 5
+						"vgap": 5
+					} ) {
+						name: "paymentPnel"
+						"maximumSize": new java.awt.Dimension( 300, 200 )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "paymentLabel"
+							"text": "Payment method"
+							"foreground": #Color0
+							"font": #SwingDerivedFont0
+						} )
+						add( new FormComponent( "javax.swing.JTextField" ) {
+							name: "paymentTextField"
+							"editable": false
+						} )
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+							name: "paymentEditPanel"
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "paymentAddButton"
+								"text": "Add"
+								"foreground": #Color1
+								"background": #Color2
+								"font": #SwingDerivedFont1
+							} )
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "paymentEditButton"
+								"text": "Edit"
+								"background": #Color3
+								"foreground": #Color4
+							} )
+						} )
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"hAlign": 4
+						"weightx": 1.0
+						"gridy": 1
+						"insets": new java.awt.Insets( 20, 0, 0, 0 )
+					} )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"weightx": 0.8
+					"hAlign": 5
+					"insets": new java.awt.Insets( 0, 10, 0, 20 )
+				} )
+				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+					name: "pendingOrderScrollPanel"
+					"preferredSize": new java.awt.Dimension( 615, 200 )
+					"horizontalScrollBarPolicy": 31
+					"maximumSize": new java.awt.Dimension( 600, 32767 )
+					"minimumSize": new java.awt.Dimension( 600, 6 )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+						"$columnSpecs": "0"
+						"$rowSpecs": "0"
+						"$hGap": 5
+						"$vGap": 5
+						"$alignTop": true
+						"$alignLeft": true
+					} ) {
+						name: "pendingOrderItemsPanel"
+						"maximumSize": new java.awt.Dimension( 600, 32767 )
+						"minimumSize": new java.awt.Dimension( 600, 1096 )
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+							"$columnSpecs": "0, 0, 0, 0"
+							"$rowSpecs": "center:0:1.0"
+							"$alignTop": true
+							"$alignLeft": true
+						} ) {
+							name: "pendingOrderCardPanel"
+							"border": new javax.swing.border.MatteBorder( 3, 3, 3, 3, new java.awt.Color( 0, 55, 98, 255 ) )
+							"foreground": new java.awt.Color( 0, 51, 102, 255 )
+							"preferredSize": new java.awt.Dimension( 600, 120 )
+							"maximumSize": new java.awt.Dimension( 2147483647, 100 )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "itemImage1"
+								"text": new FormMessage( null, "pendingOrderPage.itemImage1.text" )
+								"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/tgv.jpeg" )
+								"preferredSize": new java.awt.Dimension( 150, 120 )
+								"maximumSize": new java.awt.Dimension( 160, 120 )
+								"minimumSize": new java.awt.Dimension( 160, 120 )
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "itemName1"
+								"text": new FormMessage( null, "pendingOrderPage.itemName1.text" )
+								"horizontalAlignment": 0
+								"preferredSize": new java.awt.Dimension( 200, 17 )
+								"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 2, false )
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+								"gridx": 1
+								"weightx": 0.3
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "itemPrice1"
+								"text": new FormMessage( null, "pendingOrderPage.itemPrice1.text" )
+								"horizontalAlignment": 0
+								"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 4, false )
+								"preferredSize": new java.awt.Dimension( 100, 22 )
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+								"gridx": 2
+								"weightx": 0.2
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "itemNumLabel1"
+								"text": "1"
+								"horizontalAlignment": 0
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+								"gridx": 3
+								"weightx": 0.2
+							} )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+							"hAlign": 2
+						} )
+					} )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridx": 2
+					"weighty": 1.0
+					"weightx": 1.0
+					"hAlign": 2
+				} )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "Center"
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+				name: "pendingOrderButtonPanel"
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "cancelButton"
+					"text": "Cancel order"
+					"preferredSize": new java.awt.Dimension( 150, 40 )
+					"background": new java.awt.Color( 213, 73, 69, 255 )
+					"foreground": &Color5 new java.awt.Color( 233, 228, 227, 255 )
+					"font": &SwingDerivedFont2 new com.jformdesigner.model.SwingDerivedFont( null, 1, 2, false )
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "confirmButton"
+					"text": "Confirm order"
+					"preferredSize": new java.awt.Dimension( 150, 40 )
+					"background": new java.awt.Color( 85, 161, 90, 255 )
+					"foreground": #Color5
+					"font": #SwingDerivedFont2
+				} )
+			}, new FormLayoutConstraints( class java.lang.String ) {
+				"value": "South"
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 290, 105 )
+			"size": new java.awt.Dimension( 900, 700 )
+		} )
+	}
+}
