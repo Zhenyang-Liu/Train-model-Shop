@@ -75,12 +75,12 @@ CREATE TABLE User_Address (
 
 CREATE TABLE Bank_Detail (
     bank_detail_id INT AUTO_INCREMENT PRIMARY KEY,
-    card_name VARCHAR(255),
-    card_holder_name VARCHAR(255),
-    card_number VARCHAR(255), 
-    expiry_date DATE,
-    security_code VARCHAR(255),
-    user_id INT,
+    card_name VARCHAR(255) NOT NULL,
+    card_holder_name VARCHAR(255) NOT NULL,
+    card_number VARCHAR(255) NOT NULL, 
+    expiry_date VARCHAR(10) NOT NULL,
+    security_code VARCHAR(255) NOT NULL,
+    user_id INT NOT NULL, 
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 

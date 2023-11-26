@@ -221,6 +221,7 @@ public class CartService {
      */
     public static Order checkoutCart(int cartID) {
         try {
+            // TODO: unfinished
             Cart cart = CartDAO.findCartByID(cartID);
             int holderID = cart.getUserID();
             if (!permission.hasPermission(holderID,"EDIT_OWN_CART")){

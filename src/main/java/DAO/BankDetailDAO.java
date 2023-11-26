@@ -55,7 +55,7 @@ public class BankDetailDAO {
     public static void updateBankDetail(BankDetail bankDetail) throws DatabaseException {
         String updateSQL = "UPDATE Bank_Detail "
                 + "SET card_name = ?, card_holder_name = ?, card_number = ?, expiry_date = ?, security_code = ? "
-                + "WHERE bank_detail_id = ?;";
+                + "WHERE user_id = ?;";
     
         try (Connection connection = DatabaseConnectionHandler.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
@@ -65,7 +65,7 @@ public class BankDetailDAO {
             preparedStatement.setString(3, bankDetail.getCardNumber());
             preparedStatement.setString(4, bankDetail.getExpiryDate());
             preparedStatement.setString(5, bankDetail.getSecurityCode());
-            preparedStatement.setInt(6, bankDetail.getBankDetailID());
+            preparedStatement.setInt(6, bankDetail.getUserID());
     
             preparedStatement.executeUpdate();
 

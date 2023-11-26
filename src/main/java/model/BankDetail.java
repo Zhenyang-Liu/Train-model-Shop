@@ -14,6 +14,7 @@ public class BankDetail {
 
     public BankDetail(int userID, String cardName, String cardHolderName, String cardNumber, String expiryDate, String securityCode) {
         this.userID = userID;
+        this.cardName = cardName;
         this.cardHolderName = cardHolderName;
         this.cardNumber = cardNumber;
         this.expiryDate = expiryDate;

@@ -10,6 +10,10 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import DAO.UserDAO;
+import helper.UserSession;
+import model.User;
+
 /**
  * @author Zhenyang Liu
  */
@@ -317,7 +321,15 @@ public class PendingOrderPage extends JFrame {
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
     }
+    public static void main(String[] args) {
+        User user = UserDAO.findUserByEmail("manager@manager.com");
+        UserSession.getInstance().setCurrentUser(user);
 
+        SwingUtilities.invokeLater(() -> {
+            PendingOrderPage frame = new PendingOrderPage();
+            frame.setVisible(true);
+        });
+    }
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
     private JLabel pendingOrderTitleLabel;
     private JPanel pendingOrderContentPanel;

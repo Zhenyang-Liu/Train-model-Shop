@@ -52,6 +52,27 @@ public class EncryptionKeysDAO {
         return keyID;
     }
 
+    public static int insertUserKey(int userID, int keyID) throws DatabaseException {
+        String insertSQL = "INSERT INTO User_Key (user_id,key_id) VALUES (?,?);";
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
+            preparedStatement.setInt(1, userID);
+            preparedStatement.setInt(2, keyID);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("Insert User & key failed, no rows affected."); 
+            } 
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connection failed", e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(), e);
+        }
+
+        return keyID;
+    }
+
     /**
      * Finds an encryption key by its ID in the database.
      *

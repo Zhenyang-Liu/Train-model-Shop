@@ -82,27 +82,25 @@ public class BankDetailService {
     }
     
     /**
-     * Adds bank details for a user to the database.
+     * Adds bank details for a user.
      *
-     * This method first checks if the user has permission to add bank details.
-     * If permitted, it encrypts the card number and security code using AES encryption and inserts the bank details into the database.
-     * Returns a success message or an error message depending on the outcome of the operation.
-     *
-     * @param userID       The ID of the user for whom the bank details are being added.
-     * @param cardHolder   The name of the card holder.
-     * @param cardNumber   The card number.
-     * @param expiryDate   The card's expiry date in MM/YY format.
-     * @param securityCode The card's security code.
-     * @return A status message indicating the result of the operation (e.g., "success" or an error message).
+     * @param userID        The ID of the user.
+     * @param cardHolder    The name of the card holder.
+     * @param cardNumber    The credit card number.
+     * @param expiryDate    The expiry date of the card.
+     * @param securityCode  The security code of the card.
+     * @return String       A message indicating the result of the operation.
      */
     public static String addBankDetail(int userID, String cardHolder, String cardNumber, String expiryDate, String securityCode){
-        try{
-            if (!permission.hasPermission(userID,"VIEW_OWN_ORDERS")) {
-                throw new AuthorizationException("Access denied. Users can only access their own carts.");
+        try {
+            // Check if user has permission to edit bank details
+            if (!permission.hasPermission(userID,"EDIT_OWN_BANK_DETAILS")) {
+                throw new AuthorizationException("Access denied. Users can only access their own bank details.");
             }
+
+            // Find or create encryption key for the user
             int keyID = EncryptionKeysDAO.findUserKey(userID);
             String keyString = "";
-
             if (keyID > 0){
                 keyString = EncryptionKeysDAO.findKey(keyID);
             } else if (keyID == 0) {
@@ -115,9 +113,15 @@ public class BankDetailService {
                 return "Action Failed. Please try again.";
             }
 
+            // Associate user with the key
+            EncryptionKeysDAO.insertUserKey(userID, keyID);
+
+            // Encrypt card details
             String cardName = getCreditCardType(cardNumber);
             String encryCardNumber = AESUtil.encrypt(cardNumber, keyString);
             String encrySecurityCode = AESUtil.encrypt(securityCode, keyString);
+
+            // Insert bank details into the database
             BankDetail bankDetail = new BankDetail(userID, cardName, cardHolder, encryCardNumber, expiryDate, encrySecurityCode);
             BankDetailDAO.insertBankDetail(bankDetail);
 
@@ -130,5 +134,82 @@ public class BankDetailService {
         }
         return "success";
     }
-    
+
+    /**
+     * Finds and returns the bank details of a user.
+     *
+     * @param userID The ID of the user.
+     * @return BankDetail The decrypted bank detail of the user, or null if an error occurs.
+     */
+    public static BankDetail findBankDetail(int userID){
+        try {
+            // Check if user has permission to view bank details
+            if (!permission.hasPermission(userID,"EDIT_OWN_BANK_DETAILS")) {
+                throw new AuthorizationException("Access denied. Users can only access their own bank details.");
+            }
+
+            // Retrieve encrypted bank details from the database
+            BankDetail bankDetail = BankDetailDAO.findBankDetail(userID);
+
+            // Decrypt bank details
+            String keyString = EncryptionKeysDAO.findKey(EncryptionKeysDAO.findUserKey(userID));
+            String cardNumber = AESUtil.decrypt(bankDetail.getCardNumber(), keyString);
+            String securityCode = AESUtil.decrypt(bankDetail.getSecurityCode(), keyString);
+
+            // Set decrypted values in the bank detail object
+            bankDetail.setCardNumber(cardNumber);
+            bankDetail.setSecurityCode(securityCode);
+            return bankDetail;
+
+        } catch (DatabaseException e){
+            ExceptionHandler.printErrorMessage(e);
+            return null;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Updates the bank details for a specific user.
+     *
+     * @param userID        The ID of the user whose bank details are to be updated.
+     * @param cardHolder    The updated name of the card holder.
+     * @param cardNumber    The updated credit card number.
+     * @param expiryDate    The updated expiry date of the card.
+     * @param securityCode  The updated security code of the card.
+     * @return String       A message indicating the result of the operation.
+     */
+    public static String updateBankDetail(int userID, String cardHolder, String cardNumber, String expiryDate, String securityCode) {
+        try {
+            // Check if the user has permission to edit their bank details
+            if (!permission.hasPermission(userID, "EDIT_OWN_BANK_DETAILS")) {
+                throw new AuthorizationException("Access denied. Users can only edit their own bank details.");
+            }
+
+            // Retrieve the encryption key for the user
+            int keyID = EncryptionKeysDAO.findUserKey(userID);
+            if (keyID <= 0) {
+                return "Encryption key not found. Please try again.";
+            }
+            String keyString = EncryptionKeysDAO.findKey(keyID);
+
+            // Encrypt the updated card details
+            String cardName = getCreditCardType(cardNumber);
+            String encryCardNumber = AESUtil.encrypt(cardNumber, keyString);
+            String encrySecurityCode = AESUtil.encrypt(securityCode, keyString);
+
+            // Update the bank details in the database
+            BankDetail bankDetail = new BankDetail(userID, cardName, cardHolder, encryCardNumber, expiryDate, encrySecurityCode);
+            BankDetailDAO.updateBankDetail(bankDetail);
+
+        } catch (DatabaseException e) {
+            ExceptionHandler.printErrorMessage(e);
+            return e.getMessage();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "Action Failed. Please try again.";
+        }
+        return "success";
+    }
 }
