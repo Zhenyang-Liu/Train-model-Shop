@@ -10,6 +10,9 @@ new FormModel {
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 			name: "this"
 			"preferredSize": new java.awt.Dimension( 900, 700 )
+			auxiliary() {
+				"JavaCodeGenerator.customCreate": true
+			}
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "pendingOrderTitleLabel"
 				"text": new FormMessage( null, "pendingOrderPage.pendingOrderTitleLabel.text" )
@@ -64,16 +67,19 @@ new FormModel {
 								"foreground": &Color1 new java.awt.Color( 233, 228, 227, 255 )
 								"background": &Color2 new java.awt.Color( 85, 161, 90, 255 )
 								"font": &SwingDerivedFont1 new com.jformdesigner.model.SwingDerivedFont( null, 65536, 0, false )
+								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "addressAddButtonMouseClicked", true ) )
 							} )
 							add( new FormComponent( "javax.swing.JButton" ) {
 								name: "addressEditButton"
 								"text": "Edit"
 								"background": &Color3 new java.awt.Color( 0, 165, 243, 255 )
 								"foreground": &Color4 new java.awt.Color( 233, 228, 227, 255 )
+								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "addressEditButtonMouseClicked", true ) )
 							} )
 						} )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"hAlign": 4
+						"weightx": 1.0
 					} )
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
 						"columns": 1
@@ -101,19 +107,21 @@ new FormModel {
 								"foreground": #Color1
 								"background": #Color2
 								"font": #SwingDerivedFont1
+								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "paymentAddButtonMouseClicked", true ) )
 							} )
 							add( new FormComponent( "javax.swing.JButton" ) {
 								name: "paymentEditButton"
 								"text": "Edit"
 								"background": #Color3
 								"foreground": #Color4
+								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "paymentEditButtonMouseClicked", true ) )
 							} )
 						} )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"hAlign": 4
-						"weightx": 1.0
 						"gridy": 1
 						"insets": new java.awt.Insets( 20, 0, 0, 0 )
+						"weightx": 1.0
 					} )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"weightx": 0.8
@@ -206,6 +214,7 @@ new FormModel {
 					"background": new java.awt.Color( 213, 73, 69, 255 )
 					"foreground": &Color5 new java.awt.Color( 233, 228, 227, 255 )
 					"font": &SwingDerivedFont2 new com.jformdesigner.model.SwingDerivedFont( null, 1, 2, false )
+					addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "cancelButtonMouseClicked", true ) )
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "confirmButton"
@@ -214,6 +223,7 @@ new FormModel {
 					"background": new java.awt.Color( 85, 161, 90, 255 )
 					"foreground": #Color5
 					"font": #SwingDerivedFont2
+					addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "confirmButtonMouseClicked", true ) )
 				} )
 			}, new FormLayoutConstraints( class java.lang.String ) {
 				"value": "South"

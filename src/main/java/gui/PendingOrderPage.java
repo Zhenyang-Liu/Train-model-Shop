@@ -5,6 +5,7 @@
 package gui;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -15,6 +16,30 @@ import javax.swing.border.*;
 public class PendingOrderPage extends JFrame {
     public PendingOrderPage() {
         initComponents();
+    }
+
+    private void confirmButtonMouseClicked(MouseEvent e) {
+        // TODO add your code here
+    }
+
+    private void cancelButtonMouseClicked(MouseEvent e) {
+        // TODO add your code here
+    }
+
+    private void addressAddButtonMouseClicked(MouseEvent e) {
+        // TODO add your code here
+    }
+
+    private void addressEditButtonMouseClicked(MouseEvent e) {
+        // TODO add your code here
+    }
+
+    private void paymentAddButtonMouseClicked(MouseEvent e) {
+        // TODO add your code here
+    }
+
+    private void paymentEditButtonMouseClicked(MouseEvent e) {
+        // TODO add your code here
     }
 
     private void initComponents() {
@@ -99,17 +124,29 @@ public class PendingOrderPage extends JFrame {
                         addressAddButton.setForeground(new Color(0xe9e4e3));
                         addressAddButton.setBackground(new Color(0x55a15a));
                         addressAddButton.setFont(addressAddButton.getFont().deriveFont(addressAddButton.getFont().getStyle() & ~Font.BOLD));
+                        addressAddButton.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mouseClicked(MouseEvent e) {
+                                addressAddButtonMouseClicked(e);
+                            }
+                        });
                         addressEditPanel.add(addressAddButton);
 
                         //---- addressEditButton ----
                         addressEditButton.setText("Edit");
                         addressEditButton.setBackground(new Color(0x00a5f3));
                         addressEditButton.setForeground(new Color(0xe9e4e3));
+                        addressEditButton.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mouseClicked(MouseEvent e) {
+                                addressEditButtonMouseClicked(e);
+                            }
+                        });
                         addressEditPanel.add(addressEditButton);
                     }
                     addressPanel.add(addressEditPanel);
                 }
-                customerInfoPanel.add(addressPanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                customerInfoPanel.add(addressPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
                     GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
                     new Insets(0, 0, 5, 0), 0, 0));
 
@@ -137,12 +174,24 @@ public class PendingOrderPage extends JFrame {
                         paymentAddButton.setForeground(new Color(0xe9e4e3));
                         paymentAddButton.setBackground(new Color(0x55a15a));
                         paymentAddButton.setFont(paymentAddButton.getFont().deriveFont(paymentAddButton.getFont().getStyle() & ~Font.BOLD));
+                        paymentAddButton.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mouseClicked(MouseEvent e) {
+                                paymentAddButtonMouseClicked(e);
+                            }
+                        });
                         paymentEditPanel.add(paymentAddButton);
 
                         //---- paymentEditButton ----
                         paymentEditButton.setText("Edit");
                         paymentEditButton.setBackground(new Color(0x00a5f3));
                         paymentEditButton.setForeground(new Color(0xe9e4e3));
+                        paymentEditButton.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mouseClicked(MouseEvent e) {
+                                paymentEditButtonMouseClicked(e);
+                            }
+                        });
                         paymentEditPanel.add(paymentEditButton);
                     }
                     paymentPnel.add(paymentEditPanel);
@@ -241,6 +290,12 @@ public class PendingOrderPage extends JFrame {
             cancelButton.setBackground(new Color(0xd54945));
             cancelButton.setForeground(new Color(0xe9e4e3));
             cancelButton.setFont(cancelButton.getFont().deriveFont(cancelButton.getFont().getStyle() | Font.BOLD, cancelButton.getFont().getSize() + 2f));
+            cancelButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    cancelButtonMouseClicked(e);
+                }
+            });
             pendingOrderButtonPanel.add(cancelButton);
 
             //---- confirmButton ----
@@ -249,6 +304,12 @@ public class PendingOrderPage extends JFrame {
             confirmButton.setBackground(new Color(0x55a15a));
             confirmButton.setForeground(new Color(0xe9e4e3));
             confirmButton.setFont(confirmButton.getFont().deriveFont(confirmButton.getFont().getStyle() | Font.BOLD, confirmButton.getFont().getSize() + 2f));
+            confirmButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    confirmButtonMouseClicked(e);
+                }
+            });
             pendingOrderButtonPanel.add(confirmButton);
         }
         contentPane.add(pendingOrderButtonPanel, BorderLayout.SOUTH);
