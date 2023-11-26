@@ -1,5 +1,6 @@
 package service;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import model.Order;
@@ -33,6 +34,20 @@ public class OrderService {
         } catch (DatabaseException e) {
             ExceptionHandler.printErrorMessage(e);
             return false;
+        }
+    }
+
+    public static ArrayList<Order> getAllOrders() {
+        try{
+            if (!permission.hasPermission("MANAGE_ORDERS")){
+                throw new AuthorizationException("Access denied. Only Staff can manage orders.");
+            }
+            ArrayList<Order> orders = OrderDAO.findAllOrder();
+
+            return orders;
+        } catch (DatabaseException e) {
+            ExceptionHandler.printErrorMessage(e);
+            return null;
         }
     }
 }

@@ -29,8 +29,8 @@ public class Test {
 
     private static void performDatabaseOperations() {
         try (Connection connection = DatabaseConnectionHandler.getConnection()) {            
-            Brand brand = new Brand("Bachmann", "UK");
-            brand.setBrandID(1);
+            // Brand brand = new Brand("Bachmann", "UK");
+            // brand.setBrandID(1);
             
             // // Test ProductDAO 
             // Product product = new Product(brand, "Test Insert", "T000", 8.8, "??", 0);
@@ -112,11 +112,11 @@ public class Test {
             // RollingStockDAO.deleteRollingStock(productID1);
             // RollingStockDAO.deleteRollingStock(productID2);
 
-            // //Test BoxedSetDAO
-            // Product product = new Product(brand, "Test BoxedSet Insert1", "M022", 900.0, "A simple test case", 5);
-            // Product product1 = new Product(brand, "BoxedSet item1", "S874", 89.8, "A simple test case", 5);
-            // Product product2 = new Product(brand, "BoxedSet item2", "L584", 114.5, "A simple test case", 6);
-            // Product product3 = new Product(brand, "BoxedSet item3", "C5444", 114.5, "A simple test case", 6);
+            //Test BoxedSetDAO
+            // Product product = new Product("Bachmann", "Test BoxedSet Insert1", "M022", 900.0, "A simple test case", 5);
+            // Product product1 = new Product("Bachmann", "BoxedSet item1", "S874", 89.8, "A simple test case", 5);
+            // Product product2 = new Product("Bachmann", "BoxedSet item2", "L584", 114.5, "A simple test case", 6);
+            // Product product3 = new Product("Bachmann", "BoxedSet item3", "C5444", 114.5, "A simple test case", 6);
             // int[] era1 = {1,3};
             // int[] era2 = {2,3};
 
@@ -144,7 +144,7 @@ public class Test {
             // BoxedSetDAO.findAllBoxedSet();
             // BoxedSetDAO.findBoxedSetByType(BoxedType.TRACKPACK);
             // int id = ProductDAO.findIDByName("Test BoxedSet Insert1");
-            // System.out.println(BoxedSetDAO.findBoxedSetByID(id).getBrand().getBrandName());
+            // System.out.println(BoxedSetDAO.findBoxedSetByID(id).getBrand());
 
             // BoxedSetDAO.deleteBoxedSet(id);
             // RollingStockDAO.deleteRollingStock(roID);

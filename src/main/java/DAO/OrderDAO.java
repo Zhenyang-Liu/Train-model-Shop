@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -154,5 +155,34 @@ public class OrderDAO {
             throw new DatabaseException(e.getMessage(),e);
         }
         return itemList;
+    }
+
+    public static ArrayList<Order> findAllOrder() throws DatabaseException {
+        String selectSQL = "SELECT * FROM Orders;";
+        ArrayList<Order> orderList = new ArrayList<>();
+    
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement checkStatement = connection.prepareStatement(selectSQL);
+            ResultSet resultSet = checkStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int orderID = resultSet.getInt("order_id");
+                int userID = resultSet.getInt("user_id");
+                int addressID = resultSet.getInt("delivery_address_id");
+                Timestamp createTime = resultSet.getTimestamp("create_time");
+                Timestamp updateTime = resultSet.getTimestamp("update_time");
+                double total_cost = resultSet.getDouble("total_cost");
+                String status = resultSet.getString("status");
+                Map<Product,Integer> itemList = findOrderItems(orderID);
+                Order order = new Order(orderID, userID, addressID, createTime, updateTime, total_cost, status,itemList);
+
+                orderList.add(order);
+            }
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed", e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(), e);
+        }
+        return orderList;
     }
 }
