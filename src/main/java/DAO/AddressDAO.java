@@ -213,4 +213,25 @@ public class AddressDAO {
         return address;
     }
 
+    public static int findAddressIDByUser(int userID) throws DatabaseException {
+        String selectSQL = "SELECT address_id FROM User_Address WHERE user_id = ?;";
+        int addressID = 0;
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+
+            preparedStatement.setInt(1, userID);
+            
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                addressID = resultSet.getInt("address_id");
+            }
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(),e);
+        }
+        return addressID;
+    }
+
 }

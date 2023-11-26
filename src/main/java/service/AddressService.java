@@ -110,4 +110,17 @@ public class AddressService {
         }
     }
 
+    public static Address getAddressIDByUser(int userID) {
+        try {
+            if (!permission.hasPermission(userID, "EDIT_OWN_ADDRESS")){
+                throw new AuthorizationException("Access denied. Users can only access their own address.");
+            }
+            int addressID = AddressDAO.findAddressIDByUser(userID);
+            return AddressDAO.findByAddressID(addressID);
+        } catch (DatabaseException e) {
+            ExceptionHandler.printErrorMessage(e);
+            return null;
+        }
+    }
+
 }
