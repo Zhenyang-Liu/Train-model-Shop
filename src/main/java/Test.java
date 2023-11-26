@@ -1,5 +1,4 @@
 import model.BoxedSet;
-import model.Brand;
 import model.Controller;
 import model.Gauge;
 import model.Locomotive;

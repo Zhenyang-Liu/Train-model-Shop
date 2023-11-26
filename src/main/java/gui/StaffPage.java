@@ -5,17 +5,14 @@ import javax.swing.*;
 import DAO.BoxedSetDAO;
 import DAO.ControllerDAO;
 import DAO.LocomotiveDAO;
-import DAO.ProductDAO;
 import DAO.RollingStockDAO;
 import DAO.TrackDAO;
 import DAO.UserDAO;
-import exception.DatabaseException;
 import helper.UserSession;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import model.*;
@@ -211,38 +208,15 @@ public class StaffPage extends JFrame {
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
-
-        String[] gaugeTypes = {"OO", "TT", "N"};
-        JComboBox<String> gaugeTypeComboBox = new JComboBox<>(gaugeTypes);
-
-        Map<String, String> tooltips = new HashMap<>();
-        tooltips.put("OO", "1/76th scale");
-        tooltips.put("TT", "1/120th scale");
-        tooltips.put("N", "1/148th scale");
-        gaugeTypeComboBox.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                JComponent comp = (JComponent) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-                // Set the tooltip based on the selected option
-                String tooltipText = tooltips.get(value);
-                comp.setToolTipText(tooltipText);
-
-                return comp;
-            }
-        });
-
-        String[] dccTypes = {"Analogue", "Ready", "Fitted", "Sound"};
-        JComboBox<String> dccTypeComboBox = new JComboBox<>(dccTypes);
-
-        String[] digitalTypes = {"Digital", "Analogue"};
-        JComboBox<String> digitalTypeComboBox = new JComboBox<>(digitalTypes);
-
-        String[] compartmentTypes = {"Wagon", "Carriage"};
-        JComboBox<String> compartmentTypeComboBox = new JComboBox<>(compartmentTypes);
-
-        additionalPanel.add(new JLabel("Product Type: "+productType), gbc);
-
+    
+        // 在这里声明组件
+        JComboBox<String> gaugeTypeComboBox = new JComboBox<>(new String[]{"OO", "TT", "N"});
+        JComboBox<String> dccTypeComboBox = new JComboBox<>(new String[]{"Analogue", "Ready", "Fitted", "Sound"});
+        JComboBox<String> digitalTypeComboBox = new JComboBox<>(new String[]{"Digital", "Analogue"});
+        JComboBox<String> compartmentTypeComboBox = new JComboBox<>(new String[]{"Wagon", "Carriage"});
+    
+        additionalPanel.add(new JLabel("Product Type: " + productType), gbc);
+    
         switch (productType) {
             case "Track":
                 additionalPanel.add(new JLabel("Gauge:"), gbc);
@@ -251,6 +225,7 @@ public class StaffPage extends JFrame {
             case "Controller":
                 additionalPanel.add(new JLabel("Digital Type: "), gbc);
                 additionalPanel.add(digitalTypeComboBox, gbc);
+                break;
             case "Locomotive":
                 additionalPanel.add(new JLabel("Gauge:"), gbc);
                 additionalPanel.add(gaugeTypeComboBox, gbc);
@@ -264,8 +239,10 @@ public class StaffPage extends JFrame {
                 additionalPanel.add(compartmentTypeComboBox, gbc);
                 break;
             case "Train Set":
+                // 添加特定于 Train Set 的组件
                 break;
             case "Track Pack":
+                // 添加特定于 Track Pack 的组件
                 break;
         }
     
@@ -273,40 +250,40 @@ public class StaffPage extends JFrame {
         JButton finishButton = new JButton("Submit");
         finishButton.addActionListener(e -> {
             try{
-            switch (productType) {
-                case "Track":
-                    String selectedGauge = gaugeTypeComboBox.getSelectedItem().toString();
-                    Track track = new Track(product, selectedGauge);
-                    TrackDAO.insertTrack(track);
-                    break;
-                case "Controller":
-                    boolean selectedDigitalType = digitalTypeComboBox.getSelectedItem().equals("Digital");
-                    Controller controller = new Controller(product, selectedDigitalType);
-                    ControllerDAO.insertController(controller);
-                    break;
-                case "Locomotive":
-                    String selectedDccType = dccTypeComboBox.getSelectedItem().toString();
-                    String selectedGaugeForLoco = gaugeTypeComboBox.getSelectedItem().toString();
-                    int[] era = new int[]{1,3};
-                    Locomotive locomotive = new Locomotive(product, selectedGaugeForLoco,selectedDccType,era);
-                    LocomotiveDAO.insertLocomotive(locomotive);
-                    break;
-                case "Rolling Stock":
-                    String selectedCompartmentType = compartmentTypeComboBox.getSelectedItem().toString();
-                    String selectedGaugeForRoll = gaugeTypeComboBox.getSelectedItem().toString();
-                    int[] era1 = new int[]{1,3};
-                    RollingStock rollingStock = new RollingStock(product,selectedCompartmentType,selectedGaugeForRoll,era1);
-                    RollingStockDAO.insertRollingStock(rollingStock);
-                    break;
-                case "Train Set":
-                    BoxedSet trainSet = new BoxedSet(product, productType);
-                    BoxedSetDAO.insertBoxedSet(trainSet);
-                    break;
-                case "Track Pack":
-                    BoxedSet trackPack = new BoxedSet(product, productType);
-                    BoxedSetDAO.insertBoxedSet(trackPack);
-                    break;
-            }
+                switch (productType) {
+                    case "Track":
+                        String selectedGauge = gaugeTypeComboBox.getSelectedItem().toString();
+                        Track track = new Track(product, selectedGauge);
+                        TrackDAO.insertTrack(track);
+                        break;
+                    case "Controller":
+                        boolean selectedDigitalType = digitalTypeComboBox.getSelectedItem().equals("Digital");
+                        Controller controller = new Controller(product, selectedDigitalType);
+                        ControllerDAO.insertController(controller);
+                        break;
+                    case "Locomotive":
+                        String selectedDccType = dccTypeComboBox.getSelectedItem().toString();
+                        String selectedGaugeForLoco = gaugeTypeComboBox.getSelectedItem().toString();
+                        int[] era = new int[]{1,3}; // TODO: era selection is unfinished
+                        Locomotive locomotive = new Locomotive(product, selectedGaugeForLoco,selectedDccType,era);
+                        LocomotiveDAO.insertLocomotive(locomotive);
+                        break;
+                    case "Rolling Stock":
+                        String selectedCompartmentType = compartmentTypeComboBox.getSelectedItem().toString();
+                        String selectedGaugeForRoll = gaugeTypeComboBox.getSelectedItem().toString();
+                        int[] era1 = new int[]{1,3};// TODO: era selection is unfinished
+                        RollingStock rollingStock = new RollingStock(product,selectedCompartmentType,selectedGaugeForRoll,era1);
+                        RollingStockDAO.insertRollingStock(rollingStock);
+                        break;
+                    case "Train Set":
+                        BoxedSet trainSet = new BoxedSet(product, productType);
+                        BoxedSetDAO.insertBoxedSet(trainSet);
+                        break;
+                    case "Track Pack":
+                        BoxedSet trackPack = new BoxedSet(product, productType);
+                        BoxedSetDAO.insertBoxedSet(trackPack);
+                        break;
+                }
 
             additionalPanel.getTopLevelAncestor().setVisible(false);
             } catch (Exception ex) {

@@ -384,4 +384,23 @@ public class ProductDAO {
         }
         return false;
     }
+
+    public static ArrayList<String> findAllBrand() {
+        String selectSQL = "SELECT DISTINCT brand_name FROM Product;";
+        ArrayList<String> brandList = new ArrayList<>();
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    brandList.add(resultSet.getString("brand_name"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+        return brandList;
+    }
 }

@@ -4,7 +4,6 @@
 
 package gui;
 
-import DAO.BrandDAO;
 import DAO.ProductDAO;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.jgoodies.forms.factories.DefaultComponentFactory;
@@ -144,7 +143,7 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     private void populateBrandFilters(){
-        ArrayList<String> toAdd = BrandDAO.findAllBrand();
+        ArrayList<String> toAdd = ProductDAO.findAllBrand();
         filterBox4.addItem(f.new BrandFilter(null, "All"));
         for(String b: toAdd)
             filterBox4.addItem(f.new BrandFilter(b));
