@@ -23,13 +23,10 @@ import DAO.UserDAO;
  * @author LIU ZHENYANG
  */
 
-/**
- * TODO: ADD ERRORS JULIAN PLEASE ADD ERRORS PLEASE NOTHING WORKS WITHOUT ERRORS
- * TODO: ERROR MESSAGES ARE EVERYTHING HOW WILL OUR POOR USERS KNOW THEY ARE STUPID WITHOUT BEING TOLD
- */
 public class LoginPage extends JFrame {
     public LoginPage() {
         initComponents();
+        createUIComponents();
     }
 
     private ReloadListener loginSuccessListener;
@@ -49,14 +46,7 @@ public class LoginPage extends JFrame {
         this.dispose();
     }
 
-    private void LoginButtonMouseClicked(MouseEvent e) {
-        // TODO add your code here
-        LoginButtonMouseClicked(LoginTextField_email.getText(), new String(LoginPasswordField.getPassword()));
-    }
-
-    private boolean LoginButtonMouseClicked(String email, String password) {
-        // Get user
-
+    private String LoginButtonMouseClicked(String email, String password) {
         // Try to get and check login details
         try {
             User user = UserDAO.findUserByEmail(email);
@@ -75,7 +65,7 @@ public class LoginPage extends JFrame {
 
                     // Return true as everything went successful
                     backButtonMouseClicked();
-                    return true;
+                    return "OK";
                 }
             }
 
@@ -83,12 +73,21 @@ public class LoginPage extends JFrame {
             e.printStackTrace();
         }
 
-        // Assume something went wrong, return false
-        return false;
+        // Assume something went wrong, return default error message
+        // for security we don't want to say if the password or email was wrong
+        return "Email or Password was incorrect";
     }
 
     private void createUIComponents() {
-        // TODO: add custom component creation code here
+        //---- errorLabel ----
+        errorLabel = new JLabel();
+        errorLabel.setText("");
+        errorLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+        errorLabel.setFont(errorLabel.getFont().deriveFont(errorLabel.getFont().getSize() + 1f));
+        errorLabel.setIconTextGap(6);
+        errorLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        errorLabel.setForeground(new Color(0xb13437));
+        LoginTitlePanel.add(errorLabel);
     }
 
     private void initComponents() {
@@ -203,7 +202,10 @@ public class LoginPage extends JFrame {
                 LoginButton.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        LoginButtonMouseClicked(e);
+                        String error = LoginButtonMouseClicked(LoginTextField_email.getText(), new String(LoginPasswordField.getPassword()));
+                        if (!error.equals("OK")) {
+                            errorLabel.setText(error);
+                        }
                     }
                 });
                 LoginButtonBar.add(LoginButton, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
@@ -232,5 +234,6 @@ public class LoginPage extends JFrame {
     private JPanel LoginButtonBar;
     private JButton button_register;
     private JButton LoginButton;
+    private JLabel errorLabel;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }
