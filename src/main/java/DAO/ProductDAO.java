@@ -98,6 +98,24 @@ public class ProductDAO {
         }
     }
 
+    public static void updateStock(int productID, int quantity) throws DatabaseException {
+        String updateSQL = "UPDATE Product SET stock_quantity = ? WHERE product_id = ?;"; 
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
+            // Set the parameters for the product
+            preparedStatement.setInt(1, quantity);
+            preparedStatement.setInt(2, productID);
+
+            preparedStatement.executeUpdate();
+            
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(),e);
+        }
+    }
+
     /**
      * Deletes a product from the database by its ID.
      *

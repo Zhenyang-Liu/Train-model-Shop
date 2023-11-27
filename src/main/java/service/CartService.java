@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import DAO.BoxedSetDAO;
 import DAO.CartDAO;
@@ -239,6 +242,7 @@ public class CartService {
             
             Map<Product, Integer> itemList = new HashMap<>();
             Map<Product, Integer> checkList = new HashMap<>();
+            Set<Integer> boxedSetList = new HashSet<>();
 
             for (CartItem item : cart.getCartItems()) {
                 String itemType = item.getItem().getProductType();
@@ -246,6 +250,7 @@ public class CartService {
                     BoxedSet set = BoxedSetDAO.findBoxedSetByID(item.getItem().getProductID());
                     for (Map.Entry<Product,Integer> setItem : set.getContain().entrySet()){
                         addProductToMap(checkList, setItem.getKey(), setItem.getValue()*item.getQuantity());
+                        boxedSetList.add(setItem.getKey().getProductID());
                     }
                 } else {
                     addProductToMap(checkList, item.getItem(), item.getQuantity());
@@ -270,7 +275,11 @@ public class CartService {
                 }
             }
 
-            // TODO: Missing BoxedSet STock update
+            Iterator<Integer> iterator = boxedSetList.iterator();
+            while (iterator.hasNext()) {
+                int setID = iterator.next();
+                ProductService.updateBoxedSetQuantity(setID);
+            }
             
             // Address ID is default to -1. This should be setted in confirmOrder(); 
             Order order = new Order(holderID, -1, itemList, false);

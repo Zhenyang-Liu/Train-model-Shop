@@ -12,6 +12,7 @@ import model.RollingStock.RollingStockType;
 import service.AddressService;
 import service.BankDetailService;
 import service.CartService;
+import service.ProductService;
 import model.User;
 import model.BoxedSet;
 
@@ -59,7 +60,8 @@ public class Test {
         // CartService.addToCart(5, 3, 2);
         // CartService.addToCart(5, 7, 2);
             
-        System.out.println(CartService.checkoutCart(5));
+        // System.out.println(CartService.checkoutCart(5));
+        ProductService.updateBoxedSetQuantity(5);
 
     }
 

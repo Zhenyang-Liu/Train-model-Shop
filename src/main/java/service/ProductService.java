@@ -1,9 +1,13 @@
 package service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+import DAO.BoxedSetDAO;
 import DAO.ProductDAO;
 import exception.*;
+import model.BoxedSet;
 import model.Product;
 
 public class ProductService {
@@ -68,6 +72,26 @@ public class ProductService {
         }
 
         return null;
+    }
+
+    public static void updateBoxedSetQuantity(int boxID){
+        try {
+            BoxedSet set = BoxedSetDAO.findBoxedSetByID(boxID);
+            int minQuantity = Integer.MAX_VALUE;
+            for (Map.Entry<Product,Integer> entry : set.getContain().entrySet()){
+                int quantity = entry.getKey().getStockQuantity();
+                int maxQuantity = quantity / entry.getValue();
+                if (maxQuantity < minQuantity){
+                    minQuantity = maxQuantity;
+                }
+            }
+            
+            if (minQuantity != Integer.MAX_VALUE){
+                ProductDAO.updateStock(boxID, minQuantity);
+            } 
+        } catch (DatabaseException e) {
+            e.printStackTrace();
+        }
     }
 
 }
