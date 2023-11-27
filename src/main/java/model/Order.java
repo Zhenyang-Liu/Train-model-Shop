@@ -14,6 +14,7 @@ public class Order {
     private final double totalCost;
     private OrderStatus status;
     private final Map<Product,Integer> itemList;
+    private boolean validBankDetail;
 
     public interface OrderState {
         public void nextState(Order order);
@@ -60,7 +61,7 @@ public class Order {
         }
     }
     
-    public Order(int orderID, int userID, int addressID, Timestamp createTime, Timestamp updateTime, double totalCost, String status, Map<Product, Integer> itemList) {
+    public Order(int orderID, int userID, int addressID, Timestamp createTime, Timestamp updateTime, double totalCost, String status, Map<Product, Integer> itemList, boolean validBankDetail) {
         this.orderID = orderID;
         this.userID = userID;
         this.addressID = addressID;
@@ -69,9 +70,10 @@ public class Order {
         this.totalCost = calculateTotalCost(itemList);
         this.status = OrderStatus.fromName(status);
         this.itemList = itemList;
+        this.validBankDetail = validBankDetail;
     }
 
-    public Order(int userID, int addressID, Map<Product, Integer> itemList) {
+    public Order(int userID, int addressID, Map<Product, Integer> itemList, boolean validBankDetail) {
         this.userID = userID;
         this.addressID = addressID;
         this.createTime = Timestamp.from(Instant.now());
@@ -79,6 +81,7 @@ public class Order {
         this.totalCost = calculateTotalCost(itemList);
         this.status = OrderStatus.PENDING;
         this.itemList = itemList;
+        this.validBankDetail = validBankDetail;
     }
 
     public int getOrderID(){
@@ -167,6 +170,14 @@ public class Order {
 
     public Map<Product,Integer> getOrderItems() {
         return itemList;
+    }
+
+    public boolean getBankDetailState(){
+        return validBankDetail;
+    }
+
+    public void setBankDetailState(boolean validBankDetail) {
+        this.validBankDetail = validBankDetail;
     }
 
 }

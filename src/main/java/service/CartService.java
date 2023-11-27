@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import DAO.BoxedSetDAO;
 import DAO.CartDAO;
+import DAO.OrderDAO;
 import DAO.ProductDAO;
 import exception.*;
+import model.BoxedSet;
 import model.Cart;
 import model.CartItem;
 import model.Order;
@@ -211,17 +214,20 @@ public class CartService {
     }
 
     /**
-     * Proceeds to checkout for a specified cart.
+     * Processes the checkout of a cart and creates an order.
      *
-     * This method checks if the current user has permission to access their own cart and then creates an order based on the cart items.
-     * Returns the created Order object, or null if a DatabaseException occurs or the cart is empty or non-existent.
+     * This method checks if the user has permission to edit their own cart and validates the cart's existence.
+     * It then checks the stock for each product in the cart and creates an order if the stock is sufficient.
+     * Returns the ID of the created order, or a negative number indicating specific error conditions:
+     * -1 -- Stock issue
+     * -2 -- Create Order issue
+     * -3 -- Other Exception
      *
-     * @param cartID The ID of the cart to checkout.
-     * @return An Order object representing the checked-out cart, or null if an error occurs or the cart is invalid.
+     * @param cartID The ID of the cart to be checked out.
+     * @return The ID of the created order, or a negative number in case of errors.
      */
-    public static Order checkoutCart(int cartID) {
+    public static int checkoutCart(int cartID) {
         try {
-            // TODO: unfinished
             Cart cart = CartDAO.findCartByID(cartID);
             int holderID = cart.getUserID();
             if (!permission.hasPermission(holderID,"EDIT_OWN_CART")){
@@ -231,17 +237,152 @@ public class CartService {
                 throw new DatabaseException("Cart is empty or not exist.");
             }
             
-            Map<Product,Integer> itemList = new HashMap<>();
+            Map<Product, Integer> itemList = new HashMap<>();
+            Map<Product, Integer> checkList = new HashMap<>();
+
             for (CartItem item : cart.getCartItems()) {
+                String itemType = item.getItem().getProductType();
+                if ("Train Set".equals(itemType) || "Track Pack".equals(itemType)) {
+                    BoxedSet set = BoxedSetDAO.findBoxedSetByID(item.getItem().getProductID());
+                    for (Map.Entry<Product,Integer> setItem : set.getContain().entrySet()){
+                        addProductToMap(checkList, setItem.getKey(), setItem.getValue()*item.getQuantity());
+                    }
+                } else {
+                    addProductToMap(checkList, item.getItem(), item.getQuantity());
+                }
                 itemList.put(item.getItem(), item.getQuantity());
             }
+
+            // Check the Stock
+            if (!checkStock(checkList)){
+                return -1; // stock not enough
+            } 
+            
+            Map<Product, Integer> successList = new HashMap<>();
+
+            for (Map.Entry<Product,Integer> entry : checkList.entrySet()){
+                int productID = entry.getKey().getProductID();
+                int quantity = entry.getValue();
+                if (reduceStock(productID, quantity)){
+                    successList.put(entry.getKey(), entry.getValue());
+                } else {
+                    restoreStock(successList);
+                }
+            }
+
+            // TODO: Missing BoxedSet STock update
+            
             // Address ID is default to -1. This should be setted in confirmOrder(); 
-            Order order = new Order(holderID, -1, itemList);
-            return order;
+            Order order = new Order(holderID, -1, itemList, false);
+            int orderID = OrderDAO.insertOrder(order);
+            if (orderID > 0) {
+                for (CartItem item : cart.getCartItems()) {
+                    removeFromCart(item.getItemID());
+                }
+                return orderID;
+            } else {
+                return -2;
+            }
         } catch (DatabaseException e) {
             ExceptionHandler.printErrorMessage(e);
-            return null;
+            return -3;
         }
+    }
+
+    /**
+     * Checks if sufficient stock is available for all products in the cart.
+     *
+     * This method iterates over the provided checkList of products and their quantities,
+     * checking if there is enough stock for each product.
+     *
+     * @param checkList A map of products and their quantities to be checked.
+     * @return true if enough stock is available for all products; false otherwise.
+     */
+    public static boolean checkStock(Map<Product, Integer> checkList){
+        boolean enoughStock = true;
+        try{
+            for(Map.Entry<Product,Integer> entry : checkList.entrySet()){
+                int productID = entry.getKey().getProductID();
+                int quantity = entry.getValue();
+                if (!ProductDAO.checkProductStock(productID, quantity)) {
+                    enoughStock = false;
+                    System.out.println("Item: "+entry.getKey().getProductName());
+                    return false;
+                }
+            }
+        } catch (DatabaseException e) {
+            ExceptionHandler.printErrorMessage(e);
+            return false;
+        }
+        return enoughStock;
+    }
+
+    /**
+     * Reduces the stock quantity for a specified product.
+     *
+     * This method updates the stock quantity for a given product in the database.
+     *
+     * @param productID The ID of the product whose stock is to be reduced.
+     * @param quantity The quantity by which the stock should be reduced.
+     * @return true if the stock reduction is successful; false otherwise.
+     */
+    public static boolean reduceStock(int productID, int quantity) {
+        try {
+            Product product = ProductDAO.findProductByID(productID);
+            product.setStockQuantity(product.getStockQuantity() - quantity);
+            ProductDAO.updateProduct(product);
+            return true;
+        } catch (IllegalArgumentException i) {
+            ExceptionHandler.printErrorMessage(i);
+            return false;
+        } catch (DatabaseException e) {
+            ExceptionHandler.printErrorMessage(e);
+            return false;
+        }
+    }
+
+    /**
+     * Restores the stock for a list of products.
+     *
+     * This method is typically used to revert stock changes in case of an incomplete transaction or error.
+     *
+     * @param successList A map of products and the quantities to be restored.
+     */
+    public static void restoreStock(Map<Product, Integer> successList) {
+        try {
+            for (Map.Entry<Product, Integer> entry : successList.entrySet()){
+                int productID = entry.getKey().getProductID();
+                int quantity = entry.getValue();
+                reduceStock(productID, -quantity);
+            }
+        } catch (IllegalArgumentException i) {
+            ExceptionHandler.printErrorMessage(i);
+        }
+    }
+    
+    /**
+     * Adds a product and its quantity to a map, updating the quantity if the product already exists in the map.
+     *
+     * @param itemList A map of products and their quantities.
+     * @param product The product to be added or updated in the map.
+     * @param quantity The quantity of the product.
+     * @return The updated map with the added or updated product.
+     */
+    private static Map<Product,Integer> addProductToMap(Map<Product,Integer> itemList, Product product, int quantity){
+        boolean isFound = false;
+        for (Map.Entry<Product, Integer> entry : itemList.entrySet()){
+            int productID = entry.getKey().getProductID();
+            if (productID == product.getProductID()){
+                entry.setValue(entry.getValue()+quantity);
+                isFound = true;
+                break;
+            }
+        }
+
+        if (!isFound){
+            itemList.put(product, quantity);
+        }
+        return itemList;
     }
 
     /**

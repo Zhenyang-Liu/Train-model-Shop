@@ -151,10 +151,6 @@ public class ProductDAO {
                 product.setRetailPrice(resultSet.getFloat("retail_price"));
                 product.setStockQuantity(resultSet.getInt("stock_quantity"));
             }
-            // //Print for test
-            // System.out.println("<=================== GET SPECIFIC PRODUCTS By ID====================>");
-            // System.out.println(product.toString());
-            // System.out.println("<======================================================>");
             return product;
         } catch (SQLTimeoutException e){
             throw new ConnectionException("Database connect failed",e);
@@ -188,12 +184,6 @@ public class ProductDAO {
                 product.setRetailPrice(resultSet.getFloat("retail_price"));
                 product.setStockQuantity(resultSet.getInt("stock_quantity"));
             }
-
-            // Print for test
-            // System.out.println("<=================== GET SPECIFIC PRODUCTS By Code====================>");
-            // System.out.println(product.toString());
-            // System.out.println("<======================================================>");
-
             return product;
             
         } catch (SQLTimeoutException e) {
@@ -239,7 +229,7 @@ public class ProductDAO {
             sqlString += " ORDER BY ? ?";
         return sqlString;
     }
-
+ 
     /**
      * Constructs an SQL PreparedStatement based on all the filters given and the search query used by the user
      *
@@ -313,15 +303,7 @@ public class ProductDAO {
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             
-            return arrayFromResultSet(resultSet);
-            
-            //  //Print for test
-            //  System.out.println("<=================== GET ALL PRODUCTS ====================>");
-            //  for (Product obj : productList) {
-            //      System.out.println(obj.toString());
-            //  }
-            //  System.out.println("<======================================================>");
-            
+            return arrayFromResultSet(resultSet);       
         } catch (SQLTimeoutException e) {
             throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
@@ -402,5 +384,26 @@ public class ProductDAO {
             return new ArrayList<>();
         }
         return brandList;
+    }  
+
+    public static boolean checkProductStock (int productID, int quantity) throws DatabaseException {
+        String selectSQL = "SELECT stock_quantity FROM Product WHERE product_id = ?;";
+        int stock = -1;
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+            preparedStatement.setInt(1, productID);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    stock = resultSet.getInt("stock_quantity");
+                }
+            }
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(),e);
+        }
+        return stock >= quantity;
     }
+
 }
