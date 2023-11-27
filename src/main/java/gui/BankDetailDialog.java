@@ -2,6 +2,7 @@ package gui;
 
 import service.BankDetailService;
 import helper.UserSession;
+import model.BankDetail;
 
 import javax.swing.*;
 import javax.swing.text.DocumentFilter;
@@ -16,14 +17,22 @@ public class BankDetailDialog extends JDialog {
     private JTextField expiryDateField;
     private JTextField expiryYearField;
     private JTextField securityCodeField;
-    private JButton confirmButton;
+    private JButton actionButton;
     private JButton cancelButton;
 
-    private boolean inputValid = false;
+    private BankDetail bankDetail;
+    private boolean isEditMode;
+    private boolean isInputValid;
 
-    public BankDetailDialog(Frame parent) {
-        super(parent, "Add Bank Detail", true);
+    public BankDetailDialog(Frame parent, BankDetail bankDetail, boolean isEditMode) {
+        super(parent, isEditMode ? "Edit Bank Detail" : "Add Bank Detail", true);
+        this.bankDetail = bankDetail;
+        this.isEditMode = isEditMode;
+        this.isInputValid = false;
         initializeComponents();
+        if (isEditMode) {
+            populateFields();
+        }
         setLocationRelativeTo(parent);
     }
     
@@ -56,14 +65,14 @@ public class BankDetailDialog extends JDialog {
         ((PlainDocument) securityCodeField.getDocument()).setDocumentFilter(new NumericDocumentFilter());
         add(securityCodeField);
     
-        confirmButton = new JButton("Confirm");
-        confirmButton.addActionListener(e -> onConfirm());
-        add(confirmButton);
-    
+        actionButton = new JButton(isEditMode ? "Update" : "Add");
+        actionButton.addActionListener(isEditMode ? e -> onUpdate() : e -> onAdd());
+        add(actionButton);
+
         cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(e -> dispose());
         add(cancelButton);
-    
+
         pack();
     }
     
@@ -84,7 +93,7 @@ public class BankDetailDialog extends JDialog {
     }
     
 
-    private void onConfirm() {
+    private void onAdd() {
         String message = BankDetailService.checkBankDetail(getCardHolder(), getCardNumber(), getExpiryDate(), getSecurityCode());
         
         if (!"Bank details are valid.".equals(message)) {
@@ -92,13 +101,44 @@ public class BankDetailDialog extends JDialog {
         } else {
             int currentUserID = UserSession.getInstance().getCurrentUser().getUserID();
             String insertBankDetail = BankDetailService.addBankDetail(currentUserID, getCardHolder(), getCardNumber(), getExpiryDate(), getSecurityCode());
-            if (insertBankDetail != null) {
-                JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+            if (insertBankDetail != "success") {
+                JOptionPane.showMessageDialog(this, insertBankDetail, "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(this, "Operation was successful.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                inputValid = true;
+                isInputValid = true;
                 dispose();
             }
+        }
+    }
+
+    private void onUpdate() {
+        String message = BankDetailService.checkBankDetail(getCardHolder(), getCardNumber(), getExpiryDate(), getSecurityCode());
+        
+        if (!"Bank details are valid.".equals(message)) {
+            JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            int currentUserID = UserSession.getInstance().getCurrentUser().getUserID();
+            String updateBankDetail = BankDetailService.updateBankDetail(currentUserID, getCardHolder(), getCardNumber(), getExpiryDate(), getSecurityCode());
+            if (updateBankDetail != "success") {
+                JOptionPane.showMessageDialog(this, updateBankDetail, "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                isInputValid = true;
+                dispose();
+            }
+        }
+    }
+
+    private void populateFields() {
+        if (bankDetail != null) {
+            cardHolderField.setText(bankDetail.getCardHolderName());
+            cardNumberField.setText(bankDetail.getCardNumber());
+    
+            String[] expiry = bankDetail.getExpiryDate().split("/");
+            if (expiry.length == 2) {
+                expiryDateField.setText(expiry[0]);
+                expiryYearField.setText(expiry[1]); 
+            }
+    
+            securityCodeField.setText(bankDetail.getSecurityCode());
         }
     }
     
@@ -106,5 +146,5 @@ public class BankDetailDialog extends JDialog {
     public String getCardNumber() { return cardNumberField.getText(); }
     public String getExpiryDate() { return expiryDateField.getText()+"/"+ expiryYearField.getText(); }
     public String getSecurityCode() { return securityCodeField.getText(); }
-    public boolean isInputValid() { return inputValid; }
+    public boolean isInputValid() { return isInputValid; }
 }

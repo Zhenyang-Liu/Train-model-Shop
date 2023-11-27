@@ -10,6 +10,8 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import com.mysql.cj.jdbc.NClob;
+
 import DAO.UserDAO;
 import helper.UserSession;
 import model.BankDetail;
@@ -42,21 +44,26 @@ public class PendingOrderPage extends JFrame {
 
     private void paymentAddButtonMouseClicked(MouseEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        BankDetailDialog bankDetailDialog = new BankDetailDialog(parentFrame);
+        BankDetailDialog bankDetailDialog = new BankDetailDialog(parentFrame,bankDetail,false);
         bankDetailDialog.setVisible(true);
 
         if (bankDetailDialog.isInputValid()) {
             updatePaymentPanel();
         }
     }
-    
 
     private void paymentSelectButtonMouseClicked(MouseEvent e) {
         // TODO add your code here
     }
 
     private void paymentEditButtonMouseClicked(MouseEvent e) {
-        // TODO add your code here
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        BankDetailDialog bankDetailDialog = new BankDetailDialog(parentFrame,bankDetail,true);
+        bankDetailDialog.setVisible(true);
+
+        if (bankDetailDialog.isInputValid()) {
+            updatePaymentPanel();
+        }
     }
 
     private void initComponents() {
@@ -73,7 +80,6 @@ public class PendingOrderPage extends JFrame {
         addressEditButton = new JButton();
         paymentPnel = new JPanel();
         paymentLabel = new JLabel();
-        // paymentTextField = new JTextField();
         paymentEditPanel = new JPanel();
         paymentAddButton = new JButton();
         paymentSelectButton = new JButton();
@@ -89,6 +95,7 @@ public class PendingOrderPage extends JFrame {
         cancelButton = new JButton();
         confirmButton = new JButton();
 
+        bankDetail = new BankDetail();
         //======== this ========
         setPreferredSize(new Dimension(900, 700));
         var contentPane = getContentPane();
@@ -315,7 +322,7 @@ public class PendingOrderPage extends JFrame {
         paymentPnel.add(paymentLabel);
         
         //---- paymentTextField ----
-        BankDetail bankDetail = BankDetailService.findBankDetail();
+        this.bankDetail = BankDetailService.findBankDetail();
         boolean isPaymentExist = false;
         if (bankDetail != null){
             JLabel paymentLabel = new JLabel();
@@ -380,8 +387,8 @@ public class PendingOrderPage extends JFrame {
     }
     // TODO: Test method
     public static void main(String[] args) {
-        // User user = UserDAO.findUserByEmail("manager@manager.com");
-        User user = UserDAO.findUserByEmail("staff@gmail.com");
+        User user = UserDAO.findUserByEmail("manager@manager.com");
+        // User user = UserDAO.findUserByEmail("staff@gmail.com");
         UserSession.getInstance().setCurrentUser(user);
 
         SwingUtilities.invokeLater(() -> {
@@ -416,5 +423,6 @@ public class PendingOrderPage extends JFrame {
     private JPanel pendingOrderButtonPanel;
     private JButton cancelButton;
     private JButton confirmButton;
+    private BankDetail bankDetail;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }

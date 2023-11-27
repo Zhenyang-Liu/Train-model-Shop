@@ -37,9 +37,9 @@ public class Test {
         // System.out.println(bankDetail.getCardNumber());
         // System.out.println(bankDetail.getSecurityCode());
         
-        // String test =  BankDetailService.updateBankDetail(user.getUserID(), "Manager","5309906574719204", "08/25", "888");
+        // String test =  BankDetailService.updateBankDetail(user.getUserID(), "Manager","4518109938765522", "08/25", "888");
         // System.out.println(test);
-        // BankDetail bankDetail = BankDetailService.findBankDetail(user.getUserID());
+        // BankDetail bankDetail = BankDetailService.findBankDetail();
         // System.out.println(bankDetail.getCardNumber());
         // System.out.println(bankDetail.getSecurityCode());
     }

@@ -255,7 +255,7 @@ public class BankDetailService {
         }
 
         // All checks passed
-        return "";
+        return "Bank details are valid.";
     }
 
     /**
