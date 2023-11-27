@@ -88,15 +88,6 @@ public class RegistrationPage extends JFrame {
      * @param passwordValidate inputted password confirm, will be checked against password
      * @return a string for the error message or "OK" if everything is good
      */
-    /**
-     * Checks the inputs to make sure they're valid before adding to database
-     * @param email inputted email
-     * @param forename inputted forename (first name)
-     * @param surname inputted surname (last name)
-     * @param password inputted password
-     * @param passwordValidate inputted password confirm, will be checked against password
-     * @return a string for the error message or "OK" if everything is good
-     */
     private String checkInputs(String email, String forename, String surname, String password, String passwordValidate) {
         // Emails
         Pattern emailPattern = Pattern.compile("^[A-z0-9._%+-]+@+[A-z0-9_%+-]+.[A-z_-]{2,}$");
