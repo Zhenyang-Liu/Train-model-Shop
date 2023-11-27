@@ -10,10 +10,14 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import DAO.OrderDAO;
 import DAO.UserDAO;
+import exception.DatabaseException;
 import helper.UserSession;
 import model.Address;
 import model.BankDetail;
+import model.Order;
+import model.Product;
 import model.User;
 import service.AddressService;
 import service.BankDetailService;
@@ -22,7 +26,8 @@ import service.BankDetailService;
  * @author Zhenyang Liu
  */
 public class PendingOrderPage extends JFrame {
-    public PendingOrderPage() {
+    public PendingOrderPage(Order order) {
+        this.order = order;
         initComponents();
     }
 
@@ -69,7 +74,7 @@ public class PendingOrderPage extends JFrame {
     }
 
     private void paymentSelectButtonMouseClicked(MouseEvent e) {
-        // TODO add your code here
+        
     }
 
     private void paymentEditButtonMouseClicked(MouseEvent e) {
@@ -90,7 +95,6 @@ public class PendingOrderPage extends JFrame {
         customerInfoPanel = new JPanel();
         addressPanel = new JPanel();
         addressLabel = new JLabel();
-        addressTextField = new JTextField();
         addressEditPanel = new JPanel();
         addressSelectButton = new JButton();
         addressAddButton = new JButton();
@@ -181,7 +185,7 @@ public class PendingOrderPage extends JFrame {
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                 new Insets(0, 10, 0, 25), 0, 0));
 
-            //======== pendingOrderScrollPanel ========
+           //======== pendingOrderScrollPanel ========
             {
                 pendingOrderScrollPanel.setPreferredSize(new Dimension(615, 200));
                 pendingOrderScrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -198,56 +202,7 @@ public class PendingOrderPage extends JFrame {
                     ((GridBagLayout)pendingOrderItemsPanel.getLayout()).columnWeights = new double[] {0.0, 1.0E-4};
                     ((GridBagLayout)pendingOrderItemsPanel.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-                    //======== pendingOrderCardPanel ========
-                    {
-                        pendingOrderCardPanel.setBorder(new MatteBorder(3, 3, 3, 3, new Color(0x003762)));
-                        pendingOrderCardPanel.setForeground(new Color(0x003366));
-                        pendingOrderCardPanel.setPreferredSize(new Dimension(600, 120));
-                        pendingOrderCardPanel.setMaximumSize(new Dimension(2147483647, 100));
-                        pendingOrderCardPanel.setLayout(new GridBagLayout());
-                        ((GridBagLayout)pendingOrderCardPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0};
-                        ((GridBagLayout)pendingOrderCardPanel.getLayout()).rowHeights = new int[] {0, 0};
-                        ((GridBagLayout)pendingOrderCardPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
-                        ((GridBagLayout)pendingOrderCardPanel.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
-
-                        //---- itemImage1 ----
-                        itemImage1.setText(bundle.getString("pendingOrderPage.itemImage1.text"));
-                        itemImage1.setIcon(new ImageIcon(getClass().getResource("/images/tgv.jpeg")));
-                        itemImage1.setPreferredSize(new Dimension(150, 120));
-                        itemImage1.setMaximumSize(new Dimension(160, 120));
-                        itemImage1.setMinimumSize(new Dimension(160, 120));
-                        pendingOrderCardPanel.add(itemImage1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-                            new Insets(0, 0, 0, 0), 0, 0));
-
-                        //---- itemName1 ----
-                        itemName1.setText(bundle.getString("pendingOrderPage.itemName1.text"));
-                        itemName1.setHorizontalAlignment(SwingConstants.CENTER);
-                        itemName1.setPreferredSize(new Dimension(200, 17));
-                        itemName1.setFont(itemName1.getFont().deriveFont(itemName1.getFont().getSize() + 2f));
-                        pendingOrderCardPanel.add(itemName1, new GridBagConstraints(1, 0, 1, 1, 0.3, 0.0,
-                            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-                            new Insets(0, 0, 0, 0), 0, 0));
-
-                        //---- itemPrice1 ----
-                        itemPrice1.setText(bundle.getString("pendingOrderPage.itemPrice1.text"));
-                        itemPrice1.setHorizontalAlignment(SwingConstants.CENTER);
-                        itemPrice1.setFont(itemPrice1.getFont().deriveFont(itemPrice1.getFont().getSize() + 4f));
-                        itemPrice1.setPreferredSize(new Dimension(100, 22));
-                        pendingOrderCardPanel.add(itemPrice1, new GridBagConstraints(2, 0, 1, 1, 0.2, 0.0,
-                            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-                            new Insets(0, 0, 0, 0), 0, 0));
-
-                        //---- itemNumLabel1 ----
-                        itemNumLabel1.setText("1");
-                        itemNumLabel1.setHorizontalAlignment(SwingConstants.CENTER);
-                        pendingOrderCardPanel.add(itemNumLabel1, new GridBagConstraints(3, 0, 1, 1, 0.2, 0.0,
-                            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-                            new Insets(0, 0, 0, 0), 0, 0));
-                    }
-                    pendingOrderItemsPanel.add(pendingOrderCardPanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                        GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-                        new Insets(0, 0, 0, 0), 0, 0));
+                    addProductCards();
                 }
                 pendingOrderScrollPanel.setViewportView(pendingOrderItemsPanel);
             }
@@ -402,14 +357,13 @@ public class PendingOrderPage extends JFrame {
             addressAddButton.setBackground(new Color(0x55a15a));
             addressAddButton.setFont(addressAddButton.getFont().deriveFont(addressAddButton.getFont().getStyle() & ~Font.BOLD));
             addressAddButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                addressAddButtonMouseClicked(e);
-            }
-        });
-        addressEditPanel.add(addressAddButton);
-    }
-
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    addressAddButtonMouseClicked(e);
+                }
+            });
+            addressEditPanel.add(addressAddButton);
+        }
         //======== addressEditPanel ========
         if (isAddressExist) {
             //---- addressSelectButton ----
@@ -441,17 +395,77 @@ public class PendingOrderPage extends JFrame {
         addressPanel.revalidate();
         addressPanel.repaint();
     }
+
+    private JPanel createProductCard(Product product, int quantity) {
+        JPanel cardPanel = new JPanel(new GridBagLayout());
+        cardPanel.setBorder(new MatteBorder(3, 3, 3, 3, new Color(0x003762)));
+        cardPanel.setPreferredSize(new Dimension(600, 120));
+    
+        JLabel itemImage = new JLabel();
+        // itemImage.setIcon(new ImageIcon(getClass().getResource("/images/" + product.getImagePath())));
+        itemImage.setText("pendingOrderPage.itemImage1.text");
+        itemImage.setIcon(new ImageIcon(getClass().getResource("/images/tgv.jpeg")));
+        itemImage.setPreferredSize(new Dimension(150, 120));
+        itemImage.setMaximumSize(new Dimension(160, 120));
+        itemImage.setMinimumSize(new Dimension(160, 120));
+        cardPanel.add(itemImage, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+             GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+             new Insets(0, 0, 0, 0), 0, 0));
+    
+        JLabel itemName = new JLabel(product.getProductName());
+        itemName.setHorizontalAlignment(SwingConstants.CENTER);
+        itemName.setPreferredSize(new Dimension(200, 17));
+        itemName.setFont(itemName.getFont().deriveFont(itemName.getFont().getSize() + 2f));
+        cardPanel.add(itemName, new GridBagConstraints(1, 0, 1, 1, 0.3, 0.0,
+            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+            new Insets(0, 0, 0, 0), 0, 0));
+
+
+        JLabel itemPrice = new JLabel(String.format("\u00A3%.2f", product.getRetailPrice()));
+        itemPrice.setHorizontalAlignment(SwingConstants.RIGHT);
+        itemPrice.setFont(itemPrice.getFont().deriveFont(itemPrice.getFont().getSize() + 4f));
+        itemPrice.setPreferredSize(new Dimension(100, 22));
+        cardPanel.add(itemPrice, new GridBagConstraints(2, 0, 1, 1, 0.2, 0.0,
+            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+            new Insets(0, 0, 0, 0), 0, 0));
+    
+        JLabel itemNumLabel = new JLabel(String.valueOf(quantity));
+        itemNumLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        cardPanel.add(itemNumLabel, new GridBagConstraints(3, 0, 1, 1, 0.2, 0.0,
+            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+            new Insets(0, 0, 0, 0), 0, 0));   
+        return cardPanel;
+    }
+
+    private void addProductCards() {
+        Map<Product, Integer> products = order.getOrderItems();
+        pendingOrderItemsPanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTH;
+    
+        int row = 0;
+        for (Map.Entry<Product, Integer> entry : products.entrySet()) {
+            JPanel cardPanel = createProductCard(entry.getKey(), entry.getValue());
+            gbc.gridy = row++;
+            gbc.weighty = row < products.size() ? 0 : 1;
+            pendingOrderItemsPanel.add(cardPanel, gbc);
+        }
+    }
     
     
 
     // TODO: Test method
-    public static void main(String[] args) {
+    public static void main(String[] args) throws DatabaseException {
         // User user = UserDAO.findUserByEmail("manager@manager.com");
-        User user = UserDAO.findUserByEmail("staff@gmail.com");
+        // User user = UserDAO.findUserByEmail("staff@gmail.com");
+        User user = UserDAO.findUserByEmail("testemail@gmail.com");
         UserSession.getInstance().setCurrentUser(user);
+        Order order = OrderDAO.findOrderByID(3);
 
         SwingUtilities.invokeLater(() -> {
-            PendingOrderPage frame = new PendingOrderPage();
+            PendingOrderPage frame = new PendingOrderPage(order);
             frame.setVisible(true);
         });
     }
@@ -462,7 +476,6 @@ public class PendingOrderPage extends JFrame {
     private JPanel customerInfoPanel;
     private JPanel addressPanel;
     private JLabel addressLabel;
-    private JTextField addressTextField;
     private JPanel addressEditPanel;
     private JButton addressSelectButton;
     private JButton addressAddButton;
@@ -487,4 +500,5 @@ public class PendingOrderPage extends JFrame {
 
     private BankDetail bankDetail;
     private Address address;
+    private Order order;
 }

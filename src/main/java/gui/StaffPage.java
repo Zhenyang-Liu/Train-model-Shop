@@ -173,16 +173,19 @@ public class StaffPage extends JFrame {
         // Event listener for the "Next" button
         nextButton.addActionListener(e -> {
             String productName = productNameField.getText();
-            String productCode = productCodeField.getText();
+            String productCode = productCodeField.getText().toUpperCase();
             String brandName = brandNameField.getText();
             String retailPrice = retailPriceField.getText();
             String stockQuantity = stockQuantityField.getText();
             String description = descriptionField.getText();
+            char productTypeChar = productCode.charAt(0);
 
             String validationResult = ProductService.validateProductInput(productName, productCode, brandName, retailPrice, stockQuantity);
             if (validationResult != null) {
                 errorLabel.setText(validationResult); 
                 errorLabel.setVisible(true);
+            } else if (productTypeChar == 'T' || productTypeChar == 'M'){
+                // TODO: call the Add Boxset Panel
             } else {
                 errorLabel.setVisible(false);
                 Product product = new Product(brandName, productName, productCode, Double.parseDouble(retailPrice), description, Integer.parseInt(stockQuantityField.getText()));
@@ -237,10 +240,6 @@ public class StaffPage extends JFrame {
                 additionalPanel.add(new JLabel("Compartment Type: "), gbc);
                 additionalPanel.add(compartmentTypeComboBox, gbc);
                 break;
-            case "Train Set":
-                break;
-            case "Track Pack":
-                break;
         }
     
         // Add a "Submit" button
@@ -271,14 +270,6 @@ public class StaffPage extends JFrame {
                         int[] era1 = new int[]{1,3};// TODO: era selection is unfinished
                         RollingStock rollingStock = new RollingStock(product,selectedCompartmentType,selectedGaugeForRoll,era1);
                         RollingStockDAO.insertRollingStock(rollingStock);
-                        break;
-                    case "Train Set":
-                        BoxedSet trainSet = new BoxedSet(product, productType);
-                        BoxedSetDAO.insertBoxedSet(trainSet);
-                        break;
-                    case "Track Pack":
-                        BoxedSet trackPack = new BoxedSet(product, productType);
-                        BoxedSetDAO.insertBoxedSet(trackPack);
                         break;
                 }
 
@@ -318,7 +309,6 @@ public class StaffPage extends JFrame {
     
         return card;
     }
-    
 
     private void showProductDetails(Product product) {
         // TODO: Unfinished
