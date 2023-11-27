@@ -11,11 +11,10 @@ import model.BoxedSet;
 import model.Product;
 
 public class ProductService {
-    private static PermissionService permission = new PermissionService();
 
     public static ArrayList<Product> getAllProducts() {
         try{
-            if (!permission.hasPermission("MANAGE_PRODUCTS")){
+            if (!PermissionService.hasPermission("MANAGE_PRODUCTS")){
                 throw new AuthorizationException("Access denied. Only Staff can manage Products.");
             }
             ArrayList<Product> products = ProductDAO.getAllProduct();

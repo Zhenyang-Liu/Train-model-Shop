@@ -10,12 +10,11 @@ import DAO.ProductDAO;
 import exception.*;
 
 public class OrderService {
-    private static PermissionService permission = new PermissionService();
-
+    
     public static boolean confirmOrder(Order order) {
         // TODO: Unfinished
         try{
-            if (!permission.hasPermission(order.getUserID(),"EDIT_OWN_CART")){
+            if (!PermissionService.hasPermission(order.getUserID(),"EDIT_OWN_CART")){
                 throw new AuthorizationException("Access denied. Users can only confirm their own order.");
             }
             // Check the address
@@ -39,7 +38,7 @@ public class OrderService {
 
     public static ArrayList<Order> getAllOrders() {
         try{
-            if (!permission.hasPermission("MANAGE_ORDERS")){
+            if (!PermissionService.hasPermission("MANAGE_ORDERS")){
                 throw new AuthorizationException("Access denied. Only Staff can manage orders.");
             }
             ArrayList<Order> orders = OrderDAO.findAllOrder();

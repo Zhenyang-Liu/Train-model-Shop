@@ -14,8 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class BankDetailService {
-    private static PermissionService permission = new PermissionService();
-
     /**
      * Determines the type of a credit card based on its number.
      *
@@ -99,7 +97,7 @@ public class BankDetailService {
     public static String addBankDetail(int userID, String cardHolder, String cardNumber, String expiryDate, String securityCode){
         try {
             // Check if user has permission to edit bank details
-            if (!permission.hasPermission(userID,"EDIT_OWN_BANK_DETAILS")) {
+            if (!PermissionService.hasPermission(userID,"EDIT_OWN_BANK_DETAILS")) {
                 throw new AuthorizationException("Access denied. Users can only access their own bank details.");
             }
 
@@ -156,7 +154,7 @@ public class BankDetailService {
             }
 
             // Check if user has permission to view bank details
-            if (!permission.hasPermission(bankDetail.getUserID(),"EDIT_OWN_BANK_DETAILS")) {
+            if (!PermissionService.hasPermission(bankDetail.getUserID(),"EDIT_OWN_BANK_DETAILS")) {
                 throw new AuthorizationException("Access denied. Users can only access their own bank details.");
             }
 
@@ -192,7 +190,7 @@ public class BankDetailService {
     public static String updateBankDetail(int userID, String cardHolder, String cardNumber, String expiryDate, String securityCode) {
         try {
             // Check if the user has permission to edit their bank details
-            if (!permission.hasPermission(userID, "EDIT_OWN_BANK_DETAILS")) {
+            if (!PermissionService.hasPermission(userID, "EDIT_OWN_BANK_DETAILS")) {
                 throw new AuthorizationException("Access denied. Users can only edit their own bank details.");
             }
 

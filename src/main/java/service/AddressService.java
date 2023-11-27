@@ -10,9 +10,7 @@ import model.User;
 import exception.*;
 import helper.*;
 
-public class AddressService {
-    private static PermissionService permission = new PermissionService();
-    
+public class AddressService {    
     /**
      * Adds a new address for the current user.
      *
@@ -26,7 +24,7 @@ public class AddressService {
     public static boolean addAddress(Address address) {
         try {
             User currentUser = UserSession.getInstance().getCurrentUser();
-            if (!permission.hasPermission(currentUser.getUserID(),"EDIT_OWN_ADDRESS")){
+            if (!PermissionService.hasPermission(currentUser.getUserID(),"EDIT_OWN_ADDRESS")){
                 throw new AuthorizationException("Access denied. Users can only access their own address.");
             }
             // Check whether the address has existed in the database.
@@ -56,7 +54,7 @@ public class AddressService {
     public static boolean updateAddress(Address newAddress) {
         try {
             User currentUser = UserSession.getInstance().getCurrentUser();
-            if (!permission.hasPermission(currentUser.getUserID(), "EDIT_OWN_ADDRESS")){
+            if (!PermissionService.hasPermission(currentUser.getUserID(), "EDIT_OWN_ADDRESS")){
                 throw new AuthorizationException("Access denied. Users can only access their own address.");
             }
 
@@ -113,7 +111,7 @@ public class AddressService {
     public static Address getAddressByUser() {
         try {
             int userID = UserSession.getInstance().getCurrentUser().getUserID();
-            if (!permission.hasPermission(userID, "EDIT_OWN_ADDRESS")){
+            if (!PermissionService.hasPermission(userID, "EDIT_OWN_ADDRESS")){
                 throw new AuthorizationException("Access denied. Users can only access their own address.");
             }
             int addressID = AddressDAO.findAddressIDByUser(userID);
