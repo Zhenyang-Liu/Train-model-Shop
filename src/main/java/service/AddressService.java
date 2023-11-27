@@ -32,7 +32,6 @@ public class AddressService {
             // Check whether the address has existed in the database.
             Address existAddress = AddressDAO.findByNumberAndPostcode(address.getHouseNumber(), address.getPostcode());
             if (existAddress.getHouseNumber() != null) {
-                // TODO: This function may be changed based on the way of address storage.
                 AddressDAO.insertUserAddress(currentUser.getUserID(), existAddress.getID());
             } else {
                 AddressDAO.insertAddress(currentUser.getUserID(), address);
@@ -64,7 +63,6 @@ public class AddressService {
             AddressDAO.deleteAddressByUser(currentUser.getUserID());
             Address existAddress = AddressDAO.findByNumberAndPostcode(newAddress.getHouseNumber(), newAddress.getPostcode());
             if (existAddress.getHouseNumber() != null) {
-                // TODO: This function may be changed based on the way of address storage.
                 AddressDAO.insertUserAddress(currentUser.getUserID(), existAddress.getID());
             } else {
                 AddressDAO.insertAddress(currentUser.getUserID(), newAddress);

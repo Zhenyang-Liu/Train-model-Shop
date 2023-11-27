@@ -11,14 +11,20 @@ import model.Locomotive.DCCType;
 import model.RollingStock.RollingStockType;
 import service.AddressService;
 import service.BankDetailService;
+import service.CartService;
 import model.User;
 import model.BoxedSet;
+
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
@@ -30,9 +36,9 @@ import helper.UserSession;
 public class Test {
     public static void main(String[] args) {
         // performDatabaseOperations();
-        User user = UserDAO.findUserByEmail("manager@manager.com");
-        UserSession.getInstance().setCurrentUser(user);
-        Address address = AddressService.getAddressByUser();
+        // User user = UserDAO.findUserByEmail("manager@manager.com");
+        // UserSession.getInstance().setCurrentUser(user);
+        // Address address = AddressService.getAddressByUser();
         // String test =  BankDetailService.addBankDetail(user.getUserID(), "Manager","4870137427669857", "08/25", "666");
         // System.out.println(test);
         // BankDetail bankDetail = BankDetailService.findBankDetail(user.getUserID());
@@ -44,6 +50,17 @@ public class Test {
         // BankDetail bankDetail = BankDetailService.findBankDetail();
         // System.out.println(bankDetail.getCardNumber());
         // System.out.println(bankDetail.getSecurityCode());
+
+        
+        User user = UserDAO.findUserByEmail("testemail@gmail.com");
+        UserSession.getInstance().setCurrentUser(user);
+        
+        // CartService.addToCart(5, 5, 1);
+        // CartService.addToCart(5, 3, 2);
+        // CartService.addToCart(5, 7, 2);
+            
+        System.out.println(CartService.checkoutCart(5));
+
     }
 
     private static void performDatabaseOperations() {

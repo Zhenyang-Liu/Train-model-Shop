@@ -87,11 +87,12 @@ CREATE TABLE Bank_Detail (
 CREATE TABLE Orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    delivery_address_id INT NOT NULL,
+    delivery_address_id INT,
     create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     total_cost DECIMAL(10, 2) NOT NULL,
     status ENUM('Pending', 'Confirmed', 'Fulfilled') NOT NULL,
+    bank_detail_state INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES User(user_id),
     FOREIGN KEY (delivery_address_id) REFERENCES Address(address_id)
 );

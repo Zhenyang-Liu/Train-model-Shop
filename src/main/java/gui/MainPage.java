@@ -5,6 +5,8 @@
 package gui;
 
 import DAO.ProductDAO;
+import DAO.UserDAO;
+
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.jgoodies.forms.factories.DefaultComponentFactory;
 import java.awt.*;
@@ -799,6 +801,9 @@ public class MainPage extends JFrame implements ReloadListener {
         return productCardPanel;
     }
     public static void main(String[] args) {
+        User user = UserDAO.findUserByEmail("testemail@gmail.com");
+        UserSession.getInstance().setCurrentUser(user);
+
         EventQueue.invokeLater(() -> {
             try {
                 MainPage frame = new MainPage();
