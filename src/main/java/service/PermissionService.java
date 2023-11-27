@@ -18,7 +18,7 @@ public class PermissionService {
      * @param permissionName The name of the permission to check.
      * @return true if the current user session has the specified permission; false otherwise.
      */
-    public boolean hasPermission(String permissionName) {
+    public static boolean hasPermission(String permissionName) {
         if (permissionName.contains("OWN")) {
             return false;
         }
@@ -36,7 +36,7 @@ public class PermissionService {
      * @param permissionName The name of the permission to check.
      * @return true if the current user session has the specified permission for the provided user; false otherwise.
      */
-    public boolean hasPermission(int userID, String permissionName) {
+    public static boolean hasPermission(int userID, String permissionName) {
         UserSession session = UserSession.getInstance();
         boolean hasBasicPermission = session.hasPermission(permissionName);
         if (permissionName.contains("OWN")) {
