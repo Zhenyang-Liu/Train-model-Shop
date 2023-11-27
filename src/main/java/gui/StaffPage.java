@@ -209,7 +209,6 @@ public class StaffPage extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
     
-        // 在这里声明组件
         JComboBox<String> gaugeTypeComboBox = new JComboBox<>(new String[]{"OO", "TT", "N"});
         JComboBox<String> dccTypeComboBox = new JComboBox<>(new String[]{"Analogue", "Ready", "Fitted", "Sound"});
         JComboBox<String> digitalTypeComboBox = new JComboBox<>(new String[]{"Digital", "Analogue"});
@@ -239,10 +238,8 @@ public class StaffPage extends JFrame {
                 additionalPanel.add(compartmentTypeComboBox, gbc);
                 break;
             case "Train Set":
-                // 添加特定于 Train Set 的组件
                 break;
             case "Track Pack":
-                // 添加特定于 Track Pack 的组件
                 break;
         }
     

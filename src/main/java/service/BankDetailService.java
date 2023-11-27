@@ -6,7 +6,12 @@ import exception.AuthorizationException;
 import exception.DatabaseException;
 import exception.ExceptionHandler;
 import helper.AESUtil;
+import helper.UserSession;
 import model.BankDetail;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class BankDetailService {
     private static PermissionService permission = new PermissionService();
@@ -141,18 +146,22 @@ public class BankDetailService {
      * @param userID The ID of the user.
      * @return BankDetail The decrypted bank detail of the user, or null if an error occurs.
      */
-    public static BankDetail findBankDetail(int userID){
+    public static BankDetail findBankDetail(){
         try {
+            // Retrieve encrypted bank details from the database
+            int currentUserID = UserSession.getInstance().getCurrentUser().getUserID();
+            BankDetail bankDetail = BankDetailDAO.findBankDetail(currentUserID);
+            if (bankDetail == null) {
+                return null;
+            }
+
             // Check if user has permission to view bank details
-            if (!permission.hasPermission(userID,"EDIT_OWN_BANK_DETAILS")) {
+            if (!permission.hasPermission(bankDetail.getUserID(),"EDIT_OWN_BANK_DETAILS")) {
                 throw new AuthorizationException("Access denied. Users can only access their own bank details.");
             }
 
-            // Retrieve encrypted bank details from the database
-            BankDetail bankDetail = BankDetailDAO.findBankDetail(userID);
-
             // Decrypt bank details
-            String keyString = EncryptionKeysDAO.findKey(EncryptionKeysDAO.findUserKey(userID));
+            String keyString = EncryptionKeysDAO.findKey(EncryptionKeysDAO.findUserKey(currentUserID));
             String cardNumber = AESUtil.decrypt(bankDetail.getCardNumber(), keyString);
             String securityCode = AESUtil.decrypt(bankDetail.getSecurityCode(), keyString);
 
@@ -212,4 +221,58 @@ public class BankDetailService {
         }
         return "success";
     }
+
+    /**
+     * Checks the validity of bank details.
+     *
+     * @param cardHolder   The name of the card holder.
+     * @param cardNumber   The credit card number.
+     * @param expiryDate   The expiry date of the card in mm/yy format.
+     * @param securityCode The security code of the card.
+     * @return String      A message indicating whether the bank details are valid or not.
+     */
+    public static String checkBankDetail(String cardHolder, String cardNumber, String expiryDate, String securityCode) {
+        // Check if the card number is valid
+        if (!isValidCreditCardNumber(cardNumber)) {
+            
+            return "Invalid card number.";
+        }
+
+        // Check the card type
+        String cardType = getCreditCardType(cardNumber);
+        if ("Unknown".equals(cardType)) {
+            return "Card type cannot be determined. Change a card";
+        }
+
+        // Check the expiry date format and if it's a future date.
+        if (!expiryDate.matches("\\d{2}/\\d{2}") || !isFutureDate(expiryDate)) {
+            return "Invalid expiry date. Ensure it's in mm/yy format and is a future date.";
+        }
+
+        // Check the security code
+        if (!securityCode.matches("\\d{3}")) {
+            return "Invalid security code. Should be 3digits.";
+        }
+
+        // All checks passed
+        return "";
+    }
+
+    /**
+     * Checks if a given date in mm/yy format is a future date.
+     *
+     * @param dateStr The date string in mm/yy format.
+     * @return true if the date is in the future, false otherwise.
+     */
+    private static boolean isFutureDate(String dateStr) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/yy");
+            sdf.setLenient(false);
+            Date expiry = sdf.parse(dateStr);
+            return expiry.after(new Date());
+        } catch (ParseException e) {
+            return false;
+        }
+    }
+
 }

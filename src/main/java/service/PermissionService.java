@@ -39,7 +39,6 @@ public class PermissionService {
     public boolean hasPermission(int userID, String permissionName) {
         UserSession session = UserSession.getInstance();
         boolean hasBasicPermission = session.hasPermission(permissionName);
-
         if (permissionName.contains("OWN")) {
             return hasBasicPermission && userID == session.getCurrentUser().getUserID();
         }

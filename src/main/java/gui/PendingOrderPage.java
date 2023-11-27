@@ -12,7 +12,9 @@ import javax.swing.border.*;
 
 import DAO.UserDAO;
 import helper.UserSession;
+import model.BankDetail;
 import model.User;
+import service.BankDetailService;
 
 /**
  * @author Zhenyang Liu
@@ -39,6 +41,17 @@ public class PendingOrderPage extends JFrame {
     }
 
     private void paymentAddButtonMouseClicked(MouseEvent e) {
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        BankDetailDialog bankDetailDialog = new BankDetailDialog(parentFrame);
+        bankDetailDialog.setVisible(true);
+
+        if (bankDetailDialog.isInputValid()) {
+            updatePaymentPanel();
+        }
+    }
+    
+
+    private void paymentSelectButtonMouseClicked(MouseEvent e) {
         // TODO add your code here
     }
 
@@ -60,9 +73,10 @@ public class PendingOrderPage extends JFrame {
         addressEditButton = new JButton();
         paymentPnel = new JPanel();
         paymentLabel = new JLabel();
-        paymentTextField = new JTextField();
+        // paymentTextField = new JTextField();
         paymentEditPanel = new JPanel();
         paymentAddButton = new JButton();
+        paymentSelectButton = new JButton();
         paymentEditButton = new JButton();
         pendingOrderScrollPanel = new JScrollPane();
         pendingOrderItemsPanel = new JPanel();
@@ -165,40 +179,7 @@ public class PendingOrderPage extends JFrame {
                     paymentLabel.setFont(paymentLabel.getFont().deriveFont(paymentLabel.getFont().getStyle() | Font.BOLD, paymentLabel.getFont().getSize() + 5f));
                     paymentPnel.add(paymentLabel);
 
-                    //---- paymentTextField ----
-                    paymentTextField.setEditable(false);
-                    paymentPnel.add(paymentTextField);
-
-                    //======== paymentEditPanel ========
-                    {
-                        paymentEditPanel.setLayout(new FlowLayout());
-
-                        //---- paymentAddButton ----
-                        paymentAddButton.setText("Add");
-                        paymentAddButton.setForeground(new Color(0xe9e4e3));
-                        paymentAddButton.setBackground(new Color(0x55a15a));
-                        paymentAddButton.setFont(paymentAddButton.getFont().deriveFont(paymentAddButton.getFont().getStyle() & ~Font.BOLD));
-                        paymentAddButton.addMouseListener(new MouseAdapter() {
-                            @Override
-                            public void mouseClicked(MouseEvent e) {
-                                paymentAddButtonMouseClicked(e);
-                            }
-                        });
-                        paymentEditPanel.add(paymentAddButton);
-
-                        //---- paymentEditButton ----
-                        paymentEditButton.setText("Edit");
-                        paymentEditButton.setBackground(new Color(0x00a5f3));
-                        paymentEditButton.setForeground(new Color(0xe9e4e3));
-                        paymentEditButton.addMouseListener(new MouseAdapter() {
-                            @Override
-                            public void mouseClicked(MouseEvent e) {
-                                paymentEditButtonMouseClicked(e);
-                            }
-                        });
-                        paymentEditPanel.add(paymentEditButton);
-                    }
-                    paymentPnel.add(paymentEditPanel);
+                    updatePaymentPanel();
                 }
                 customerInfoPanel.add(paymentPnel, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
                     GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
@@ -321,8 +302,86 @@ public class PendingOrderPage extends JFrame {
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
     }
+
+    private String formatCardNumber(String cardNumber) {
+        return cardNumber.replaceAll("....", "$0 ");
+    }
+
+    private void updatePaymentPanel() {
+        paymentPnel.removeAll();
+        paymentEditPanel.removeAll(); 
+
+        paymentPnel.setLayout(new GridLayout(3, 1, 5, 5));
+        paymentPnel.add(paymentLabel);
+        
+        //---- paymentTextField ----
+        BankDetail bankDetail = BankDetailService.findBankDetail();
+        boolean isPaymentExist = false;
+        if (bankDetail != null){
+            JLabel paymentLabel = new JLabel();
+            String formattedText = "<html><body>"
+                + bankDetail.getCardName() + "</b><br>"
+                + formatCardNumber(bankDetail.getCardNumber()) + "</b><br>"
+                + bankDetail.getCardHolderName() + "</b><br>"
+                + bankDetail.getExpiryDate() + "   " 
+                + "CVV: " + bankDetail.getSecurityCode() + "</b><br>"
+                + "</b><br>"+"</body></html>";
+            paymentLabel.setText(formattedText);
+            paymentPnel.add(paymentLabel);
+            isPaymentExist = true;
+        } else {
+            //---- paymentAddButton ----
+            JLabel addPaymentLabel = new JLabel();
+            addPaymentLabel.setText("Pleases add a payment card.");
+            paymentPnel.add(addPaymentLabel);
+            paymentAddButton.setText("Add a Card");
+            paymentAddButton.setForeground(new Color(0xe9e4e3));
+            paymentAddButton.setBackground(new Color(0x55a15a));
+            paymentAddButton.setFont(paymentAddButton.getFont().deriveFont(paymentAddButton.getFont().getStyle() & ~Font.BOLD));
+            paymentAddButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                paymentAddButtonMouseClicked(e);
+            }
+        });
+        paymentEditPanel.add(paymentAddButton);
+    }
+
+        //======== paymentEditPanel ========
+        if (isPaymentExist) {
+            //---- paymentSelectButton ----
+            paymentSelectButton.setText("Select this card");
+            paymentSelectButton.setForeground(new Color(0xe9e4e3));
+            paymentSelectButton.setBackground(new Color(0x55a15a));
+            paymentSelectButton.setFont(paymentAddButton.getFont().deriveFont(paymentAddButton.getFont().getStyle() & ~Font.BOLD));
+            paymentSelectButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    paymentSelectButtonMouseClicked(e);
+                }
+            });
+            paymentEditPanel.add(paymentSelectButton);
+
+            //---- paymentEditButton ----
+            paymentEditButton.setText("Edit");
+            paymentEditButton.setBackground(new Color(0x00a5f3));
+            paymentEditButton.setForeground(new Color(0xe9e4e3));
+            paymentEditButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    paymentEditButtonMouseClicked(e);
+                }
+            });
+            paymentEditPanel.add(paymentEditButton);
+        }
+        paymentPnel.add(paymentEditPanel);
+        paymentPnel.revalidate();
+        paymentPnel.repaint();
+    }
+    // TODO: Test method
     public static void main(String[] args) {
-        User user = UserDAO.findUserByEmail("manager@manager.com");
+        // User user = UserDAO.findUserByEmail("manager@manager.com");
+        User user = UserDAO.findUserByEmail("staff@gmail.com");
         UserSession.getInstance().setCurrentUser(user);
 
         SwingUtilities.invokeLater(() -> {
@@ -330,6 +389,7 @@ public class PendingOrderPage extends JFrame {
             frame.setVisible(true);
         });
     }
+
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
     private JLabel pendingOrderTitleLabel;
     private JPanel pendingOrderContentPanel;
@@ -342,9 +402,9 @@ public class PendingOrderPage extends JFrame {
     private JButton addressEditButton;
     private JPanel paymentPnel;
     private JLabel paymentLabel;
-    private JTextField paymentTextField;
     private JPanel paymentEditPanel;
     private JButton paymentAddButton;
+    private JButton paymentSelectButton;
     private JButton paymentEditButton;
     private JScrollPane pendingOrderScrollPanel;
     private JPanel pendingOrderItemsPanel;

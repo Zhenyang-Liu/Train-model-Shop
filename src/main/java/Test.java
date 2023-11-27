@@ -1,3 +1,4 @@
+import model.BankDetail;
 import model.BoxedSet;
 import model.Controller;
 import model.Gauge;
@@ -7,6 +8,8 @@ import model.RollingStock;
 import model.BoxedSet.BoxedType;
 import model.Locomotive.DCCType;
 import model.RollingStock.RollingStockType;
+import service.BankDetailService;
+import model.User;
 import model.BoxedSet;
 
 import java.awt.event.WindowAdapter;
@@ -20,10 +23,25 @@ import javax.swing.JFrame;
 import DAO.*;
 import exception.DatabaseException;
 import gui.ManagerPage;
+import helper.UserSession;
 
 public class Test {
     public static void main(String[] args) {
-        performDatabaseOperations();
+        // performDatabaseOperations();
+        User user = UserDAO.findUserByEmail("manager@manager.com");
+        UserSession.getInstance().setCurrentUser(user);
+
+        // String test =  BankDetailService.addBankDetail(user.getUserID(), "Manager","4870137427669857", "08/25", "666");
+        // System.out.println(test);
+        // BankDetail bankDetail = BankDetailService.findBankDetail(user.getUserID());
+        // System.out.println(bankDetail.getCardNumber());
+        // System.out.println(bankDetail.getSecurityCode());
+        
+        // String test =  BankDetailService.updateBankDetail(user.getUserID(), "Manager","5309906574719204", "08/25", "888");
+        // System.out.println(test);
+        // BankDetail bankDetail = BankDetailService.findBankDetail(user.getUserID());
+        // System.out.println(bankDetail.getCardNumber());
+        // System.out.println(bankDetail.getSecurityCode());
     }
 
     private static void performDatabaseOperations() {
