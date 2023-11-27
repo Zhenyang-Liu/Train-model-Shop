@@ -22,8 +22,15 @@ public class BankDetailDialog extends JDialog {
 
     private BankDetail bankDetail;
     private boolean isEditMode;
-    private boolean isInputValid;
+    private boolean isInputValid; // flag for whether do a valid action
 
+    /**
+     * Constructs a BankDetailDialog.
+     *
+     * @param parent The parent frame to which this dialog is attached.
+     * @param bankDetail The BankDetail object to be edited; if null, a new bank detail is being added.
+     * @param isEditMode True if editing existing bank details, false if adding new details.
+     */
     public BankDetailDialog(Frame parent, BankDetail bankDetail, boolean isEditMode) {
         super(parent, isEditMode ? "Edit Bank Detail" : "Add Bank Detail", true);
         this.bankDetail = bankDetail;
@@ -92,7 +99,11 @@ public class BankDetailDialog extends JDialog {
         }
     }
     
-
+    /**
+     * Handles the "Add" action.
+     *
+     * Validates the user input and adds the new bank details to the database. Closes the dialog if the operation is successful.
+     */
     private void onAdd() {
         String message = BankDetailService.checkBankDetail(getCardHolder(), getCardNumber(), getExpiryDate(), getSecurityCode());
         
@@ -110,6 +121,11 @@ public class BankDetailDialog extends JDialog {
         }
     }
 
+    /**
+     * Handles the "Update" action.
+     *
+     * Validates the user input and updates the existing bank details in the database. Closes the dialog if the operation is successful.
+     */
     private void onUpdate() {
         String message = BankDetailService.checkBankDetail(getCardHolder(), getCardNumber(), getExpiryDate(), getSecurityCode());
         

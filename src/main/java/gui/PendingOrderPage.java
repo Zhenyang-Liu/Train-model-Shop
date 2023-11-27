@@ -10,12 +10,12 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import com.mysql.cj.jdbc.NClob;
-
 import DAO.UserDAO;
 import helper.UserSession;
+import model.Address;
 import model.BankDetail;
 import model.User;
+import service.AddressService;
 import service.BankDetailService;
 
 /**
@@ -35,11 +35,27 @@ public class PendingOrderPage extends JFrame {
     }
 
     private void addressAddButtonMouseClicked(MouseEvent e) {
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        AddressDialog addressDialog = new AddressDialog(parentFrame, null,false);
+        addressDialog.setVisible(true);
+
+        if (addressDialog.isInputValid()) {
+            updateAddressPanel();
+        }
+    }
+
+    private void addressSelectButtonMouseClicked(MouseEvent e) {
         // TODO add your code here
     }
 
     private void addressEditButtonMouseClicked(MouseEvent e) {
-        // TODO add your code here
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        AddressDialog addressDialog = new AddressDialog(parentFrame,address,true);
+        addressDialog.setVisible(true);
+
+        if (addressDialog.isInputValid()) {
+            updateAddressPanel();
+        }
     }
 
     private void paymentAddButtonMouseClicked(MouseEvent e) {
@@ -76,9 +92,10 @@ public class PendingOrderPage extends JFrame {
         addressLabel = new JLabel();
         addressTextField = new JTextField();
         addressEditPanel = new JPanel();
+        addressSelectButton = new JButton();
         addressAddButton = new JButton();
         addressEditButton = new JButton();
-        paymentPnel = new JPanel();
+        paymentPanel = new JPanel();
         paymentLabel = new JLabel();
         paymentEditPanel = new JPanel();
         paymentAddButton = new JButton();
@@ -96,6 +113,7 @@ public class PendingOrderPage extends JFrame {
         confirmButton = new JButton();
 
         bankDetail = new BankDetail();
+        address = new Address();
         //======== this ========
         setPreferredSize(new Dimension(900, 700));
         var contentPane = getContentPane();
@@ -136,59 +154,26 @@ public class PendingOrderPage extends JFrame {
                     addressLabel.setFont(addressLabel.getFont().deriveFont(addressLabel.getFont().getStyle() | Font.BOLD, addressLabel.getFont().getSize() + 5f));
                     addressPanel.add(addressLabel);
 
-                    //---- addressTextField ----
-                    addressTextField.setEditable(false);
-                    addressPanel.add(addressTextField);
-
-                    //======== addressEditPanel ========
-                    {
-                        addressEditPanel.setLayout(new FlowLayout());
-
-                        //---- addressAddButton ----
-                        addressAddButton.setText("Add");
-                        addressAddButton.setForeground(new Color(0xe9e4e3));
-                        addressAddButton.setBackground(new Color(0x55a15a));
-                        addressAddButton.setFont(addressAddButton.getFont().deriveFont(addressAddButton.getFont().getStyle() & ~Font.BOLD));
-                        addressAddButton.addMouseListener(new MouseAdapter() {
-                            @Override
-                            public void mouseClicked(MouseEvent e) {
-                                addressAddButtonMouseClicked(e);
-                            }
-                        });
-                        addressEditPanel.add(addressAddButton);
-
-                        //---- addressEditButton ----
-                        addressEditButton.setText("Edit");
-                        addressEditButton.setBackground(new Color(0x00a5f3));
-                        addressEditButton.setForeground(new Color(0xe9e4e3));
-                        addressEditButton.addMouseListener(new MouseAdapter() {
-                            @Override
-                            public void mouseClicked(MouseEvent e) {
-                                addressEditButtonMouseClicked(e);
-                            }
-                        });
-                        addressEditPanel.add(addressEditButton);
-                    }
-                    addressPanel.add(addressEditPanel);
+                    updateAddressPanel();
                 }
                 customerInfoPanel.add(addressPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
                     GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
                     new Insets(0, 0, 5, 0), 0, 0));
 
-                //======== paymentPnel ========
+                //======== paymentPanel ========
                 {
-                    paymentPnel.setMaximumSize(new Dimension(300, 200));
-                    paymentPnel.setLayout(new GridLayout(3, 1, 5, 5));
+                    paymentPanel.setMaximumSize(new Dimension(300, 200));
+                    paymentPanel.setLayout(new GridLayout(3, 1, 5, 5));
 
                     //---- paymentLabel ----
                     paymentLabel.setText("Payment method");
                     paymentLabel.setForeground(new Color(0x003366));
                     paymentLabel.setFont(paymentLabel.getFont().deriveFont(paymentLabel.getFont().getStyle() | Font.BOLD, paymentLabel.getFont().getSize() + 5f));
-                    paymentPnel.add(paymentLabel);
+                    paymentPanel.add(paymentLabel);
 
                     updatePaymentPanel();
                 }
-                customerInfoPanel.add(paymentPnel, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+                customerInfoPanel.add(paymentPanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
                     GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
                     new Insets(20, 0, 0, 0), 0, 0));
             }
@@ -315,11 +300,11 @@ public class PendingOrderPage extends JFrame {
     }
 
     private void updatePaymentPanel() {
-        paymentPnel.removeAll();
+        paymentPanel.removeAll();
         paymentEditPanel.removeAll(); 
 
-        paymentPnel.setLayout(new GridLayout(3, 1, 5, 5));
-        paymentPnel.add(paymentLabel);
+        paymentPanel.setLayout(new GridLayout(3, 1, 5, 5));
+        paymentPanel.add(paymentLabel);
         
         //---- paymentTextField ----
         this.bankDetail = BankDetailService.findBankDetail();
@@ -334,13 +319,13 @@ public class PendingOrderPage extends JFrame {
                 + "CVV: " + bankDetail.getSecurityCode() + "</b><br>"
                 + "</b><br>"+"</body></html>";
             paymentLabel.setText(formattedText);
-            paymentPnel.add(paymentLabel);
+            paymentPanel.add(paymentLabel);
             isPaymentExist = true;
         } else {
             //---- paymentAddButton ----
             JLabel addPaymentLabel = new JLabel();
             addPaymentLabel.setText("Pleases add a payment card.");
-            paymentPnel.add(addPaymentLabel);
+            paymentPanel.add(addPaymentLabel);
             paymentAddButton.setText("Add a Card");
             paymentAddButton.setForeground(new Color(0xe9e4e3));
             paymentAddButton.setBackground(new Color(0x55a15a));
@@ -381,14 +366,88 @@ public class PendingOrderPage extends JFrame {
             });
             paymentEditPanel.add(paymentEditButton);
         }
-        paymentPnel.add(paymentEditPanel);
-        paymentPnel.revalidate();
-        paymentPnel.repaint();
+        paymentPanel.add(paymentEditPanel);
+        paymentPanel.revalidate();
+        paymentPanel.repaint();
     }
+
+    private void updateAddressPanel() {
+        addressPanel.removeAll();
+        addressEditPanel.removeAll(); 
+
+        addressPanel.setLayout(new GridLayout(3, 1, 5, 5));
+        addressPanel.add(addressLabel);
+        
+        //---- AddressTextField ----
+        this.address = AddressService.getAddressByUser();
+        boolean isAddressExist = false;
+        if (!AddressService.isAddressEmpty(address)){
+            JLabel addressLabel = new JLabel();
+            String formattedText = "<html><body>"
+                + address.getHouseNumber() + "</b><br>"
+                + address.getRoadName() + "</b><br>"
+                + address.getCity()+ "</b><br>"
+                + address.getPostcode()
+                + "</b><br>"+"</body></html>";
+            addressLabel.setText(formattedText);
+            addressPanel.add(addressLabel);
+            isAddressExist = true;
+        } else {
+            //---- addressAddButton ----
+            JLabel addAddressLabel = new JLabel();
+            addAddressLabel.setText("Pleases add an address.");
+            addressPanel.add(addAddressLabel);
+            addressAddButton.setText("Add an Address");
+            addressAddButton.setForeground(new Color(0xe9e4e3));
+            addressAddButton.setBackground(new Color(0x55a15a));
+            addressAddButton.setFont(addressAddButton.getFont().deriveFont(addressAddButton.getFont().getStyle() & ~Font.BOLD));
+            addressAddButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                addressAddButtonMouseClicked(e);
+            }
+        });
+        addressEditPanel.add(addressAddButton);
+    }
+
+        //======== addressEditPanel ========
+        if (isAddressExist) {
+            //---- addressSelectButton ----
+            addressSelectButton.setText("Select this address");
+            addressSelectButton.setForeground(new Color(0xe9e4e3));
+            addressSelectButton.setBackground(new Color(0x55a15a));
+            addressSelectButton.setFont(addressAddButton.getFont().deriveFont(addressAddButton.getFont().getStyle() & ~Font.BOLD));
+            addressSelectButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    addressSelectButtonMouseClicked(e);
+                }
+            });
+            addressEditPanel.add(addressSelectButton);
+
+            //---- addressEditButton ----
+            addressEditButton.setText("Edit");
+            addressEditButton.setBackground(new Color(0x00a5f3));
+            addressEditButton.setForeground(new Color(0xe9e4e3));
+            addressEditButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    addressEditButtonMouseClicked(e);
+                }
+            });
+            addressEditPanel.add(addressEditButton);
+        }
+        addressPanel.add(addressEditPanel);
+        addressPanel.revalidate();
+        addressPanel.repaint();
+    }
+    
+    
+
     // TODO: Test method
     public static void main(String[] args) {
-        User user = UserDAO.findUserByEmail("manager@manager.com");
-        // User user = UserDAO.findUserByEmail("staff@gmail.com");
+        // User user = UserDAO.findUserByEmail("manager@manager.com");
+        User user = UserDAO.findUserByEmail("staff@gmail.com");
         UserSession.getInstance().setCurrentUser(user);
 
         SwingUtilities.invokeLater(() -> {
@@ -405,9 +464,10 @@ public class PendingOrderPage extends JFrame {
     private JLabel addressLabel;
     private JTextField addressTextField;
     private JPanel addressEditPanel;
+    private JButton addressSelectButton;
     private JButton addressAddButton;
     private JButton addressEditButton;
-    private JPanel paymentPnel;
+    private JPanel paymentPanel;
     private JLabel paymentLabel;
     private JPanel paymentEditPanel;
     private JButton paymentAddButton;
@@ -423,6 +483,8 @@ public class PendingOrderPage extends JFrame {
     private JPanel pendingOrderButtonPanel;
     private JButton cancelButton;
     private JButton confirmButton;
-    private BankDetail bankDetail;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
+
+    private BankDetail bankDetail;
+    private Address address;
 }

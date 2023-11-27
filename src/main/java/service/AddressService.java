@@ -1,6 +1,8 @@
 package service;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import DAO.AddressDAO;
 import model.Address;
@@ -110,8 +112,9 @@ public class AddressService {
         }
     }
 
-    public static Address getAddressIDByUser(int userID) {
+    public static Address getAddressByUser() {
         try {
+            int userID = UserSession.getInstance().getCurrentUser().getUserID();
             if (!permission.hasPermission(userID, "EDIT_OWN_ADDRESS")){
                 throw new AuthorizationException("Access denied. Users can only access their own address.");
             }
@@ -121,6 +124,37 @@ public class AddressService {
             ExceptionHandler.printErrorMessage(e);
             return null;
         }
+    }
+
+    public static boolean isAddressEmpty(Address address) {
+        if (address == null) {
+            return true;
+        }
+        
+        if (address.getHouseNumber() == null || address.getHouseNumber().isEmpty()) {
+            return true;
+        }
+        
+        if (address.getCity() == null || address.getCity().isEmpty()) {
+            return true;
+        }
+        
+        if (address.getRoadName() == null || address.getRoadName().isEmpty()) {
+            return true;
+        }
+        
+        if (address.getPostcode() == null || address.getPostcode().isEmpty()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isValidUKPostcode(String postcode) {
+        final String UK_POSTCODE_PATTERN = "^[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}$";
+        Pattern pattern = Pattern.compile(UK_POSTCODE_PATTERN);
+        Matcher matcher = pattern.matcher(postcode);
+        return matcher.matches();
     }
 
 }

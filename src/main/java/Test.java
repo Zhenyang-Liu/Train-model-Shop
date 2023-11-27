@@ -1,3 +1,4 @@
+import model.Address;
 import model.BankDetail;
 import model.BoxedSet;
 import model.Controller;
@@ -8,6 +9,7 @@ import model.RollingStock;
 import model.BoxedSet.BoxedType;
 import model.Locomotive.DCCType;
 import model.RollingStock.RollingStockType;
+import service.AddressService;
 import service.BankDetailService;
 import model.User;
 import model.BoxedSet;
@@ -30,7 +32,7 @@ public class Test {
         // performDatabaseOperations();
         User user = UserDAO.findUserByEmail("manager@manager.com");
         UserSession.getInstance().setCurrentUser(user);
-
+        Address address = AddressService.getAddressByUser();
         // String test =  BankDetailService.addBankDetail(user.getUserID(), "Manager","4870137427669857", "08/25", "666");
         // System.out.println(test);
         // BankDetail bankDetail = BankDetailService.findBankDetail(user.getUserID());
