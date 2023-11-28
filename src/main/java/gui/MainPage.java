@@ -4,6 +4,7 @@
 
 package gui;
 
+import DAO.DatabaseConnectionHandler;
 import DAO.ProductDAO;
 import DAO.UserDAO;
 
@@ -55,7 +56,6 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     private void button_accountMouseClicked() {
-        Logging.getLogger().info("Logged in as user: " + UserSession.getInstance().getCurrentUser().getEmail());
         SwingUtilities.invokeLater(() -> {
             if (!UserSession.getInstance().isLoggedIn()) {
                 LoginPage loginPage = new LoginPage();;
@@ -822,6 +822,7 @@ public class MainPage extends JFrame implements ReloadListener {
                 // Close logging :D
                 frame.addWindowListener(new WindowAdapter() {
                     public void windowClosing(WindowEvent e){
+                        DatabaseConnectionHandler.shutdown();
                         Logging.Close();
                     }
                 });
