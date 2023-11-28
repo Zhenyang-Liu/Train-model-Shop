@@ -82,7 +82,7 @@ public class AccountPage extends JFrame {
      * Create details panel
      */
     private void createDetailsPanel() {
-        DetailsPanel.setPreferredSize(new Dimension(400, 130));
+        DetailsPanel.setPreferredSize(new Dimension(400, 150));
         DetailsPanel.setMinimumSize(new Dimension(50, 92));
         DetailsPanel.setLayout(new GridLayout(0, 2));
         
@@ -98,6 +98,21 @@ public class AccountPage extends JFrame {
         setTextStyle(passwordLabel, false);
         DetailsPanel.add(passwordLabel);
         DetailsPanel.add(passwordField);
+
+        // Bank section, uses another panel
+        JPanel BankPanel = new JPanel();
+        JLabel bankLabel = new JLabel("Bank Details:");
+        JTextField accountNumber = new JTextField("1234567");
+        JTextField sortCode = new JTextField("00-00-00");
+        JTextField expiryDate = new JTextField("06/25");
+        setTextStyle(bankLabel, false);
+        BankPanel.setLayout(new GridLayout(1, 3));
+        BankPanel.add(accountNumber);
+        BankPanel.add(sortCode);
+        BankPanel.add(expiryDate);
+        DetailsPanel.add(bankLabel);
+        DetailsPanel.add(BankPanel);
+
 
         // Add to Main Dialogue
         MainDialoguePanel.add(DetailsPanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0,
