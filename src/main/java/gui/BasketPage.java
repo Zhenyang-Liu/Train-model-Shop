@@ -406,13 +406,30 @@ public class BasketPage extends JFrame {
                         reloadListener.reloadProducts();
                     }
                 } else if (currentQuantity > 0) {
-                    if(CartService.updateCartItem(cartItem.getItemID(), currentQuantity)){
-                        if (reloadListener != null) {
-                            reloadListener.reloadProducts();
+                    if (cartItem.getProductStock() >= currentQuantity){
+                        if(CartService.updateCartItem(cartItem.getItemID(), currentQuantity)){
+                            if (reloadListener != null) {
+                                reloadListener.reloadProducts();
+                            }
+                        }else{
+                            JOptionPane.showMessageDialog(null,
+                                    "Illegal Operation",
+                                    "Update Failed",
+                                    JOptionPane.ERROR_MESSAGE);
                         }
-                    }else{
+                    }else {
+                        itemSpinner.setValue(cartItem.getProductStock());
+                        JOptionPane.showMessageDialog(null,
+                                "Max stock quantity reached",
+                                "Update Failed",
+                                JOptionPane.INFORMATION_MESSAGE);
                     }
+
                 } else {
+                    JOptionPane.showMessageDialog(null,
+                            "Illegal Quantity",
+                            "Update Failed",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

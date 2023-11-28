@@ -32,6 +32,8 @@ public class CartItem {
         return quantity;
     }
 
+    public int getProductStock(){return item.getStockQuantity();}
+
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
