@@ -35,13 +35,7 @@ public class BasketPage extends JFrame {
 
     public BasketPage(int userID) {
         initComponents();
-        this.cart = CartService.getCartDetails(userID);
-        if (cart != null){
-            loadUserCart(userID);
-        }else{
-            CartService.createCartForUser(userID);
-            loadUserCart(userID);
-        }
+        loadUserCart(userID);
     }
 
     private void checkOutButtonMouseClicked(MouseEvent e) {
@@ -284,7 +278,17 @@ public class BasketPage extends JFrame {
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
     private void loadUserCart(int userID) {
+        Cart cart = CartService.getCartDetails(userID);
+        if (cart.getCartID() == 0){
+            CartService.createCart();
+            cart = CartService.getCartDetails(userID);
+        }
+        if (cart.getCartItems().size() > 0){
             loadTrolleyItems(cart.getCartItems()); // Load cart items into the trolley view
+        } else {
+            JLabel noItemLabel = new JLabel("There is no item in your cart.");
+            trolleyItemsPanel.add(noItemLabel);
+        }
     }
 
     // Method to load cart items into the trolley view

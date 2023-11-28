@@ -5,6 +5,8 @@ import service.AddressService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class AddressDialog extends JDialog {
     private JTextField houseNumberField;
@@ -18,7 +20,7 @@ public class AddressDialog extends JDialog {
     private Address address;
     private boolean isInputValid;
 
-    public AddressDialog(Frame parent,  Address address, boolean isEditMode) {
+    public AddressDialog(Frame parent, Address address, boolean isEditMode) {
         super(parent, isEditMode ? "Edit Address" : "Add Address", true);
         this.isEditMode = isEditMode;
         this.address = address;
@@ -28,7 +30,14 @@ public class AddressDialog extends JDialog {
         if (isEditMode) {
             populateFields();
         }
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                onCancelButtonClicked();
+            }
+        });
     }
+    
     
     private void initializeComponents() {
         setLayout(new GridLayout(0, 2));
@@ -54,7 +63,7 @@ public class AddressDialog extends JDialog {
         add(actionButton);
 
         cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(e -> dispose());
+        cancelButton.addActionListener(e -> onCancelButtonClicked());
         add(cancelButton);
 
         pack();
@@ -97,6 +106,11 @@ public class AddressDialog extends JDialog {
                 dispose();
             }
         }
+    }
+
+    private void onCancelButtonClicked() {
+        isInputValid = false;
+        dispose();
     }
 
     public String getHouseNumber() { return houseNumberField.getText(); }

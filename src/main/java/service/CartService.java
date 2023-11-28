@@ -20,37 +20,25 @@ import model.Cart;
 import model.CartItem;
 import model.Order;
 import model.Product;
+import model.User;
 
 
 public class CartService {
 
-    /**
-     * Creates a new cart for a specified user.
-     *
-     * This method first checks if the current user has permission to create a cart.
-     * It then creates a new empty cart for the user and stores it in the database.
-     * Returns true if the cart is successfully created, or false if a DatabaseException occurs.
-     *
-     * @param userID The ID of the user for whom the cart is to be created.
-     * @return true if the cart is successfully created; false otherwise.
-     */
-    public static boolean createCartForUser(int userID) {
+    public static boolean createCart() {
         try {
-            if (!PermissionService.hasPermission(userID, "CREATE_CART")) {
-                throw new AuthorizationException("Access denied. User does not have permission to create a cart.");
+            int userID = UserSession.getInstance().getCurrentUser().getUserID();
+            if (!PermissionService.hasPermission(userID,"EDIT_OWN_CART")) {
+                throw new AuthorizationException("Access denied. Users can only access their own carts.");
             }
-
-            Cart newCart = new Cart(userID);
-
-            CartDAO.insertCart(newCart);
+            CartDAO.insertCart(new Cart(userID));
             return true;
+
         } catch (DatabaseException e) {
             ExceptionHandler.printErrorMessage(e);
             return false;
         }
     }
-
-
     /**
      * Adds a product to a specified cart.
      *
