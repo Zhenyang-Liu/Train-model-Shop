@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import helper.Logging;
-import model.*;
+import model.Login;
 
 public class LoginDAO{
     /**
@@ -23,7 +23,7 @@ public class LoginDAO{
             PreparedStatement preparedStatement = connection.prepareStatement(stmt)) {
 
             if(doesLoginExist(login.getUserID())){
-                System.out.println("Login information for this user " + login.getUserID() + " already exists in the database.");
+                Logging.getLogger().warning("Login information for this user " + login.getUserID() + " already exists in the database.");
                 return false;
             }
             preparedStatement.setInt(1, login.getUserID());
@@ -54,7 +54,7 @@ public class LoginDAO{
             "last_login_attempt = ?, lockout_enabled = ?, lockout_end = ? WHERE user_id = ?";
 
         if(!doesLoginExist(login.getUserID())){
-            System.out.println("No login exists in the database with the given userID.");
+            Logging.getLogger().warning("No login exists in the database with the given userID " + login.getUserID());
             return false;
         }
 

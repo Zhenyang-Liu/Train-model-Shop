@@ -14,7 +14,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import exception.DatabaseException;
+import helper.Logging;
 import listeners.ReloadListener;
+import model.Cart;
 import model.CartItem;
 import model.Product;
 import model.User;
@@ -65,7 +67,8 @@ public class BasketPage extends JFrame {
                 this.dispose();
                 PendingOrderPage pendingOrderPage = new PendingOrderPage(findOrderByID(orderID));
                 pendingOrderPage.setVisible(true);
-            } catch (DatabaseException ex) {
+            }catch(DatabaseException e1){
+                Logging.getLogger().warning("Could not find create pending order page at orderID " + orderID + "\nStacktrace: " + e1.getMessage());
                 JOptionPane.showMessageDialog(this,
                         "An error occurred while fetching order details.",
                         "Order Error",

@@ -195,7 +195,6 @@ public class CartService {
     public static boolean updateCartItem(int itemID, int quantity) {
         try {
             int itemHolderID = CartDAO.findCartBelongedTo(CartDAO.findItemBelongedTo(itemID));
-            System.out.println(itemHolderID);
             if (!PermissionService.hasPermission(itemHolderID,"EDIT_OWN_CART")){
                 throw new AuthorizationException("Access denied. User cannot access item " + itemID + ".");
             }
@@ -331,7 +330,6 @@ public class CartService {
                 int quantity = entry.getValue();
                 if (!ProductDAO.checkProductStock(productID, quantity)) {
                     enoughStock = false;
-                    System.out.println("Item: "+entry.getKey().getProductName());
                     return false;
                 }
             }

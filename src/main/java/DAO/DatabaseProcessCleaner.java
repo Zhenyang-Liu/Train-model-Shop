@@ -2,9 +2,10 @@ package DAO;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.sql.SQLException;
+import helper.Logging;
 
 public class DatabaseProcessCleaner {
 
@@ -24,9 +25,9 @@ public class DatabaseProcessCleaner {
                 if ("Sleep".equals(command)) {
                     try (Statement killStmt = conn.createStatement()) {
                         killStmt.execute("KILL " + id);
-                        System.out.println("Killed process with ID: " + id);
+                        Logging.getLogger().info("Killed process with ID: " + id);
                     } catch (SQLException e) {
-                        System.out.println("Failed to kill process with ID: " + id);
+                        Logging.getLogger().warning("Failed to kill process with ID: " + id);
                     }
                 }
             }

@@ -77,9 +77,9 @@ public class ControllerDAO extends ProductDAO {
             // Print to Test
             if (rowsAffected > 0) {
                 ProductDAO.deleteProduct(productId);
-                System.out.println("Controller with ID " + productId + " was deleted successfully.");
+                Logging.getLogger().info("Controller with ID " + productId + " was deleted successfully.");
             } else {
-                System.out.println("No Locomotive was found with ID " + productId + " to delete.");
+                Logging.getLogger().warning("No Locomotive was found with ID " + productId + " to delete.");
             }
         } catch (SQLTimeoutException e) {
             throw new ConnectionException("Database connect failed",e);
