@@ -56,7 +56,8 @@ public class MainPage extends JFrame implements ReloadListener {
                 loginPage.setVisible(true);
                 loginPage.setLoginSuccessListener(this::loadProducts);
             } else {
-                // User logged in
+                AccountPage accountPage = new AccountPage();
+                accountPage.setVisible(true);
             }
         });
     }
@@ -66,7 +67,6 @@ public class MainPage extends JFrame implements ReloadListener {
 
         if (currentUser != null) {
             int userID = currentUser.getUserID();
-            System.out.println(userID);
             BasketPage basketPage = new BasketPage(userID);
             basketPage.setVisible(true);
             basketPage.setReloadListener(this::loadProducts);
@@ -167,10 +167,6 @@ public class MainPage extends JFrame implements ReloadListener {
         });
     }
 
-    private void button_accountMouseClicked(MouseEvent e) {
-        // TODO add your code here
-    }
-
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
@@ -234,7 +230,7 @@ public class MainPage extends JFrame implements ReloadListener {
                 button_account.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        button_accountMouseClicked(e);
+                        button_accountMouseClicked();
                     }
                 });
                 accountPanel.add(button_account, BorderLayout.WEST);
@@ -667,8 +663,8 @@ public class MainPage extends JFrame implements ReloadListener {
         moreButton.setPreferredSize(new Dimension(100, 30));
 
         moreButton.addActionListener(e -> {
-            ProductPage p = new ProductPage(product);
-            p.setVisible(true);
+            // ProductPage p = new ProductPage(product);
+            // p.setVisible(true);
         });
 
 
@@ -805,6 +801,10 @@ public class MainPage extends JFrame implements ReloadListener {
 
         return productCardPanel;
     }
+
+    /*
+     * Main function for testing
+     */
     public static void main(String[] args) {
         User user = UserDAO.findUserByEmail("testemail@gmail.com");
         UserSession.getInstance().setCurrentUser(user);
