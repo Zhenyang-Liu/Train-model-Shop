@@ -60,7 +60,8 @@ public class MainPage extends JFrame implements ReloadListener {
                 loginPage.setVisible(true);
                 loginPage.setLoginSuccessListener(this::loadProducts);
             } else {
-                // User logged in
+                AccountPage accountPage = new AccountPage();
+                accountPage.setVisible(true);
             }
         });
     }
@@ -70,7 +71,6 @@ public class MainPage extends JFrame implements ReloadListener {
 
         if (currentUser != null) {
             int userID = currentUser.getUserID();
-            System.out.println(userID);
             BasketPage basketPage = new BasketPage(userID);
             basketPage.setVisible(true);
             basketPage.setReloadListener(this::loadProducts);
@@ -167,19 +167,6 @@ public class MainPage extends JFrame implements ReloadListener {
         });
     }
 
-    private void button_accountMouseClicked(MouseEvent e) {
-        User currentUser = UserSession.getInstance().getCurrentUser();
-
-        // Show account page if user is logged in, else login page
-        if (currentUser != null) {
-            AccountPage accountPage = new AccountPage();
-            accountPage.setVisible(true);
-        } else {
-            LoginPage loginPage = new LoginPage();
-            loginPage.setVisible(true);
-        }
-    }
-
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
@@ -243,7 +230,7 @@ public class MainPage extends JFrame implements ReloadListener {
                 button_account.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        button_accountMouseClicked(e);
+                        button_accountMouseClicked();
                     }
                 });
                 accountPanel.add(button_account, BorderLayout.WEST);

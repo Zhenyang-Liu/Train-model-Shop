@@ -36,7 +36,7 @@ public class AccountPage extends JFrame {
         MainDialoguePanel.setLayout(new BorderLayout());
 
         // Create title panel and label
-        TitleContentPanel.setLayout(new BoxLayout(MainDialoguePanel, BoxLayout.Y_AXIS));
+        TitleContentPanel.setLayout(new BoxLayout(TitleContentPanel, BoxLayout.Y_AXIS));
         TitleLabel.setText("Account");
         TitleLabel.setFont(TitleLabel.getFont().deriveFont(TitleLabel.getFont().getStyle() | Font.BOLD, TitleLabel.getFont().getSize() + 11f));
         TitleLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
