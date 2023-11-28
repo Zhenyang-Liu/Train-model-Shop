@@ -64,57 +64,42 @@ public class AccountPage extends JFrame {
      * Updates the values of the user, login, and bank tables (if needing changed)
      */
     private void updateDetails() {
-        // Look over each field, check if there's a change, verify and upload if there is
-        String email = inputs.get("email").toString();
-        String forename = inputs.get("forename").toString();
-        String surname = inputs.get("surname").toString();
-        String address = inputs.get("address").toString();
-        String accountNumber = inputs.get("accountNumber").toString();
-        String sortCode = inputs.get("sortCode").toString();
-        String expiryDate = inputs.get("expiryDate").toString();
+        // Get inputs
+        String email = inputs.get("email").getText();
+        String forename = inputs.get("forename").getText();
+        String surname = inputs.get("surname").getText();
+        String accountNumber = inputs.get("accountNumber").getText();
+        String sortCode = inputs.get("sortCode").getText();
+        String expiryDate = inputs.get("expiryDate").getText();
         String password = new String(passwordInput.getPassword());
-        String error = checkInputs(email, forename, surname, address, password, accountNumber, sortCode, expiryDate);
 
-        if (error.equals("OK")) {
-        } else {
+        // CHeck password, account number, and sort code to see if they've been changed
+        // and give them a default value if they've not (they're hashed so can't compare)
+        if (password == "") 
+            password = "CorrectPassword1?";
+        if (accountNumber == "xxxx-xxxx-xxx-xxx")
+            accountNumber = "1111-1111-1111-1111";
+        if (sortCode == "xx-xx-xx")
+            sortCode = "11-11-11";
+
+        // Validate inputs
+        String error = RegistrationPage.checkInputs(email, forename, surname, password, password);
+        String cardError = validateCard(accountNumber, sortCode, expiryDate);
+        if (!error.equals("OK")) {
             errorLabel.setText(error);
+        } else if (!cardError.equals("OK")) {
+            errorLabel.setText(cardError);
         }
     }
 
     /**
-     * Check the input fields for errors
-     * @param email inputted email
-     * @param forename inputted forename
-     * @param surname inputted surname
-     * @param address inputted address
-     * @param password inputted password
+     * Validate card of user
      * @param accountNumber inputted account number
      * @param sortCode inputted sort code
      * @param expiryDate inputted expiry date
-     * @return "OK" if there were no errors otherwise an error message
+     * @return "OK" if the card is correct else an error message
      */
-    private String checkInputs(String email, String forename, String surname, String address, String password, String accountNumber, String sortCode, String expiryDate) {
-        // Emails
-        Pattern emailPattern = Pattern.compile("^[A-z0-9._%+-]+@+[A-z0-9_%+-]+.[A-z_-]{2,}$");
-        if (!emailPattern.matcher(email).matches())
-            return "Email field(s) are not valid emails";
-
-        // Forename
-        if (forename.length() < 3)
-            return "First name is too short, it must be greater than 2 letters";
-        if (forename.length() > 16)
-            return "First name is too long, it must be less than 16 letters";
-
-        // Surname
-        if (surname.length() < 3)
-            return "Last name is too short, it must be greater than 2 letters";
-        if (surname.length() > 16)
-            return "Last name is too long, it must be less than 16 letters";
-
-        // Address
-        if (address.length() < 3)
-            return "Address is too short, it must be greater than 2 letters";
-
+    private String validateCard(String accountNumber, String sortCode, String expiryDate) {
         // Account number, sort code, and expiry date
         Pattern accountNumberPattern = Pattern.compile("^[1-9]{4}-[1-9]{4}-[1-9]{4}-[1-9]{4}$");
         Pattern sortCodePattern = Pattern.compile("^[1-9]{2}-[1-9]{2}-[1-9]{2}$");
@@ -125,11 +110,6 @@ public class AccountPage extends JFrame {
             return "Sort code must be in format xx-xx-xx";
         if (!expiryDatePattern.matcher(expiryDate).matches() || expiryDate.length() != 5)
             return "Expiry date must be in format xx/xx";
-
-        // Passwords
-        Pattern passwordPattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])(?=.*[@!£$%^&*?]).{8,}");
-        if (!passwordPattern.matcher(password).matches())
-            return "Password must be longer than 8 letters and have at least one digit and special character";
 
         return "OK";
     }
@@ -189,6 +169,10 @@ public class AccountPage extends JFrame {
         TitleSeparator.setBackground(new Color(0x7f7272));
         TitlePanel.add(TitleSeparator);
 
+        // Add error messages
+        errorLabel.setForeground(new Color(0xb13437));
+        TitlePanel.add(errorLabel);
+
         // Add to Main Dialogue 
         MainDialoguePanel.add(TitlePanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
             GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -233,10 +217,6 @@ public class AccountPage extends JFrame {
         inputs.put("accountNumber", accountNumber);
         inputs.put("sortCode", sortCode);
         inputs.put("expiryDate", expiryDate);
-
-        // Add error messages
-        errorLabel.setForeground(new Color(0xb13437));
-        DetailsPanel.add(errorLabel);
 
         // Add to Main Dialogue
         MainDialoguePanel.add(DetailsPanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0,
