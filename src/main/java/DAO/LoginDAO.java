@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import helper.Logging;
 import model.*;
 
 public class LoginDAO{
@@ -111,7 +112,6 @@ public class LoginDAO{
             return login;
 
         } catch (SQLException e) {
-            e.printStackTrace();
             throw e;
         }
     }
@@ -128,7 +128,7 @@ public class LoginDAO{
             Login dbLoginDetails = findLoginByUserID(userID);
             return dbLoginDetails.getPasswordHash().equals(passwordhash);
         } catch(SQLException e){
-            e.printStackTrace();
+            Logging.getLogger().warning("Error while checking password for user " + userID + "\nStacktrace: " + e.getMessage());
             return false;
         }
     }
@@ -144,7 +144,7 @@ public class LoginDAO{
             return deleteFromGenericID("DELETE FROM login WHERE user_id = ?", userID);
         }
         catch(SQLException e){
-            e.printStackTrace();
+            Logging.getLogger().warning("Error while deleting login details for user " + userID + "\nStacktrace: " + e.getMessage());
             return false;
         }
     }
@@ -160,7 +160,7 @@ public class LoginDAO{
             return deleteFromGenericID("DELETE FROM Login WHERE login_id = ?", loginID);
         }
         catch(SQLException e){
-            e.printStackTrace();
+            Logging.getLogger().warning("Error while checking password for login id " + loginID + "\nStacktrace: " + e.getMessage());
             return false;
         }
     }
@@ -203,10 +203,10 @@ public class LoginDAO{
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.getLogger().warning("Error while checking login exists for user " + userID + "\nStacktrace: " + e.getMessage());
             throw e;
         }
         return false;
-        }
     }
+}
 

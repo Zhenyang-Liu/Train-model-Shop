@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import exception.ConnectionException;
 import exception.DatabaseException;
+import helper.Logging;
+
 import java.util.ArrayList;
 import model.User;
 
@@ -43,7 +45,7 @@ public class UserDAO {
             System.out.println("Successfully added user into database!");
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.getLogger().warning("Error while inserting new user: SQL Excepted\nStacktrace: " + e.getMessage());
         }
 
         // Default return false as nothing above matched
@@ -57,7 +59,7 @@ public class UserDAO {
      * @return {@code true} if the user exists, {@code false} otherwise
      * @throws SQLException If there was an error during query
      */
-    public static boolean doesUserExist(int userID) {
+    public static boolean doesUserExist(int userID) throws SQLException{
         String checkSQL = "SELECT COUNT(*) FROM User WHERE user_id = ?";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -69,9 +71,9 @@ public class UserDAO {
                     return results.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.getLogger().warning("Could not check if user " + userID + " existed as SQL Excepted\nStacktrace: " + e.getMessage());
+            throw e;
         }
-
         // Default return false as nothing above matched
         return false;
     }
@@ -83,7 +85,7 @@ public class UserDAO {
      * @return {@code true} if the user exists, {@code false} otherwise
      * @throws SQLException If there was an error during query
      */
-    public static boolean doesUserExist(String email) {
+    public static boolean doesUserExist(String email) throws SQLException{
         String checkSQL = "SELECT COUNT(*) FROM User WHERE email = ?";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -95,7 +97,8 @@ public class UserDAO {
                     return results.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.getLogger().warning("Could not check if user " + email + " existed as SQL Excepted\nStacktrace: " + e.getMessage());
+            throw e;
         }
 
         // Default return false as nothing above matched

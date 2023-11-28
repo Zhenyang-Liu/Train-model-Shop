@@ -9,6 +9,7 @@ import java.util.List;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
+import helper.Logging;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,7 +84,7 @@ public class EraDAO {
      * @return An array of era codes associated with the product.
      * @throws DatabaseException If a database error occurs.
      */
-    public static int[] findEraByID(int productID) throws DatabaseException {
+    public static int[] findEraByID(int productID) {
         String selectSQL = "SELECT era_code FROM ProductEra WHERE product_id = ?;";
         List<Integer> eraList = new ArrayList<>();
         
@@ -97,10 +98,12 @@ public class EraDAO {
                     eraList.add(eraCode);
                 }
             }
-        } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLTimeoutException e) {
+            Logging.getLogger().warning("Error when finding eras for product: " + productID + 
+                "SQL Timed out\n Stacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding eras for product: " + productID + 
+                "SQL Excepted :0\nStacktrace: " + e.getMessage());
         }
 
         int[] era = eraList.stream().mapToInt(Integer::intValue).toArray();
@@ -114,7 +117,7 @@ public class EraDAO {
      * @return An array of product IDs associated with the era codes.
      * @throws DatabaseException If a database error occurs.
      */
-    public static int[] findIDByEra(int[] eraList) throws DatabaseException {
+    public static int[] findIDByEra(int[] eraList) {
         String selectSQL = "SELECT DISTINCT product_id FROM ProductEra WHERE era_code IN (" + 
                                       String.join(",", Collections.nCopies(eraList.length, "?")) + ")";
         List<Integer> productIDs = new ArrayList<>();
@@ -132,10 +135,12 @@ public class EraDAO {
                     productIDs.add(productID);
                 }
             }
-        } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLTimeoutException e) {
+            Logging.getLogger().warning("Error when finding products for eras:" + 
+                "SQL Timed out\n Stacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding products for eras:" + 
+                "SQL Excepted :0\nStacktrace: " + e.getMessage());
         }
 
         int[] idList = productIDs.stream().mapToInt(Integer::intValue).toArray();

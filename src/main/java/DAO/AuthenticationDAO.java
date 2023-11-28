@@ -12,6 +12,7 @@ import java.util.HashSet;
 import exception.ConnectionException;
 import exception.DatabaseException;
 import exception.NotFoundException;
+import helper.Logging;
 
 public class AuthenticationDAO {
 
@@ -25,7 +26,7 @@ public class AuthenticationDAO {
      * @return A Set of strings, where each string represents a permission name.
      * @throws DatabaseException if there is an issue with database access.
      */
-    public static Set<String> getUserPermissions(int userID) throws DatabaseException {
+    public static Set<String> getUserPermissions(int userID) {
         Set<String> permissions = new HashSet<>();
         String selectSQL = "SELECT p.permission_name FROM Permission p " +
                      "JOIN Role_Permission rp ON p.permission_id = rp.permission_id " +
@@ -42,9 +43,9 @@ public class AuthenticationDAO {
                 }
             }
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error getting user permissions: SQL timed out\n Stacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error getting user permissions: SQL exception\n Stacktrace: " + e.getMessage());
         }
         return permissions;
     }

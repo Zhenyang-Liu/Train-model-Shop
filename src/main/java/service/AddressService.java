@@ -76,18 +76,13 @@ public class AddressService {
      * Retrieves a list of addresses matching a specific postcode.
      *
      * This method queries the database for addresses that match the given postcode.
-     * Returns a list of Address objects or null if a DatabaseException occurs.
+     * Returns a list of Address objects
      *
      * @param postcode The postcode to search for addresses.
      * @return An ArrayList of Address objects matching the given postcode, or null if an error occurs.
      */
     public static ArrayList<Address> getAddressByPostcode(String postcode) {
-        try {
-            return AddressDAO.findByPostcode(postcode);
-        } catch (DatabaseException e) {
-            ExceptionHandler.printErrorMessage(e);
-            return null;
-        }
+        return AddressDAO.findByPostcode(postcode);
     }
 
     /**

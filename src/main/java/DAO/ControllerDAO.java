@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
+import helper.Logging;
 import model.Controller;
 import model.Product;
 
@@ -110,7 +111,7 @@ public class ControllerDAO extends ProductDAO {
         return controller;
     }
     
-    public static ArrayList<Controller> findControllersByType(boolean isDigital) throws DatabaseException {
+    public static ArrayList<Controller> findControllersByType(boolean isDigital) {
         ArrayList<Controller> controllers = new ArrayList<Controller>();
         String  selectSQL = "SELECT * FROM Controller WHERE digital_type = ?;";
 
@@ -126,21 +127,28 @@ public class ControllerDAO extends ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+                Product newProduct = null;
+                try{
+                    newProduct = ProductDAO.findProductByID(productId);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding controllers of type " + 
+                        (isDigital ? "digital" : "non-digital") + ": could not find product " 
+                            + productId + "\n Stacktrace: " + e.getMessage());
+                }
                 boolean digital = resultSet.getInt("digital_type") == 1;
 
                 Controller controller = new Controller(newProduct, digital);
                 controllers.add(controller);
             }
         } catch (SQLTimeoutException e) {
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding controllers: SQL Timed out\n Stacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding controllers: SQL Excepted :0\nStacktrace: " + e.getMessage());
         }
         return controllers;
     }
     
-    public static ArrayList<Controller> findAllControllers() throws DatabaseException {
+    public static ArrayList<Controller> findAllControllers() {
         ArrayList<Controller> controllers = new ArrayList<Controller>();
         String  selectSQL = "SELECT * FROM Controller;";
 
@@ -151,16 +159,22 @@ public class ControllerDAO extends ProductDAO {
 
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+                Product newProduct = null;
+                try{
+                    newProduct = ProductDAO.findProductByID(productId);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding all controllers: could not find product " 
+                            + productId + "\n Stacktrace: " + e.getMessage());
+                }
                 boolean digital = resultSet.getInt("digital_type") == 1;
 
                 Controller controller = new Controller(newProduct, digital);
                 controllers.add(controller);
             }
         } catch (SQLTimeoutException e) {
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding controllers: SQL Timed out\n Stacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding controllers: SQL Excepted :0\nStacktrace: " + e.getMessage());
         }
         return controllers;
     }
