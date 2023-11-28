@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import exception.*;
+import helper.Logging;
 import model.Cart;
 import model.CartItem;
 
@@ -251,9 +252,8 @@ public class CartDAO {
      * @param cartID The ID of the cart.
      * @return An ArrayList of CartItem objects.
      * @throws DatabaseException if there is a problem executing the query.
-     * @throws ConnectionException if there is a problem to connecting the database.
      */
-    public static ArrayList<CartItem> findCartItems(int cartID) throws DatabaseException {
+    public static ArrayList<CartItem> findCartItems(int cartID) {
         String selectSQL = "SELECT * FROM Cart_Item WHERE cart_id = ?;";
         ArrayList<CartItem> itemList = new ArrayList<CartItem>();
 
@@ -267,15 +267,19 @@ public class CartDAO {
                 int itemID = resultSet.getInt("cart_item_id");
                 int productID = resultSet.getInt("product_id");
                 int quantity = resultSet.getInt("quantity");
-                CartItem item = new CartItem(itemID, ProductDAO.findProductByID(productID), quantity);
-
+                CartItem item = null;
+                try{
+                    item = new CartItem(itemID, ProductDAO.findProductByID(productID), quantity);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Could not get product " + productID + " for cart " + cartID + "\n Stacktrace: " + e.getMessage());
+                }
                 itemList.add(item);
             }
 
-        } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLTimeoutException e) {
+            Logging.getLogger().warning("Error getting cart contents of cardID" + cartID + ": SQL Timed out\n Stacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error getting cart contents of cardID" + cartID + ": SQL Exception\nStacktrace: " + e.getMessage());
         }
         return itemList;
     }

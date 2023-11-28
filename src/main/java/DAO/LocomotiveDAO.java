@@ -10,6 +10,7 @@ import java.util.Collections;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
+import helper.Logging;
 import model.Gauge;
 import model.Locomotive;
 import model.Locomotive.*;
@@ -139,7 +140,7 @@ public class LocomotiveDAO extends ProductDAO {
      * @return An ArrayList of Locomotive objects that match the specified gauge | null if can't find.
      * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Locomotive> findLocomotivesByGauge(Gauge gauge) throws DatabaseException{
+    public static ArrayList<Locomotive> findLocomotivesByGauge(Gauge gauge){
         String selectSQL = "SELECT * FROM Locomotive WHERE gauge = ?;";
         ArrayList<Locomotive> locomotives = new ArrayList<Locomotive>();
 
@@ -151,7 +152,14 @@ public class LocomotiveDAO extends ProductDAO {
 
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+                Product newProduct = null;
+                try{
+                    newProduct = ProductDAO.findProductByID(productId);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding all locomotives for gauge " + gauge + 
+                    ": could not find product " + productId + "\n Stacktrace: " + e.getMessage());
+                    continue;
+                }
                 String newGauge = resultSet.getString("gauge");
                 String newDCCType = resultSet.getString("dcc_type");
                 int[] newEra = EraDAO.findEraByID(productId);
@@ -159,10 +167,12 @@ public class LocomotiveDAO extends ProductDAO {
                 Locomotive locomotive = new Locomotive(newProduct, newGauge, newDCCType, newEra);
                 locomotives.add(locomotive);
             }
-        } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLTimeoutException e) {
+            Logging.getLogger().warning("Error when finding locomotives for gauge: " + gauge + 
+                "SQL Timed out\n Stacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding locomotives for gauge: " + gauge + 
+                "SQL Excepted :0\nStacktrace: " + e.getMessage());
         }
         return locomotives;
     }
@@ -174,7 +184,7 @@ public class LocomotiveDAO extends ProductDAO {
      * @return An ArrayList of Locomotive objects that match the specified era(s) | null if can't find.
      * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Locomotive> findLocomotivesByEra(int[] eraList) throws DatabaseException {
+    public static ArrayList<Locomotive> findLocomotivesByEra(int[] eraList) {
         ArrayList<Locomotive> locomotives = new ArrayList<Locomotive>();
     
         try (Connection connection = DatabaseConnectionHandler.getConnection()) {
@@ -191,7 +201,14 @@ public class LocomotiveDAO extends ProductDAO {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
                         int productId = resultSet.getInt("product_id");
-                        Product newProduct = ProductDAO.findProductByID(productId);
+                        Product newProduct = null;
+                        try{
+                            newProduct = ProductDAO.findProductByID(productId);
+                        }catch(DatabaseException e){
+                            Logging.getLogger().warning("Error when finding all locomotives for era " + eraList + 
+                                ": could not find product " + productId + "\n Stacktrace: " + e.getMessage());
+                            continue;
+                        }
                         String newGauge = resultSet.getString("gauge");
                         String newDCCType = resultSet.getString("dcc_type");
                         int[] newEra = EraDAO.findEraByID(productId);
@@ -202,9 +219,11 @@ public class LocomotiveDAO extends ProductDAO {
                 }
             }
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding locomotives for eras " + eraList + 
+                ": SQL Timed out :( \nStacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding locomotives for eras " + eraList + 
+                ": SQL Excepted :( \nStacktrace: " + e.getMessage());
         }
         return locomotives;
     }
@@ -216,7 +235,7 @@ public class LocomotiveDAO extends ProductDAO {
      * @return An ArrayList of Locomotive objects that match the specified DCC type | null if can't find.
      * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Locomotive> findLocomotivesByDCCType(DCCType dccType) throws DatabaseException{
+    public static ArrayList<Locomotive> findLocomotivesByDCCType(DCCType dccType){
         String selectSQL = "SELECT * FROM Locomotive WHERE dcc_type = ?;";
         ArrayList<Locomotive> locomotives = new ArrayList<Locomotive>();
 
@@ -228,7 +247,14 @@ public class LocomotiveDAO extends ProductDAO {
 
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+                Product newProduct = null;
+                try{
+                    newProduct = ProductDAO.findProductByID(productId);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding all locomotives for dcctype " + dccType + 
+                        ": could not find product " + productId + "\n Stacktrace: " + e.getMessage());
+                    continue;
+                }
                 String newGauge = resultSet.getString("gauge");
                 String newDCCType = resultSet.getString("dcc_type");
                 int[] newEra = EraDAO.findEraByID(productId);
@@ -237,9 +263,11 @@ public class LocomotiveDAO extends ProductDAO {
                 locomotives.add(locomotive);
             }
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding all locomotives for dcctype " + dccType + 
+                ": SQL Timed out\nStacktrace" + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding all locomotives for dcctype " + dccType + 
+                ": SQL Excepted\nStacktrace" + e.getMessage());
         }
         return locomotives;
     }

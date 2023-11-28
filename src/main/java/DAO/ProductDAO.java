@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
+import helper.Logging;
 import model.*;
 
 public class ProductDAO {
@@ -319,7 +320,7 @@ public class ProductDAO {
      * @return An ArrayList<Product> with all Product in database.
      * @throws DatabaseException If there is a problem executing the select.
      */
-    public static ArrayList<Product> getAllProduct() throws DatabaseException {
+    public static ArrayList<Product> getAllProduct() {
         String selectSQL = "SELECT * FROM Product";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -327,11 +328,12 @@ public class ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
             
             return arrayFromResultSet(resultSet);       
-        } catch (SQLTimeoutException e) {
-            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLTimeoutException e){
+            Logging.getLogger().warning("Error when finding all products: SQL Timed out\nStacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding all products: SQL Excepted\nStacktrace: " + e.getMessage());
         }
+        return new ArrayList<>();
     }
 
     /**
@@ -403,7 +405,7 @@ public class ProductDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.getLogger().warning("Error finding all brands: SQL Excepted\nStacktrace: " + e.getMessage());
             return new ArrayList<>();
         }
         return brandList;

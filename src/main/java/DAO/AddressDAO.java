@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import exception.*;
+import helper.Logging;
 import model.Address;
 
 public class AddressDAO {
@@ -144,7 +145,7 @@ public class AddressDAO {
         return address;
     }
 
-    public static ArrayList<Address> findByPostcode(String postcode) throws DatabaseException {
+    public static ArrayList<Address> findByPostcode(String postcode) {
         String selectSQL = "SELECT * FROM Address WHERE postcode = ?;";
         ArrayList<Address> addressList = new ArrayList<>();
 
@@ -165,9 +166,9 @@ public class AddressDAO {
                 addressList.add(address);
             }
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error finding address by postcode: SQL Timed out. Stacktrace: \n" + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error finding address by postcode: SQL Exception. Stacktrace: \n" + e.getMessage());
         }
         return addressList;
     }

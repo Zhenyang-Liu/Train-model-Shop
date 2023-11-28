@@ -10,6 +10,7 @@ import java.util.Collections;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
+import helper.Logging;
 import model.Gauge;
 import model.RollingStock;
 import model.RollingStock.RollingStockType;
@@ -149,7 +150,7 @@ public class RollingStockDAO extends ProductDAO {
      * @return An ArrayList of RollingStock objects that match the specified gauge | null if can't find.
      * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<RollingStock> findRollingStocksByGauge(Gauge gauge) throws DatabaseException{
+    public static ArrayList<RollingStock> findRollingStocksByGauge(Gauge gauge){
         String selectSQL = "SELECT * FROM RollingStock WHERE gauge = ?;";
         ArrayList<RollingStock> rollingStocks = new ArrayList<RollingStock>();
 
@@ -161,7 +162,14 @@ public class RollingStockDAO extends ProductDAO {
 
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+                Product newProduct = null;
+                try{
+                    newProduct = ProductDAO.findProductByID(productId);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding all rolling stocks for gauge " + gauge + ": could not find product " 
+                            + productId + "\n Stacktrace: " + e.getMessage());
+                    continue;
+                }
                 String newGauge = resultSet.getString("gauge");
                 String newType = resultSet.getString("type");
                 int[] newEra = EraDAO.findEraByID(productId);
@@ -170,9 +178,9 @@ public class RollingStockDAO extends ProductDAO {
                 rollingStocks.add(rollingStock);
             }
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding all rolling stocks: SQL Timeout\nStacktrace: " + e.getMessage());;
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding all rolling stocks: SQL Exception\nStacktrace: " + e.getMessage());;
         }
         return rollingStocks;
     }
@@ -184,7 +192,7 @@ public class RollingStockDAO extends ProductDAO {
      * @return An ArrayList of RollingStock objects that match the specified era(s) | null if can't find.
      * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<RollingStock> findRollingStocksByEra(int[] eraList) throws DatabaseException {
+    public static ArrayList<RollingStock> findRollingStocksByEra(int[] eraList) {
         ArrayList<RollingStock> rollingStocks = new ArrayList<RollingStock>();
     
         try (Connection connection = DatabaseConnectionHandler.getConnection()) {
@@ -201,7 +209,14 @@ public class RollingStockDAO extends ProductDAO {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
                         int productId = resultSet.getInt("product_id");
-                        Product newProduct = ProductDAO.findProductByID(productId);
+                        Product newProduct = null;
+                        try{
+                            newProduct = ProductDAO.findProductByID(productId);
+                        }catch(DatabaseException e){
+                            Logging.getLogger().warning("Error when finding all rolling stocks for era " + eraList + ": could not find product " 
+                                    + productId + "\n Stacktrace: " + e.getMessage());
+                            continue;
+                        }
                         String newGauge = resultSet.getString("gauge");
                         String newType = resultSet.getString("type");
                         int[] newEra = EraDAO.findEraByID(productId);
@@ -212,9 +227,9 @@ public class RollingStockDAO extends ProductDAO {
                 }
             }
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding all rolling stocks: SQL Timeout\nStacktrace: " + e.getMessage());;
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding all rolling stocks: SQL Exception\nStacktrace: " + e.getMessage());;
         }
         return rollingStocks;
     }
@@ -226,7 +241,7 @@ public class RollingStockDAO extends ProductDAO {
      * @return An ArrayList of RollingStock objects that match the specified type | null if can't find.
      * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<RollingStock> findRollingStocksByType(RollingStockType type) throws DatabaseException{
+    public static ArrayList<RollingStock> findRollingStocksByType(RollingStockType type){
         String selectSQL = "SELECT * FROM RollingStock WHERE type = ?;";
         ArrayList<RollingStock> rollingStocks = new ArrayList<RollingStock>();
 
@@ -238,7 +253,14 @@ public class RollingStockDAO extends ProductDAO {
 
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+                Product newProduct = null;
+                try{
+                    newProduct = ProductDAO.findProductByID(productId);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding all rolling stocks for stock type " + type + ": could not find product " 
+                            + productId + "\n Stacktrace: " + e.getMessage());
+                    continue;
+                }
                 String newGauge = resultSet.getString("gauge");
                 String newType = resultSet.getString("type");
                 int[] newEra = EraDAO.findEraByID(productId);
@@ -247,9 +269,9 @@ public class RollingStockDAO extends ProductDAO {
                 rollingStocks.add(rollingStock);
             }
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding all rolling stocks: SQL Timeout\nStacktrace: " + e.getMessage());;
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding all rolling stocks: SQL Exception\nStacktrace: " + e.getMessage());;
         }
         return rollingStocks;
     }
@@ -260,7 +282,7 @@ public class RollingStockDAO extends ProductDAO {
      * @return An ArrayList of all RollingStock objects in the database | null if can't find.
      * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<RollingStock> findAllRollingStocks() throws DatabaseException{
+    public static ArrayList<RollingStock> findAllRollingStocks() {
         String selectSQL = "SELECT * FROM RollingStock;";
         ArrayList<RollingStock> rollingStocks = new ArrayList<RollingStock>();
 
@@ -271,7 +293,13 @@ public class RollingStockDAO extends ProductDAO {
 
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+                Product newProduct = null;
+                try{
+                    newProduct = ProductDAO.findProductByID(productId);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding all rolling stocks\n Stacktrace: " + e.getMessage());
+                    continue;
+                }
                 String newGauge = resultSet.getString("gauge");
                 String newType = resultSet.getString("type");
                 int[] newEra = EraDAO.findEraByID(productId);
@@ -280,9 +308,9 @@ public class RollingStockDAO extends ProductDAO {
                 rollingStocks.add(rollingStock);
             }
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding all rolling stocks: SQL Timeout\nStacktrace: " + e.getMessage());;
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding all rolling stocks: SQL Exception\nStacktrace: " + e.getMessage());;
         }
         return rollingStocks;
     }

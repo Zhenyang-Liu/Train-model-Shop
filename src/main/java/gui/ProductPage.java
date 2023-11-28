@@ -17,7 +17,6 @@ import javax.swing.*;
 import model.Product;
 import DAO.ProductDAO;
 import DAO.UserDAO;
-import exception.DatabaseException;
 
 public class ProductPage extends JFrame {
 
@@ -129,13 +128,9 @@ public class ProductPage extends JFrame {
 
     public static void main(String[] args){
         UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("testey@gmail.com"));
-        try{
-            ProductPage p = new ProductPage(ProductDAO.getAllProduct().get(0));
-            p.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            p.setVisible(true);
-        }catch(DatabaseException e){
-            e.printStackTrace();
-        }
+        ProductPage p = new ProductPage(ProductDAO.getAllProduct().get(0));
+        p.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        p.setVisible(true);
     }
 }
 
