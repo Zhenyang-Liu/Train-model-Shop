@@ -813,6 +813,8 @@ public class MainPage extends JFrame implements ReloadListener {
      * Main function for testing
      */
     public static void main(String[] args) {
+        // for debug we can log to console too
+        Logging.Init(true);
         User user = UserDAO.findUserByEmail("testemail@gmail.com");
         UserSession.getInstance().setCurrentUser(user);
 
