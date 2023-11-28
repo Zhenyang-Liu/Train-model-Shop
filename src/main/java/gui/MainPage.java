@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.*;
 import exception.DatabaseException;
 import helper.Filter;
+import helper.Logging;
 import helper.UserSession;
 import listeners.ReloadListener;
 import model.*;
@@ -25,6 +26,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -34,6 +37,9 @@ import java.util.ResourceBundle;
 public class MainPage extends JFrame implements ReloadListener {
     private Filter f;
     public MainPage() {
+
+        Logging.getLogger().info("Creating Main Page");
+
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         initComponents();
@@ -49,7 +55,7 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     private void button_accountMouseClicked() {
-        System.out.println("Logged in: " + UserSession.getInstance().isLoggedIn());
+        Logging.getLogger().info("Logged in as user: " + UserSession.getInstance().getCurrentUser().getEmail());
         SwingUtilities.invokeLater(() -> {
             if (!UserSession.getInstance().isLoggedIn()) {
                 LoginPage loginPage = new LoginPage();;
@@ -813,6 +819,12 @@ public class MainPage extends JFrame implements ReloadListener {
         EventQueue.invokeLater(() -> {
             try {
                 MainPage frame = new MainPage();
+                // Close logging :D
+                frame.addWindowListener(new WindowAdapter() {
+                    public void windowClosing(WindowEvent e){
+                        Logging.Close();
+                    }
+                });
                 frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();

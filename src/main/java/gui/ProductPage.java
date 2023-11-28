@@ -110,16 +110,11 @@ public class ProductPage extends JFrame {
             public void mousePressed(MouseEvent e){
                 final JFileChooser fc = new JFileChooser();
                 int returnVal = fc.showOpenDialog(productArea);
-
+                if(returnVal != JFileChooser.APPROVE_OPTION)
+                    return;
                 String imageBase64 = ImageUtils.toBase64(fc.getSelectedFile());
 
                 p.setImageBase64(imageBase64);
-                try {
-                    ProductDAO.updateProduct(p);
-                } catch (DatabaseException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
 
                 productImage.setIcon(ImageUtils.imageToIcon(imageBase64));
                 productImage.repaint();
