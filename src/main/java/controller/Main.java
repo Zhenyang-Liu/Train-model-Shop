@@ -1,5 +1,6 @@
 package controller;
 import gui.MainPage;
+import helper.Logging;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -20,6 +21,7 @@ public class Main {
                 @Override
                 public void windowClosing(WindowEvent e) {
                     DatabaseConnectionHandler.shutdown();
+                    Logging.Close();
                 }
             });
             mainPage.setVisible(true);
