@@ -77,7 +77,7 @@ public class ProductDAO {
      */ 
     public static void updateProduct(Product product) throws DatabaseException {
         String updateSQL = "UPDATE Product SET brand_name = ?, product_name = ?, product_code = ?, retail_price = ?, "
-            + "description = ?, stock_quantity = ? WHERE product_id = ?;"; 
+            + "description = ?, stock_quantity = ?, product_image = ? WHERE product_id = ?;"; 
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
@@ -88,7 +88,8 @@ public class ProductDAO {
             preparedStatement.setDouble(4, product.getRetailPrice());
             preparedStatement.setString(5, product.getDescription());
             preparedStatement.setInt(6, product.getStockQuantity());
-            preparedStatement.setInt(7,product.getProductID());
+            preparedStatement.setString(7, product.getImageBase64());
+            preparedStatement.setInt(8,product.getProductID());
 
             preparedStatement.executeUpdate();
             
