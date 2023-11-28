@@ -20,16 +20,13 @@ import model.*;
 import model.Locomotive.DCCType;
 import service.CartService;
 
-import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author Zhenyang Liu
@@ -37,6 +34,8 @@ import java.util.concurrent.ExecutionException;
 public class MainPage extends JFrame implements ReloadListener {
     private Filter f;
     public MainPage() {
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         initComponents();
         f = new Filter();
         populateFilterBoxes();
@@ -45,15 +44,12 @@ public class MainPage extends JFrame implements ReloadListener {
         button_accountMouseClicked();
     }
 
-    private void createUIComponents() {
-        // TODO: add custom component creation code here
-    }
-
     public void reloadProducts() {
         loadProducts();
     }
 
     private void button_accountMouseClicked() {
+        System.out.println("Logged in: " + UserSession.getInstance().isLoggedIn());
         SwingUtilities.invokeLater(() -> {
             if (!UserSession.getInstance().isLoggedIn()) {
                 LoginPage loginPage = new LoginPage();;
@@ -99,19 +95,22 @@ public class MainPage extends JFrame implements ReloadListener {
     private void populateSubFilters(){
         subTypeFilterBox.removeAllItems();
         String table = ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).getDbTable();
+        subTypeFilterBox.setVisible(true);
+        subTypeFilterLabel.setVisible(true);
         if(table.equals("Locomotive")){
-            System.out.println("Adding items :D");
+            subTypeFilterLabel.setText("DCC Type");
             subTypeFilterBox.addItem(DCCType.ANALOGUE);
             subTypeFilterBox.addItem(DCCType.FITTED);
             subTypeFilterBox.addItem(DCCType.READY);
             subTypeFilterBox.addItem(DCCType.SOUND);
         }else if(table.equals("Track")){
+            subTypeFilterLabel.setText("Gauge");
             subTypeFilterBox.addItem(Gauge.OO);
             subTypeFilterBox.addItem(Gauge.TT);
             subTypeFilterBox.addItem(Gauge.N);
-        }
-        else{
-            subTypeFilterBox.addItem("No sub-filters");
+        }else{
+            subTypeFilterBox.setVisible(false);
+            subTypeFilterLabel.setVisible(false);
         }
     }
 
@@ -161,6 +160,7 @@ public class MainPage extends JFrame implements ReloadListener {
         populateBrandFilters();
         populateSortOptions();
         populateTypeFilters();
+        populateSubFilters();
 
         searchButton.addActionListener(e -> {
             loadProducts();
@@ -190,15 +190,15 @@ public class MainPage extends JFrame implements ReloadListener {
         mainPageSplitPane = new JSplitPane();
         filterPanel = new JPanel();
         sortLabel = new JLabel();
-        sortOptions = new JComboBox();
+        sortOptions = new JComboBox<>();
         priceFilterLabel = new JLabel();
-        priceFilterBox = new JComboBox();
+        priceFilterBox = new JComboBox<>();
         typeFilterLabel = new JLabel();
-        typeFilterBox = new JComboBox();
+        typeFilterBox = new JComboBox<>();
         brandFilterLabel = new JLabel();
-        filterBox4 = new JComboBox();
+        filterBox4 = new JComboBox<>();
         subTypeFilterLabel = new JLabel();
-        subTypeFilterBox = new JComboBox();
+        subTypeFilterBox = new JComboBox<>();
         productPanel = new JPanel();
         productCardPanel1 = new JPanel();
         productImage1 = new JLabel();
@@ -522,15 +522,15 @@ public class MainPage extends JFrame implements ReloadListener {
     private JSplitPane mainPageSplitPane;
     private JPanel filterPanel;
     private JLabel sortLabel;
-    private JComboBox sortOptions;
+    private JComboBox<Filter.SortBy> sortOptions;
     private JLabel priceFilterLabel;
-    private JComboBox priceFilterBox;
+    private JComboBox<Filter.PriceRange> priceFilterBox;
     private JLabel typeFilterLabel;
-    private JComboBox typeFilterBox;
+    private JComboBox<Filter.TypeFilter> typeFilterBox;
     private JLabel brandFilterLabel;
-    private JComboBox filterBox4;
+    private JComboBox<Filter.BrandFilter> filterBox4;
     private JLabel subTypeFilterLabel;
-    private JComboBox subTypeFilterBox;
+    private JComboBox<Enum> subTypeFilterBox;
     private JPanel productPanel;
     private JPanel productCardPanel1;
     private JLabel productImage1;
@@ -665,6 +665,11 @@ public class MainPage extends JFrame implements ReloadListener {
         moreButton.setBackground(new Color(0x4e748d));
         moreButton.setForeground(new Color(0xe0e2e8));
         moreButton.setPreferredSize(new Dimension(100, 30));
+
+        moreButton.addActionListener(e -> {
+            ProductPage p = new ProductPage(product);
+            p.setVisible(true);
+        });
 
 
         // Create Add button
