@@ -32,10 +32,10 @@ public class ProductDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
             // wait for change
             if (productCodeExist(product.getProductCode())) {
-                System.out.println("Check the product code since this code is duplicated in the database");
+                Logging.getLogger().warning("Check the product code since the code " + productId + " is duplicated in the database");
                 return -1;
             } else {
-                System.out.println("Successful pass the productCodeExist");
+               Logging.getLogger().info("Successful pass the productCodeExist");
             }
             
             // Set the parameters for the product
@@ -136,9 +136,9 @@ public class ProductDAO {
             
             // Print to Test
             if (rowsAffected > 0) {
-                System.out.println("Product with ID " + productId + " was deleted successfully.");
+                Logging.getLogger().info("Product with ID " + productId + " was deleted successfully.");
             } else {
-                System.out.println("No product was found with ID " + productId + " to delete.");
+                Logging.getLogger().info("No product was found with ID " + productId + " to delete.");
             }
         } catch (SQLTimeoutException e) {
             throw new ConnectionException("Database connect failed",e);
