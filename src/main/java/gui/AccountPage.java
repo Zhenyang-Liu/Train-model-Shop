@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -26,6 +28,9 @@ public class AccountPage extends JFrame {
     private JPanel TitlePanel;
     private JPanel DetailsPanel;
     private JPanel ButtonPanel;
+    private JLabel errorLabel;
+    private JPasswordField passwordInput;
+    private HashMap<String, JTextField> inputs;
     private User user;
     private Login userLogin;
     private BankDetail userBankDetails;
@@ -56,6 +61,80 @@ public class AccountPage extends JFrame {
     }
 
     /**
+     * Updates the values of the user, login, and bank tables (if needing changed)
+     */
+    private void updateDetails() {
+        // Look over each field, check if there's a change, verify and upload if there is
+        String email = inputs.get("email").toString();
+        String forename = inputs.get("forename").toString();
+        String surname = inputs.get("surname").toString();
+        String address = inputs.get("address").toString();
+        String accountNumber = inputs.get("accountNumber").toString();
+        String sortCode = inputs.get("sortCode").toString();
+        String expiryDate = inputs.get("expiryDate").toString();
+        String password = new String(passwordInput.getPassword());
+        String error = checkInputs(email, forename, surname, address, password, accountNumber, sortCode, expiryDate);
+
+        if (error.equals("OK")) {
+        } else {
+            errorLabel.setText(error);
+        }
+    }
+
+    /**
+     * Check the input fields for errors
+     * @param email inputted email
+     * @param forename inputted forename
+     * @param surname inputted surname
+     * @param address inputted address
+     * @param password inputted password
+     * @param accountNumber inputted account number
+     * @param sortCode inputted sort code
+     * @param expiryDate inputted expiry date
+     * @return "OK" if there were no errors otherwise an error message
+     */
+    private String checkInputs(String email, String forename, String surname, String address, String password, String accountNumber, String sortCode, String expiryDate) {
+        // Emails
+        Pattern emailPattern = Pattern.compile("^[A-z0-9._%+-]+@+[A-z0-9_%+-]+.[A-z_-]{2,}$");
+        if (!emailPattern.matcher(email).matches())
+            return "Email field(s) are not valid emails";
+
+        // Forename
+        if (forename.length() < 3)
+            return "First name is too short, it must be greater than 2 letters";
+        if (forename.length() > 16)
+            return "First name is too long, it must be less than 16 letters";
+
+        // Surname
+        if (surname.length() < 3)
+            return "Last name is too short, it must be greater than 2 letters";
+        if (surname.length() > 16)
+            return "Last name is too long, it must be less than 16 letters";
+
+        // Address
+        if (address.length() < 3)
+            return "Address is too short, it must be greater than 2 letters";
+
+        // Account number, sort code, and expiry date
+        Pattern accountNumberPattern = Pattern.compile("^[1-9]{4}-[1-9]{4}-[1-9]{4}-[1-9]{4}$");
+        Pattern sortCodePattern = Pattern.compile("^[1-9]{2}-[1-9]{2}-[1-9]{2}$");
+        Pattern expiryDatePattern = Pattern.compile("^[1-9]{2}/[1-9]{2}$");
+        if (!accountNumberPattern.matcher(accountNumber).matches() || accountNumber.length() != 19)
+            return "Account number must be in format xxxx-xxxx-xxxx-xxxx";
+        if (!sortCodePattern.matcher(sortCode).matches() || sortCode.length() != 8)
+            return "Sort code must be in format xx-xx-xx";
+        if (!expiryDatePattern.matcher(expiryDate).matches() || expiryDate.length() != 5)
+            return "Expiry date must be in format xx/xx";
+
+        // Passwords
+        Pattern passwordPattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])(?=.*[@!£$%^&*?]).{8,}");
+        if (!passwordPattern.matcher(password).matches())
+            return "Password must be longer than 8 letters and have at least one digit and special character";
+
+        return "OK";
+    }
+
+    /**
      * Initialises the components for this page 
      */
     public void initComponents() {
@@ -65,6 +144,8 @@ public class AccountPage extends JFrame {
         DetailsPanel = new JPanel();
         TitlePanel = new JPanel();
         ButtonPanel = new JPanel();
+        errorLabel = new JLabel();
+        inputs = new HashMap<>();
 
         // Set size and layout
         setPreferredSize(new Dimension(600, 450));
@@ -123,17 +204,18 @@ public class AccountPage extends JFrame {
         DetailsPanel.setLayout(new GridLayout(0, 2));
         
         // Add all labels and inputs (that are generic)
-        addLabelAndInput("Email:", user.getEmail(), DetailsPanel);
-        addLabelAndInput("Address:", user.getAddress(), DetailsPanel);
-        addLabelAndInput("First Name:", user.getForename(), DetailsPanel);
-        addLabelAndInput("Last Name:", user.getSurname(), DetailsPanel);
+        inputs.put("email", addLabelAndInput("Email:", user.getEmail(), DetailsPanel));
+        inputs.put("address", addLabelAndInput("Address:", user.getAddress(), DetailsPanel));
+        inputs.put("forename", addLabelAndInput("First Name:", user.getForename(), DetailsPanel));
+        inputs.put("surname", addLabelAndInput("Last Name:", user.getSurname(), DetailsPanel));
 
         // Password section, needs to be different
         JLabel passwordLabel = new JLabel("Password:");
-        JPasswordField passwordField = new JPasswordField();
+        passwordInput = new JPasswordField();
         setTextStyle(passwordLabel, false);
         DetailsPanel.add(passwordLabel);
-        DetailsPanel.add(passwordField);
+        DetailsPanel.add(passwordInput);
+        inputs.put("password", passwordInput);
 
         // Bank section, uses another panel
         JPanel BankPanel = new JPanel();
@@ -148,6 +230,13 @@ public class AccountPage extends JFrame {
         BankPanel.add(expiryDate);
         DetailsPanel.add(bankLabel);
         DetailsPanel.add(BankPanel);
+        inputs.put("accountNumber", accountNumber);
+        inputs.put("sortCode", sortCode);
+        inputs.put("expiryDate", expiryDate);
+
+        // Add error messages
+        errorLabel.setForeground(new Color(0xb13437));
+        DetailsPanel.add(errorLabel);
 
         // Add to Main Dialogue
         MainDialoguePanel.add(DetailsPanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0,
@@ -161,12 +250,13 @@ public class AccountPage extends JFrame {
      * @param textFieldValue The default text field value (can be empty)
      * @param panel The panel to add these to
      */
-    private void addLabelAndInput(String labelName, String textFieldValue, JPanel panel) {
+    private JTextField addLabelAndInput(String labelName, String textFieldValue, JPanel panel) {
         JLabel label = new JLabel(labelName);
         JTextField input = new JTextField(textFieldValue);
         setTextStyle(label, false);
         panel.add(label);
         panel.add(input);
+        return input;
     }
 
     /**
@@ -213,7 +303,7 @@ public class AccountPage extends JFrame {
         updateButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("clicked");
+                updateDetails();
             }
         });
         ButtonPanel.add(updateButton, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
