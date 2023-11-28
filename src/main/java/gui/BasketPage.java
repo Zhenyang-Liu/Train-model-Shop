@@ -253,10 +253,15 @@ public class BasketPage extends JFrame {
 
     private void loadUserCart(int userID) {
         Cart cart = CartService.getCartDetails(userID);
-        if (cart != null){
+        if (cart.getCartID() == 0){
+            CartService.createCart();
+            cart = CartService.getCartDetails(userID);
+        }
+        if (cart.getCartItems().size() > 0){
             loadTrolleyItems(cart.getCartItems()); // Load cart items into the trolley view
-        } else{
-            // TODO: Missing logic when action failed
+        } else {
+            JLabel noItemLabel = new JLabel("There is no item in your cart.");
+            trolleyItemsPanel.add(noItemLabel);
         }
     }
 

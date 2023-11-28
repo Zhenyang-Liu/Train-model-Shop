@@ -1,6 +1,7 @@
 import model.Address;
 import model.BankDetail;
 import model.BoxedSet;
+import model.Cart;
 import model.Controller;
 import model.Gauge;
 import model.Locomotive;
@@ -55,6 +56,8 @@ public class Test {
         
         User user = UserDAO.findUserByEmail("testemail@gmail.com");
         UserSession.getInstance().setCurrentUser(user);
+        Cart cart = new Cart(2);
+        System.out.println(cart.getCartItems().size());
         
         // CartService.addToCart(5, 5, 1);
         // CartService.addToCart(5, 3, 2);

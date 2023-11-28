@@ -26,6 +26,7 @@ import service.OrderService;
 
 /**
  * @author Zhenyang Liu
+ * @author Jiawei Jiang
  */
 public class PendingOrderPage extends JFrame {
     public PendingOrderPage(Order order) {

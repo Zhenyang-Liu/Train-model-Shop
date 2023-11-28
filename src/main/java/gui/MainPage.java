@@ -733,6 +733,10 @@ public class MainPage extends JFrame implements ReloadListener {
                 adjustNumPanel.setVisible(true);
                 Cart cart = CartService.getCartDetails(userID);
                 int cartID = cart.getCartID();
+                if (cartID == 0) {
+                    CartService.createCart();
+                    cartID = CartService.getCartDetails(userID).getCartID();
+                }
                 int productID = product.getProductID();
                 CartService.addToCart(cartID, productID, 1);
             }else {
@@ -813,7 +817,8 @@ public class MainPage extends JFrame implements ReloadListener {
      * Main function for testing
      */
     public static void main(String[] args) {
-        User user = UserDAO.findUserByEmail("testemail@gmail.com");
+        // User user = UserDAO.findUserByEmail("testemail@gmail.com");
+        User user = UserDAO.findUserByEmail("manager@manager.com");
         UserSession.getInstance().setCurrentUser(user);
 
         EventQueue.invokeLater(() -> {

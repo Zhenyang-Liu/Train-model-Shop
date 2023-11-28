@@ -10,6 +10,8 @@ import javax.swing.text.PlainDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class BankDetailDialog extends JDialog {
     private JTextField cardHolderField;
@@ -41,6 +43,12 @@ public class BankDetailDialog extends JDialog {
             populateFields();
         }
         setLocationRelativeTo(parent);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                onCancelButtonClicked();
+            }
+        });
     }
     
     private void initializeComponents() {
@@ -77,7 +85,7 @@ public class BankDetailDialog extends JDialog {
         add(actionButton);
 
         cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(e -> dispose());
+        cancelButton.addActionListener(e -> onCancelButtonClicked());
         add(cancelButton);
 
         pack();
@@ -156,6 +164,11 @@ public class BankDetailDialog extends JDialog {
     
             securityCodeField.setText(bankDetail.getSecurityCode());
         }
+    }
+
+    private void onCancelButtonClicked() {
+        isInputValid = false;
+        dispose();
     }
     
     public String getCardHolder() { return cardHolderField.getText(); }

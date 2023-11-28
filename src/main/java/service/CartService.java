@@ -20,9 +20,25 @@ import model.Cart;
 import model.CartItem;
 import model.Order;
 import model.Product;
+import model.User;
 
 
 public class CartService {
+
+    public static boolean createCart() {
+        try {
+            int userID = UserSession.getInstance().getCurrentUser().getUserID();
+            if (!PermissionService.hasPermission(userID,"EDIT_OWN_CART")) {
+                throw new AuthorizationException("Access denied. Users can only access their own carts.");
+            }
+            CartDAO.insertCart(new Cart(userID));
+            return true;
+            
+        } catch (DatabaseException e) {
+            ExceptionHandler.printErrorMessage(e);
+            return false;
+        }
+    }
     /**
      * Adds a product to a specified cart.
      *
