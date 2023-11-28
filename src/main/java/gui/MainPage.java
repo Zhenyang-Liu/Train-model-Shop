@@ -663,8 +663,8 @@ public class MainPage extends JFrame implements ReloadListener {
         moreButton.setPreferredSize(new Dimension(100, 30));
 
         moreButton.addActionListener(e -> {
-            ProductPage p = new ProductPage(product);
-            p.setVisible(true);
+            // ProductPage p = new ProductPage(product);
+            // p.setVisible(true);
         });
 
 
