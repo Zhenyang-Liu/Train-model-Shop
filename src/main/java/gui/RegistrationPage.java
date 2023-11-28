@@ -9,6 +9,7 @@ import DAO.LoginDAO;
 import DAO.UserDAO;
 import exception.DatabaseException;
 import helper.UserSession;
+import helper.Logging;
 import model.Login;
 import model.User;
 import javax.swing.*;
@@ -54,7 +55,7 @@ public class RegistrationPage extends JFrame {
 
             if (hasCreatedUser) {
                 UserSession.getInstance().setCurrentUser(newUser);
-                System.out.println("User has logged in (id = " + newUser.getUserID() + ")");
+                Logging.getLogger().info("User has logged in (id = " + newUser.getUserID() + ")");
 
                 // Attempt to set default role
                 try {
@@ -149,7 +150,7 @@ public class RegistrationPage extends JFrame {
                 errorLabel.setText(userCreationError);
         }
         else {
-            System.out.println("Inputs were not valid: " + fieldsError);
+            Logging.getLogger().warning("Inputs were not valid: " + fieldsError);
             errorLabel.setText(fieldsError);
         }
     }

@@ -5,14 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
 import helper.Logging;
-
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class EraDAO {
     
@@ -40,9 +39,9 @@ public class EraDAO {
             // print to Test
             for (int i = 0; i < batchResults.length; i++) {
                 if (batchResults[i] == PreparedStatement.EXECUTE_FAILED) {
-                    System.err.println("Insert operation failed for record at index " + i);
+                    Logging.getLogger().warning("Insert operation failed for record at index " + i);
                 } else {
-                    System.out.println("Insert operation succeeded for record at index " + i);
+                    Logging.getLogger().info("Insert operation succeeded for record at index " + i);
                 }
             }
 

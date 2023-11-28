@@ -4,24 +4,47 @@
 
 package gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import static DAO.OrderDAO.findOrderByID;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
-import javax.swing.*;
-import javax.swing.border.*;
+import java.util.ResourceBundle;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import exception.DatabaseException;
+import helper.Logging;
 import listeners.ReloadListener;
+import model.Cart;
 import model.CartItem;
 import model.Product;
-import model.User;
 import service.CartService;
-import model.Cart;
-
-import static DAO.OrderDAO.findOrderByID;
 
 /**
  * @author Zhenyang Liu
@@ -47,8 +70,13 @@ public class BasketPage extends JFrame {
         } else if (orderID == -3) {
 
         } else {
-            PendingOrderPage pendingOrderPage = new PendingOrderPage(findOrderByID(orderID));
-            pendingOrderPage.setVisible(true);
+            try{
+                PendingOrderPage pendingOrderPage = new PendingOrderPage(findOrderByID(orderID));
+                pendingOrderPage.setVisible(true);
+            }catch(DatabaseException e1){
+                Logging.getLogger().warning("Could not find create pending order page at orderID " + orderID + "\nStacktrace: " + e1.getMessage());
+            };
+            
         }
     }
 

@@ -1,19 +1,34 @@
 package gui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JSeparator;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 import DAO.BankDetailDAO;
 import DAO.LoginDAO;
 import DAO.UserDAO;
 import exception.DatabaseException;
+import helper.Logging;
 import model.BankDetail;
 import model.Login;
 import model.User;
@@ -39,12 +54,13 @@ public class AccountPage extends JFrame {
      * Instantiate object and create components for GUI
      */
     public AccountPage(int userID) {
+        Logging.getLogger().info("Creating account page for user " + userID);
         try {
             user = UserDAO.findUserByID(userID);
             userLogin = LoginDAO.findLoginByUserID(userID);
             userBankDetails = BankDetailDAO.findBankDetail(userID);
         } catch (DatabaseException | SQLException e) {
-            System.out.println("User not logged in for account page, closing account page");
+            Logging.getLogger().warning("User not logged in for account page, closing account page");
             LoginPage loginPage = new LoginPage();
             loginPage.setVisible(true);
             this.dispose();

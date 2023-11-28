@@ -5,11 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
+import java.util.ArrayList;
+
 import exception.ConnectionException;
 import exception.DatabaseException;
 import helper.Logging;
-
-import java.util.ArrayList;
 import model.User;
 
 public class UserDAO {
@@ -29,7 +29,7 @@ public class UserDAO {
         PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             // Make sure the user is not in the database before adding
             if (doesUserExist(newUser.getUserID())) {
-                System.out.println("User not added, they are already in the database");
+                Logging.getLogger().warning("User not added, they are already in the database");
                 return false;
             }
             
@@ -42,7 +42,7 @@ public class UserDAO {
 
             // Run SQL command
             preparedStatement.executeUpdate();
-            System.out.println("Successfully added user into database!");
+            Logging.getLogger().info("Successfully added user into database!");
             return true;
         } catch (SQLException e) {
             Logging.getLogger().warning("Error while inserting new user: SQL Excepted\nStacktrace: " + e.getMessage());

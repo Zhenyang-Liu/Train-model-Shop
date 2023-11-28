@@ -4,25 +4,38 @@
 
 package gui;
 
-import helper.ImageUtils;
-import helper.Logging;
-import helper.UserSession;
-import service.PermissionService;
-
-import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
-import model.Product;
 import DAO.ProductDAO;
 import DAO.UserDAO;
 import exception.DatabaseException;
+import helper.ImageUtils;
+import helper.Logging;
+import helper.UserSession;
+import model.Product;
+import service.PermissionService;
 
 public class ProductPage extends JFrame {
 
@@ -115,6 +128,7 @@ public class ProductPage extends JFrame {
         Dimension d = field.getPreferredSize();
         d.width = 200;
         field.setPreferredSize(d);
+        field.setBackground(new Color(0xFFFFFF));
         field.setEditable(isStaff);
 
         panel.add(label);
@@ -126,7 +140,7 @@ public class ProductPage extends JFrame {
         JPanel attributePanel = new JPanel();
         productName = new JTextField(p.getProductName());
         productDescription = new JTextField(p.getDescription());
-        productPrice = new JTextField(String.valueOf(p.getRetailPrice()));
+        productPrice = new JTextField("£" + String.valueOf(p.getRetailPrice()));
 
         attributePanel.setBackground(new Color(0xFFFFFF));
         attributePanel.setLayout(new BoxLayout(attributePanel, BoxLayout.Y_AXIS));
