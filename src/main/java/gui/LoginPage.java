@@ -52,9 +52,7 @@ public class LoginPage extends JFrame {
             Login userLogin = LoginDAO.findLoginByUserID(user.getUserID());
 
             if (!UserSession.getInstance().isLoggedIn() && UserDAO.doesUserExist(email)) {
-                System.out.println("Matching passwords..");
                 if (userLogin.doesPasswordMatch(password)) {
-                    System.out.println("Passwords work!");
                     UserSession.getInstance().setCurrentUser(user);
 
                     // Reload products for user

@@ -128,7 +128,6 @@ public class MainPage extends JFrame implements ReloadListener {
         typeFilterBox.addItem(f.new TypeFilter("BoxedSet", "Box Sets", "pack_type"));
 
         typeFilterBox.addItemListener(e -> {
-            System.out.println("Loading filters: " + e.getItem().toString());
             populateSubFilters();
             loadProducts();
         });
@@ -162,7 +161,6 @@ public class MainPage extends JFrame implements ReloadListener {
 
     private void populateFilterBoxes()
     {
-        System.out.println("Filter boxes");
         populatePriceRangeFilters();
         populateBrandFilters();
         populateSortOptions();

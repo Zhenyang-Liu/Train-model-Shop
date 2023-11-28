@@ -112,12 +112,11 @@ public class BankDetailService {
                 if (keyID == 0){
                     return "Generate encryption key Failed. Please try again.";
                 }
+                // Associate user with the key
+                EncryptionKeysDAO.insertUserKey(userID, keyID);
             } else {
                 return "Action Failed. Please try again.";
             }
-
-            // Associate user with the key
-            EncryptionKeysDAO.insertUserKey(userID, keyID);
 
             // Encrypt card details
             String cardName = getCreditCardType(cardNumber);

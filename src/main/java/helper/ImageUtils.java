@@ -30,10 +30,9 @@ public class ImageUtils {
             reader.close();
             return Base64.getEncoder().encodeToString(scaleImage(bytes, 256, 150));
         }catch(FileNotFoundException e){
-            System.out.println("Could not find file specified!");
+           Logging.getLogger().warning("Could not find file specified: " + file.getAbsolutePath());
         }catch(IOException e){
-            System.out.println("IO EXCEPTION");
-            e.printStackTrace();
+            Logging.getLogger().warning("IOException thrown while reading file at " + file.getAbsolutePath() + "\nStacktrace: " + e.getMessage());
         }
         return "";
     }
@@ -57,8 +56,7 @@ public class ImageUtils {
             ImageIO.write(imageBuff, "jpg", buffer);
             return buffer.toByteArray();
         }catch(IOException e){
-            System.out.println("IO Exception while scaling image :D");
-            e.printStackTrace();
+            Logging.getLogger().warning("Error while attempting to scale image to dimensions (" + width + ", " + height + ")" + "\nStacktrace: " + e.getMessage());
         }
         return new byte[]{};
     }

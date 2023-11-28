@@ -6,18 +6,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
 import helper.Logging;
-
-import java.util.HashMap;
-import java.util.ArrayList;
-
 import model.BoxedSet;
-import model.Product;
 import model.BoxedSet.BoxedType;
+import model.Product;
 
 public class BoxedSetDAO extends ProductDAO {
 
@@ -100,9 +98,9 @@ public class BoxedSetDAO extends ProductDAO {
             
             if (rowsAffected > 0) {
                 ProductDAO.deleteProduct(productId);
-                System.out.println("BoxedSet with ID " + productId + " was deleted successfully.");
+                Logging.getLogger().info("BoxedSet with ID " + productId + " was deleted successfully.");
             } else {
-                System.out.println("No set was found with ID " + productId + " to delete.");
+                Logging.getLogger().warning("No set was found with ID " + productId + " to delete.");
             }
         } catch (SQLTimeoutException e) {
             throw new ConnectionException("Database connect failed",e);
@@ -121,9 +119,9 @@ public class BoxedSetDAO extends ProductDAO {
             int rowsAffected = preparedStatement.executeUpdate();
             
             if (rowsAffected > 0) {
-                System.out.println("Item of set with ID " + productId + " was deleted successfully.");
+                Logging.getLogger().info("Item of set with ID " + productId + " was deleted successfully.");
             } else {
-                System.out.println("No item was found in set ID " + productId + " to delete.");
+                Logging.getLogger().warning("No item was found in set ID " + productId + " to delete.");
             }
         } catch (SQLTimeoutException e) {
             throw new ConnectionException("Database connect failed",e);
