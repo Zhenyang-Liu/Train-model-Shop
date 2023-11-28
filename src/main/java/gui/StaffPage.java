@@ -1,9 +1,12 @@
 package gui;
 
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
 
 import DAO.ControllerDAO;
 import DAO.LocomotiveDAO;
+import DAO.OrderDAO;
 import DAO.RollingStockDAO;
 import DAO.TrackDAO;
 import DAO.UserDAO;
@@ -11,8 +14,8 @@ import helper.UserSession;
 
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Map;
 
 import model.*;
 import service.OrderService;
@@ -40,8 +43,7 @@ public class StaffPage extends JFrame {
         add(mainPanel, BorderLayout.CENTER);
     }
 
-    // ------------------------------------------------------------------
-    // Top Panel
+    // Main Panel Constructor
     private JPanel createTopPanel() {
         JPanel topPanel = new JPanel(new BorderLayout());
 
@@ -73,16 +75,6 @@ public class StaffPage extends JFrame {
         return topPanel;
     }
     
-    private void showProductPanel() {
-        cardLayout.show(mainPanel, "Product");
-    }
-    
-    private void showOrderPanel() {
-        cardLayout.show(mainPanel, "Order");
-    }
-    
-    // ------------------------------------------------------------------
-    // Product Panel
     private JPanel createProductPanel() {
         JPanel productPanel = new JPanel(new BorderLayout());
 
@@ -122,6 +114,74 @@ public class StaffPage extends JFrame {
         return productPanel;
     }
 
+    private JPanel createOrderPanel() {
+        JPanel orderPanel = new JPanel(new BorderLayout());
+        JPanel leftPanel = createOrderFilterPanel();
+    
+        OrderTableModel tableModel = new OrderTableModel(OrderService.getAllOrders());
+        JTable orderTable = new JTable(tableModel);
+    
+        ButtonColumnListener listener = (row, column) -> {
+            Order selectedOrder = tableModel.getOrderAt(row);
+
+            SwingUtilities.invokeLater(() -> {
+                OrderDetailPage frame = new OrderDetailPage(selectedOrder);
+                frame.setVisible(true);
+            });
+        };
+    
+        orderTable.getColumn("Details").setCellRenderer(new ButtonRenderer());
+        orderTable.getColumn("Details").setCellEditor(new ButtonEditor(new JCheckBox(), listener));
+    
+        JScrollPane scrollPane = new JScrollPane(orderTable);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+    
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, scrollPane);
+        splitPane.setDividerLocation(150);
+        orderPanel.add(splitPane, BorderLayout.CENTER);
+    
+        return orderPanel;
+    }   
+
+    //
+    private JPanel createOrderFilterPanel(){
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.add(Box.createVerticalGlue());
+        
+        Dimension buttonSize = new Dimension(100, 30);
+        JButton allButton = createButton("All", buttonSize, e -> loadOrderData("all"));
+        JButton confirmedButton = createButton("Confirmed", buttonSize, e -> loadOrderData("confirmed"));
+        JButton fulfilledButton = createButton("Fulfilled", buttonSize, e -> loadOrderData("fulfilled"));
+    
+        leftPanel.add(allButton);
+        leftPanel.add(confirmedButton);
+        leftPanel.add(fulfilledButton);
+        leftPanel.add(Box.createVerticalGlue());
+
+        return leftPanel;
+    }
+
+    private JPanel createProductCard(Product product) {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+    
+        card.add(new JLabel("ProductID: " + product.getProductID()));
+        card.add(new JLabel("Brand: " + (product.getBrand() != null ? product.getBrand() : "Unknown")));
+        card.add(new JLabel("Product Name: " + product.getProductName()));
+        card.add(new JLabel("Product Code: " + product.getProductCode()));
+        card.add(new JLabel("Retail Price: " + product.getRetailPrice()));
+        card.add(new JLabel("Stock Quantity: " + product.getStockQuantity()));
+    
+        JButton detailsButton = new JButton("Detail");
+        detailsButton.addActionListener(e -> showProductDetails(product));
+        card.add(detailsButton);
+    
+        return card;
+    }
+
+    // Method about Product
     private void addProduct() {
         JDialog dialog = new JDialog(this, "Add Product", true);
         dialog.setLayout(new GridBagLayout());
@@ -202,8 +262,11 @@ public class StaffPage extends JFrame {
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
-    
-    // TODO: ADD BoxedSet Unfinished
+        
+    private void showProductDetails(Product product) {
+        // TODO: Unfinished
+    }
+
     private void showAdditionalOptions(JPanel additionalPanel, String productType, JDialog dialog, Product product) {
         additionalPanel.removeAll();
         GridBagConstraints gbc = new GridBagConstraints();
@@ -289,125 +352,18 @@ public class StaffPage extends JFrame {
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }    
-
-    // TODO: wait for a nicer look
-    private JPanel createProductCard(Product product) {
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-    
-        card.add(new JLabel("ProductID: " + product.getProductID()));
-        card.add(new JLabel("Brand: " + (product.getBrand() != null ? product.getBrand() : "Unknown")));
-        card.add(new JLabel("Product Name: " + product.getProductName()));
-        card.add(new JLabel("Product Code: " + product.getProductCode()));
-        card.add(new JLabel("Retail Price: " + product.getRetailPrice()));
-        card.add(new JLabel("Stock Quantity: " + product.getStockQuantity()));
-    
-        JButton detailsButton = new JButton("Detail");
-        detailsButton.addActionListener(e -> showProductDetails(product));
-        card.add(detailsButton);
-    
-        return card;
-    }
-
-    private void showProductDetails(Product product) {
-        // TODO: Unfinished
-    }
-
-
-    // ------------------------------------------------------------------
-    // Order Panel
-    private JPanel createOrderPanel() {
-        JPanel orderPanel = new JPanel(new BorderLayout());
-
-        JPanel leftPanel = createLeftOrderPanel();
-        JPanel rightPanel = createRightOrderPanel();
-    
-        JScrollPane scrollPane = new JScrollPane(rightPanel);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, scrollPane);
-        splitPane.setDividerLocation(150);
-        orderPanel.add(splitPane, BorderLayout.CENTER);
-    
-        return orderPanel;
-    }
-
-    private JPanel createLeftOrderPanel(){
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-        leftPanel.add(Box.createVerticalGlue());
-        
-        Dimension buttonSize = new Dimension(100, 30);
-        JButton allButton = createButton("All", buttonSize, e -> loadOrderData("all"));
-        JButton confirmedButton = createButton("Confirmed", buttonSize, e -> loadOrderData("confirmed"));
-        JButton fulfilledButton = createButton("Fulfilled", buttonSize, e -> loadOrderData("fulfilled"));
-    
-        leftPanel.add(allButton);
-        leftPanel.add(confirmedButton);
-        leftPanel.add(fulfilledButton);
-        leftPanel.add(Box.createVerticalGlue());
-
-        return leftPanel;
-    }
-
-    private JPanel createRightOrderPanel() {
-        JPanel rightPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.weightx = 1;
-        gbc.weighty = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        
-        ArrayList<Order> orderList = OrderService.getAllOrders();
-        // TODO: loading order data and create a card for each order
-        for (Order order : orderList) {
-            rightPanel.add(createOrderCard(order), gbc);
-        }
-        return rightPanel;
+   
+    // Display Specific Panel
+    private void showProductPanel() {
+        cardLayout.show(mainPanel, "Product");
     }
     
-    // TODO: wait for a nicer look
-    private JPanel createOrderCard(Order order) {
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-
-        card.add(new JLabel("OrderID: " + order.getOrderID()));
-        card.add(new JLabel("UserID: " + order.getUserID()));
-        card.add(new JLabel("AddressID: " + order.getAddressID()));
-        card.add(new JLabel("Create Time: " + order.getCreateTime()));
-        card.add(new JLabel("Update Time: " + order.getUpdateTime()));
-        card.add(new JLabel("Total Cost: " + order.getTotalCost()));
-        card.add(new JLabel("Status: " + order.getStatus()));
-    
-        // Show the itemList in the Order
-        if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
-            card.add(new JLabel("Order List:"));
-            for (Map.Entry<Product, Integer> entry : order.getOrderItems().entrySet()) {
-                Product product = entry.getKey();
-                Integer quantity = entry.getValue();
-                card.add(new JLabel("- " + product.getProductName() + " (Quantity: " + quantity + ")"));
-            }
-        }
-    
-        // Detail Button
-        JButton detailsButton = new JButton("Detail");
-        detailsButton.addActionListener(e -> showOrderDetails(order));
-        card.add(detailsButton);
-    
-        return card;
+    private void showOrderPanel() {
+        cardLayout.show(mainPanel, "Order");
     }
     
-    private void showOrderDetails(Order order) {
-        // TODO：Unfinished
-    }
-
-    private void loadOrderData(String roleFilter) {
-
-    }
-
-    // Method for creating Buttons
-    private JButton createButton(String text, Dimension size, ActionListener listener) {
+    // Assistance Method
+     private JButton createButton(String text, Dimension size, ActionListener listener) {
         JButton button = new JButton(text);
         button.setMinimumSize(size);
         button.setMaximumSize(size);
@@ -415,6 +371,126 @@ public class StaffPage extends JFrame {
         button.addActionListener(listener);
         return button;
     }
+   
+    // Inner Class
+    class OrderTableModel extends AbstractTableModel {
+        private final String[] columnNames = {"OrderID", "UserID", "Create Time", "Update Time", "Total Cost", "Status", "Details"};
+        private ArrayList<Order> orders;
+    
+        public OrderTableModel(ArrayList<Order> orders) {
+            this.orders = orders;
+        }
+    
+        @Override
+        public int getRowCount() {
+            return orders.size();
+        }
+    
+        @Override
+        public int getColumnCount() {
+            return columnNames.length;
+        }
+    
+        @Override
+        public String getColumnName(int column) {
+            return columnNames[column];
+        }
+    
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            Order order = orders.get(rowIndex);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        
+            switch (columnIndex) {
+                case 0: return order.getOrderID();
+                case 1: return order.getUserID();
+                case 2: return dateFormat.format(order.getCreateTime());
+                case 3: return dateFormat.format(order.getUpdateTime());
+                case 4: return String.format("%.2f", order.getTotalCost());
+                case 5: return order.getStatus();
+                case 6: return "Details";
+                default: return null;
+            }
+        }
+        
+        public Order getOrderAt(int rowIndex) {
+            return orders.get(rowIndex);
+        }
+    }        
+
+    class ButtonRenderer extends JButton implements TableCellRenderer {
+        public ButtonRenderer() {
+            setOpaque(true);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                    boolean isSelected, boolean hasFocus, int row, int column) {
+            setText((value == null) ? "" : value.toString());
+            return this;
+        }
+    }
+
+    class ButtonEditor extends DefaultCellEditor {
+        private JButton button;
+        private String label;
+        private boolean isPushed;
+        private ButtonColumnListener listener;
+        private int row, column;
+    
+        public ButtonEditor(JCheckBox checkBox, ButtonColumnListener listener) {
+            super(checkBox);
+            this.button = new JButton();
+            this.button.setOpaque(true);
+            this.listener = listener;
+            this.button.addActionListener(e -> fireEditingStopped());
+        }
+    
+        public Component getTableCellEditorComponent(JTable table, Object value,
+                boolean isSelected, int row, int column) {
+            if (isSelected) {
+                button.setForeground(table.getSelectionForeground());
+                button.setBackground(table.getSelectionBackground());
+            } else {
+                button.setForeground(table.getForeground());
+                button.setBackground(table.getBackground());
+            }
+            label = (value == null) ? "" : value.toString();
+            button.setText(label);
+            isPushed = true;
+            this.row = row;
+            this.column = column;
+            return button;
+        }
+    
+        public Object getCellEditorValue() {
+            if (isPushed) {
+                listener.onButtonClicked(row, column);
+            }
+            isPushed = false;
+            return label;
+        }
+    
+        public boolean stopCellEditing() {
+            isPushed = false;
+            return super.stopCellEditing();
+        }
+    
+        protected void fireEditingStopped() {
+            super.fireEditingStopped();
+        }
+    }
+    
+    public interface ButtonColumnListener {
+        void onButtonClicked(int row, int column);
+    }
+    
+
+    private void loadOrderData(String roleFilter) {
+
+    }
+
+    // Method for creating Buttons
 
     public static void main(String[] args) {
         User user = UserDAO.findUserByEmail("manager@manager.com");
