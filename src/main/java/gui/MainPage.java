@@ -627,7 +627,7 @@ public class MainPage extends JFrame implements ReloadListener {
         // Add a product image
         JLabel productImage = new JLabel();
         //productImage.setPreferredSize(new Dimension(260, 120));
-        ImageIcon originalIcon = new ImageIcon(product.getProductImage());
+        ImageIcon originalIcon = product.getProductImage();
         Image originalImage = originalIcon.getImage();
         Image resizedImage = originalImage.getScaledInstance(256, 140, Image.SCALE_SMOOTH);
         productImage.setIcon(new ImageIcon(resizedImage));
@@ -663,8 +663,8 @@ public class MainPage extends JFrame implements ReloadListener {
         moreButton.setPreferredSize(new Dimension(100, 30));
 
         moreButton.addActionListener(e -> {
-            // ProductPage p = new ProductPage(product);
-            // p.setVisible(true);
+            ProductPage p = new ProductPage(product);
+            p.setVisible(true);
         });
 
 
