@@ -21,6 +21,8 @@ import model.Product;
 import model.User;
 import service.AddressService;
 import service.BankDetailService;
+import service.CartService;
+import service.OrderService;
 
 /**
  * @author Zhenyang Liu
@@ -32,13 +34,52 @@ public class PendingOrderPage extends JFrame {
     }
 
     private void confirmButtonMouseClicked(MouseEvent e) {
-        // TODO add your code here
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+    
+        if (!isAddressExist) {
+            JOptionPane.showMessageDialog(parentFrame, "Please add an address", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (!isPaymentExist) {
+            JOptionPane.showMessageDialog(parentFrame, "Please add a payment card", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            order.setAddressID(address.getID());
+            order.setBankDetailState(isPaymentExist);
+            order.nextStatus();
+            if (OrderService.confirmOrder(order)){
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(parentFrame, "Meet an error when confirming the order. Please try again later.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
-
+    
     private void cancelButtonMouseClicked(MouseEvent e) {
-        // TODO add your code here
-    }
+        int confirmCancel = JOptionPane.showConfirmDialog(
+            this,
+            "Are you sure you want to cancel the order?",
+            "Confirm Cancellation",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        );
+    
+        if (confirmCancel == JOptionPane.YES_OPTION) {
+            CartService.restoreStock(order.getOrderItems());
 
+            int confirmReturnToCart = JOptionPane.showConfirmDialog(
+                this,
+                "Do you want to move the items back to the shopping cart?",
+                "Return to Cart",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+            );
+    
+            if (confirmReturnToCart == JOptionPane.YES_OPTION) {
+                OrderService.returnToCart(order);
+            }
+    
+            dispose();
+        }
+    }
+    
     private void addressAddButtonMouseClicked(MouseEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         AddressDialog addressDialog = new AddressDialog(parentFrame, null,false);
@@ -47,10 +88,6 @@ public class PendingOrderPage extends JFrame {
         if (addressDialog.isInputValid()) {
             updateAddressPanel();
         }
-    }
-
-    private void addressSelectButtonMouseClicked(MouseEvent e) {
-        // TODO add your code here
     }
 
     private void addressEditButtonMouseClicked(MouseEvent e) {
@@ -73,10 +110,6 @@ public class PendingOrderPage extends JFrame {
         }
     }
 
-    private void paymentSelectButtonMouseClicked(MouseEvent e) {
-        
-    }
-
     private void paymentEditButtonMouseClicked(MouseEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         BankDetailDialog bankDetailDialog = new BankDetailDialog(parentFrame,bankDetail,true);
@@ -96,25 +129,20 @@ public class PendingOrderPage extends JFrame {
         addressPanel = new JPanel();
         addressLabel = new JLabel();
         addressEditPanel = new JPanel();
-        addressSelectButton = new JButton();
         addressAddButton = new JButton();
         addressEditButton = new JButton();
         paymentPanel = new JPanel();
         paymentLabel = new JLabel();
         paymentEditPanel = new JPanel();
         paymentAddButton = new JButton();
-        paymentSelectButton = new JButton();
         paymentEditButton = new JButton();
         pendingOrderScrollPanel = new JScrollPane();
         pendingOrderItemsPanel = new JPanel();
-        pendingOrderCardPanel = new JPanel();
-        itemImage1 = new JLabel();
-        itemName1 = new JLabel();
-        itemPrice1 = new JLabel();
-        itemNumLabel1 = new JLabel();
         pendingOrderButtonPanel = new JPanel();
         cancelButton = new JButton();
         confirmButton = new JButton();
+        isAddressExist = false;
+        isPaymentExist = false;
 
         bankDetail = new BankDetail();
         address = new Address();
@@ -213,7 +241,7 @@ public class PendingOrderPage extends JFrame {
         contentPane.add(pendingOrderContentPanel, BorderLayout.CENTER);
 
         //======== pendingOrderButtonPanel ========
-        {
+        if(order.getStatus().getStatus().equals("Pending")){
             pendingOrderButtonPanel.setLayout(new FlowLayout());
 
             //---- cancelButton ----
@@ -263,7 +291,6 @@ public class PendingOrderPage extends JFrame {
         
         //---- paymentTextField ----
         this.bankDetail = BankDetailService.findBankDetail();
-        boolean isPaymentExist = false;
         if (bankDetail != null){
             JLabel paymentLabel = new JLabel();
             String formattedText = "<html><body>"
@@ -286,29 +313,17 @@ public class PendingOrderPage extends JFrame {
             paymentAddButton.setBackground(new Color(0x55a15a));
             paymentAddButton.setFont(paymentAddButton.getFont().deriveFont(paymentAddButton.getFont().getStyle() & ~Font.BOLD));
             paymentAddButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                paymentAddButtonMouseClicked(e);
-            }
-        });
-        paymentEditPanel.add(paymentAddButton);
-    }
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    paymentAddButtonMouseClicked(e);
+                }
+            });
+            isPaymentExist = false;
+            paymentEditPanel.add(paymentAddButton);
+        }
 
         //======== paymentEditPanel ========
         if (isPaymentExist) {
-            //---- paymentSelectButton ----
-            paymentSelectButton.setText("Select this card");
-            paymentSelectButton.setForeground(new Color(0xe9e4e3));
-            paymentSelectButton.setBackground(new Color(0x55a15a));
-            paymentSelectButton.setFont(paymentAddButton.getFont().deriveFont(paymentAddButton.getFont().getStyle() & ~Font.BOLD));
-            paymentSelectButton.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    paymentSelectButtonMouseClicked(e);
-                }
-            });
-            paymentEditPanel.add(paymentSelectButton);
-
             //---- paymentEditButton ----
             paymentEditButton.setText("Edit");
             paymentEditButton.setBackground(new Color(0x00a5f3));
@@ -335,7 +350,6 @@ public class PendingOrderPage extends JFrame {
         
         //---- AddressTextField ----
         this.address = AddressService.getAddressByUser();
-        boolean isAddressExist = false;
         if (!AddressService.isAddressEmpty(address)){
             JLabel addressLabel = new JLabel();
             String formattedText = "<html><body>"
@@ -362,23 +376,11 @@ public class PendingOrderPage extends JFrame {
                     addressAddButtonMouseClicked(e);
                 }
             });
+            isAddressExist = false;
             addressEditPanel.add(addressAddButton);
         }
         //======== addressEditPanel ========
         if (isAddressExist) {
-            //---- addressSelectButton ----
-            addressSelectButton.setText("Select this address");
-            addressSelectButton.setForeground(new Color(0xe9e4e3));
-            addressSelectButton.setBackground(new Color(0x55a15a));
-            addressSelectButton.setFont(addressAddButton.getFont().deriveFont(addressAddButton.getFont().getStyle() & ~Font.BOLD));
-            addressSelectButton.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    addressSelectButtonMouseClicked(e);
-                }
-            });
-            addressEditPanel.add(addressSelectButton);
-
             //---- addressEditButton ----
             addressEditButton.setText("Edit");
             addressEditButton.setBackground(new Color(0x00a5f3));
@@ -402,7 +404,6 @@ public class PendingOrderPage extends JFrame {
         cardPanel.setPreferredSize(new Dimension(600, 120));
     
         JLabel itemImage = new JLabel();
-        // itemImage.setIcon(new ImageIcon(getClass().getResource("/images/" + product.getImagePath())));
         itemImage.setText("pendingOrderPage.itemImage1.text");
         itemImage.setIcon(new ImageIcon(getClass().getResource("/images/tgv.jpeg")));
         itemImage.setPreferredSize(new Dimension(150, 120));
@@ -477,22 +478,15 @@ public class PendingOrderPage extends JFrame {
     private JPanel addressPanel;
     private JLabel addressLabel;
     private JPanel addressEditPanel;
-    private JButton addressSelectButton;
     private JButton addressAddButton;
     private JButton addressEditButton;
     private JPanel paymentPanel;
     private JLabel paymentLabel;
     private JPanel paymentEditPanel;
     private JButton paymentAddButton;
-    private JButton paymentSelectButton;
     private JButton paymentEditButton;
     private JScrollPane pendingOrderScrollPanel;
     private JPanel pendingOrderItemsPanel;
-    private JPanel pendingOrderCardPanel;
-    private JLabel itemImage1;
-    private JLabel itemName1;
-    private JLabel itemPrice1;
-    private JLabel itemNumLabel1;
     private JPanel pendingOrderButtonPanel;
     private JButton cancelButton;
     private JButton confirmButton;
@@ -501,4 +495,6 @@ public class PendingOrderPage extends JFrame {
     private BankDetail bankDetail;
     private Address address;
     private Order order;
+    private boolean isPaymentExist;
+    private boolean isAddressExist;
 }
