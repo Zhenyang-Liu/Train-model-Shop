@@ -13,6 +13,8 @@ import DAO.CartDAO;
 import DAO.OrderDAO;
 import DAO.ProductDAO;
 import exception.*;
+import helper.Logging;
+import helper.UserSession;
 import model.BoxedSet;
 import model.Cart;
 import model.CartItem;
@@ -114,7 +116,7 @@ public class CartService {
      */
     public static Cart getCartDetails(int userID) {
         try {
-            if (!PermissionService.hasPermission(userID,"EDIT_OWN_CART")) {
+            if (!PermissionService.hasPermission(userID,"VIEW_OWN_ORDERS")) {
                 throw new AuthorizationException("Access denied. Users can only access their own carts.");
             }
 

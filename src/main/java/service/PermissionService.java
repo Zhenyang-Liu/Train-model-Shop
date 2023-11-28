@@ -3,7 +3,7 @@ package service;
 import java.util.Set;
 
 import DAO.AuthenticationDAO;
-
+import helper.Logging;
 import helper.UserSession;
 
 public class PermissionService {
@@ -38,6 +38,7 @@ public class PermissionService {
      */
     public static boolean hasPermission(int userID, String permissionName) {
         UserSession session = UserSession.getInstance();
+        Logging.getLogger().info("Checking user " + userID + " has permission " + permissionName + "(Logged in user: " + session.getCurrentUser().getUserID() + ")");
         boolean hasBasicPermission = session.hasPermission(permissionName);
         if (permissionName.contains("OWN")) {
             return hasBasicPermission && userID == session.getCurrentUser().getUserID();
