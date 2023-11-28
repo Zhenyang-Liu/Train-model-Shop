@@ -34,99 +34,121 @@ new FormModel {
 				name: "pendingOrderContentPanel"
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
 					"$columnSpecs": "0"
-					"$rowSpecs": "0, 0"
+					"$rowSpecs": "0"
 					"$hGap": 5
 					"$vGap": 5
-					"$alignLeft": true
 					"$alignTop": true
+					"$alignLeft": true
 				} ) {
-					name: "customerInfoPanel"
-					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
-						"columns": 1
-						"rows": 3
-						"hgap": 5
-						"vgap": 5
+					name: "infoPanel"
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+						"$columnSpecs": "0"
+						"$rowSpecs": "0, 0"
+						"$hGap": 5
+						"$vGap": 5
+						"$alignLeft": true
+						"$alignTop": true
 					} ) {
-						name: "addressPanel"
-						"maximumSize": new java.awt.Dimension( 300, 200 )
-						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "addressLabel"
-							"text": "Address"
-							"foreground": &Color0 new java.awt.Color( 0, 51, 102, 255 )
-							"font": &SwingDerivedFont0 new com.jformdesigner.model.SwingDerivedFont( null, 1, 5, false )
-						} )
-						add( new FormComponent( "javax.swing.JTextField" ) {
-							name: "addressTextField"
-							"editable": false
-						} )
-						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
-							name: "addressEditPanel"
-							add( new FormComponent( "javax.swing.JButton" ) {
-								name: "addressAddButton"
-								"text": "Add"
-								"foreground": &Color1 new java.awt.Color( 233, 228, 227, 255 )
-								"background": &Color2 new java.awt.Color( 85, 161, 90, 255 )
-								"font": &SwingDerivedFont1 new com.jformdesigner.model.SwingDerivedFont( null, 65536, 0, false )
-								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "addressAddButtonMouseClicked", true ) )
+						name: "customerInfoPanel"
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
+							"columns": 1
+							"rows": 3
+							"hgap": 5
+							"vgap": 5
+						} ) {
+							name: "addressPanel"
+							"maximumSize": new java.awt.Dimension( 300, 200 )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "addressLabel"
+								"text": "Address"
+								"foreground": &Color0 new java.awt.Color( 0, 51, 102, 255 )
+								"font": &SwingDerivedFont0 new com.jformdesigner.model.SwingDerivedFont( null, 1, 5, false )
+								"horizontalAlignment": 2
 							} )
-							add( new FormComponent( "javax.swing.JButton" ) {
-								name: "addressEditButton"
-								"text": "Edit"
-								"background": &Color3 new java.awt.Color( 0, 165, 243, 255 )
-								"foreground": &Color4 new java.awt.Color( 233, 228, 227, 255 )
-								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "addressEditButtonMouseClicked", true ) )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "addressText"
 							} )
+							add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) {
+								"alignment": 0
+								"hgap": 0
+							} ) {
+								name: "addressEditPanel"
+								add( new FormComponent( "javax.swing.JButton" ) {
+									name: "addressAddButton"
+									"text": "Add a new address"
+									"foreground": &Color1 new java.awt.Color( 233, 228, 227, 255 )
+									"background": &Color2 new java.awt.Color( 85, 161, 90, 255 )
+									"font": &SwingDerivedFont1 new com.jformdesigner.model.SwingDerivedFont( null, 65536, 0, false )
+									"preferredSize": new java.awt.Dimension( 150, 23 )
+									addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "addressAddButtonMouseClicked", true ) )
+								} )
+								add( new FormComponent( "javax.swing.JButton" ) {
+									name: "addressEditButton"
+									"text": "Edit the address"
+									"background": &Color3 new java.awt.Color( 0, 165, 243, 255 )
+									"foreground": &Color4 new java.awt.Color( 233, 228, 227, 255 )
+									"preferredSize": new java.awt.Dimension( 150, 23 )
+									addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "addressEditButtonMouseClicked", true ) )
+								} )
+							} )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+							"hAlign": 2
+							"weightx": 1.0
+						} )
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
+							"columns": 1
+							"rows": 3
+							"hgap": 5
+							"vgap": 5
+						} ) {
+							name: "paymentPanel"
+							"maximumSize": new java.awt.Dimension( 300, 200 )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "paymentLabel"
+								"text": "Payment method"
+								"foreground": #Color0
+								"font": #SwingDerivedFont0
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "paymentText"
+							} )
+							add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) {
+								"alignment": 0
+								"hgap": 0
+							} ) {
+								name: "paymentEditPanel"
+								add( new FormComponent( "javax.swing.JButton" ) {
+									name: "paymentAddButton"
+									"text": "Add a new card"
+									"foreground": #Color1
+									"background": #Color2
+									"font": #SwingDerivedFont1
+									"preferredSize": new java.awt.Dimension( 150, 23 )
+									addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "paymentAddButtonMouseClicked", true ) )
+								} )
+								add( new FormComponent( "javax.swing.JButton" ) {
+									name: "paymentEditButton"
+									"text": "Edit the payment"
+									"background": #Color3
+									"foreground": #Color4
+									"preferredSize": new java.awt.Dimension( 150, 23 )
+									addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "paymentEditButtonMouseClicked", true ) )
+								} )
+							} )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+							"hAlign": 2
+							"gridy": 1
+							"insets": new java.awt.Insets( 20, 0, 0, 0 )
+							"weightx": 1.0
 						} )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"insets": new java.awt.Insets( 0, 10, 0, 20 )
 						"hAlign": 4
-						"weightx": 1.0
-					} )
-					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
-						"columns": 1
-						"rows": 3
-						"hgap": 5
-						"vgap": 5
-					} ) {
-						name: "paymentPnel"
-						"maximumSize": new java.awt.Dimension( 300, 200 )
-						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "paymentLabel"
-							"text": "Payment method"
-							"foreground": #Color0
-							"font": #SwingDerivedFont0
-						} )
-						add( new FormComponent( "javax.swing.JTextField" ) {
-							name: "paymentTextField"
-							"editable": false
-						} )
-						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
-							name: "paymentEditPanel"
-							add( new FormComponent( "javax.swing.JButton" ) {
-								name: "paymentAddButton"
-								"text": "Add"
-								"foreground": #Color1
-								"background": #Color2
-								"font": #SwingDerivedFont1
-								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "paymentAddButtonMouseClicked", true ) )
-							} )
-							add( new FormComponent( "javax.swing.JButton" ) {
-								name: "paymentEditButton"
-								"text": "Edit"
-								"background": #Color3
-								"foreground": #Color4
-								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "paymentEditButtonMouseClicked", true ) )
-							} )
-						} )
-					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
-						"hAlign": 4
-						"gridy": 1
-						"insets": new java.awt.Insets( 20, 0, 0, 0 )
 						"weightx": 1.0
 					} )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"weightx": 0.8
 					"hAlign": 5
-					"insets": new java.awt.Insets( 0, 10, 0, 20 )
 				} )
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 					name: "pendingOrderScrollPanel"
@@ -229,7 +251,7 @@ new FormModel {
 				"value": "South"
 			} )
 		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 290, 105 )
+			"location": new java.awt.Point( 5, 20 )
 			"size": new java.awt.Dimension( 900, 700 )
 		} )
 	}
