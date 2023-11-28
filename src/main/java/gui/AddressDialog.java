@@ -71,12 +71,12 @@ public class AddressDialog extends JDialog {
 
     private void onAdd() {
         if (!AddressService.isValidUKPostcode(getPostcode())) {
-            JOptionPane.showMessageDialog(this, "Invalid Post Code", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Invalid Post Code", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             Address address = new Address(getHouseNumber(), getRoadName(), getCity(), getPostcode());
             boolean isAddSuccess = AddressService.addAddress(address);
             if (!isAddSuccess) {
-                JOptionPane.showMessageDialog(this, "Add Address failed", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Add Address failed", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 isInputValid = true;
                 dispose();
@@ -86,12 +86,12 @@ public class AddressDialog extends JDialog {
 
     private void onUpdate() {
         if (!AddressService.isValidUKPostcode(getPostcode())) {
-            JOptionPane.showMessageDialog(this, "Invalid Post Code", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Invalid Post Code", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             Address address = new Address(getHouseNumber(), getRoadName(), getCity(), getPostcode());
             boolean isAddSuccess = AddressService.updateAddress(address);
             if (!isAddSuccess) {
-                JOptionPane.showMessageDialog(this, "Add Address failed", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Add Address failed", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 isInputValid = true;
                 dispose();
