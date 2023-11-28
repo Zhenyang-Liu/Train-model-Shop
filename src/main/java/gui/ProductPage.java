@@ -17,7 +17,6 @@ import javax.swing.*;
 import model.Product;
 import DAO.ProductDAO;
 import DAO.UserDAO;
-import exception.DatabaseException;
 
 public class ProductPage extends JFrame {
 
