@@ -4,18 +4,15 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+/*
+ * Written by: Julian Jones
+ */
 public class AccountPage extends JFrame {
     // GUI Variables
     private JPanel WindowPanel;
     private JPanel MainDialoguePanel;
     private JPanel TitlePanel;
     private JPanel DetailsPanel;
-    private JSeparator TitleSeparator;
-    private JLabel TitleLabel;
-    private JLabel EmailLabel;
-    private JLabel AddressLabel;
-    private JTextField EmailTextField;
-    private JTextField AddressTextField;
 
     /*
      * Instantiate object and create components for GUI
@@ -33,12 +30,6 @@ public class AccountPage extends JFrame {
         MainDialoguePanel = new JPanel();
         DetailsPanel = new JPanel();
         TitlePanel = new JPanel();
-        TitleSeparator = new JSeparator();
-        TitleLabel = new JLabel();
-        EmailLabel = new JLabel();
-        AddressLabel = new JLabel();
-        EmailTextField = new JTextField();
-        AddressTextField = new JTextField();
 
         // Set size and layout
         setPreferredSize(new Dimension(600, 450));
@@ -71,11 +62,12 @@ public class AccountPage extends JFrame {
     private void createTitlePanel() {
         // Create title panel and label
         TitlePanel.setLayout(new BoxLayout(TitlePanel, BoxLayout.Y_AXIS));
-        TitleLabel.setText("Your Account");
+        JLabel TitleLabel = new JLabel("Your Account");
         setTextStyle(TitleLabel, true);
         TitlePanel.add(TitleLabel);
 
         // Title Separator
+        JSeparator TitleSeparator = new JSeparator();
         TitleSeparator.setForeground(new Color(0x7f7272));
         TitleSeparator.setBackground(new Color(0x7f7272));
         TitlePanel.add(TitleSeparator);
@@ -90,23 +82,30 @@ public class AccountPage extends JFrame {
      * Create details panel
      */
     private void createDetailsPanel() {
-        DetailsPanel.setPreferredSize(new Dimension(200, 130));
+        DetailsPanel.setPreferredSize(new Dimension(400, 130));
         DetailsPanel.setMinimumSize(new Dimension(50, 92));
-        DetailsPanel.setLayout(new GridLayout(4, 2));
+        DetailsPanel.setLayout(new GridLayout(0, 2));
 
         // Email section
-        EmailTextField.setText("example@email.com");
-        EmailLabel.setText("Your Email:");
+        JLabel EmailLabel = new JLabel("Email:");
+        JTextField EmailTextField = new JTextField("example@email.com");
         setTextStyle(EmailLabel, false);
         DetailsPanel.add(EmailLabel);
         DetailsPanel.add(EmailTextField);
 
-        // Email section
-        AddressTextField.setText("some address, postcode, england");
-        AddressLabel.setText("Your Address:");
+        // Address section
+        JLabel AddressLabel = new JLabel("Address:");
+        JTextField AddressTextField = new JTextField("Some address, postcode, england");
         setTextStyle(AddressLabel, false);
         DetailsPanel.add(AddressLabel);
         DetailsPanel.add(AddressTextField);
+
+        // Password section
+        JLabel PasswordLabel = new JLabel("Password:");
+        JTextField PasswordTextField = new JTextField();
+        setTextStyle(PasswordLabel, false);
+        DetailsPanel.add(PasswordLabel);
+        DetailsPanel.add(PasswordTextField);
 
         // Add to Main Dialogue
         MainDialoguePanel.add(DetailsPanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0,
