@@ -35,21 +35,21 @@ public class BoxedSet extends Product{
 
     }
 
-    public BoxedSet(String brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String boxedType) {
-        super(brand, productName, productCode, retailPrice, description, stockQuantity);
+    public BoxedSet(String brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String boxedType, String image) {
+        super(brand, productName, productCode, retailPrice, description, stockQuantity, image);
         this.setBoxedType(boxedType);
         this.contain = new HashMap<>();
     }
 
     public BoxedSet(Product product, String boxedType) {
-        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity());
+        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity(), product.getImageBase64());
         this.setBoxedType(boxedType);
         this.contain = new HashMap<>();
         this.setProductID(product.getProductID());
     }
 
     public BoxedSet(Product product, String boxedType, Map<Product, Integer> itemList) {
-        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity());
+        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity(), product.getImageBase64());
         this.setBoxedType(boxedType);
         this.contain = itemList;
         this.setProductID(product.getProductID());

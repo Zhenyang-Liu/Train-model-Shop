@@ -3,7 +3,6 @@ package model;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 import javax.swing.ImageIcon;
 
@@ -35,13 +34,14 @@ public class Product {
      * @param stockQuantity The stock quantity of the product.
      */
     public Product(String brand, String productName, String productCode,
-                   double d, String description, int stockQuantity) {
+                   double d, String description, int stockQuantity, String image) {
         this.setBrand(brand);
         this.setProductName(productName);
         this.setProductCode(productCode);
         this.setRetailPrice(d);
         this.setDescription(description);
         this.setStockQuantity(stockQuantity);
+        this.setImageBase64(image);
     }
 
     // Getter and Setter
@@ -102,6 +102,10 @@ public class Product {
 
     public void setProductImage(String base64Image){
         this.imageBase64 = base64Image;
+    }
+
+    public String getImageBase64(){
+        return imageBase64;
     }
 
     /**
@@ -205,6 +209,10 @@ public class Product {
      */
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public void setImageBase64(String base64){
+        this.imageBase64 = base64;
     }
 
 
