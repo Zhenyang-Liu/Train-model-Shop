@@ -331,6 +331,8 @@ public class CartDAO {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     userID = resultSet.getInt("user_id");
+                }else{
+                    Logging.getLogger().warning("Error: Could not find userID from cart " + cartID);
                 }
             } 
         } catch (SQLTimeoutException e){
@@ -382,7 +384,7 @@ public class CartDAO {
      */
     public static int checkProductInCart(int productID, int cartID) throws DatabaseException {
         String selectSQL = "SELECT cart_item_id FROM Cart_Item WHERE product_id = ? AND cart_id = ?";
-        int cartItemID = -1; 
+        int cartItemID = -1;
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
