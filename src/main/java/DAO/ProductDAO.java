@@ -170,6 +170,7 @@ public class ProductDAO {
                 product.setDescription(resultSet.getString("description"));
                 product.setRetailPrice(resultSet.getFloat("retail_price"));
                 product.setStockQuantity(resultSet.getInt("stock_quantity"));
+                product.setImageBase64(resultSet.getString("product_image"));
             }
             return product;
         } catch (SQLTimeoutException e){
