@@ -14,8 +14,9 @@ public class Logging {
     /**
      * Initialises logging. By default, the logfile is in TrainShop/log.log
      */
-    public static void Init(){
-        LogManager.getLogManager().reset();
+    public static void Init(boolean logToConsole){
+        if(!logToConsole)
+            LogManager.getLogManager().reset();
         l = Logger.getLogger("Train Logger");
         try {
             fn = new FileHandler("log.log");
@@ -36,7 +37,7 @@ public class Logging {
      */
     public static Logger getLogger(){
         if (l == null)
-            Logging.Init();
+            Logging.Init(false);
         return l;
     }
 
