@@ -1,6 +1,13 @@
 package model;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+
+import javax.swing.ImageIcon;
+
+import helper.ImageUtils;
 
 public class Product {
     private int productID;
@@ -10,6 +17,7 @@ public class Product {
     private double retailPrice;
     private String description;
     private int stockQuantity;
+    private String imageBase64;
     private String imagePath;
 
     // No-argument constructor
@@ -90,6 +98,10 @@ public class Product {
      */
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+
+    public void setProductImage(String base64Image){
+        this.imageBase64 = base64Image;
     }
 
     /**
@@ -241,11 +253,11 @@ public class Product {
     }
 
     /**
-     * Get the URL of the product image.
+     * Get the base64 encoded  of the product image.
      *
      * @return Returns the URL of the product image if the image path is valid; otherwise, returns null.
      */
-    public URL getProductImage() {
+    public ImageIcon getProductImage() {
         /**
         if (imagePath != null && !imagePath.isEmpty()) {
             try {
@@ -256,10 +268,14 @@ public class Product {
             }
         }
          */
-
-        URL imageUrl = getClass().getResource("/images/tgv.jpeg");
-
-        return imageUrl;
+        URI defaultImage = null;
+        try {
+            defaultImage = getClass().getResource("/images/tgv.jpeg").toURI();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        String imageIcon = this.imageBase64 != null ? this.imageBase64 : ImageUtils.toBase64(new File(defaultImage));
+        return ImageUtils.imageToIcon(imageIcon);
     }
 
 

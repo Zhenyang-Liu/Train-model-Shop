@@ -4,22 +4,17 @@
 
 package gui;
 
+import helper.ImageUtils;
 import helper.UserSession;
-import listeners.ReloadListener;
-import model.Login;
-import model.User;
 import service.PermissionService;
 
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.*;
-import javax.swing.border.*;
-import java.sql.SQLException;
 
 import model.Product;
-import DAO.AuthenticationDAO;
-import DAO.LoginDAO;
 import DAO.ProductDAO;
 import DAO.UserDAO;
 import exception.DatabaseException;
@@ -67,10 +62,11 @@ public class ProductPage extends JFrame {
 
     private GridBagConstraints createProductName(){
         productName = new JTextField(p.getProductName());
-        productName.setHorizontalAlignment(JTextField.CENTER);
+        productName.setHorizontalAlignment(JTextField.LEFT);
         productName.setEditable( isStaff );
         productName.setPreferredSize(new Dimension(256, 50));
         productName.setFont(productName.getFont().deriveFont(24.0f));
+        productName.setBorder(BorderFactory.createEmptyBorder());
         return getPanelConstraint(2, 1, 1, 1);
     }
 
@@ -78,6 +74,8 @@ public class ProductPage extends JFrame {
         productDescription = new JTextArea(p.getDescription());
         productDescription.setEditable( isStaff );
         productDescription.setPreferredSize(new Dimension(256, 150));
+        productDescription.setLineWrap(true);
+        productDescription.setBorder(BorderFactory.createEmptyBorder());
 
         return getPanelConstraint(2, 2, 1, 2);
     }
@@ -87,7 +85,7 @@ public class ProductPage extends JFrame {
         productImage = new JLabel();
         productImage.setPreferredSize(new Dimension(256, 140));
 
-        ImageIcon originalIcon = new ImageIcon(this.p.getProductImage());
+        ImageIcon originalIcon = this.p.getProductImage();
         Image originalImage = originalIcon.getImage();
         Image resizedImage = originalImage.getScaledInstance(256, 140, Image.SCALE_SMOOTH);
         productImage.setIcon(new ImageIcon(resizedImage));
@@ -108,11 +106,21 @@ public class ProductPage extends JFrame {
         GridBagConstraints descriptionLayout = createProductDescription();
 
         productArea.add(productImage, imageLayout);
+        productImage.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e){
+                final JFileChooser fc = new JFileChooser();
+                int returnVal = fc.showOpenDialog(productArea);
+
+                String imageBase64 = ImageUtils.toBase64(fc.getSelectedFile());
+
+                productImage.setIcon(ImageUtils.imageToIcon(imageBase64));
+                productImage.repaint();
+            }
+        });
         productArea.add(productName, nameLayout);
         productArea.add(productDescription, descriptionLayout);
 
         contentPane.add(productArea, BorderLayout.CENTER);
-
         pack();
     }
 
