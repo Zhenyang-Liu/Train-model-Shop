@@ -1,6 +1,5 @@
 package model;
 
-import java.sql.SQLException;
 import java.util.Random;
 
 import DAO.UserDAO;
@@ -12,6 +11,7 @@ public class User {
     private String surname;
     private String address;
 
+    public User() {}
 
     public User(String email, String forename, String surname, String address) {
         this.userID = generateUserID();

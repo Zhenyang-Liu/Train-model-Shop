@@ -103,7 +103,7 @@ public class LoginDAO{
                 login.setUserID(resultSet.getInt("user_id"));
                 login.setPassword(resultSet.getString("password_hash"), resultSet.getString("password_salt"));
                 login.setFailedAttempts(resultSet.getInt("failed_attempts"));
-                login.setLastLoginAttempt(resultSet.getTimestamp("last_login_atttempt"));
+                login.setLastLoginAttempt(resultSet.getTimestamp("last_login_attempt"));
                 login.setLockoutEnabled(resultSet.getBoolean("lockout_enabled"));
                 login.setLockoutEnd(resultSet.getTimestamp("lockout_end"));
             }

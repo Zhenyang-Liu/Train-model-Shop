@@ -11,7 +11,6 @@ import exception.ConnectionException;
 import exception.DatabaseException;
 import model.Gauge;
 import model.Track;
-import model.Track.TrackType;
 import model.Product;
 
 public class TrackDAO extends ProductDAO {
@@ -24,14 +23,13 @@ public class TrackDAO extends ProductDAO {
      */
     public static void insertTrack(Track track) throws DatabaseException {
         int productID = insertProduct(track);
-        String insertSQL = "INSERT INTO Track (product_id, track_type, gauge) VALUES (?, ?, ?);";
+        String insertSQL = "INSERT INTO Track (product_id, gauge) VALUES (?, ?, ?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             
             preparedStatement.setInt(1, productID);
-            preparedStatement.setString(2, track.getTrackType());
-            preparedStatement.setString(3, track.getGauge());
+            preparedStatement.setString(2, track.getGauge());
 
             int rowsAffected = preparedStatement.executeUpdate();
 
@@ -56,14 +54,13 @@ public class TrackDAO extends ProductDAO {
      */
     public static void updateTrack(Track track) throws DatabaseException{
         ProductDAO.updateProduct(track);
-        String updateSQL = "UPDATE Track SET track_type = ?, gauge = ? WHERE product_id = ?;";
+        String updateSQL = "UPDATE Track SET gauge = ? WHERE product_id = ?;";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
             
-            preparedStatement.setString(1, track.getTrackType());
-            preparedStatement.setString(2, track.getGauge());
-            preparedStatement.setInt(3, track.getProductID());
+            preparedStatement.setString(1, track.getGauge());
+            preparedStatement.setInt(2, track.getProductID());
 
             int rowsAffected = preparedStatement.executeUpdate();
 
@@ -125,9 +122,8 @@ public class TrackDAO extends ProductDAO {
                 int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
                 String newGauge = resultSet.getString("gauge");
-                String newType = resultSet.getString("track_type");
 
-                track = new Track(newProduct, newType, newGauge);
+                track = new Track(newProduct, newGauge);
             }
         } catch (SQLTimeoutException e){
             throw new ConnectionException("Database connect failed",e);
@@ -158,43 +154,8 @@ public class TrackDAO extends ProductDAO {
                 int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
                 String newGauge = resultSet.getString("gauge");
-                String newType = resultSet.getString("track_type");
 
-                Track track = new Track(newProduct, newType, newGauge);
-                tracks.add(track);
-            }
-        } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
-        } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
-        }
-        return tracks;
-    }
-    
-    /**
-     * Retrieves a list of tracks from the database that match the specified type.
-     *
-     * @param type The track type to filter rollingstocks by.
-     * @return An ArrayList of Track objects that match the specified type | null if can't find.
-     * @throws DatabaseException If a database error occurs.
-     */
-    public static ArrayList<Track> findTracksByType(TrackType type) throws DatabaseException{
-        String selectSQL = "SELECT * FROM Track WHERE track_type = ?;";
-        ArrayList<Track> tracks = new ArrayList<Track>();
-
-        try (Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
-
-            preparedStatement.setString(1, type.getType());
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
-                String newGauge = resultSet.getString("gauge");
-                String newType = resultSet.getString("track_type");
-
-                Track track = new Track(newProduct, newType, newGauge);
+                Track track = new Track(newProduct, newGauge);
                 tracks.add(track);
             }
         } catch (SQLTimeoutException e){
@@ -224,9 +185,8 @@ public class TrackDAO extends ProductDAO {
                 int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
                 String newGauge = resultSet.getString("gauge");
-                String newType = resultSet.getString("track_type");
 
-                Track track = new Track(newProduct, newType, newGauge);
+                Track track = new Track(newProduct, newGauge);
                 tracks.add(track);
             }
         } catch (SQLTimeoutException e){

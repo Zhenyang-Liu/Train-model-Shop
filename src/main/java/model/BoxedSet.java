@@ -35,7 +35,7 @@ public class BoxedSet extends Product{
 
     }
 
-    public BoxedSet(Brand brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String boxedType) {
+    public BoxedSet(String brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String boxedType) {
         super(brand, productName, productCode, retailPrice, description, stockQuantity);
         this.setBoxedType(boxedType);
         this.contain = new HashMap<>();

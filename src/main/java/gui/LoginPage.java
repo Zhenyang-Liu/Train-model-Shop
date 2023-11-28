@@ -6,6 +6,7 @@ package gui;
 
 import helper.UserSession;
 import listeners.ReloadListener;
+import model.Login;
 import model.User;
 
 import java.awt.*;
@@ -13,13 +14,19 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
+import java.sql.SQLException;
+
+import DAO.LoginDAO;
+import DAO.UserDAO;
 
 /**
  * @author LIU ZHENYANG
  */
+
 public class LoginPage extends JFrame {
     public LoginPage() {
         initComponents();
+        createUIComponents();
     }
 
     private ReloadListener loginSuccessListener;
@@ -35,28 +42,56 @@ public class LoginPage extends JFrame {
         this.dispose();
     }
 
-    private void backButtonMouseClicked(MouseEvent e) {
-        // TODO add your code here
+    private void backButtonMouseClicked() {
         this.dispose();
     }
 
-    private void LoginButtonMouseClicked(MouseEvent e) {
-        // TODO add your code here TO deal with login
-         User loggedInUser = new User("test@gmail.com", "Julian", "Jones", "s14gn");
-         UserSession.getInstance().setCurrentUser(loggedInUser);
-        if (loginSuccessListener != null) {
-            loginSuccessListener.reloadProducts();
+    private String LoginButtonMouseClicked(String email, String password) {
+        // Try to get and check login details
+        try {
+            User user = UserDAO.findUserByEmail(email);
+            Login userLogin = LoginDAO.findLoginByUserID(user.getUserID());
+
+            if (!UserSession.getInstance().isLoggedIn() && UserDAO.doesUserExist(email)) {
+                System.out.println("Matching passwords..");
+                if (userLogin.doesPasswordMatch(password)) {
+                    System.out.println("Passwords work!");
+                    UserSession.getInstance().setCurrentUser(user);
+
+                    // Reload products for user
+                    if (loginSuccessListener != null) {
+                        loginSuccessListener.reloadProducts();
+                    }
+
+                    // Return true as everything went successful
+                    backButtonMouseClicked();
+                    return "OK";
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
+        // Assume something went wrong, return default error message
+        // for security we don't want to say if the password or email was wrong
+        return "Email or Password was incorrect";
     }
 
     private void createUIComponents() {
-        // TODO: add custom component creation code here
+        //---- errorLabel ----
+        errorLabel = new JLabel();
+        errorLabel.setText("");
+        errorLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+        errorLabel.setFont(errorLabel.getFont().deriveFont(errorLabel.getFont().getSize() + 1f));
+        errorLabel.setIconTextGap(6);
+        errorLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        errorLabel.setForeground(new Color(0xb13437));
+        LoginTitlePanel.add(errorLabel);
     }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
-        createUIComponents();
-
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
         LoginDialogPanel = new JPanel();
         LoginContentPanel = new JPanel();
@@ -71,7 +106,6 @@ public class LoginPage extends JFrame {
         LoginButtonBar = new JPanel();
         button_register = new JButton();
         LoginButton = new JButton();
-        LoginCancelButton = new JButton();
 
         //======== this ========
         setPreferredSize(new Dimension(600, 450));
@@ -163,32 +197,18 @@ public class LoginPage extends JFrame {
 
                 //---- LoginButton ----
                 LoginButton.setText("Login");
-                LoginButton.setActionCommand("Login");
                 LoginButton.setBackground(new Color(0x003366));
                 LoginButton.setForeground(new Color(0xe9e5e5));
-                LoginButton.setPreferredSize(new Dimension(78, 28));
-                LoginButton.setFont(LoginButton.getFont().deriveFont(LoginButton.getFont().getSize() + 1f));
                 LoginButton.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        LoginButtonMouseClicked(e);
+                        String error = LoginButtonMouseClicked(LoginTextField_email.getText(), new String(LoginPasswordField.getPassword()));
+                        if (!error.equals("OK")) {
+                            errorLabel.setText(error);
+                        }
                     }
                 });
-                LoginButtonBar.add(LoginButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                    new Insets(0, 0, 0, 5), 0, 0));
-
-                //---- LoginCancelButton ----
-                LoginCancelButton.setText("Back");
-                LoginCancelButton.setPreferredSize(new Dimension(78, 28));
-                LoginCancelButton.setFont(LoginCancelButton.getFont().deriveFont(LoginCancelButton.getFont().getSize() + 1f));
-                LoginCancelButton.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        backButtonMouseClicked(e);
-                    }
-                });
-                LoginButtonBar.add(LoginCancelButton, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+                LoginButtonBar.add(LoginButton, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 0), 0, 0));
             }
@@ -214,6 +234,6 @@ public class LoginPage extends JFrame {
     private JPanel LoginButtonBar;
     private JButton button_register;
     private JButton LoginButton;
-    private JButton LoginCancelButton;
+    private JLabel errorLabel;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }

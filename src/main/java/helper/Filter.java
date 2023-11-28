@@ -2,8 +2,6 @@ package helper;
 
 import java.nio.charset.StandardCharsets;
 
-import model.Brand;
-
 public class Filter {
     public class SortBy{
         public SortBy(String name, String dbHandle, boolean asc){
@@ -18,7 +16,7 @@ public class Filter {
         @Override
         public String toString()
         {
-            return this.name;
+            return this.name + (isAscending ? " ^" : " v");
         }
 
         public String getDbHandle()
@@ -65,24 +63,29 @@ public class Filter {
         private float maxVal;
         private String displayName;
     }
-    public class BrandFilter{
-        public BrandFilter(Brand b, String displayName){
-            this.enclosedBrand = b;
+    public class BrandFilter {
+        public BrandFilter(String brandName, String displayName) {
+            this.brandName = brandName;
             this.displayName = displayName;
         }
-        public BrandFilter(Brand b){
-            this(b, b.getBrandName());
+
+        public BrandFilter(String brandName) {
+            this.brandName = brandName;
+            this.displayName = brandName;
         }
+    
         @Override
-        public String toString(){
+        public String toString() {
             return displayName;
         }
-        public int getBrand(){
-            return enclosedBrand != null ? enclosedBrand.getBrandID() : -1;
+        public String getBrand() {
+            return brandName;
         }
-        private Brand enclosedBrand;
+    
+        private String brandName;
         private String displayName;
     }
+    
     public class TypeFilter{
         public TypeFilter(String dbColumn, String displayName, String subFilterCol){
             this.dbHandle = dbColumn;

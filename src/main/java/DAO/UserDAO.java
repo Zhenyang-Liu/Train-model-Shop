@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
+import java.sql.SQLTimeoutException;
+import exception.ConnectionException;
+import exception.DatabaseException;
+import java.util.ArrayList;
 import model.User;
 
 public class UserDAO {
@@ -98,4 +101,91 @@ public class UserDAO {
         // Default return false as nothing above matched
         return false;
     }
+
+    public static User findUserByEmail(String email) {
+        String checkSQL = "SELECT * FROM User WHERE email = ?";
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+        PreparedStatement checkStatement = connection.prepareStatement(checkSQL)) {
+
+            checkStatement.setString(1, email);
+            try (ResultSet results = checkStatement.executeQuery()) {
+                User user = new User();
+
+                // Populate new user
+                if (results.next()) {
+                    user.setUserID(results.getInt("user_id"));
+                    user.setEmail(results.getString("email"));
+                    user.setForename(results.getString("forename"));
+                    user.setSurname(results.getString("surname"));
+                    user.setAddress(results.getString("address"));
+                }
+                    
+                // Return the user
+                return user;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return new User();
+    }
+
+    public static User findUserByID(int userID) throws DatabaseException{
+        String checkSQL = "SELECT * FROM User WHERE user_id = ?";
+        User user = new User();
+        
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+        PreparedStatement checkStatement = connection.prepareStatement(checkSQL)) {
+
+            checkStatement.setInt(1, userID);
+            try (ResultSet results = checkStatement.executeQuery()) {            
+                if (results.next()) {
+                    user.setUserID(results.getInt("user_id"));
+                    user.setEmail(results.getString("email"));
+                    user.setForename(results.getString("forename"));
+                    user.setSurname(results.getString("surname"));
+                }
+            }
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed", e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(), e);
+        }
+        return user;
+    }
+
+    /**
+     * Retrieves all users from the database.
+     *
+     * This method queries the database to retrieve all user records. It constructs and returns a list of User objects,
+     * each representing a user in the database. If a database access issue occurs, it throws a corresponding exception.
+     *
+     * @return An ArrayList of User objects representing all users in the database.
+     * @throws DatabaseException if there is an issue with database access.
+     */
+    public static ArrayList<User> findAllUser() throws DatabaseException {
+        String selectSQL = "SELECT * FROM User;";
+        ArrayList<User> userList = new ArrayList<>();
+    
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement checkStatement = connection.prepareStatement(selectSQL);
+            ResultSet results = checkStatement.executeQuery()) {
+
+            while (results.next()) {
+                User user = new User();
+                user.setUserID(results.getInt("user_id"));
+                user.setEmail(results.getString("email"));
+                user.setForename(results.getString("forename"));
+                user.setSurname(results.getString("surname"));
+                userList.add(user);
+            }
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed", e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(), e);
+        }
+        return userList;
+    }
+
 }

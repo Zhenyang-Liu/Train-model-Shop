@@ -171,14 +171,18 @@ public class BoxedSetDAO extends ProductDAO {
 
                 switch (item.getProductType()) {
                     case "Track":
-                        contain.put(TrackDAO.findTrackByID(itemID),quantity);
+                        contain.put(TrackDAO.findTrackByID(itemID), quantity);
+                        break;
                     case "Controller":
-                        contain.put(ControllerDAO.findControllerByID(itemID),quantity);
+                        contain.put(ControllerDAO.findControllerByID(itemID), quantity);
+                        break; 
                     case "Locomotive":
-                        contain.put(LocomotiveDAO.findLocomotiveByID(itemID),quantity);
+                        contain.put(LocomotiveDAO.findLocomotiveByID(itemID), quantity);
+                        break;
                     case "Rolling Stock":
-                        contain.put(RollingStockDAO.findProductByID(itemID),quantity);
-                }
+                        contain.put(RollingStockDAO.findProductByID(itemID), quantity);
+                        break;
+                }              
             }
         } catch (SQLTimeoutException e) {
             throw new ConnectionException("Database connect failed",e);

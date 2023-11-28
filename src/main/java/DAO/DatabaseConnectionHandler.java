@@ -16,8 +16,9 @@ public class DatabaseConnectionHandler {
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-
+        config.setLeakDetectionThreshold(60000); 
         dataSource = new HikariDataSource(config);
+        
     }
 
     public static Connection getConnection() throws SQLException {

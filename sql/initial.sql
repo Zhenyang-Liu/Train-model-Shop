@@ -17,6 +17,19 @@ CREATE TABLE Login (
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
+CREATE TABLE EncryptionKeys (
+    key_id INT AUTO_INCREMENT PRIMARY KEY,
+    key_value VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE User_Key (
+    user_id INT UNIQUE,
+    key_id INT,
+    PRIMARY KEY (user_id, key_id),
+    FOREIGN KEY (user_id) REFERENCES User(user_id),
+    FOREIGN KEY (key_id) REFERENCES EncryptionKeys(key_id)
+);
+
 CREATE TABLE Role (
     role_id INT AUTO_INCREMENT PRIMARY KEY,
     role_name VARCHAR(10) NOT NULL UNIQUE
@@ -62,23 +75,24 @@ CREATE TABLE User_Address (
 
 CREATE TABLE Bank_Detail (
     bank_detail_id INT AUTO_INCREMENT PRIMARY KEY,
-    card_name VARCHAR(255),
-    card_holder_name VARCHAR(255),
-    card_number VARCHAR(255), 
-    expiry_date DATE,
-    security_code VARCHAR(255),
-    user_id INT,
+    card_name VARCHAR(255) NOT NULL,
+    card_holder_name VARCHAR(255) NOT NULL,
+    card_number VARCHAR(255) NOT NULL, 
+    expiry_date VARCHAR(10) NOT NULL,
+    security_code VARCHAR(255) NOT NULL,
+    user_id INT NOT NULL, 
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
 CREATE TABLE Orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    delivery_address_id INT NOT NULL,
+    delivery_address_id INT,
     create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     total_cost DECIMAL(10, 2) NOT NULL,
     status ENUM('Pending', 'Confirmed', 'Fulfilled') NOT NULL,
+    bank_detail_state INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES User(user_id),
     FOREIGN KEY (delivery_address_id) REFERENCES Address(address_id)
 );
@@ -90,21 +104,14 @@ CREATE TABLE Cart (
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
-CREATE TABLE Brand (
-    brand_id INT AUTO_INCREMENT PRIMARY KEY,
-    brand_name VARCHAR(255) NOT NULL,
-    country VARCHAR(255) NOT NULL
-);
-
 CREATE TABLE Product (
     product_id INT AUTO_INCREMENT PRIMARY KEY,
-    brand_id INT NOT NULL,
+    brand_name VARCHAR(255) NOT NULL,
     product_name VARCHAR(255) NOT NULL,
     product_code VARCHAR(8) NOT NULL,
     retail_price DECIMAL(10, 2) NOT NULL,
     description TEXT NOT NULL,
-    stock_quantity INT NOT NULL,
-    FOREIGN KEY (brand_id) REFERENCES Brand(brand_id)
+    stock_quantity INT NOT NULL
 );
 
 CREATE TABLE Order_Line (
@@ -140,7 +147,6 @@ CREATE TABLE ProductEra (
 
 CREATE TABLE Track (
     product_id INT,
-    track_type VARCHAR(255),
     gauge VARCHAR(255),
     FOREIGN KEY (product_id) REFERENCES Product(product_id)
 );

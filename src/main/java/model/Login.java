@@ -1,10 +1,11 @@
 package model;
 
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
+import java.util.Arrays;
+
 
 public class Login{
 
@@ -124,8 +125,20 @@ public class Login{
         byte[] salt = new byte[16];
         SecureRandom random = new SecureRandom();
         random.nextBytes(salt);
-        this.setPasswordSalt(salt.toString());
+        this.setPasswordSalt(new String(salt));
+        System.out.println("Created acount, salt used: " + Arrays.toString(salt));
         this.setPasswordHash(hash(password, getPasswordSalt()));
+    }
+
+    private static String bytesToHex(byte[] bytes){
+        final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+        }
+        return new String(hexChars);
     }
 
     /**
@@ -143,9 +156,8 @@ public class Login{
             System.out.println("Could not use SHA-512 uh oh");
             return "";
         };
-        
-        md.update(salt.getBytes(StandardCharsets.UTF_8));
-        return md.digest(toHash.getBytes(StandardCharsets.UTF_8)).toString();
+        System.out.println("Hashing: " + toHash + salt);
+        return bytesToHex(md.digest((toHash + salt).getBytes()));
     }
 
     /**
@@ -155,7 +167,8 @@ public class Login{
      * @return True if the password matches the hashed password stored else False
      */
     public boolean doesPasswordMatch(String password){
-        return hash(password, getPasswordSalt()).equals(password);
+        System.out.println("Hashed password: " + new String(hash(password, getPasswordSalt()) + "Stored: " + new String(getPasswordHash())));
+        return hash(password, getPasswordSalt()).equals(getPasswordHash());
     }
 
     /**

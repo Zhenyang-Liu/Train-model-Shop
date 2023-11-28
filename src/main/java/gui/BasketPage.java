@@ -12,16 +12,11 @@ import javax.swing.border.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.jgoodies.forms.factories.*;
-import exception.AuthorizationException;
-import exception.DatabaseException;
 import listeners.ReloadListener;
 import model.CartItem;
 import model.Product;
 import service.CartService;
 import model.Cart;
-import helper.UserSession;
-
 
 /**
  * @author Zhenyang Liu
@@ -257,12 +252,11 @@ public class BasketPage extends JFrame {
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
     private void loadUserCart(int userID) {
-        try {
-            Cart cart = CartService.getCartDetails(userID); // Get user cart details
+        Cart cart = CartService.getCartDetails(userID);
+        if (cart != null){
             loadTrolleyItems(cart.getCartItems()); // Load cart items into the trolley view
-        } catch (DatabaseException e) {
-            // Exception handling
-            e.printStackTrace();
+        } else{
+            // TODO: Missing logic when action failed
         }
     }
 
@@ -306,7 +300,7 @@ public class BasketPage extends JFrame {
 
         // Create and configure the product image label
         JLabel itemImage = new JLabel();
-        ImageIcon originalIcon = new ImageIcon(product.getProductImage());
+        ImageIcon originalIcon = product.getProductImage();
         Image originalImage = originalIcon.getImage();
         Image resizedImage = originalImage.getScaledInstance(150, 100, Image.SCALE_SMOOTH);
         itemImage.setIcon(new ImageIcon(resizedImage));
@@ -346,13 +340,12 @@ public class BasketPage extends JFrame {
             public void stateChanged(ChangeEvent e) {
                 int currentQuantity = (Integer) itemSpinner.getValue();
 
-                try {
-                    CartService.updateCartItem(cartItem.getItemID(), currentQuantity);
+                if(CartService.updateCartItem(cartItem.getItemID(), currentQuantity)){
                     if (reloadListener != null) {
                         reloadListener.reloadProducts();
                     }
-                } catch (DatabaseException ex) {
-                    throw new RuntimeException(ex);
+                }else{
+                    //TODO: Missing logic if update failed
                 }
             }
         });

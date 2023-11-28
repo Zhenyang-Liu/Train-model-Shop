@@ -64,7 +64,7 @@ public class AuthenticationDAO {
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             
             preparedStatement.setInt(1, userID);
-            preparedStatement.setInt(2, getRoleId("CUSTOMOER"));
+            preparedStatement.setInt(2, getRoleId("CUSTOMER"));
 
             int rowsAffected = preparedStatement.executeUpdate();
             
@@ -128,6 +128,30 @@ public class AuthenticationDAO {
         }
     }
 
+    public static String findRoleByID(int userID) throws DatabaseException {
+        String roleName = null;
+        String selectSQL = "SELECT Role.role_name " +
+                         "FROM User_Role " +
+                         "JOIN Role ON User_Role.role_id = Role.role_id " +
+                         "WHERE User_Role.user_id = ?";
+
+         try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+            preparedStatement.setInt(1, userID);
+    
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    roleName = resultSet.getString("role_name");
+                }
+            }
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(),e);
+        }
+        return roleName;
+    }
+
     /**
      * Retrieves the ID of a role based on its name.
      *
@@ -145,7 +169,7 @@ public class AuthenticationDAO {
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
             preparedStatement.setString(1, roleName.toUpperCase());
 
-            ResultSet resultSet = preparedStatement.executeQuery(selectSQL);
+            ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getInt("role_id");
             } else {

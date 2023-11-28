@@ -25,14 +25,14 @@ public class AddressDAO {
      * @throws DatabaseException if there is an issue with database access.
      */
     public static void insertAddress(int userID, Address address) throws DatabaseException {
-        String insertSQL = "INSERT INTO address (houseNumber, roadName, city, postcode) VALUES (?, ?, ?, ?);";
+        String insertSQL = "INSERT INTO Address (house_number, road_name, city_name, postcode) VALUES (?, ?, ?, ?);";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, address.getHouseNumber());
             preparedStatement.setString(2, address.getRoadName());
-            preparedStatement.setString(3, address.getRoadName());
-            preparedStatement.setString(4, address.getRoadName());
+            preparedStatement.setString(3, address.getCity());
+            preparedStatement.setString(4, address.getPostcode());
     
             int rowsAffected = preparedStatement.executeUpdate();
     
@@ -92,7 +92,7 @@ public class AddressDAO {
      * @throws DatabaseException if there is an issue with database access.
      */
     public static void deleteAddressByUser(int userID) throws DatabaseException {
-        String deleteSQL = "DROP FROM User_Address WHERE user_id = ?;";
+        String deleteSQL = "DELETE FROM User_Address WHERE user_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
@@ -132,7 +132,7 @@ public class AddressDAO {
                 String houseNumber = resultSet.getString("house_number");
                 String roadName = resultSet.getString("road_name");
                 String cityName = resultSet.getString("city_name");
-                String postCode = resultSet.getString("post_code");
+                String postCode = resultSet.getString("postcode");
 
                 address = new Address(newID, houseNumber, roadName, cityName, postCode);
             }
@@ -159,7 +159,7 @@ public class AddressDAO {
                 String houseNumber = resultSet.getString("house_number");
                 String roadName = resultSet.getString("road_name");
                 String cityName = resultSet.getString("city_name");
-                String postCode = resultSet.getString("post_code");
+                String postCode = resultSet.getString("postcode");
                 Address address = new Address(newID, houseNumber, roadName, cityName, postCode);
 
                 addressList.add(address);
@@ -200,7 +200,7 @@ public class AddressDAO {
                 String newHouseNumber = resultSet.getString("house_number");
                 String roadName = resultSet.getString("road_name");
                 String cityName = resultSet.getString("city_name");
-                String postCode = resultSet.getString("post_code");
+                String postCode = resultSet.getString("postcode");
 
                 address = new Address(addressID, newHouseNumber, roadName, cityName, postCode);
             }
@@ -211,6 +211,27 @@ public class AddressDAO {
             throw new DatabaseException(e.getMessage(),e);
         }
         return address;
+    }
+
+    public static int findAddressIDByUser(int userID) throws DatabaseException {
+        String selectSQL = "SELECT address_id FROM User_Address WHERE user_id = ?;";
+        int addressID = 0;
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+
+            preparedStatement.setInt(1, userID);
+            
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                addressID = resultSet.getInt("address_id");
+            }
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(),e);
+        }
+        return addressID;
     }
 
 }

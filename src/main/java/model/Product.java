@@ -1,15 +1,23 @@
 package model;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+
+import javax.swing.ImageIcon;
+
+import helper.ImageUtils;
 
 public class Product {
     private int productID;
-    private Brand brand; // Association to Brand
+    private String brand;
     private String productName;
     private String productCode;
     private double retailPrice;
     private String description;
     private int stockQuantity;
+    private String imageBase64;
     private String imagePath;
 
     // No-argument constructor
@@ -26,7 +34,7 @@ public class Product {
      * @param description  The description of the product.
      * @param stockQuantity The stock quantity of the product.
      */
-    public Product(Brand brand, String productName, String productCode,
+    public Product(String brand, String productName, String productCode,
                    double d, String description, int stockQuantity) {
         this.setBrand(brand);
         this.setProductName(productName);
@@ -43,7 +51,7 @@ public class Product {
      *
      * @return the brand name associated with this product
      */
-    public Brand getBrand() {
+    public String getBrand() {
         return brand;
     }
 
@@ -52,7 +60,7 @@ public class Product {
      *
      * @param brand the Brand object to associate with this product
      */
-    public void setBrand(Brand brand) {
+    public void setBrand(String brand) {
         this.brand = brand;
     }
 
@@ -90,6 +98,10 @@ public class Product {
      */
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+
+    public void setProductImage(String base64Image){
+        this.imageBase64 = base64Image;
     }
 
     /**
@@ -220,11 +232,6 @@ public class Product {
      * @return The product type as a string, or null if the product code is invalid.
      */
     public String getProductType() {
-        // Validate the product code
-        // if (isValidProductCode(productCode)) {
-        //     return null; // Invalid product code
-        // }
-
         char typeIndicator = productCode.charAt(0);
 
         switch (typeIndicator) {
@@ -246,26 +253,21 @@ public class Product {
     }
 
     /**
-     * Get the URL of the product image.
+     * Get the base64 encoded  of the product image.
      *
-     * @return Returns the URL of the product image if the image path is valid; otherwise, returns null.
+     * @return Returns an ImageIcon containing the image associated with this product
      */
-    public URL getProductImage() {
-        /**
-        if (imagePath != null && !imagePath.isEmpty()) {
-            try {
-                return new File(imagePath).toURI().toURL();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                // Handle the exception (e.g., return a default image URL or null)
-            }
+    public ImageIcon getProductImage() {
+        // Get the URI of the default image to use if no image is supplied
+        URI defaultImage = null;
+        try {
+            defaultImage = getClass().getResource("/images/tgv.jpeg").toURI();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
         }
-         */
-
-        URL imageUrl = getClass().getResource("/images/tgv.jpeg");
-
-// 如果你需要将 URL 转换为字符串
-        return imageUrl;
+        // Get the base64 of either the stored image or the default image and return
+        String imageIcon = this.imageBase64 != null ? this.imageBase64 : ImageUtils.toBase64(new File(defaultImage));
+        return ImageUtils.imageToIcon(imageIcon);
     }
 
 
@@ -296,7 +298,7 @@ public class Product {
     //Test use
     @Override
     public String toString() {
-        return "ID: " + this.productID + "; Brand: " + this.getBrand().getBrandName() + "; ProductName: " + this.getProductName();
+        return "ID: " + this.productID + "; Brand: " + this.getBrand() + "; ProductName: " + this.getProductName();
     }
 
 

@@ -4,31 +4,29 @@
 
 package gui;
 
+import DAO.ProductDAO;
+import DAO.UserDAO;
+
+import com.formdev.flatlaf.extras.FlatSVGIcon;
+import com.jgoodies.forms.factories.DefaultComponentFactory;
 import java.awt.*;
-import java.awt.event.*;
-import java.sql.SQLException;
-import java.util.*;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
-import javax.swing.border.*;
-import com.formdev.flatlaf.extras.*;
-import com.jgoodies.forms.factories.*;
-import controller.GlobalState;
 import exception.DatabaseException;
 import helper.Filter;
 import helper.UserSession;
 import listeners.ReloadListener;
-import model.Cart;
-import model.Gauge;
-import model.Product;
-import model.Brand;
-import DAO.BrandDAO;
-import DAO.ProductDAO;
-import model.User;
+import model.*;
 import model.Locomotive.DCCType;
-import helper.UserSession;
-import helper.Filter;
 import service.CartService;
+
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.MatteBorder;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 /**
  * @author Zhenyang Liu
@@ -36,6 +34,8 @@ import service.CartService;
 public class MainPage extends JFrame implements ReloadListener {
     private Filter f;
     public MainPage() {
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         initComponents();
         f = new Filter();
         populateFilterBoxes();
@@ -44,22 +44,20 @@ public class MainPage extends JFrame implements ReloadListener {
         button_accountMouseClicked();
     }
 
-    private void createUIComponents() {
-        // TODO: add custom component creation code here
-    }
-
     public void reloadProducts() {
         loadProducts();
     }
 
     private void button_accountMouseClicked() {
+        System.out.println("Logged in: " + UserSession.getInstance().isLoggedIn());
         SwingUtilities.invokeLater(() -> {
-            if (!GlobalState.isLoggedIn()) {
+            if (!UserSession.getInstance().isLoggedIn()) {
                 LoginPage loginPage = new LoginPage();;
                 loginPage.setVisible(true);
                 loginPage.setLoginSuccessListener(this::loadProducts);
             } else {
-                // User logged in
+                AccountPage accountPage = new AccountPage();
+                accountPage.setVisible(true);
             }
         });
     }
@@ -69,7 +67,6 @@ public class MainPage extends JFrame implements ReloadListener {
 
         if (currentUser != null) {
             int userID = currentUser.getUserID();
-            System.out.println(userID);
             BasketPage basketPage = new BasketPage(userID);
             basketPage.setVisible(true);
             basketPage.setReloadListener(this::loadProducts);
@@ -98,19 +95,22 @@ public class MainPage extends JFrame implements ReloadListener {
     private void populateSubFilters(){
         subTypeFilterBox.removeAllItems();
         String table = ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).getDbTable();
+        subTypeFilterBox.setVisible(true);
+        subTypeFilterLabel.setVisible(true);
         if(table.equals("Locomotive")){
-            System.out.println("Adding items :D");
+            subTypeFilterLabel.setText("DCC Type");
             subTypeFilterBox.addItem(DCCType.ANALOGUE);
             subTypeFilterBox.addItem(DCCType.FITTED);
             subTypeFilterBox.addItem(DCCType.READY);
             subTypeFilterBox.addItem(DCCType.SOUND);
         }else if(table.equals("Track")){
+            subTypeFilterLabel.setText("Gauge");
             subTypeFilterBox.addItem(Gauge.OO);
             subTypeFilterBox.addItem(Gauge.TT);
             subTypeFilterBox.addItem(Gauge.N);
-        }
-        else{
-            subTypeFilterBox.addItem("No sub-filters");
+        }else{
+            subTypeFilterBox.setVisible(false);
+            subTypeFilterLabel.setVisible(false);
         }
     }
 
@@ -135,6 +135,8 @@ public class MainPage extends JFrame implements ReloadListener {
         sortOptions.addItem(f.new SortBy("None", ""));
         sortOptions.addItem(f.new SortBy("Price", "retail_price"));
         sortOptions.addItem(f.new SortBy("Name", "product_name"));
+        sortOptions.addItem(f.new SortBy("Price", "retail_price", false));
+        sortOptions.addItem(f.new SortBy("Name", "product_name", false));
 
         sortOptions.addItemListener(e -> {
             loadProducts();
@@ -142,9 +144,9 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     private void populateBrandFilters(){
-        ArrayList<Brand> toAdd = BrandDAO.findAllBrand();
+        ArrayList<String> toAdd = ProductDAO.findAllBrand();
         filterBox4.addItem(f.new BrandFilter(null, "All"));
-        for(Brand b: toAdd)
+        for(String b: toAdd)
             filterBox4.addItem(f.new BrandFilter(b));
         filterBox4.addItemListener(e -> {
             loadProducts();
@@ -158,6 +160,7 @@ public class MainPage extends JFrame implements ReloadListener {
         populateBrandFilters();
         populateSortOptions();
         populateTypeFilters();
+        populateSubFilters();
 
         searchButton.addActionListener(e -> {
             loadProducts();
@@ -183,15 +186,15 @@ public class MainPage extends JFrame implements ReloadListener {
         mainPageSplitPane = new JSplitPane();
         filterPanel = new JPanel();
         sortLabel = new JLabel();
-        sortOptions = new JComboBox();
+        sortOptions = new JComboBox<>();
         priceFilterLabel = new JLabel();
-        priceFilterBox = new JComboBox();
+        priceFilterBox = new JComboBox<>();
         typeFilterLabel = new JLabel();
-        typeFilterBox = new JComboBox();
+        typeFilterBox = new JComboBox<>();
         brandFilterLabel = new JLabel();
-        filterBox4 = new JComboBox();
+        filterBox4 = new JComboBox<>();
         subTypeFilterLabel = new JLabel();
-        subTypeFilterBox = new JComboBox();
+        subTypeFilterBox = new JComboBox<>();
         productPanel = new JPanel();
         productCardPanel1 = new JPanel();
         productImage1 = new JLabel();
@@ -342,7 +345,6 @@ public class MainPage extends JFrame implements ReloadListener {
                 //---- priceFilterLabel ----
                 priceFilterLabel.setText(bundle.getString("MainPage.priceFilterLabel.text"));
                 filterPanel.add(priceFilterLabel, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
-
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
                 filterPanel.add(priceFilterBox, new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
@@ -516,15 +518,15 @@ public class MainPage extends JFrame implements ReloadListener {
     private JSplitPane mainPageSplitPane;
     private JPanel filterPanel;
     private JLabel sortLabel;
-    private JComboBox sortOptions;
+    private JComboBox<Filter.SortBy> sortOptions;
     private JLabel priceFilterLabel;
-    private JComboBox priceFilterBox;
+    private JComboBox<Filter.PriceRange> priceFilterBox;
     private JLabel typeFilterLabel;
-    private JComboBox typeFilterBox;
+    private JComboBox<Filter.TypeFilter> typeFilterBox;
     private JLabel brandFilterLabel;
-    private JComboBox filterBox4;
+    private JComboBox<Filter.BrandFilter> filterBox4;
     private JLabel subTypeFilterLabel;
-    private JComboBox subTypeFilterBox;
+    private JComboBox<Enum> subTypeFilterBox;
     private JPanel productPanel;
     private JPanel productCardPanel1;
     private JLabel productImage1;
@@ -598,7 +600,11 @@ public class MainPage extends JFrame implements ReloadListener {
         if ( currentUser != null){
             userID = currentUser.getUserID();
             Cart cart = CartService.getCartDetails(userID);
-            itemID = CartService.findItemID(cart.getCartID(), product.getProductID());
+            if ( cart != null){
+                itemID = CartService.findItemID(cart.getCartID(), product.getProductID());
+            }else {
+                itemID = -1;
+            }
         }else {
             itemID = -1;
             userID = -1;
@@ -621,7 +627,7 @@ public class MainPage extends JFrame implements ReloadListener {
         // Add a product image
         JLabel productImage = new JLabel();
         //productImage.setPreferredSize(new Dimension(260, 120));
-        ImageIcon originalIcon = new ImageIcon(product.getProductImage());
+        ImageIcon originalIcon = product.getProductImage();
         Image originalImage = originalIcon.getImage();
         Image resizedImage = originalImage.getScaledInstance(256, 140, Image.SCALE_SMOOTH);
         productImage.setIcon(new ImageIcon(resizedImage));
@@ -655,6 +661,11 @@ public class MainPage extends JFrame implements ReloadListener {
         moreButton.setBackground(new Color(0x4e748d));
         moreButton.setForeground(new Color(0xe0e2e8));
         moreButton.setPreferredSize(new Dimension(100, 30));
+
+        moreButton.addActionListener(e -> {
+            ProductPage p = new ProductPage(product);
+            p.setVisible(true);
+        });
 
 
         // Create Add button
@@ -710,23 +721,18 @@ public class MainPage extends JFrame implements ReloadListener {
 
         // Adding event listeners to the "Add" button
         addButton.addActionListener(e -> {
-            try {
-                if (currentUser != null) {
-                    addButton.setVisible(false);
-                    adjustNumPanel.setVisible(true);
-                    Cart cart = CartService.getCartDetails(userID);
-                    int cartID = cart.getCartID();
-                    int productID = product.getProductID();
-                    CartService.addToCart(cartID, productID, 1);
-                }else {
-                    // USER NOT LOGIN
-                    LoginPage loginPage = new LoginPage();
-                    loginPage.setVisible(true);
-                }
-            } catch (DatabaseException ex) {
-                ex.printStackTrace();
+            if (currentUser != null) {
+                addButton.setVisible(false);
+                adjustNumPanel.setVisible(true);
+                Cart cart = CartService.getCartDetails(userID);
+                int cartID = cart.getCartID();
+                int productID = product.getProductID();
+                CartService.addToCart(cartID, productID, 1);
+            }else {
+                // USER NOT LOGIN
+                LoginPage loginPage = new LoginPage();
+                loginPage.setVisible(true);
             }
-
         });
 
         // Adding event listeners to the "-" button
@@ -736,21 +742,17 @@ public class MainPage extends JFrame implements ReloadListener {
             if (num < 1) {
                 adjustNumPanel.setVisible(false);
                 addButton.setVisible(true);
-                try {
-                    int cartID = CartService.getCartDetails(userID).getCartID();
-                    int productID = product.getProductID();
-                    CartService.removeFromCart(cartID,productID);
-                } catch (DatabaseException ex) {
-                    ex.printStackTrace();
+                int cartID = CartService.getCartDetails(userID).getCartID();
+                int productID = product.getProductID();
+                if (!CartService.removeFromCart(cartID,productID)){
+                    //TODO: Add action failed information
                 }
             } else {
                 numberButton.setText(String.valueOf(num));
-                try {
-                    int cartID = CartService.getCartDetails(userID).getCartID();
-                    int productID = product.getProductID();
-                    CartService.updateCartItem(cartID, productID, num);
-                } catch (DatabaseException ex) {
-                    ex.printStackTrace();
+                int cartID = CartService.getCartDetails(userID).getCartID();
+                int productID = product.getProductID();
+                if (!CartService.updateCartItem(cartID, productID, num)){
+                    //TODO: Add action failed information
                 }
             }
         });
@@ -760,13 +762,11 @@ public class MainPage extends JFrame implements ReloadListener {
             int num = Integer.parseInt(numberButton.getText());
             num += 1;
             numberButton.setText(String.valueOf(num));
-            try {
-                int cartID = CartService.getCartDetails(userID).getCartID();
-                int productID = product.getProductID();
-                CartService.updateCartItem(cartID, productID, num);
-            } catch (DatabaseException ex) {
-                ex.printStackTrace();
-            }
+            int cartID = CartService.getCartDetails(userID).getCartID();
+            int productID = product.getProductID();
+                if (!CartService.updateCartItem(cartID, productID, num)){
+                    //TODO: Add action failed information
+                }
         });
 
         // Create a purchase panel and add price
@@ -801,7 +801,14 @@ public class MainPage extends JFrame implements ReloadListener {
 
         return productCardPanel;
     }
+
+    /*
+     * Main function for testing
+     */
     public static void main(String[] args) {
+        User user = UserDAO.findUserByEmail("testemail@gmail.com");
+        UserSession.getInstance().setCurrentUser(user);
+
         EventQueue.invokeLater(() -> {
             try {
                 MainPage frame = new MainPage();

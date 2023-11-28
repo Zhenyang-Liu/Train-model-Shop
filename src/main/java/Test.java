@@ -1,5 +1,6 @@
+import model.Address;
+import model.BankDetail;
 import model.BoxedSet;
-import model.Brand;
 import model.Controller;
 import model.Gauge;
 import model.Locomotive;
@@ -8,25 +9,66 @@ import model.RollingStock;
 import model.BoxedSet.BoxedType;
 import model.Locomotive.DCCType;
 import model.RollingStock.RollingStockType;
+import service.AddressService;
+import service.BankDetailService;
+import service.CartService;
+import service.ProductService;
+import model.User;
 import model.BoxedSet;
 
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
+
+import javax.swing.JFrame;
 
 import DAO.*;
 import exception.DatabaseException;
+import gui.ManagerPage;
+import helper.UserSession;
 
 public class Test {
     public static void main(String[] args) {
-        performDatabaseOperations();
+        // performDatabaseOperations();
+        // User user = UserDAO.findUserByEmail("manager@manager.com");
+        // UserSession.getInstance().setCurrentUser(user);
+        // Address address = AddressService.getAddressByUser();
+        // String test =  BankDetailService.addBankDetail(user.getUserID(), "Manager","4870137427669857", "08/25", "666");
+        // System.out.println(test);
+        // BankDetail bankDetail = BankDetailService.findBankDetail(user.getUserID());
+        // System.out.println(bankDetail.getCardNumber());
+        // System.out.println(bankDetail.getSecurityCode());
+        
+        // String test =  BankDetailService.updateBankDetail(user.getUserID(), "Manager","4518109938765522", "08/25", "888");
+        // System.out.println(test);
+        // BankDetail bankDetail = BankDetailService.findBankDetail();
+        // System.out.println(bankDetail.getCardNumber());
+        // System.out.println(bankDetail.getSecurityCode());
+
+        
+        User user = UserDAO.findUserByEmail("testemail@gmail.com");
+        UserSession.getInstance().setCurrentUser(user);
+        
+        // CartService.addToCart(5, 5, 1);
+        // CartService.addToCart(5, 3, 2);
+        // CartService.addToCart(5, 7, 2);
+            
+        // System.out.println(CartService.checkoutCart(5));
+        // ProductService.updateBoxedSetQuantity(5);
 
     }
 
     private static void performDatabaseOperations() {
         try (Connection connection = DatabaseConnectionHandler.getConnection()) {            
-            Brand brand = new Brand("Bachmann", "UK");
-            brand.setBrandID(1);
+            // Brand brand = new Brand("Bachmann", "UK");
+            // brand.setBrandID(1);
             
             // // Test ProductDAO 
             // Product product = new Product(brand, "Test Insert", "T000", 8.8, "??", 0);
@@ -109,43 +151,45 @@ public class Test {
             // RollingStockDAO.deleteRollingStock(productID2);
 
             //Test BoxedSetDAO
-            Product product = new Product(brand, "Test BoxedSet Insert1", "M022", 900.0, "A simple test case", 5);
-            Product product1 = new Product(brand, "BoxedSet item1", "S874", 89.8, "A simple test case", 5);
-            Product product2 = new Product(brand, "BoxedSet item2", "L584", 114.5, "A simple test case", 6);
-            Product product3 = new Product(brand, "BoxedSet item3", "C5444", 114.5, "A simple test case", 6);
-            int[] era1 = {1,3};
-            int[] era2 = {2,3};
+            // Product product = new Product("Bachmann", "Test BoxedSet Insert1", "M022", 900.0, "A simple test case", 5);
+            // Product product1 = new Product("Bachmann", "BoxedSet item1", "S874", 89.8, "A simple test case", 5);
+            // Product product2 = new Product("Bachmann", "BoxedSet item2", "L584", 114.5, "A simple test case", 6);
+            // Product product3 = new Product("Bachmann", "BoxedSet item3", "C5444", 114.5, "A simple test case", 6);
+            // int[] era1 = {1,3};
+            // int[] era2 = {2,3};
 
-            RollingStock ro1 = new RollingStock(product1, "Wagon", "OO", era1);
-            Locomotive lo1 = new Locomotive(product2, "TT", "Analogue",era2);
-            Controller controller = new Controller(product3, true);
+            // RollingStock ro1 = new RollingStock(product1, "Wagon", "OO", era1);
+            // Locomotive lo1 = new Locomotive(product2, "TT", "Analogue",era2);
+            // Controller controller = new Controller(product3, true);
 
-            RollingStockDAO.insertRollingStock(ro1);
-            LocomotiveDAO.insertLocomotive(lo1);
-            ControllerDAO.insertController(controller);
+            // RollingStockDAO.insertRollingStock(ro1);
+            // LocomotiveDAO.insertLocomotive(lo1);
+            // ControllerDAO.insertController(controller);
 
-            int roID = ProductDAO.findIDByName("BoxedSet item1");
-            ro1.setProductID(roID);
-            int loID = ProductDAO.findIDByName("BoxedSet item2");
-            lo1.setProductID(loID);
-            int cID = ProductDAO.findIDByName("BoxedSet item3");
-            controller.setProductID(cID);
+            // int roID = ProductDAO.findIDByName("BoxedSet item1");
+            // ro1.setProductID(roID);
+            // int loID = ProductDAO.findIDByName("BoxedSet item2");
+            // lo1.setProductID(loID);
+            // int cID = ProductDAO.findIDByName("BoxedSet item3");
+            // controller.setProductID(cID);
 
-            BoxedSet set = new BoxedSet(product, "Train Set");
-            set.addProduct(RollingStockDAO.findRollingStockByID(roID), 2);
-            set.addProduct(LocomotiveDAO.findLocomotiveByID(loID), 1);
-            set.addProduct(ControllerDAO.findControllerByID(cID), 1);
+            // BoxedSet set = new BoxedSet(product, "Train Set");
+            // set.addProduct(RollingStockDAO.findRollingStockByID(roID), 2);
+            // set.addProduct(LocomotiveDAO.findLocomotiveByID(loID), 1);
+            // set.addProduct(ControllerDAO.findControllerByID(cID), 1);
 
-            BoxedSetDAO.insertBoxedSet(set);
-            BoxedSetDAO.findAllBoxedSet();
-            BoxedSetDAO.findBoxedSetByType(BoxedType.TRACKPACK);
-            int id = ProductDAO.findIDByName("Test BoxedSet Insert1");
-            System.out.println(BoxedSetDAO.findBoxedSetByID(id).getBrand().getBrandName());
+            // BoxedSetDAO.insertBoxedSet(set);
+            // BoxedSetDAO.findAllBoxedSet();
+            // BoxedSetDAO.findBoxedSetByType(BoxedType.TRACKPACK);
+            // int id = ProductDAO.findIDByName("Test BoxedSet Insert1");
+            // System.out.println(BoxedSetDAO.findBoxedSetByID(id).getBrand());
 
-            BoxedSetDAO.deleteBoxedSet(id);
-            RollingStockDAO.deleteRollingStock(roID);
-            LocomotiveDAO.deleteLocomotive(loID);
-            ControllerDAO.deleteController(cID);
+            // BoxedSetDAO.deleteBoxedSet(id);
+            // RollingStockDAO.deleteRollingStock(roID);
+            // LocomotiveDAO.deleteLocomotive(loID);
+            // ControllerDAO.deleteController(cID);
+            AuthenticationDAO.dismissStaff(5615);
+            // AuthenticationDAO.dismissStaff();
             
         } catch (DatabaseException e) {
             e.printStackTrace();

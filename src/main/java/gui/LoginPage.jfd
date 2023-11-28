@@ -1,4 +1,4 @@
-JFDML JFormDesigner: "8.2.0.0.331" Java: "17.0.6" encoding: "UTF-8"
+JFDML JFormDesigner: "8.2.0.0.331" Java: "17.0.9" encoding: "UTF-8"
 
 new FormModel {
 	"i18n.autoExternalize": true
@@ -95,28 +95,11 @@ new FormModel {
 					add( new FormComponent( "javax.swing.JButton" ) {
 						name: "LoginButton"
 						"text": "Login"
-						"actionCommand": "Login"
 						"background": new java.awt.Color( 0, 51, 102, 255 )
 						"foreground": new java.awt.Color( 233, 229, 229, 255 )
-						"preferredSize": new java.awt.Dimension( 78, 28 )
-						"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 1, false )
-						auxiliary() {
-							"JavaCodeGenerator.customCreate": true
-						}
 						addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "LoginButtonMouseClicked", true ) )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
-						"gridx": 2
-						"gridy": 0
-					} )
-					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "LoginCancelButton"
-						"text": "Back"
-						"preferredSize": new java.awt.Dimension( 78, 28 )
-						"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 1, false )
-						addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "backButtonMouseClicked", true ) )
-					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridx": 3
-						"gridy": 0
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {
 					"value": "South"
