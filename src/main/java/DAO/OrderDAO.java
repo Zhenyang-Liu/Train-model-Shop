@@ -221,7 +221,7 @@ public class OrderDAO {
     /**
      * Retrieves all orders from the database.
      *
-     * This method queries the database for all orders and returns a list of Order objects containing their details.
+     * This method queries the database for all orders (excluding "Pending") and returns a list of Order objects containing their details.
      *
      * @return An ArrayList of Order objects representing all orders in the database.
      * @throws DatabaseException if there is an issue with database access.
@@ -246,8 +246,8 @@ public class OrderDAO {
                 boolean validBankDetail = resultSet.getInt("bank_detail_state") == 1;
 
                 Order order = new Order(orderID, userID, addressID, createTime, updateTime, total_cost, status,itemList,validBankDetail);
-
-                orderList.add(order);
+                if (!status.equals("Pending"))
+                    orderList.add(order);
             }
         } catch (SQLTimeoutException e) {
             throw new ConnectionException("Database connect failed", e);

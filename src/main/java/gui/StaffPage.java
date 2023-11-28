@@ -2,7 +2,6 @@ package gui;
 
 import javax.swing.*;
 
-import DAO.BoxedSetDAO;
 import DAO.ControllerDAO;
 import DAO.LocomotiveDAO;
 import DAO.RollingStockDAO;
