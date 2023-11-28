@@ -4,7 +4,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-/*
+/**
  * Written by: Julian Jones
  */
 public class AccountPage extends JFrame {
@@ -14,14 +14,14 @@ public class AccountPage extends JFrame {
     private JPanel TitlePanel;
     private JPanel DetailsPanel;
 
-    /*
+    /**
      * Instantiate object and create components for GUI
      */
     public AccountPage() {
         initComponents();
     }
 
-    /*
+    /**
      * Initialises the components for this page 
      */
     public void initComponents() {
@@ -56,7 +56,7 @@ public class AccountPage extends JFrame {
         setLocationRelativeTo(getOwner());
     }
 
-    /*
+    /**
      * Create title panel
      */
     private void createTitlePanel() {
@@ -78,34 +78,20 @@ public class AccountPage extends JFrame {
             new Insets(0, 0, 5, 0), 0, 0));
     }
 
-    /*
+    /**
      * Create details panel
      */
     private void createDetailsPanel() {
         DetailsPanel.setPreferredSize(new Dimension(400, 130));
         DetailsPanel.setMinimumSize(new Dimension(50, 92));
         DetailsPanel.setLayout(new GridLayout(0, 2));
-
-        // Email section
-        JLabel EmailLabel = new JLabel("Email:");
-        JTextField EmailTextField = new JTextField("example@email.com");
-        setTextStyle(EmailLabel, false);
-        DetailsPanel.add(EmailLabel);
-        DetailsPanel.add(EmailTextField);
-
-        // Address section
-        JLabel AddressLabel = new JLabel("Address:");
-        JTextField AddressTextField = new JTextField("Some address, postcode, england");
-        setTextStyle(AddressLabel, false);
-        DetailsPanel.add(AddressLabel);
-        DetailsPanel.add(AddressTextField);
-
-        // Password section
-        JLabel PasswordLabel = new JLabel("Password:");
-        JTextField PasswordTextField = new JTextField();
-        setTextStyle(PasswordLabel, false);
-        DetailsPanel.add(PasswordLabel);
-        DetailsPanel.add(PasswordTextField);
+        
+        // Add all labels and inputs (that are generic)
+        addLabelAndInput("Email:", "someemail@gmail.com", DetailsPanel);
+        addLabelAndInput("Address:", "Some Address, postcode, england", DetailsPanel);
+        addLabelAndInput("Password:", "", DetailsPanel);
+        addLabelAndInput("First Name:", "User", DetailsPanel);
+        addLabelAndInput("Last Name:", "Smith", DetailsPanel);
 
         // Add to Main Dialogue
         MainDialoguePanel.add(DetailsPanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0,
@@ -113,7 +99,21 @@ public class AccountPage extends JFrame {
             new Insets(0, 0, 0, 0), 0, 0));
     }
 
-    /*
+    /**
+     * Create generic input with label for a panel
+     * @param labelName The label name that will be displayed 
+     * @param textFieldValue The default text field value (can be empty)
+     * @param panel The panel to add these to
+     */
+    private void addLabelAndInput(String labelName, String textFieldValue, JPanel panel) {
+        JLabel label = new JLabel(labelName);
+        JTextField input = new JTextField(textFieldValue);
+        setTextStyle(label, false);
+        panel.add(label);
+        panel.add(input);
+    }
+
+    /**
      * Set default font, colour, and border
      */
     private void setTextStyle(JLabel textLabel, boolean header) {
