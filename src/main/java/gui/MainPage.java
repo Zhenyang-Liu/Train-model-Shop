@@ -174,6 +174,10 @@ public class MainPage extends JFrame implements ReloadListener {
         });
     }
 
+    private void button_accountMouseClicked(MouseEvent e) {
+        // TODO add your code here
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
@@ -193,15 +197,15 @@ public class MainPage extends JFrame implements ReloadListener {
         mainPageSplitPane = new JSplitPane();
         filterPanel = new JPanel();
         sortLabel = new JLabel();
-        sortOptions = new JComboBox<>();
+        sortOptions = new JComboBox();
         priceFilterLabel = new JLabel();
-        priceFilterBox = new JComboBox<>();
+        priceFilterBox = new JComboBox();
         typeFilterLabel = new JLabel();
-        typeFilterBox = new JComboBox<>();
+        typeFilterBox = new JComboBox();
         brandFilterLabel = new JLabel();
-        filterBox4 = new JComboBox<>();
+        filterBox4 = new JComboBox();
         subTypeFilterLabel = new JLabel();
-        subTypeFilterBox = new JComboBox<>();
+        subTypeFilterBox = new JComboBox();
         productPanel = new JPanel();
         productCardPanel1 = new JPanel();
         productImage1 = new JLabel();
@@ -237,7 +241,7 @@ public class MainPage extends JFrame implements ReloadListener {
                 button_account.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        button_accountMouseClicked();
+                        button_accountMouseClicked(e);
                     }
                 });
                 accountPanel.add(button_account, BorderLayout.WEST);
@@ -525,15 +529,15 @@ public class MainPage extends JFrame implements ReloadListener {
     private JSplitPane mainPageSplitPane;
     private JPanel filterPanel;
     private JLabel sortLabel;
-    private JComboBox<Filter.SortBy> sortOptions;
+    private JComboBox sortOptions;
     private JLabel priceFilterLabel;
-    private JComboBox<Filter.PriceRange> priceFilterBox;
+    private JComboBox priceFilterBox;
     private JLabel typeFilterLabel;
-    private JComboBox<Filter.TypeFilter> typeFilterBox;
+    private JComboBox typeFilterBox;
     private JLabel brandFilterLabel;
-    private JComboBox<Filter.BrandFilter> filterBox4;
+    private JComboBox filterBox4;
     private JLabel subTypeFilterLabel;
-    private JComboBox<Enum> subTypeFilterBox;
+    private JComboBox subTypeFilterBox;
     private JPanel productPanel;
     private JPanel productCardPanel1;
     private JLabel productImage1;

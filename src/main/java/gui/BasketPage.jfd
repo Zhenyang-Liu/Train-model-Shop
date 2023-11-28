@@ -139,6 +139,7 @@ new FormModel {
 					"background": new java.awt.Color( 85, 161, 90, 255 )
 					"foreground": new java.awt.Color( 233, 228, 227, 255 )
 					"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 2, false )
+					addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "checkOutButtonMouseClicked", true ) )
 				} )
 			}, new FormLayoutConstraints( class java.lang.String ) {
 				"value": "South"

@@ -5,6 +5,7 @@
 package gui;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -12,16 +13,21 @@ import javax.swing.border.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import exception.DatabaseException;
 import listeners.ReloadListener;
 import model.CartItem;
 import model.Product;
+import model.User;
 import service.CartService;
 import model.Cart;
+
+import static DAO.OrderDAO.findOrderByID;
 
 /**
  * @author Zhenyang Liu
  */
 public class BasketPage extends JFrame {
+    private Cart cart;
     private ReloadListener reloadListener;
     public void setReloadListener(ReloadListener listener) {
         this.reloadListener = listener;
@@ -29,7 +35,27 @@ public class BasketPage extends JFrame {
 
     public BasketPage(int userID) {
         initComponents();
-        loadUserCart(userID);
+        this.cart = CartService.getCartDetails(userID);
+        if (cart != null){
+            loadUserCart(userID);
+        }else{
+            CartService.createCartForUser(userID);
+            loadUserCart(userID);
+        }
+    }
+
+    private void checkOutButtonMouseClicked(MouseEvent e) {
+        int orderID = CartService.checkoutCart(cart.getCartID());
+        if (orderID == -1){
+
+        } else if (orderID == -2) {
+
+        } else if (orderID == -3) {
+
+        } else {
+            PendingOrderPage pendingOrderPage = new PendingOrderPage(findOrderByID(orderID));
+            pendingOrderPage.setVisible(true);
+        }
     }
 
     private void initComponents() {
@@ -225,6 +251,12 @@ public class BasketPage extends JFrame {
             checkOutButton.setBackground(new Color(0x55a15a));
             checkOutButton.setForeground(new Color(0xe9e4e3));
             checkOutButton.setFont(checkOutButton.getFont().deriveFont(checkOutButton.getFont().getStyle() | Font.BOLD, checkOutButton.getFont().getSize() + 2f));
+            checkOutButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    checkOutButtonMouseClicked(e);
+                }
+            });
             trolleyButtonPanel.add(checkOutButton);
         }
         contentPane.add(trolleyButtonPanel, BorderLayout.SOUTH);
@@ -252,12 +284,7 @@ public class BasketPage extends JFrame {
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
     private void loadUserCart(int userID) {
-        Cart cart = CartService.getCartDetails(userID);
-        if (cart != null){
             loadTrolleyItems(cart.getCartItems()); // Load cart items into the trolley view
-        } else{
-            // TODO: Missing logic when action failed
-        }
     }
 
     // Method to load cart items into the trolley view
