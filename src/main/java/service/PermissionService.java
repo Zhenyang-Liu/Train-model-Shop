@@ -3,7 +3,7 @@ package service;
 import java.util.Set;
 
 import DAO.AuthenticationDAO;
-import exception.DatabaseException;
+
 import helper.UserSession;
 
 public class PermissionService {
