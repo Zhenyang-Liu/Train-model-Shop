@@ -35,7 +35,6 @@ public class LoginPage extends JFrame {
     }
 
     private void button_to_registerPageMouseClicked(MouseEvent e) {
-        // TODO add your code here
         RegistrationPage registrationPage = new RegistrationPage();
         registrationPage.setVisible(true);
 

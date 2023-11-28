@@ -26,6 +26,13 @@ public class AccountPage extends JFrame {
     }
 
     /**
+     * Close Window
+     */
+    private void closeWindow() {
+        this.dispose();
+    }
+
+    /**
      * Initialises the components for this page 
      */
     public void initComponents() {
@@ -171,7 +178,7 @@ public class AccountPage extends JFrame {
         closeButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("clicked");
+                closeWindow();
             }
         });
         ButtonPanel.add(closeButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
@@ -179,7 +186,7 @@ public class AccountPage extends JFrame {
             new Insets(0, 0, 0, 5), 0, 0));
 
 
-        // Make back button
+        // Make update button
         JButton updateButton = makeButton("Update", 0x55a15a, 0xe9e5e5);
         updateButton.addMouseListener(new MouseAdapter() {
             @Override
