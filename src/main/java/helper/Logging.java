@@ -13,7 +13,7 @@ public class Logging {
         LogManager.getLogManager().reset();
         l = Logger.getLogger("Train Logger");
         try {
-            fn = new FileHandler("C:/Users/joant/Documents/log.log");
+            fn = new FileHandler("log.log");
         } catch (SecurityException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
