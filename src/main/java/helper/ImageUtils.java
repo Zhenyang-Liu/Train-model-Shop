@@ -3,7 +3,6 @@ package helper;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -16,6 +15,12 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 public class ImageUtils {
+    /**
+     * Converts a given file to a base64 encoded string
+     * 
+     * @param file a file :D
+     * @return a base64 encoded string representing the file
+     */
     public static String toBase64(File file){
         byte[] bytes;
         try{
@@ -33,6 +38,14 @@ public class ImageUtils {
         return "";
     }
 
+    /**
+     * Scales a given image in byte array form
+     * 
+     * @param imageData the image in byte array form
+     * @param width desired width of the image
+     * @param height desired height of the image
+     * @return
+     */
     public static byte[] scaleImage(byte[] imageData, int width, int height){
         ByteArrayInputStream in = new ByteArrayInputStream(imageData);
         try{
@@ -49,6 +62,12 @@ public class ImageUtils {
         }
         return new byte[]{};
     }
+
+    /**
+     * Converts an image in base64 format to an java swing ImageIcon
+     * @param base64Image image to convert
+     * @return
+     */
     public static ImageIcon imageToIcon(String base64Image){
         try{
             byte[] imageBytes = Base64.getDecoder().decode(base64Image.getBytes("UTF-8"));

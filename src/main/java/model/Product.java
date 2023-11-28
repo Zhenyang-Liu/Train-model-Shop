@@ -255,25 +255,17 @@ public class Product {
     /**
      * Get the base64 encoded  of the product image.
      *
-     * @return Returns the URL of the product image if the image path is valid; otherwise, returns null.
+     * @return Returns an ImageIcon containing the image associated with this product
      */
     public ImageIcon getProductImage() {
-        /**
-        if (imagePath != null && !imagePath.isEmpty()) {
-            try {
-                return new File(imagePath).toURI().toURL();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                // Handle the exception (e.g., return a default image URL or null)
-            }
-        }
-         */
+        // Get the URI of the default image to use if no image is supplied
         URI defaultImage = null;
         try {
             defaultImage = getClass().getResource("/images/tgv.jpeg").toURI();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
+        // Get the base64 of either the stored image or the default image and return
         String imageIcon = this.imageBase64 != null ? this.imageBase64 : ImageUtils.toBase64(new File(defaultImage));
         return ImageUtils.imageToIcon(imageIcon);
     }
