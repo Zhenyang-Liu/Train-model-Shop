@@ -56,7 +56,8 @@ public class MainPage extends JFrame implements ReloadListener {
                 loginPage.setVisible(true);
                 loginPage.setLoginSuccessListener(this::loadProducts);
             } else {
-                AccountPage accountPage = new AccountPage();
+                int userID = UserSession.getInstance().getCurrentUser().getUserID();
+                AccountPage accountPage = new AccountPage(userID);
                 accountPage.setVisible(true);
             }
         });

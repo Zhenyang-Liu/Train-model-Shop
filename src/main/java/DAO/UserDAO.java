@@ -131,7 +131,7 @@ public class UserDAO {
         return new User();
     }
 
-    public static User findUserByID(int userID) throws DatabaseException{
+    public static User findUserByID(int userID) throws DatabaseException {
         String checkSQL = "SELECT * FROM User WHERE user_id = ?";
         User user = new User();
         

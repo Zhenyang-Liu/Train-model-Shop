@@ -3,9 +3,18 @@ package gui;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 
 import javax.swing.*;
 import javax.swing.border.*;
+
+import DAO.BankDetailDAO;
+import DAO.LoginDAO;
+import DAO.UserDAO;
+import exception.DatabaseException;
+import model.BankDetail;
+import model.Login;
+import model.User;
 
 /**
  * Written by: Julian Jones
@@ -17,11 +26,25 @@ public class AccountPage extends JFrame {
     private JPanel TitlePanel;
     private JPanel DetailsPanel;
     private JPanel ButtonPanel;
+    private User user;
+    private Login userLogin;
+    private BankDetail userBankDetails;
 
     /**
      * Instantiate object and create components for GUI
      */
-    public AccountPage() {
+    public AccountPage(int userID) {
+        try {
+            user = UserDAO.findUserByID(userID);
+            userLogin = LoginDAO.findLoginByUserID(userID);
+            userBankDetails = BankDetailDAO.findBankDetail(userID);
+        } catch (DatabaseException | SQLException e) {
+            System.out.println("User not logged in for account page, closing account page");
+            LoginPage loginPage = new LoginPage();
+            loginPage.setVisible(true);
+            this.dispose();
+        }
+
         initComponents();
     }
 
@@ -100,10 +123,10 @@ public class AccountPage extends JFrame {
         DetailsPanel.setLayout(new GridLayout(0, 2));
         
         // Add all labels and inputs (that are generic)
-        addLabelAndInput("Email:", "someemail@gmail.com", DetailsPanel);
-        addLabelAndInput("Address:", "Some Address, postcode, england", DetailsPanel);
-        addLabelAndInput("First Name:", "User", DetailsPanel);
-        addLabelAndInput("Last Name:", "Smith", DetailsPanel);
+        addLabelAndInput("Email:", user.getEmail(), DetailsPanel);
+        addLabelAndInput("Address:", user.getAddress(), DetailsPanel);
+        addLabelAndInput("First Name:", user.getForename(), DetailsPanel);
+        addLabelAndInput("Last Name:", user.getSurname(), DetailsPanel);
 
         // Password section, needs to be different
         JLabel passwordLabel = new JLabel("Password:");
@@ -115,9 +138,9 @@ public class AccountPage extends JFrame {
         // Bank section, uses another panel
         JPanel BankPanel = new JPanel();
         JLabel bankLabel = new JLabel("Bank Details:");
-        JTextField accountNumber = new JTextField("1234567");
-        JTextField sortCode = new JTextField("00-00-00");
-        JTextField expiryDate = new JTextField("06/25");
+        JTextField accountNumber = new JTextField("xxxxxxxxxxxxxxxx");
+        JTextField sortCode = new JTextField("xx-xx-xx");
+        JTextField expiryDate = new JTextField(userBankDetails.getExpiryDate());
         setTextStyle(bankLabel, false);
         BankPanel.setLayout(new GridLayout(1, 3));
         BankPanel.add(accountNumber);
@@ -125,7 +148,6 @@ public class AccountPage extends JFrame {
         BankPanel.add(expiryDate);
         DetailsPanel.add(bankLabel);
         DetailsPanel.add(BankPanel);
-
 
         // Add to Main Dialogue
         MainDialoguePanel.add(DetailsPanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0,
