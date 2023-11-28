@@ -187,7 +187,7 @@ public class StaffPage extends JFrame {
                 // TODO: call the Add Boxset Panel
             } else {
                 errorLabel.setVisible(false);
-                Product product = new Product(brandName, productName, productCode, Double.parseDouble(retailPrice), description, Integer.parseInt(stockQuantityField.getText()));
+                Product product = new Product(brandName, productName, productCode, Double.parseDouble(retailPrice), description, Integer.parseInt(stockQuantityField.getText()), "");
                 String productType = product.getProductType();
 
                 showAdditionalOptions(additionalPanel, productType, dialog, product);
