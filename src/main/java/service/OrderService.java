@@ -3,10 +3,6 @@ package service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Iterator;
 
 import model.Cart;
 import model.Order;
@@ -16,11 +12,10 @@ import DAO.OrderDAO;
 import exception.*;
 
 public class OrderService {
-    private static PermissionService permission = new PermissionService();
-
+    
     public static boolean confirmOrder(Order order) {
         try{
-            if (!permission.hasPermission(order.getUserID(),"VIEW_OWN_ORDERS")){
+            if (!PermissionService.hasPermission(order.getUserID(),"VIEW_OWN_ORDERS")){
                 throw new AuthorizationException("Access denied. Users can only confirm their own order.");
             }
             // Check the address
@@ -41,7 +36,7 @@ public class OrderService {
 
     public static ArrayList<Order> getAllOrders() {
         try{
-            if (!permission.hasPermission("MANAGE_ORDERS")){
+            if (!PermissionService.hasPermission("MANAGE_ORDERS")){
                 throw new AuthorizationException("Access denied. Only Staff can manage orders.");
             }
             ArrayList<Order> orders = OrderDAO.findAllOrder();
@@ -56,7 +51,7 @@ public class OrderService {
     public static void returnToCart(Order order){
         try{
             int userID = order.getUserID();
-            if (!permission.hasPermission(userID,"VIEW_OWN_ORDERS")){
+            if (!PermissionService.hasPermission(order.getUserID(),"VIEW_OWN_ORDERS")){
                 throw new AuthorizationException("Access denied. Users can only edit their own order.");
             }
             Cart cart = CartService.getCartDetails(userID);

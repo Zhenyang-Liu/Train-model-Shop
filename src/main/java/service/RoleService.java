@@ -12,7 +12,6 @@ import DAO.UserDAO;
 import exception.*;
 
 public class RoleService {
-    private static PermissionService permission = new PermissionService();
 
     /**
      * Assigns the "STAFF" role to a specified user.
@@ -26,7 +25,7 @@ public class RoleService {
      */
     public static boolean assignStaff(int userID) {
         try{
-            if (!permission.hasPermission("ASSIGN_STAFF_ROLE")){
+            if (!PermissionService.hasPermission("ASSIGN_STAFF_ROLE")){
                 throw new AuthorizationException("Access denied. Only Manager can assign staff.");
             }
             AuthenticationDAO.setStaff(userID);
@@ -49,7 +48,7 @@ public class RoleService {
      */
     public static boolean dismissStaff(int userID) {
         try{
-            if (!permission.hasPermission("ASSIGN_STAFF_ROLE")){
+            if (!PermissionService.hasPermission("ASSIGN_STAFF_ROLE")){
                 throw new AuthorizationException("Access denied. Only Manager can assign staff.");
             }
             AuthenticationDAO.dismissStaff(userID);
@@ -71,7 +70,7 @@ public class RoleService {
      */
     public static Map<User,String> getAllUserWithRole() {
         try{
-            if (!permission.hasPermission("ASSIGN_STAFF_ROLE")){
+            if (!PermissionService.hasPermission("ASSIGN_STAFF_ROLE")){
                 throw new AuthorizationException("Access denied. Only Manager can assign staff.");
             }
             Map<User,String> list = new LinkedHashMap<>();
@@ -100,7 +99,7 @@ public class RoleService {
      */
     public static Map<User,String> getUserWithRole(int userID) {
         try{
-            if (!permission.hasPermission("ASSIGN_STAFF_ROLE")){
+            if (!PermissionService.hasPermission("ASSIGN_STAFF_ROLE")){
                 throw new AuthorizationException("Access denied. Only Manager can assign staff.");
             }
             Map<User,String> list = new LinkedHashMap<>();
