@@ -1,6 +1,9 @@
 package gui;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -13,6 +16,7 @@ public class AccountPage extends JFrame {
     private JPanel MainDialoguePanel;
     private JPanel TitlePanel;
     private JPanel DetailsPanel;
+    private JPanel ButtonPanel;
 
     /**
      * Instantiate object and create components for GUI
@@ -30,6 +34,7 @@ public class AccountPage extends JFrame {
         MainDialoguePanel = new JPanel();
         DetailsPanel = new JPanel();
         TitlePanel = new JPanel();
+        ButtonPanel = new JPanel();
 
         // Set size and layout
         setPreferredSize(new Dimension(600, 450));
@@ -48,6 +53,7 @@ public class AccountPage extends JFrame {
         // Create panels and add to mainDialogue
         createTitlePanel();
         createDetailsPanel();
+        createButtonPanel();
         
         // Finally add everything to contentPane
         WindowPanel.add(MainDialoguePanel, BorderLayout.CENTER);
@@ -148,5 +154,53 @@ public class AccountPage extends JFrame {
             textLabel.setMinimumSize(new Dimension(42, 16));
             textLabel.setMaximumSize(null);
         }
+    }
+
+    /**
+     * Create button panel
+     */
+    private void createButtonPanel() {
+        // Create button panel
+        ButtonPanel.setBorder(new EmptyBorder(12, 0, 0, 0));
+        ButtonPanel.setLayout(new GridBagLayout());
+        ((GridBagLayout)ButtonPanel.getLayout()).columnWidths = new int[] {0, 0, 85, 80};
+        ((GridBagLayout)ButtonPanel.getLayout()).columnWeights = new double[] {0.0, 1.0, 0.0, 0.0};
+
+        // Make back button
+        JButton closeButton = makeButton("Close", 0xcf3a30, 0xe9e5e5);
+        closeButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                System.out.println("clicked");
+            }
+        });
+        ButtonPanel.add(closeButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+            new Insets(0, 0, 0, 5), 0, 0));
+
+
+        // Make back button
+        JButton updateButton = makeButton("Update", 0x55a15a, 0xe9e5e5);
+        updateButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                System.out.println("clicked");
+            }
+        });
+        ButtonPanel.add(updateButton, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+            new Insets(0, 0, 0, 0), 0, 0));
+
+        // Add to window panel at bottom of page
+        WindowPanel.add(ButtonPanel, BorderLayout.SOUTH);
+    }
+
+    private JButton makeButton(String buttonLabel, int bgColor, int fgColor) {
+        JButton button = new JButton(buttonLabel);
+        button.setBackground(new Color(bgColor));
+        button.setForeground(new Color(fgColor));
+        button.setPreferredSize(new Dimension(95, 28));
+        button.setFont(button.getFont().deriveFont(button.getFont().getSize() + 1f));
+        return button;
     }
 }
