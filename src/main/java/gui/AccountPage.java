@@ -64,6 +64,11 @@ public class AccountPage extends JFrame {
      * Updates the values of the user, login, and bank tables (if needing changed)
      */
     private void updateDetails() {
+        // Default password, account number, sort code
+        String defaultPassword = "CorrectPassword1?";
+        String defaultAccountNumber = "1111-1111-1111-1111";
+        String defaultSortCode = "11-11-11";
+
         // Get inputs
         String email = inputs.get("email").getText();
         String forename = inputs.get("forename").getText();
@@ -75,12 +80,12 @@ public class AccountPage extends JFrame {
 
         // CHeck password, account number, and sort code to see if they've been changed
         // and give them a default value if they've not (they're hashed so can't compare)
-        if (password == "") 
-            password = "CorrectPassword1?";
-        if (accountNumber == "xxxx-xxxx-xxx-xxx")
-            accountNumber = "1111-1111-1111-1111";
-        if (sortCode == "xx-xx-xx")
-            sortCode = "11-11-11";
+        if (password.equals("")) 
+            password = defaultPassword;
+        if (accountNumber.equals("xxxx-xxxx-xxx-xxx"))
+            accountNumber = defaultAccountNumber;
+        if (sortCode.equals("xx-xx-xx"))
+            sortCode = defaultSortCode;
 
         // Validate inputs
         String error = RegistrationPage.checkInputs(email, forename, surname, password, password);
@@ -90,6 +95,8 @@ public class AccountPage extends JFrame {
         } else if (!cardError.equals("OK")) {
             errorLabel.setText(cardError);
         }
+
+        // TODO: UPDATE IN DB
     }
 
     /**
