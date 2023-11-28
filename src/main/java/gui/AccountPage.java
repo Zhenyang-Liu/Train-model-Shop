@@ -13,7 +13,9 @@ public class AccountPage extends JFrame {
     private JSeparator TitleSeparator;
     private JLabel TitleLabel;
     private JLabel EmailLabel;
+    private JLabel AddressLabel;
     private JTextField EmailTextField;
+    private JTextField AddressTextField;
 
     /*
      * Instantiate object and create components for GUI
@@ -34,7 +36,9 @@ public class AccountPage extends JFrame {
         TitleSeparator = new JSeparator();
         TitleLabel = new JLabel();
         EmailLabel = new JLabel();
+        AddressLabel = new JLabel();
         EmailTextField = new JTextField();
+        AddressTextField = new JTextField();
 
         // Set size and layout
         setPreferredSize(new Dimension(600, 450));
@@ -96,6 +100,13 @@ public class AccountPage extends JFrame {
         setTextStyle(EmailLabel, false);
         DetailsPanel.add(EmailLabel);
         DetailsPanel.add(EmailTextField);
+
+        // Email section
+        AddressTextField.setText("some address, postcode, england");
+        AddressLabel.setText("Your Address:");
+        setTextStyle(AddressLabel, false);
+        DetailsPanel.add(AddressLabel);
+        DetailsPanel.add(AddressTextField);
 
         // Add to Main Dialogue
         MainDialoguePanel.add(DetailsPanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0,
