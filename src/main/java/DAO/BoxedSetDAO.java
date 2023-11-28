@@ -10,6 +10,7 @@ import java.util.Map;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
+import helper.Logging;
 
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -154,7 +155,7 @@ public class BoxedSetDAO extends ProductDAO {
         return set;
     }
 
-    public static Map<Product, Integer> findBoxedSetItem(int setID) throws DatabaseException {
+    public static Map<Product, Integer> findBoxedSetItem(int setID) {
         String selectSQL = "SELECT * FROM BoxedSet_Item WHERE boxed_set_id = ?;";
         Map<Product, Integer> contain = new HashMap<>();
 
@@ -166,10 +167,16 @@ public class BoxedSetDAO extends ProductDAO {
             while (resultSet.next()) {
                 int itemID = resultSet.getInt("item_id");
                 int quantity = resultSet.getInt("quantity");
-
-                Product item = ProductDAO.findProductByID(itemID);
-
-                switch (item.getProductType()) {
+                Product item = null;
+                try{
+                    item = ProductDAO.findProductByID(itemID);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error finding item" + itemID + " when getting items for box set " +
+                        setID + "\nStacktrace: " + e.getMessage());
+                    continue;
+                }
+                try{
+                    switch (item.getProductType()) {
                     case "Track":
                         contain.put(TrackDAO.findTrackByID(itemID), quantity);
                         break;
@@ -182,17 +189,22 @@ public class BoxedSetDAO extends ProductDAO {
                     case "Rolling Stock":
                         contain.put(RollingStockDAO.findProductByID(itemID), quantity);
                         break;
-                }              
+                } 
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Could not find " + item.getProductType() + " for itemID " + itemID + 
+                        "\nStacktrace: " + e.getMessage());
+                }
+                             
             }
         } catch (SQLTimeoutException e) {
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding items for box set " + setID + " SQL Timeout\nStacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding items for box set " + setID + " SQL Excepted\nStacktrace: " + e.getMessage());
         }
         return contain;
     }
 
-    public static ArrayList<BoxedSet> findAllBoxedSet() throws DatabaseException {
+    public static ArrayList<BoxedSet> findAllBoxedSet() {
         String selectSQL = "SELECT * FROM BoxedSet;";
         ArrayList<BoxedSet> setList = new ArrayList<>();
 
@@ -202,22 +214,28 @@ public class BoxedSetDAO extends ProductDAO {
 
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+                Product newProduct = null;
+                try{
+                    newProduct = ProductDAO.findProductByID(productId);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding all boxed sets: could not find product " + productId + "\n Stacktrace: " + e.getMessage());
+                    continue;
+                }
+                
                 String newType = resultSet.getString("pack_type");
                 
                 BoxedSet set = new BoxedSet(newProduct,newType,findBoxedSetItem(productId));
                 setList.add(set);
             }
-            return setList;
-
         } catch (SQLTimeoutException e) {
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error getting all boxed sets: SQL Timed out\n Stacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error getting all boxed sets: SQL Exception\nStacktrace: " + e.getMessage());
         }
+        return setList;
     }
     
-    public static ArrayList<BoxedSet> findBoxedSetByType(BoxedType type) throws DatabaseException {
+    public static ArrayList<BoxedSet> findBoxedSetByType(BoxedType type) {
         String selectSQL = "SELECT * FROM BoxedSet WHERE pack_type = ?;";
         ArrayList<BoxedSet> setList = new ArrayList<>();
 
@@ -228,19 +246,24 @@ public class BoxedSetDAO extends ProductDAO {
 
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+                Product newProduct = null;
+                try{
+                    newProduct = ProductDAO.findProductByID(productId);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding all boxed sets with type " + type + ": could not find product " + productId + "\n Stacktrace: " + e.getMessage());
+                    continue;
+                }
                 String newType = resultSet.getString("pack_type");
                 
                 BoxedSet set = new BoxedSet(newProduct,newType,findBoxedSetItem(productId));
                 setList.add(set);
             }
-            return setList;
-
         } catch (SQLTimeoutException e) {
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error getting boxed sets with type" + type + ": SQL Timed out\n Stacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error getting boxed sets with type" + type + ": SQL Exception\nStacktrace: " + e.getMessage());
         }
+        return setList;
     }
 
 

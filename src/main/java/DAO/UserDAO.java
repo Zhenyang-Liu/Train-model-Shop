@@ -59,7 +59,7 @@ public class UserDAO {
      * @return {@code true} if the user exists, {@code false} otherwise
      * @throws SQLException If there was an error during query
      */
-    public static boolean doesUserExist(int userID) throws SQLException{
+    public static boolean doesUserExist(int userID){
         String checkSQL = "SELECT COUNT(*) FROM User WHERE user_id = ?";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -72,7 +72,6 @@ public class UserDAO {
             }
         } catch (SQLException e) {
             Logging.getLogger().warning("Could not check if user " + userID + " existed as SQL Excepted\nStacktrace: " + e.getMessage());
-            throw e;
         }
         // Default return false as nothing above matched
         return false;
@@ -85,7 +84,7 @@ public class UserDAO {
      * @return {@code true} if the user exists, {@code false} otherwise
      * @throws SQLException If there was an error during query
      */
-    public static boolean doesUserExist(String email) throws SQLException{
+    public static boolean doesUserExist(String email){
         String checkSQL = "SELECT COUNT(*) FROM User WHERE email = ?";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -98,7 +97,6 @@ public class UserDAO {
             }
         } catch (SQLException e) {
             Logging.getLogger().warning("Could not check if user " + email + " existed as SQL Excepted\nStacktrace: " + e.getMessage());
-            throw e;
         }
 
         // Default return false as nothing above matched
@@ -134,7 +132,7 @@ public class UserDAO {
         return new User();
     }
 
-    public static User findUserByID(int userID) throws DatabaseException {
+    public static User findUserByID(int userID) throws DatabaseException{
         String checkSQL = "SELECT * FROM User WHERE user_id = ?";
         User user = new User();
         

@@ -134,6 +134,7 @@ public class ControllerDAO extends ProductDAO {
                     Logging.getLogger().warning("Error when finding controllers of type " + 
                         (isDigital ? "digital" : "non-digital") + ": could not find product " 
                             + productId + "\n Stacktrace: " + e.getMessage());
+                    continue;
                 }
                 boolean digital = resultSet.getInt("digital_type") == 1;
 
@@ -165,6 +166,7 @@ public class ControllerDAO extends ProductDAO {
                 }catch(DatabaseException e){
                     Logging.getLogger().warning("Error when finding all controllers: could not find product " 
                             + productId + "\n Stacktrace: " + e.getMessage());
+                    continue;
                 }
                 boolean digital = resultSet.getInt("digital_type") == 1;
 

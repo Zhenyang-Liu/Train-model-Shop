@@ -158,6 +158,7 @@ public class LocomotiveDAO extends ProductDAO {
                 }catch(DatabaseException e){
                     Logging.getLogger().warning("Error when finding all locomotives for gauge " + gauge + 
                     ": could not find product " + productId + "\n Stacktrace: " + e.getMessage());
+                    continue;
                 }
                 String newGauge = resultSet.getString("gauge");
                 String newDCCType = resultSet.getString("dcc_type");
@@ -206,6 +207,7 @@ public class LocomotiveDAO extends ProductDAO {
                         }catch(DatabaseException e){
                             Logging.getLogger().warning("Error when finding all locomotives for era " + eraList + 
                                 ": could not find product " + productId + "\n Stacktrace: " + e.getMessage());
+                            continue;
                         }
                         String newGauge = resultSet.getString("gauge");
                         String newDCCType = resultSet.getString("dcc_type");
@@ -251,6 +253,7 @@ public class LocomotiveDAO extends ProductDAO {
                 }catch(DatabaseException e){
                     Logging.getLogger().warning("Error when finding all locomotives for dcctype " + dccType + 
                         ": could not find product " + productId + "\n Stacktrace: " + e.getMessage());
+                    continue;
                 }
                 String newGauge = resultSet.getString("gauge");
                 String newDCCType = resultSet.getString("dcc_type");

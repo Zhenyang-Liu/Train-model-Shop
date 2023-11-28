@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
+import helper.Logging;
 import model.Gauge;
 import model.Track;
 import model.Product;
@@ -140,7 +141,7 @@ public class TrackDAO extends ProductDAO {
      * @return An ArrayList of track objects that match the specified gauge | null if can't find.
      * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Track> findTracksByGauge(Gauge gauge) throws DatabaseException{
+    public static ArrayList<Track> findTracksByGauge(Gauge gauge) {
         String selectSQL = "SELECT * FROM Track WHERE gauge = ?;";
         ArrayList<Track> tracks = new ArrayList<Track>();
 
@@ -152,16 +153,25 @@ public class TrackDAO extends ProductDAO {
 
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+                Product newProduct = null;
+                try{
+                    newProduct = ProductDAO.findProductByID(productId);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding controllers by gauge " + gauge + ". Could not find product " + productId + 
+                        "\n Stacktrace: " + e.getMessage());
+                    continue;
+                }
                 String newGauge = resultSet.getString("gauge");
 
                 Track track = new Track(newProduct, newGauge);
                 tracks.add(track);
             }
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding all tracks by gauge " + gauge +  
+                ": SQL Timed out\nStacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding all tracks by gauge " + gauge +  
+                ": SQL Exception Occurred\nStacktrace: " + e.getMessage());
         }
         return tracks;
     }
@@ -172,7 +182,7 @@ public class TrackDAO extends ProductDAO {
      * @return An ArrayList of all Track objects in the database | null if can't find.
      * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Track> findAllControllers() throws DatabaseException {
+    public static ArrayList<Track> findAllControllers() {
         ArrayList<Track> tracks = new ArrayList<Track>();
         String selectSQL = "SELECT * FROM Track;";
 
@@ -183,16 +193,23 @@ public class TrackDAO extends ProductDAO {
 
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+                Product newProduct = null;
+                try{
+                    newProduct = ProductDAO.findProductByID(productId);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding all controllers. Could not find product " + productId + 
+                        "\n Stacktrace: " + e.getMessage());
+                    continue;
+                }
                 String newGauge = resultSet.getString("gauge");
 
                 Track track = new Track(newProduct, newGauge);
                 tracks.add(track);
             }
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding all controllers: SQL Timed out\nStacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding all controllers: SQL Exception Occured\nStacktrace: " + e.getMessage());
         }
         return tracks;
     }
