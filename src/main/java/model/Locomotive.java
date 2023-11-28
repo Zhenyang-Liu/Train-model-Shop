@@ -69,15 +69,15 @@ public class Locomotive extends Product {
      * @param dccType      The Digital Command Control type of the locomotive.
      * @param era          The era classification of the locomotive.
      */
-    public Locomotive(String brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String gauge, String dccType, int[] era) {
-        super(brand, productName, productCode, retailPrice, description, stockQuantity);
+    public Locomotive(String brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String gauge, String dccType, int[] era, String image) {
+        super(brand, productName, productCode, retailPrice, description, stockQuantity, image);
         this.setGauge(gauge);
         this.setDCCType(dccType);
         this.setEra(era);
     }
     
     public Locomotive(Product product, String gauge, String dccType, int[] era) {
-        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity());
+        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity(), product.getImageBase64());
         this.setGauge(gauge);
         this.setDCCType(dccType);
         this.setEra(era);

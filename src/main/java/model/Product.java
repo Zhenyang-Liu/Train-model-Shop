@@ -35,13 +35,14 @@ public class Product {
      * @param stockQuantity The stock quantity of the product.
      */
     public Product(String brand, String productName, String productCode,
-                   double d, String description, int stockQuantity) {
+                   double d, String description, int stockQuantity, String image) {
         this.setBrand(brand);
         this.setProductName(productName);
         this.setProductCode(productCode);
         this.setRetailPrice(d);
         this.setDescription(description);
         this.setStockQuantity(stockQuantity);
+        this.setImageBase64(image);
     }
 
     // Getter and Setter
