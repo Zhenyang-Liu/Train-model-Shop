@@ -168,7 +168,16 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     private void button_accountMouseClicked(MouseEvent e) {
-        // TODO add your code here
+        User currentUser = UserSession.getInstance().getCurrentUser();
+
+        // Show account page if user is logged in, else login page
+        if (currentUser != null) {
+            AccountPage accountPage = new AccountPage();
+            accountPage.setVisible(true);
+        } else {
+            LoginPage loginPage = new LoginPage();
+            loginPage.setVisible(true);
+        }
     }
 
     private void initComponents() {
@@ -800,6 +809,10 @@ public class MainPage extends JFrame implements ReloadListener {
 
         return productCardPanel;
     }
+
+    /*
+     * Main function for testing
+     */
     public static void main(String[] args) {
         User user = UserDAO.findUserByEmail("testemail@gmail.com");
         UserSession.getInstance().setCurrentUser(user);
