@@ -89,9 +89,15 @@ public class AccountPage extends JFrame {
         // Add all labels and inputs (that are generic)
         addLabelAndInput("Email:", "someemail@gmail.com", DetailsPanel);
         addLabelAndInput("Address:", "Some Address, postcode, england", DetailsPanel);
-        addLabelAndInput("Password:", "", DetailsPanel);
         addLabelAndInput("First Name:", "User", DetailsPanel);
         addLabelAndInput("Last Name:", "Smith", DetailsPanel);
+
+        // Password section, needs to be different
+        JLabel passwordLabel = new JLabel("Password:");
+        JPasswordField passwordField = new JPasswordField();
+        setTextStyle(passwordLabel, false);
+        DetailsPanel.add(passwordLabel);
+        DetailsPanel.add(passwordField);
 
         // Add to Main Dialogue
         MainDialoguePanel.add(DetailsPanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0,
