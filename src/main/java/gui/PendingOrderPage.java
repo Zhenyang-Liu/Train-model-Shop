@@ -32,8 +32,10 @@ public class PendingOrderPage extends JFrame {
     public PendingOrderPage(Order order) {
         this.order = order;
         initComponents();
+        addProductCards();
         updateAddressPanel();
         updatePaymentPanel();
+        totalPrice.setText(String.format("\u00A3%.2f", order.getTotalCost()));
     }
 
     private void confirmButtonMouseClicked(MouseEvent e) {
@@ -48,9 +50,15 @@ public class PendingOrderPage extends JFrame {
             order.setBankDetailState(isPaymentExist);
             order.nextStatus();
             if (OrderService.confirmOrder(order)){
-                dispose();
+                this.dispose();
+                JOptionPane.showMessageDialog(parentFrame,
+                        "Your order has been successfully placed.",
+                        "Order Confirmed",
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(parentFrame, "Meet an error when confirming the order. Please try again later.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(parentFrame,
+                        "Meet an error when confirming the order. Please try again later.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -133,13 +141,11 @@ public class PendingOrderPage extends JFrame {
         addressPanel = new JPanel();
         addressLabel = new JLabel();
         addressText = new JLabel();
-        addressEditPanel = new JPanel();
         addressAddButton = new JButton();
         addressEditButton = new JButton();
         paymentPanel = new JPanel();
         paymentLabel = new JLabel();
         paymentText = new JLabel();
-        paymentEditPanel = new JPanel();
         paymentAddButton = new JButton();
         paymentEditButton = new JButton();
         pendingOrderScrollPanel = new JScrollPane();
@@ -149,6 +155,10 @@ public class PendingOrderPage extends JFrame {
         itemName1 = new JLabel();
         itemPrice1 = new JLabel();
         itemNumLabel1 = new JLabel();
+        bottomPanel = new JPanel();
+        paymentAmountPanel = new JPanel();
+        subtotalLabel = new JLabel();
+        totalPrice = new JLabel();
         pendingOrderButtonPanel = new JPanel();
         cancelButton = new JButton();
         confirmButton = new JButton();
@@ -193,121 +203,117 @@ public class PendingOrderPage extends JFrame {
                     //======== addressPanel ========
                     {
                         addressPanel.setMaximumSize(new Dimension(300, 200));
-                        addressPanel.setLayout(new GridLayout(3, 1, 5, 5));
+                        addressPanel.setMinimumSize(new Dimension(260, 150));
+                        addressPanel.setLayout(new BoxLayout(addressPanel, BoxLayout.Y_AXIS));
 
                         //---- addressLabel ----
                         addressLabel.setText("Address");
                         addressLabel.setForeground(new Color(0x003366));
                         addressLabel.setFont(addressLabel.getFont().deriveFont(addressLabel.getFont().getStyle() | Font.BOLD, addressLabel.getFont().getSize() + 5f));
-                        addressLabel.setHorizontalAlignment(SwingConstants.LEFT);
                         addressPanel.add(addressLabel);
+
+                        //---- addressText ----
+                        addressText.setMinimumSize(new Dimension(100, 200));
                         addressPanel.add(addressText);
 
-                        //======== addressEditPanel ========
-                        {
-                            addressEditPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 5));
+                        //---- addressAddButton ----
+                        addressAddButton.setText("Add a new address");
+                        addressAddButton.setForeground(new Color(0xe9e4e3));
+                        addressAddButton.setBackground(new Color(0x55a15a));
+                        addressAddButton.setFont(addressAddButton.getFont().deriveFont(addressAddButton.getFont().getStyle() & ~Font.BOLD));
+                        addressAddButton.setPreferredSize(new Dimension(140, 23));
+                        addressAddButton.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mouseClicked(MouseEvent e) {
+                                addressAddButtonMouseClicked(e);
+                            }
+                        });
+                        addressPanel.add(addressAddButton);
 
-                            //---- addressAddButton ----
-                            addressAddButton.setText("Add a new address");
-                            addressAddButton.setForeground(new Color(0xe9e4e3));
-                            addressAddButton.setBackground(new Color(0x55a15a));
-                            addressAddButton.setFont(addressAddButton.getFont().deriveFont(addressAddButton.getFont().getStyle() & ~Font.BOLD));
-                            addressAddButton.setPreferredSize(new Dimension(150, 23));
-                            addressAddButton.addMouseListener(new MouseAdapter() {
-                                @Override
-                                public void mouseClicked(MouseEvent e) {
-                                    addressAddButtonMouseClicked(e);
-                                }
-                            });
-                            addressEditPanel.add(addressAddButton);
-
-                            //---- addressEditButton ----
-                            addressEditButton.setText("Edit the address");
-                            addressEditButton.setBackground(new Color(0x00a5f3));
-                            addressEditButton.setForeground(new Color(0xe9e4e3));
-                            addressEditButton.setPreferredSize(new Dimension(150, 23));
-                            addressEditButton.addMouseListener(new MouseAdapter() {
-                                @Override
-                                public void mouseClicked(MouseEvent e) {
-                                    addressEditButtonMouseClicked(e);
-                                }
-                            });
-                            addressEditPanel.add(addressEditButton);
-                        }
-                        addressPanel.add(addressEditPanel);
+                        //---- addressEditButton ----
+                        addressEditButton.setText("Edit the address");
+                        addressEditButton.setBackground(new Color(0x00a5f3));
+                        addressEditButton.setForeground(new Color(0xe9e4e3));
+                        addressEditButton.setPreferredSize(new Dimension(140, 23));
+                        addressEditButton.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mouseClicked(MouseEvent e) {
+                                addressEditButtonMouseClicked(e);
+                            }
+                        });
+                        addressPanel.add(addressEditButton);
                     }
                     customerInfoPanel.add(addressPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
-                        GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                        GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
                         new Insets(0, 0, 5, 0), 0, 0));
 
                     //======== paymentPanel ========
                     {
                         paymentPanel.setMaximumSize(new Dimension(300, 200));
-                        paymentPanel.setLayout(new GridLayout(3, 1, 5, 5));
+                        paymentPanel.setMinimumSize(new Dimension(260, 150));
+                        paymentPanel.setLayout(new BoxLayout(paymentPanel, BoxLayout.Y_AXIS));
 
                         //---- paymentLabel ----
                         paymentLabel.setText("Payment method");
                         paymentLabel.setForeground(new Color(0x003366));
                         paymentLabel.setFont(paymentLabel.getFont().deriveFont(paymentLabel.getFont().getStyle() | Font.BOLD, paymentLabel.getFont().getSize() + 5f));
                         paymentPanel.add(paymentLabel);
+
+                        //---- paymentText ----
+                        paymentText.setMinimumSize(new Dimension(100, 100));
+                        paymentText.setMaximumSize(null);
                         paymentPanel.add(paymentText);
 
-                        //======== paymentEditPanel ========
-                        {
-                            paymentEditPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 5));
+                        //---- paymentAddButton ----
+                        paymentAddButton.setText("Add a new card");
+                        paymentAddButton.setForeground(new Color(0xe9e4e3));
+                        paymentAddButton.setBackground(new Color(0x55a15a));
+                        paymentAddButton.setFont(paymentAddButton.getFont().deriveFont(paymentAddButton.getFont().getStyle() & ~Font.BOLD));
+                        paymentAddButton.setPreferredSize(new Dimension(140, 23));
+                        paymentAddButton.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mouseClicked(MouseEvent e) {
+                                paymentAddButtonMouseClicked(e);
+                            }
+                        });
+                        paymentPanel.add(paymentAddButton);
 
-                            //---- paymentAddButton ----
-                            paymentAddButton.setText("Add a new card");
-                            paymentAddButton.setForeground(new Color(0xe9e4e3));
-                            paymentAddButton.setBackground(new Color(0x55a15a));
-                            paymentAddButton.setFont(paymentAddButton.getFont().deriveFont(paymentAddButton.getFont().getStyle() & ~Font.BOLD));
-                            paymentAddButton.setPreferredSize(new Dimension(150, 23));
-                            paymentAddButton.addMouseListener(new MouseAdapter() {
-                                @Override
-                                public void mouseClicked(MouseEvent e) {
-                                    paymentAddButtonMouseClicked(e);
-                                }
-                            });
-                            paymentEditPanel.add(paymentAddButton);
-
-                            //---- paymentEditButton ----
-                            paymentEditButton.setText("Edit the payment");
-                            paymentEditButton.setBackground(new Color(0x00a5f3));
-                            paymentEditButton.setForeground(new Color(0xe9e4e3));
-                            paymentEditButton.setPreferredSize(new Dimension(150, 23));
-                            paymentEditButton.addMouseListener(new MouseAdapter() {
-                                @Override
-                                public void mouseClicked(MouseEvent e) {
-                                    paymentEditButtonMouseClicked(e);
-                                }
-                            });
-                            paymentEditPanel.add(paymentEditButton);
-                        }
-                        paymentPanel.add(paymentEditPanel);
+                        //---- paymentEditButton ----
+                        paymentEditButton.setText("Edit the payment");
+                        paymentEditButton.setBackground(new Color(0x00a5f3));
+                        paymentEditButton.setForeground(new Color(0xe9e4e3));
+                        paymentEditButton.setPreferredSize(new Dimension(140, 23));
+                        paymentEditButton.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mouseClicked(MouseEvent e) {
+                                paymentEditButtonMouseClicked(e);
+                            }
+                        });
+                        paymentPanel.add(paymentEditButton);
                     }
                     customerInfoPanel.add(paymentPanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
                         GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                         new Insets(20, 0, 0, 0), 0, 0));
                 }
-                infoPanel.add(customerInfoPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+                infoPanel.add(customerInfoPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
                     GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
                     new Insets(0, 10, 0, 20), 0, 0));
             }
-            pendingOrderContentPanel.add(infoPanel, new GridBagConstraints(0, 0, 1, 1, 0.8, 0.0,
+            pendingOrderContentPanel.add(infoPanel, new GridBagConstraints(0, 0, 1, 1, 0.8, 1.0,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                 new Insets(0, 0, 0, 5), 0, 0));
 
             //======== pendingOrderScrollPanel ========
             {
-                pendingOrderScrollPanel.setPreferredSize(new Dimension(615, 200));
+                pendingOrderScrollPanel.setPreferredSize(new Dimension(620, 200));
                 pendingOrderScrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-                pendingOrderScrollPanel.setMaximumSize(new Dimension(600, 32767));
-                pendingOrderScrollPanel.setMinimumSize(new Dimension(600, 6));
+                pendingOrderScrollPanel.setMaximumSize(new Dimension(620, 32767));
+                pendingOrderScrollPanel.setMinimumSize(new Dimension(620, 6));
 
                 //======== pendingOrderItemsPanel ========
                 {
-                    pendingOrderItemsPanel.setMaximumSize(new Dimension(600, 32767));
-                    pendingOrderItemsPanel.setMinimumSize(new Dimension(600, 1096));
+                    pendingOrderItemsPanel.setMaximumSize(new Dimension(610, 32767));
+                    pendingOrderItemsPanel.setMinimumSize(new Dimension(610, 1096));
                     pendingOrderItemsPanel.setLayout(new GridBagLayout());
                     ((GridBagLayout)pendingOrderItemsPanel.getLayout()).columnWidths = new int[] {0, 0};
                     ((GridBagLayout)pendingOrderItemsPanel.getLayout()).rowHeights = new int[] {0, 0};
@@ -320,11 +326,7 @@ public class PendingOrderPage extends JFrame {
                         pendingOrderCardPanel.setForeground(new Color(0x003366));
                         pendingOrderCardPanel.setPreferredSize(new Dimension(600, 120));
                         pendingOrderCardPanel.setMaximumSize(new Dimension(2147483647, 100));
-                        pendingOrderCardPanel.setLayout(new GridBagLayout());
-                        ((GridBagLayout)pendingOrderCardPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0};
-                        ((GridBagLayout)pendingOrderCardPanel.getLayout()).rowHeights = new int[] {0, 0};
-                        ((GridBagLayout)pendingOrderCardPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
-                        ((GridBagLayout)pendingOrderCardPanel.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+                        pendingOrderCardPanel.setLayout(new BoxLayout(pendingOrderCardPanel, BoxLayout.X_AXIS));
 
                         //---- itemImage1 ----
                         itemImage1.setText(bundle.getString("pendingOrderPage.itemImage1.text"));
@@ -332,34 +334,33 @@ public class PendingOrderPage extends JFrame {
                         itemImage1.setPreferredSize(new Dimension(150, 120));
                         itemImage1.setMaximumSize(new Dimension(160, 120));
                         itemImage1.setMinimumSize(new Dimension(160, 120));
-                        pendingOrderCardPanel.add(itemImage1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-                            new Insets(0, 0, 0, 0), 0, 0));
+                        pendingOrderCardPanel.add(itemImage1);
 
                         //---- itemName1 ----
                         itemName1.setText(bundle.getString("pendingOrderPage.itemName1.text"));
                         itemName1.setHorizontalAlignment(SwingConstants.CENTER);
                         itemName1.setPreferredSize(new Dimension(200, 17));
                         itemName1.setFont(itemName1.getFont().deriveFont(itemName1.getFont().getSize() + 2f));
-                        pendingOrderCardPanel.add(itemName1, new GridBagConstraints(1, 0, 1, 1, 0.3, 0.0,
-                            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-                            new Insets(0, 0, 0, 0), 0, 0));
+                        itemName1.setMinimumSize(new Dimension(200, 19));
+                        itemName1.setMaximumSize(new Dimension(200, 19));
+                        pendingOrderCardPanel.add(itemName1);
 
                         //---- itemPrice1 ----
                         itemPrice1.setText(bundle.getString("pendingOrderPage.itemPrice1.text"));
                         itemPrice1.setHorizontalAlignment(SwingConstants.CENTER);
                         itemPrice1.setFont(itemPrice1.getFont().deriveFont(itemPrice1.getFont().getSize() + 4f));
                         itemPrice1.setPreferredSize(new Dimension(100, 22));
-                        pendingOrderCardPanel.add(itemPrice1, new GridBagConstraints(2, 0, 1, 1, 0.2, 0.0,
-                            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-                            new Insets(0, 0, 0, 0), 0, 0));
+                        itemPrice1.setMaximumSize(new Dimension(150, 22));
+                        itemPrice1.setMinimumSize(new Dimension(150, 22));
+                        pendingOrderCardPanel.add(itemPrice1);
 
                         //---- itemNumLabel1 ----
                         itemNumLabel1.setText("1");
                         itemNumLabel1.setHorizontalAlignment(SwingConstants.CENTER);
-                        pendingOrderCardPanel.add(itemNumLabel1, new GridBagConstraints(3, 0, 1, 1, 0.2, 0.0,
-                            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-                            new Insets(0, 0, 0, 0), 0, 0));
+                        itemNumLabel1.setMaximumSize(new Dimension(100, 17));
+                        itemNumLabel1.setMinimumSize(new Dimension(100, 17));
+                        itemNumLabel1.setPreferredSize(new Dimension(100, 17));
+                        pendingOrderCardPanel.add(itemNumLabel1);
                     }
                     pendingOrderItemsPanel.add(pendingOrderCardPanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
                         GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
@@ -373,39 +374,69 @@ public class PendingOrderPage extends JFrame {
         }
         contentPane.add(pendingOrderContentPanel, BorderLayout.CENTER);
 
-        //======== pendingOrderButtonPanel ========
+        //======== bottomPanel ========
         {
-            pendingOrderButtonPanel.setLayout(new FlowLayout());
+            bottomPanel.setLayout(new GridBagLayout());
+            ((GridBagLayout)bottomPanel.getLayout()).columnWidths = new int[] {0, 0};
+            ((GridBagLayout)bottomPanel.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
+            ((GridBagLayout)bottomPanel.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+            ((GridBagLayout)bottomPanel.getLayout()).rowWeights = new double[] {1.0, 0.0, 0.0, 1.0E-4};
 
-            //---- cancelButton ----
-            cancelButton.setText("Cancel order");
-            cancelButton.setPreferredSize(new Dimension(150, 40));
-            cancelButton.setBackground(new Color(0xd54945));
-            cancelButton.setForeground(new Color(0xe9e4e3));
-            cancelButton.setFont(cancelButton.getFont().deriveFont(cancelButton.getFont().getStyle() | Font.BOLD, cancelButton.getFont().getSize() + 2f));
-            cancelButton.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    cancelButtonMouseClicked(e);
-                }
-            });
-            pendingOrderButtonPanel.add(cancelButton);
+            //======== paymentAmountPanel ========
+            {
+                paymentAmountPanel.setLayout(new FlowLayout());
 
-            //---- confirmButton ----
-            confirmButton.setText("Confirm order");
-            confirmButton.setPreferredSize(new Dimension(150, 40));
-            confirmButton.setBackground(new Color(0x55a15a));
-            confirmButton.setForeground(new Color(0xe9e4e3));
-            confirmButton.setFont(confirmButton.getFont().deriveFont(confirmButton.getFont().getStyle() | Font.BOLD, confirmButton.getFont().getSize() + 2f));
-            confirmButton.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    confirmButtonMouseClicked(e);
-                }
-            });
-            pendingOrderButtonPanel.add(confirmButton);
+                //---- subtotalLabel ----
+                subtotalLabel.setText("Subtotal:");
+                subtotalLabel.setFont(subtotalLabel.getFont().deriveFont(subtotalLabel.getFont().getSize() + 3f));
+                paymentAmountPanel.add(subtotalLabel);
+
+                //---- totalPrice ----
+                totalPrice.setText("100");
+                totalPrice.setFont(totalPrice.getFont().deriveFont(totalPrice.getFont().getStyle() | Font.BOLD, totalPrice.getFont().getSize() + 4f));
+                paymentAmountPanel.add(totalPrice);
+            }
+            bottomPanel.add(paymentAmountPanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 0, 0, 0), 0, 0));
+
+            //======== pendingOrderButtonPanel ========
+            {
+                pendingOrderButtonPanel.setLayout(new FlowLayout());
+
+                //---- cancelButton ----
+                cancelButton.setText("Cancel order");
+                cancelButton.setPreferredSize(new Dimension(150, 40));
+                cancelButton.setBackground(new Color(0xd54945));
+                cancelButton.setForeground(new Color(0xe9e4e3));
+                cancelButton.setFont(cancelButton.getFont().deriveFont(cancelButton.getFont().getStyle() | Font.BOLD, cancelButton.getFont().getSize() + 2f));
+                cancelButton.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        cancelButtonMouseClicked(e);
+                    }
+                });
+                pendingOrderButtonPanel.add(cancelButton);
+
+                //---- confirmButton ----
+                confirmButton.setText("Confirm order");
+                confirmButton.setPreferredSize(new Dimension(150, 40));
+                confirmButton.setBackground(new Color(0x55a15a));
+                confirmButton.setForeground(new Color(0xe9e4e3));
+                confirmButton.setFont(confirmButton.getFont().deriveFont(confirmButton.getFont().getStyle() | Font.BOLD, confirmButton.getFont().getSize() + 2f));
+                confirmButton.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        confirmButtonMouseClicked(e);
+                    }
+                });
+                pendingOrderButtonPanel.add(confirmButton);
+            }
+            bottomPanel.add(pendingOrderButtonPanel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                new Insets(0, 0, 0, 0), 0, 0));
         }
-        contentPane.add(pendingOrderButtonPanel, BorderLayout.SOUTH);
+        contentPane.add(bottomPanel, BorderLayout.SOUTH);
         pack();
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
@@ -452,7 +483,7 @@ public class PendingOrderPage extends JFrame {
                 + address.getHouseNumber() + "</b><br>"
                 + address.getRoadName() + "</b><br>"
                 + address.getCity()+ "</b><br>"
-                + address.getPostcode()
+                + address.getPostcode()+ "</b><br>"
                 + "</b><br>"+"</body></html>";
             addressText.setText(formattedText);
             isAddressExist = true;
@@ -460,12 +491,6 @@ public class PendingOrderPage extends JFrame {
             //---- addressAddButton ----
             addressAddButton.setVisible(true);
             addressEditButton.setVisible(false);
-            addressAddButton.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    addressAddButtonMouseClicked(e);
-                }
-            });
             isAddressExist = false;
         }
         //======== addressEditPanel ========
@@ -473,56 +498,50 @@ public class PendingOrderPage extends JFrame {
             //---- addressEditButton ----
             addressAddButton.setVisible(false);
             addressEditButton.setVisible(true);
-            addressEditButton.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    addressEditButtonMouseClicked(e);
-                }
-            });
         }
     }
 
     private JPanel createProductCard(Product product, int quantity) {
-        JPanel cardPanel = new JPanel(new GridBagLayout());
+        JPanel cardPanel = new JPanel();
         cardPanel.setBorder(new MatteBorder(3, 3, 3, 3, new Color(0x003762)));
-        cardPanel.setPreferredSize(new Dimension(600, 120));
-    
+        cardPanel.setPreferredSize(new Dimension(590, 120));
+        cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.X_AXIS));
+
         JLabel itemImage = new JLabel();
-        itemImage.setText("pendingOrderPage.itemImage1.text");
         itemImage.setIcon(new ImageIcon(getClass().getResource("/images/tgv.jpeg")));
-        itemImage.setPreferredSize(new Dimension(150, 120));
+        itemImage.setPreferredSize(new Dimension(160, 120));
         itemImage.setMaximumSize(new Dimension(160, 120));
-        itemImage.setMinimumSize(new Dimension(160, 120));
-        cardPanel.add(itemImage, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-             GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-             new Insets(0, 0, 0, 0), 0, 0));
-    
+        cardPanel.add(itemImage);
+
         JLabel itemName = new JLabel(product.getProductName());
         itemName.setHorizontalAlignment(SwingConstants.CENTER);
         itemName.setPreferredSize(new Dimension(200, 17));
-        itemName.setFont(itemName.getFont().deriveFont(itemName.getFont().getSize() + 2f));
-        cardPanel.add(itemName, new GridBagConstraints(1, 0, 1, 1, 0.3, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-            new Insets(0, 0, 0, 0), 0, 0));
-
+        itemName.setMinimumSize(new Dimension(200, 19));
+        itemName.setMaximumSize(new Dimension(200, 19));
+        itemName.setFont(new Font("Arial", Font.PLAIN, 12));
+        cardPanel.add(itemName);
 
         JLabel itemPrice = new JLabel(String.format("\u00A3%.2f", product.getRetailPrice()));
-        itemPrice.setHorizontalAlignment(SwingConstants.RIGHT);
-        itemPrice.setFont(itemPrice.getFont().deriveFont(itemPrice.getFont().getSize() + 4f));
+        itemPrice.setHorizontalAlignment(SwingConstants.CENTER);
         itemPrice.setPreferredSize(new Dimension(100, 22));
-        cardPanel.add(itemPrice, new GridBagConstraints(2, 0, 1, 1, 0.2, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-            new Insets(0, 0, 0, 0), 0, 0));
-    
+        itemPrice.setMinimumSize(new Dimension(150, 22));
+        itemPrice.setMaximumSize(new Dimension(150, 22));
+        itemPrice.setFont(new Font("Arial", Font.PLAIN, 14));
+        cardPanel.add(itemPrice);
+
         JLabel itemNumLabel = new JLabel(String.valueOf(quantity));
         itemNumLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        cardPanel.add(itemNumLabel, new GridBagConstraints(3, 0, 1, 1, 0.2, 0.0,
-            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-            new Insets(0, 0, 0, 0), 0, 0));   
+        itemNumLabel.setPreferredSize(new Dimension(100, 17));
+        itemNumLabel.setMinimumSize(new Dimension(100, 17));
+        itemNumLabel.setMaximumSize(new Dimension(100, 17));
+        cardPanel.add(itemNumLabel);
+
         return cardPanel;
     }
 
+
     private void addProductCards() {
+        pendingOrderItemsPanel.removeAll();
         Map<Product, Integer> products = order.getOrderItems();
         pendingOrderItemsPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -535,19 +554,21 @@ public class PendingOrderPage extends JFrame {
             JPanel cardPanel = createProductCard(entry.getKey(), entry.getValue());
             gbc.gridy = row++;
             gbc.weighty = row < products.size() ? 0 : 1;
+            gbc.insets = new Insets(3, 5, 0, 5);
             pendingOrderItemsPanel.add(cardPanel, gbc);
         }
     }
+
     
     
 
     // TODO: Test method
     public static void main(String[] args) throws DatabaseException {
-        // User user = UserDAO.findUserByEmail("manager@manager.com");
+         User user = UserDAO.findUserByEmail("manager@manager.com");
         // User user = UserDAO.findUserByEmail("staff@gmail.com");
-        User user = UserDAO.findUserByEmail("testemail@gmail.com");
+//        User user = UserDAO.findUserByEmail("testemail@gmail.com");
         UserSession.getInstance().setCurrentUser(user);
-        Order order = OrderDAO.findOrderByID(3);
+        Order order = OrderDAO.findOrderByID(13);
 
         SwingUtilities.invokeLater(() -> {
             PendingOrderPage frame = new PendingOrderPage(order);
@@ -563,13 +584,11 @@ public class PendingOrderPage extends JFrame {
     private JPanel addressPanel;
     private JLabel addressLabel;
     private JLabel addressText;
-    private JPanel addressEditPanel;
     private JButton addressAddButton;
     private JButton addressEditButton;
     private JPanel paymentPanel;
     private JLabel paymentLabel;
     private JLabel paymentText;
-    private JPanel paymentEditPanel;
     private JButton paymentAddButton;
     private JButton paymentEditButton;
     private JScrollPane pendingOrderScrollPanel;
@@ -579,6 +598,10 @@ public class PendingOrderPage extends JFrame {
     private JLabel itemName1;
     private JLabel itemPrice1;
     private JLabel itemNumLabel1;
+    private JPanel bottomPanel;
+    private JPanel paymentAmountPanel;
+    private JLabel subtotalLabel;
+    private JLabel totalPrice;
     private JPanel pendingOrderButtonPanel;
     private JButton cancelButton;
     private JButton confirmButton;
