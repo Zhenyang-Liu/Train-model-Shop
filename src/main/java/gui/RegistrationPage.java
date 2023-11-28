@@ -88,7 +88,7 @@ public class RegistrationPage extends JFrame {
      * @param passwordValidate inputted password confirm, will be checked against password
      * @return a string for the error message or "OK" if everything is good
      */
-    private String checkInputs(String email, String forename, String surname, String password, String passwordValidate) {
+    public static String checkInputs(String email, String forename, String surname, String password, String passwordValidate) {
         // Emails
         Pattern emailPattern = Pattern.compile("^[A-z0-9._%+-]+@+[A-z0-9_%+-]+.[A-z_-]{2,}$");
         if (!emailPattern.matcher(email).matches())

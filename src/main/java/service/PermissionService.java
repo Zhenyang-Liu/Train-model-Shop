@@ -3,7 +3,7 @@ package service;
 import java.util.Set;
 
 import DAO.AuthenticationDAO;
-import exception.DatabaseException;
+import helper.Logging;
 import helper.UserSession;
 
 public class PermissionService {
@@ -38,6 +38,7 @@ public class PermissionService {
      */
     public static boolean hasPermission(int userID, String permissionName) {
         UserSession session = UserSession.getInstance();
+        Logging.getLogger().info("Checking user " + userID + " has permission " + permissionName + "(Logged in user: " + session.getCurrentUser().getUserID() + ")");
         boolean hasBasicPermission = session.hasPermission(permissionName);
         if (permissionName.contains("OWN")) {
             return hasBasicPermission && userID == session.getCurrentUser().getUserID();
@@ -57,12 +58,7 @@ public class PermissionService {
      * @return A Set of strings representing the user's permissions, or null if a DatabaseException occurs.
      */
     public static Set<String> getUserPermissions(int userID) {
-        try{
-            Set<String> permissions = AuthenticationDAO.getUserPermissions(userID);
-            return permissions;
-        } catch (DatabaseException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
+        Set<String> permissions = AuthenticationDAO.getUserPermissions(userID);
+        return permissions;
     }
 }

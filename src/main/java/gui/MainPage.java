@@ -4,6 +4,7 @@
 
 package gui;
 
+import DAO.DatabaseConnectionHandler;
 import DAO.ProductDAO;
 import DAO.UserDAO;
 
@@ -14,6 +15,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.*;
 import exception.DatabaseException;
 import helper.Filter;
+import helper.Logging;
 import helper.UserSession;
 import listeners.ReloadListener;
 import model.*;
@@ -25,6 +27,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -34,6 +38,9 @@ import java.util.ResourceBundle;
 public class MainPage extends JFrame implements ReloadListener {
     private Filter f;
     public MainPage() {
+
+        Logging.getLogger().info("Creating Main Page");
+
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         initComponents();
@@ -49,14 +56,14 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     private void button_accountMouseClicked() {
-        System.out.println("Logged in: " + UserSession.getInstance().isLoggedIn());
         SwingUtilities.invokeLater(() -> {
             if (!UserSession.getInstance().isLoggedIn()) {
                 LoginPage loginPage = new LoginPage();;
                 loginPage.setVisible(true);
                 loginPage.setLoginSuccessListener(this::loadProducts);
             } else {
-                AccountPage accountPage = new AccountPage();
+                int userID = UserSession.getInstance().getCurrentUser().getUserID();
+                AccountPage accountPage = new AccountPage(userID);
                 accountPage.setVisible(true);
             }
         });
@@ -627,7 +634,7 @@ public class MainPage extends JFrame implements ReloadListener {
         // Add a product image
         JLabel productImage = new JLabel();
         //productImage.setPreferredSize(new Dimension(260, 120));
-        ImageIcon originalIcon = new ImageIcon(product.getProductImage());
+        ImageIcon originalIcon = product.getProductImage();
         Image originalImage = originalIcon.getImage();
         Image resizedImage = originalImage.getScaledInstance(256, 140, Image.SCALE_SMOOTH);
         productImage.setIcon(new ImageIcon(resizedImage));
@@ -663,8 +670,8 @@ public class MainPage extends JFrame implements ReloadListener {
         moreButton.setPreferredSize(new Dimension(100, 30));
 
         moreButton.addActionListener(e -> {
-            // ProductPage p = new ProductPage(product);
-            // p.setVisible(true);
+            ProductPage p = new ProductPage(product);
+            p.setVisible(true);
         });
 
 
@@ -812,6 +819,13 @@ public class MainPage extends JFrame implements ReloadListener {
         EventQueue.invokeLater(() -> {
             try {
                 MainPage frame = new MainPage();
+                // Close logging :D
+                frame.addWindowListener(new WindowAdapter() {
+                    public void windowClosing(WindowEvent e){
+                        DatabaseConnectionHandler.shutdown();
+                        Logging.Close();
+                    }
+                });
                 frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();

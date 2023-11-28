@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
+import helper.Logging;
 import model.*;
 
 public class ProductDAO {
@@ -24,8 +25,8 @@ public class ProductDAO {
     public static int insertProduct(Product product) throws DatabaseException {
         int productId = 0;
         String insertSQL = "INSERT INTO Product (brand_name, product_name, product_code, "
-                + "retail_price, description, stock_quantity) "
-                + "VALUES (?,?,?,?,?,?)";
+                + "retail_price, description, stock_quantity, product_image) "
+                + "VALUES (?,?,?,?,?,?, ?)";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -44,6 +45,7 @@ public class ProductDAO {
             preparedStatement.setDouble(4, product.getRetailPrice());
             preparedStatement.setString(5, product.getDescription());
             preparedStatement.setInt(6, product.getStockQuantity());
+            preparedStatement.setString(7, product.getImageBase64());
     
             // Execute the insert
             int rowsAffected = preparedStatement.executeUpdate();
@@ -76,7 +78,7 @@ public class ProductDAO {
      */ 
     public static void updateProduct(Product product) throws DatabaseException {
         String updateSQL = "UPDATE Product SET brand_name = ?, product_name = ?, product_code = ?, retail_price = ?, "
-            + "description = ?, stock_quantity = ? WHERE product_id = ?;"; 
+            + "description = ?, stock_quantity = ?, product_image = ? WHERE product_id = ?;"; 
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
@@ -87,7 +89,8 @@ public class ProductDAO {
             preparedStatement.setDouble(4, product.getRetailPrice());
             preparedStatement.setString(5, product.getDescription());
             preparedStatement.setInt(6, product.getStockQuantity());
-            preparedStatement.setInt(7,product.getProductID());
+            preparedStatement.setString(7, product.getImageBase64());
+            preparedStatement.setInt(8,product.getProductID());
 
             preparedStatement.executeUpdate();
             
@@ -168,6 +171,7 @@ public class ProductDAO {
                 product.setDescription(resultSet.getString("description"));
                 product.setRetailPrice(resultSet.getFloat("retail_price"));
                 product.setStockQuantity(resultSet.getInt("stock_quantity"));
+                product.setImageBase64(resultSet.getString("product_image"));
             }
             return product;
         } catch (SQLTimeoutException e){
@@ -201,6 +205,7 @@ public class ProductDAO {
                 product.setDescription(resultSet.getString("description"));
                 product.setRetailPrice(resultSet.getFloat("retail_price"));
                 product.setStockQuantity(resultSet.getInt("stock_quantity"));
+                product.setImageBase64(resultSet.getString("product_image"));
             }
             return product;
             
@@ -231,6 +236,7 @@ public class ProductDAO {
             product.setDescription(selectQueryResults.getString("description"));
             product.setRetailPrice(selectQueryResults.getFloat("retail_price"));
             product.setStockQuantity(selectQueryResults.getInt("stock_quantity"));
+            product.setImageBase64(selectQueryResults.getString("product_image"));
             rVal.add(product);
         }
         return rVal;
@@ -258,7 +264,7 @@ public class ProductDAO {
      * @return
      * @throws SQLException
      */
-    private static PreparedStatement construPreparedStatement(Connection connection, String searchQuery, float minPrice, float maxPrice, String brand, String sortBy, boolean asc, String type) throws SQLException{
+    private static PreparedStatement constructPreparedStatement(Connection connection, String searchQuery, float minPrice, float maxPrice, String brand, String sortBy, boolean asc, String type) throws SQLException{
         String sqlString = constructSQLQuery(searchQuery, minPrice, maxPrice, brand, sortBy, asc, type);
         Integer cExtraIndex = 1;
 
@@ -299,7 +305,7 @@ public class ProductDAO {
      */
     public static ArrayList<Product> filterProducts(String searchQuery, float minPrice, float maxPrice, String brand, String sortBy, boolean asc, String type){
         try(Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = construPreparedStatement(connection, searchQuery, minPrice, maxPrice, brand, sortBy, asc, type)) {
+            PreparedStatement preparedStatement = constructPreparedStatement(connection, searchQuery, minPrice, maxPrice, brand, sortBy, asc, type)) {
             // Return the array of products from the result set
             return arrayFromResultSet(preparedStatement.executeQuery());
         }catch(SQLException e){
@@ -314,7 +320,7 @@ public class ProductDAO {
      * @return An ArrayList<Product> with all Product in database.
      * @throws DatabaseException If there is a problem executing the select.
      */
-    public static ArrayList<Product> getAllProduct() throws DatabaseException {
+    public static ArrayList<Product> getAllProduct() {
         String selectSQL = "SELECT * FROM Product";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -322,11 +328,12 @@ public class ProductDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
             
             return arrayFromResultSet(resultSet);       
-        } catch (SQLTimeoutException e) {
-            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLTimeoutException e){
+            Logging.getLogger().warning("Error when finding all products: SQL Timed out\nStacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding all products: SQL Excepted\nStacktrace: " + e.getMessage());
         }
+        return new ArrayList<>();
     }
 
     /**
@@ -398,7 +405,7 @@ public class ProductDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.getLogger().warning("Error finding all brands: SQL Excepted\nStacktrace: " + e.getMessage());
             return new ArrayList<>();
         }
         return brandList;

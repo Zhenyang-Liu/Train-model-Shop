@@ -13,6 +13,7 @@ import java.util.Map;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
+import helper.Logging;
 import model.Order;
 import model.Product;
 
@@ -192,7 +193,7 @@ public class OrderDAO {
      * @return A Map of Product to Integer representing the items and their quantities in the order.
      * @throws DatabaseException if there is an issue with database access.
      */
-    public static Map<Product,Integer> findOrderItems(int orderID) throws DatabaseException {
+    public static Map<Product,Integer> findOrderItems(int orderID) {
         String selectSQL = "SELECT * FROM Order_Line WHERE order_id = ?;";
         Map<Product,Integer> itemList = new HashMap<>();
 
@@ -206,14 +207,21 @@ public class OrderDAO {
                 int productID = resultSet.getInt("product_id");
                 int quantity = resultSet.getInt("quantity");
 
-                itemList.put(ProductDAO.findProductByID(productID),quantity);
+                try{
+                    itemList.put(ProductDAO.findProductByID(productID),quantity);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding order items for order no. " + orderID + 
+                        " Could not find product " + productID + "\nStacktrace: " + e.getMessage());
+                }
             }
             
 
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding order items for order no. " + orderID + 
+                        " SQL Timed out\nStacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding order items for order no. " + orderID + 
+                        " SQL Excepted\nStacktrace: " + e.getMessage());
         }
         return itemList;
     }
@@ -226,7 +234,7 @@ public class OrderDAO {
      * @return An ArrayList of Order objects representing all orders in the database.
      * @throws DatabaseException if there is an issue with database access.
      */
-    public static ArrayList<Order> findAllOrder() throws DatabaseException {
+    public static ArrayList<Order> findAllOrder()  {
         String selectSQL = "SELECT * FROM Orders;";
         ArrayList<Order> orderList = new ArrayList<>();
     
@@ -249,10 +257,10 @@ public class OrderDAO {
                 if (!status.equals("Pending"))
                     orderList.add(order);
             }
-        } catch (SQLTimeoutException e) {
-            throw new ConnectionException("Database connect failed", e);
+        } catch (SQLTimeoutException e){
+            Logging.getLogger().warning("Error when finding all orders: SQL Timed out\nStacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(), e);
+            Logging.getLogger().warning("Error when finding all orders: SQL Excepted\nStacktrace: " + e.getMessage());
         }
         return orderList;
     }

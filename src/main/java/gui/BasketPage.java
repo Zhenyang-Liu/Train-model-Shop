@@ -300,7 +300,7 @@ public class BasketPage extends JFrame {
 
         // Create and configure the product image label
         JLabel itemImage = new JLabel();
-        ImageIcon originalIcon = new ImageIcon(product.getProductImage());
+        ImageIcon originalIcon = product.getProductImage();
         Image originalImage = originalIcon.getImage();
         Image resizedImage = originalImage.getScaledInstance(150, 100, Image.SCALE_SMOOTH);
         itemImage.setIcon(new ImageIcon(resizedImage));

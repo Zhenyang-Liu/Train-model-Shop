@@ -33,15 +33,15 @@ public class RollingStock extends Product {
     public RollingStock() {
     }
 
-    public RollingStock(String brand, String productName, String productCode, float retailPrice, String description, int stockQuantity,  String type, String gauge, int[] era) {
-        super(brand, productName, productCode, retailPrice, description, stockQuantity);
+    public RollingStock(String brand, String productName, String productCode, float retailPrice, String description, int stockQuantity,  String type, String gauge, int[] era, String image) {
+        super(brand, productName, productCode, retailPrice, description, stockQuantity, image);
         this.setRollingStockType(type);
         this.setGauge(gauge);
         this.setEra(era);
     }
 
     public RollingStock(Product product, String type, String gauge, int[] era) {
-        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity());
+        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity(), product.getImageBase64());
         this.setGauge(gauge);
         this.setRollingStockType(type);
         this.setEra(era);
