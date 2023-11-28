@@ -24,8 +24,8 @@ public class ProductDAO {
     public static int insertProduct(Product product) throws DatabaseException {
         int productId = 0;
         String insertSQL = "INSERT INTO Product (brand_name, product_name, product_code, "
-                + "retail_price, description, stock_quantity) "
-                + "VALUES (?,?,?,?,?,?)";
+                + "retail_price, description, stock_quantity, product_image) "
+                + "VALUES (?,?,?,?,?,?, ?)";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -44,6 +44,7 @@ public class ProductDAO {
             preparedStatement.setDouble(4, product.getRetailPrice());
             preparedStatement.setString(5, product.getDescription());
             preparedStatement.setInt(6, product.getStockQuantity());
+            preparedStatement.setString(7, product.getImageBase64());
     
             // Execute the insert
             int rowsAffected = preparedStatement.executeUpdate();

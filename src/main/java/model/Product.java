@@ -104,6 +104,10 @@ public class Product {
         this.imageBase64 = base64Image;
     }
 
+    public String getImageBase64(){
+        return imageBase64;
+    }
+
     /**
      * Retrieves the code of the product.
      *
@@ -205,6 +209,10 @@ public class Product {
      */
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public void setImageBase64(String base64){
+        this.imageBase64 = base64;
     }
 
 
