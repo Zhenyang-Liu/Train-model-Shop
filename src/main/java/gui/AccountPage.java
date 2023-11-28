@@ -78,7 +78,7 @@ public class AccountPage extends JFrame {
         String expiryDate = inputs.get("expiryDate").getText();
         String password = new String(passwordInput.getPassword());
 
-        // CHeck password, account number, and sort code to see if they've been changed
+        // Check password, account number, and sort code to see if they've been changed
         // and give them a default value if they've not (they're hashed so can't compare)
         if (password.equals("")) 
             password = defaultPassword;
