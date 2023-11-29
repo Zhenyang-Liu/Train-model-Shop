@@ -3,15 +3,9 @@ package gui;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
-
-import gui.ProductManagePage.ProductTableModel;
-
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import model.BoxedSet;
 import model.Product;
@@ -90,7 +84,8 @@ public class ProductSelectPage extends JDialog {
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         topPanel.add(titleLabel, gbc);
     
-        String[] searchOptions = {"Email", "ProductID"};
+        //TODO: Unfinished
+        String[] searchOptions = {"Brand", "Product Code"};
         JComboBox<String> searchComboBox = new JComboBox<>(searchOptions);
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -121,15 +116,15 @@ public class ProductSelectPage extends JDialog {
         gbc.gridy = 1;
         topPanel.add(clearButton, gbc);
 
-        JButton addButton = new JButton("Add Product");
-        addButton.setBackground(new Color(34, 139, 34));
-        addButton.setForeground(Color.WHITE);
-        addButton.addActionListener(e -> {
-            openAddProductDialog();
+        JButton returnButton = new JButton("Return");
+        returnButton.setBackground(Color.RED);
+        returnButton.setForeground(Color.WHITE);
+        returnButton.addActionListener(e -> {
+            dispose();;
         });
         gbc.gridx = 4;
         gbc.gridy = 1;
-        topPanel.add(addButton, gbc);
+        topPanel.add(returnButton, gbc);
 
         return topPanel;
     }
@@ -407,15 +402,5 @@ public class ProductSelectPage extends JDialog {
     public interface ButtonColumnListener {
         void onButtonClicked(int row, int column);
     }
-
-    private void openAddProductDialog() {
-        //TODO: add quantity
-        AddProductPage addProductPage = new AddProductPage(null);
-        addProductPage.pack();
-        addProductPage.setSize(500, 400);
-        addProductPage.setLocationRelativeTo(null);
-        addProductPage.setVisible(true);
-    }
-
 }
 
