@@ -2,14 +2,12 @@ package gui;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import DAO.OrderDAO;
-import DAO.UserDAO;
-import exception.DatabaseException;
-import helper.UserSession;
 import model.Address;
 import model.Order;
 import model.Product;
@@ -20,9 +18,11 @@ import service.UserService;
 
 public class OrderDetailPage extends JFrame {
     private Order order;
+    private Runnable onCloseCallback;
 
-    public OrderDetailPage(Order order) {
+    public OrderDetailPage(Order order, Runnable onCloseCallback) {
         this.order = order;
+        this.onCloseCallback = onCloseCallback;
         initComponents();
     }
 
@@ -31,6 +31,7 @@ public class OrderDetailPage extends JFrame {
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(600, 600));
         setMinimumSize(new Dimension(600, 600));
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     
         JPanel titlePanel = createTitlePanel();
     
@@ -72,6 +73,15 @@ public class OrderDetailPage extends JFrame {
 
         pack();
         setLocationRelativeTo(null);
+        
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (onCloseCallback != null) {
+                    onCloseCallback.run();
+                }
+            }
+        });
     }
     
     private JPanel createTitlePanel() {
@@ -266,58 +276,41 @@ public class OrderDetailPage extends JFrame {
         }
     }
     
-
     private void setTextStyle(JLabel label, boolean isHeader, int fontSize) {
         label.setFont(new Font(label.getFont().getName(), isHeader ? Font.BOLD : Font.PLAIN, fontSize));
     }
 
     private void fulfillButtonMouseClicked(ActionEvent e) {
-        if (OrderService.fulfillOrder(order)){
+        if (OrderService.fulfillOrder(order)) {
             JOptionPane.showMessageDialog(null, "Fulfill Order: "+ order.getOrderID() +" success!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            Order updateOrder = OrderService.findOrderByID(order.getOrderID());
-            SwingUtilities.invokeLater(() -> {
-                OrderDetailPage frame = new OrderDetailPage(updateOrder);
-                frame.setVisible(true);
-            });
+            if (onCloseCallback != null) {
+                onCloseCallback.run();
+            }
             dispose();
         }
     }
-
+    
     private void cancelButtonMouseClicked(ActionEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        CancelOrderDialog cancelOrderDialog = new CancelOrderDialog(parentFrame, order,true);
+        CancelOrderDialog cancelOrderDialog = new CancelOrderDialog(parentFrame, order, true);
         cancelOrderDialog.setVisible(true);
-
+    
         if (cancelOrderDialog.isInputValid()) {
-            Order updateOrder = OrderService.findOrderByID(order.getOrderID());
-            SwingUtilities.invokeLater(() -> {
-                OrderDetailPage frame = new OrderDetailPage(updateOrder);
-                frame.setVisible(true);
-            });
-            dispose();
+            if (OrderService.cancelOrder(order, cancelOrderDialog.getCancelReason())) {
+                JOptionPane.showMessageDialog(null, "Cancel Order: " + order.getOrderID() + " success!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                if (onCloseCallback != null) {
+                    onCloseCallback.run();
+                }
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(null, "Failed to cancel order.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
-
+    
     private void seeCancelReasonButtonClicked(ActionEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         CancelOrderDialog cancelOrderDialog = new CancelOrderDialog(parentFrame, order,false);
         cancelOrderDialog.setVisible(true);
     }
-
-    public static void main(String[] args) {
-        User user = UserDAO.findUserByEmail("manager@manager.com");
-        UserSession.getInstance().setCurrentUser(user);
-        Order order;
-        try {
-            order = OrderDAO.findOrderByID(4);
-
-            SwingUtilities.invokeLater(() -> {
-                OrderDetailPage frame = new OrderDetailPage(order);
-                frame.setVisible(true);
-            });
-        } catch (DatabaseException e) {
-            e.printStackTrace();
-        }
-    }
-
 }

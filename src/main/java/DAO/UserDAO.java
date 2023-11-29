@@ -157,6 +157,31 @@ public class UserDAO {
     }
 
     /**
+     * Updates the user based of a new user object
+     * @param user the user object to update the values for
+     * @return true if success, false if not
+     */
+    public static boolean updateUser(User user) {
+        if (doesUserExist(user.getUserID())){
+            String getSQL = "UPDATE User SET email = ?, forename = ?, surname = ?, address = ? WHERE user_id = ?";
+            try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement sqlStatement = connection.prepareStatement(getSQL)) {
+                sqlStatement.setString(1, user.getEmail());
+                sqlStatement.setString(2, user.getForename());
+                sqlStatement.setString(3, user.getSurname());
+                sqlStatement.setString(4, user.getAddress());
+                sqlStatement.setInt(5, user.getUserID());
+                sqlStatement.executeUpdate();
+                return true;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Retrieves all users from the database.
      *
      * This method queries the database to retrieve all user records. It constructs and returns a list of User objects,
