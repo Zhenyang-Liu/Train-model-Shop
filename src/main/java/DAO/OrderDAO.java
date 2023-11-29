@@ -321,4 +321,38 @@ public class OrderDAO {
         }
         return orderList;
     }
+
+    public static ArrayList<Order> findUserAllOrder(int userID)  {
+        String selectSQL = "SELECT * FROM Orders WHERE user_id = ?;";
+        ArrayList<Order> orderList = new ArrayList<>();
+    
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement checkStatement = connection.prepareStatement(selectSQL)) {
+
+            checkStatement.setInt(1, userID);
+            ResultSet resultSet = checkStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int orderID = resultSet.getInt("order_id");
+                userID = resultSet.getInt("user_id");
+                int addressID = resultSet.getInt("delivery_address_id");
+                Timestamp createTime = resultSet.getTimestamp("create_time");
+                Timestamp updateTime = resultSet.getTimestamp("update_time");
+                double total_cost = resultSet.getDouble("total_cost");
+                String status = resultSet.getString("status");
+                Map<Product,Integer> itemList = findOrderItems(orderID);
+                boolean validBankDetail = resultSet.getInt("bank_detail_state") == 1;
+                String reason = resultSet.getString("reason");
+
+                Order order = new Order(orderID, userID, addressID, createTime, updateTime, total_cost, status,itemList,validBankDetail,reason);
+                
+                orderList.add(order);
+            }
+        } catch (SQLTimeoutException e){
+            Logging.getLogger().warning("Error when finding all orders: SQL Timed out\nStacktrace: " + e.getMessage());
+        } catch (SQLException e) {
+            Logging.getLogger().warning("Error when finding all orders: SQL Excepted\nStacktrace: " + e.getMessage());
+        }
+        return orderList;
+    }
 }

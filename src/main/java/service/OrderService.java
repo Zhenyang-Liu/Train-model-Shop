@@ -10,6 +10,7 @@ import model.Order.OrderStatus;
 import DAO.AddressDAO;
 import DAO.OrderDAO;
 import exception.*;
+import helper.UserSession;
 
 public class OrderService {
     
@@ -37,7 +38,7 @@ public class OrderService {
     public static boolean fulfillOrder(Order order) {
         try{
             if (!PermissionService.hasPermission("MANAGE_ORDERS")){
-                throw new AuthorizationException("Access denied. Users can only confirm their own order.");
+                throw new AuthorizationException("Access denied. Only Staff can manage orders.");
             }
             order.setUpdateTime();
             order.nextStatus();
@@ -52,7 +53,7 @@ public class OrderService {
     public static boolean cancelOrder(Order order, String reason) {
         try{
             if (!PermissionService.hasPermission("MANAGE_ORDERS")){
-                throw new AuthorizationException("Access denied. Users can only confirm their own order.");
+                throw new AuthorizationException("Access denied. Only Staff can manage orders.");
             }
             order.setUpdateTime();
             order.setStatus("Cancelled");
@@ -71,6 +72,22 @@ public class OrderService {
                 throw new AuthorizationException("Access denied. Only Staff can manage orders.");
             }
             ArrayList<Order> orders = OrderDAO.findAllOrder();
+
+            return orders;
+        } catch (DatabaseException e) {
+            ExceptionHandler.printErrorMessage(e);
+            return null;
+        }
+    }
+
+    
+    public static ArrayList<Order> getUserAllOrder(){
+        try{
+            int userID = UserSession.getInstance().getCurrentUser().getUserID();
+            if (!PermissionService.hasPermission(userID,"VIEW_OWN_ORDERS")){
+                throw new AuthorizationException("Access denied. Users can only see their own order.");
+            }
+            ArrayList<Order> orders = OrderDAO.findUserAllOrder(userID);
 
             return orders;
         } catch (DatabaseException e) {
