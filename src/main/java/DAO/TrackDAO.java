@@ -24,7 +24,7 @@ public class TrackDAO extends ProductDAO {
      */
     public static void insertTrack(Track track) throws DatabaseException {
         int productID = insertProduct(track);
-        String insertSQL = "INSERT INTO Track (product_id, gauge) VALUES (?, ?, ?);";
+        String insertSQL = "INSERT INTO Track (product_id, gauge) VALUES (?, ?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {

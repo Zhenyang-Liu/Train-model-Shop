@@ -122,25 +122,32 @@ public class ProductService {
         return null;
     }
 
-    public static void updateBoxedSetQuantity(int boxID){
+    public static void updateBoxedSetQuantity(int boxID) {
         try {
             BoxedSet set = BoxedSetDAO.findBoxedSetByID(boxID);
-            int minQuantity = Integer.MAX_VALUE;
-            for (Map.Entry<Product,Integer> entry : set.getContain().entrySet()){
-                int quantity = entry.getKey().getStockQuantity();
-                int maxQuantity = quantity / entry.getValue();
-                if (maxQuantity < minQuantity){
-                    minQuantity = maxQuantity;
+            System.out.println(set.getBrand());
+    
+            if (set != null) {
+                int minQuantity = Integer.MAX_VALUE;
+    
+                for (Map.Entry<Product, Integer> entry : set.getContain().entrySet()) {
+                    Product product = entry.getKey();
+                    int quantity = product.getStockQuantity();
+                    int maxQuantity = quantity / entry.getValue();
+    
+                    if (maxQuantity < minQuantity) {
+                        minQuantity = maxQuantity;
+                    }
+                }
+    
+                if (minQuantity != Integer.MAX_VALUE) {
+                    ProductDAO.updateStock(boxID, minQuantity);
                 }
             }
-            
-            if (minQuantity != Integer.MAX_VALUE){
-                ProductDAO.updateStock(boxID, minQuantity);
-            } 
         } catch (DatabaseException e) {
             e.printStackTrace();
         }
-    }
+    }    
 
     public static ArrayList<String> findAllEra(){
         try {

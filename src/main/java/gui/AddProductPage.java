@@ -9,6 +9,9 @@ import model.*;
 import service.ProductService;
 import DAO.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class AddProductPage extends JDialog {
     private JTextField productNameField, productCodeField, brandNameField, retailPriceField, stockQuantityField;
     private JTextArea descriptionField;
@@ -16,11 +19,16 @@ public class AddProductPage extends JDialog {
     private JPanel inputPanel;
     private JLabel errorLabel;
     private List<Integer> eraList;
-    
+    private Map<Product,Integer> locoList, trackPackList, rollList, trackList, ctrlList;
 
     public AddProductPage(JFrame parent) {
         super(parent, "Add Product", true);
         this.eraList = new ArrayList<>();
+        this.locoList= new HashMap<>();
+        this.trackPackList= new HashMap<>();
+        this.rollList= new HashMap<>();
+        this.trackList= new HashMap<>();
+        this.ctrlList= new HashMap<>();
         initComponents();
     }
 
@@ -40,7 +48,7 @@ public class AddProductPage extends JDialog {
         add(errorLabel, gbc);
 
         // Product Type Selection
-        String[] productTypes = {"Select Product Type", "Track", "Locomotive", "Rolling Stock", "Controller","Train Set", "Train Pack"};
+        String[] productTypes = {"Select Product Type", "Track", "Locomotive", "Rolling Stock", "Controller","Train Set", "Track Pack"};
         productTypeComboBox = new JComboBox<>(productTypes);
         productTypeComboBox.addActionListener(e -> updateInputFields());
         add(new JLabel("Product Type:"), gbc);
@@ -138,10 +146,10 @@ public class AddProductPage extends JDialog {
         JButton traPaSelectButton = createButton("Select Track Packs");
         JButton ctrlSelectButton = createButton("Select Controller");
 
-        locoSelectButton.addActionListener(e -> openProductSelectDialog("Locomotive"));
-        rollSelectButton.addActionListener(e -> openProductSelectDialog("Rolling Stock"));
-        traPaSelectButton.addActionListener(e -> openProductSelectDialog("Track Pack"));
-        ctrlSelectButton.addActionListener(e -> openProductSelectDialog("Controller"));
+        locoSelectButton.addActionListener(e -> openProductSelectDialog("Locomotive", locoList));
+        rollSelectButton.addActionListener(e -> openProductSelectDialog("Rolling Stock", rollList));
+        traPaSelectButton.addActionListener(e -> openProductSelectDialog("Track Pack", trackPackList));
+        ctrlSelectButton.addActionListener(e -> openProductSelectDialog("Controller", ctrlList));
 
         addInputField("", locoSelectButton, gbc);
         addInputField("", rollSelectButton, gbc);
@@ -152,7 +160,7 @@ public class AddProductPage extends JDialog {
 
     private void trackPackPanel(GridBagConstraints gbc){
         JButton trackSelectButton = createButton("Select Tracks");
-        trackSelectButton.addActionListener(e -> openProductSelectDialog("Track"));
+        trackSelectButton.addActionListener(e -> openProductSelectDialog("Track", trackList));
         addInputField("", trackSelectButton, gbc);
     }
 
@@ -175,9 +183,32 @@ public class AddProductPage extends JDialog {
         setSelectedEra(selectedEras);
     }
 
-    private void openProductSelectDialog(String type) {
-        ProductSelectPage productSelect = new ProductSelectPage(this, type);
+    private void openProductSelectDialog(String type, Map<Product,Integer> itemList) {
+        ProductSelectPage productSelect;
+        if (type.equalsIgnoreCase("controller")){
+            productSelect = new ProductSelectPage(this, type, itemList,true);
+        } else {
+            productSelect = new ProductSelectPage(this, type, itemList,false);
+        }
+        
         productSelect.setVisible(true);
+        switch (type) {
+            case "Track":
+                trackList = productSelect.getSelection();
+                break;
+            case "Locomotive":
+                locoList = productSelect.getSelection();
+                break;
+            case "Rolling Stock":
+                rollList = productSelect.getSelection();
+                break;
+            case "Track Pack":
+                trackList = productSelect.getSelection();
+                break;
+            case "Controller":
+                ctrlList = productSelect.getSelection();
+                break;
+        }
     }
 
     private void setSelectedEra(List<Integer> eraList) {
@@ -208,7 +239,9 @@ public class AddProductPage extends JDialog {
         }
 
         Product product = new Product(brandName, productName, productCode, Double.parseDouble(retailPrice), description, Integer.parseInt(stockQuantity), "");
-        if (!product.getProductType().equalsIgnoreCase(selectedType)){
+        boolean typeMatch = !product.getProductType().equals(selectedType);
+        System.out.println(typeMatch);
+        if (typeMatch){
             errorLabel.setText("Your select type does no match the Product Code you Enter");
             errorLabel.setVisible(true);
             return;
@@ -240,10 +273,24 @@ public class AddProductPage extends JDialog {
                     RollingStockDAO.insertRollingStock(rollingStock);
                     break;
                 case "Train Set":
-                    // TODO:
+                    if (!"success".equalsIgnoreCase(checkTrainSetEmpty())){
+                        errorLabel.setText(checkTrainSetEmpty());
+                        errorLabel.setVisible(true);
+                        return;
+                    }
+                    BoxedSet trainSet = new BoxedSet(product, selectedType, mergeSetLists());
+                    BoxedSetDAO.insertBoxedSet(trainSet);
+                    ProductService.updateBoxedSetQuantity(ProductDAO.findProductByCode(product.getProductCode()).getProductID());
                     break;
                 case "Track Pack":
-                    // TODO:
+                    if (!"success".equalsIgnoreCase(checkTrackPackEmpty())){
+                        errorLabel.setText(checkTrackPackEmpty());
+                        errorLabel.setVisible(true);
+                        return;
+                    }
+                    BoxedSet trackPack = new BoxedSet(product, selectedType, trackList);
+                    BoxedSetDAO.insertBoxedSet(trackPack);
+                    ProductService.updateBoxedSetQuantity(ProductDAO.findProductByCode(product.getProductCode()).getProductID());
                     break;
                 }
             } catch (Exception ex) {
@@ -255,5 +302,46 @@ public class AddProductPage extends JDialog {
         errorLabel.setVisible(false);
         JOptionPane.showMessageDialog(this, "Product added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
         setVisible(false);
+    }
+
+    private String checkTrainSetEmpty() {
+        if (locoList == null || locoList.isEmpty()) {
+            return "Please select at least ONE Locomotive";
+        }
+        if (trackPackList == null || trackPackList.isEmpty()) {
+            return "Please select at least ONE Track Pack";
+        }
+        if (rollList == null || rollList.isEmpty()) {
+            return "Please select At least One Rolling Stock";
+        }
+        if (ctrlList == null || ctrlList.size() != 1) {
+            return "Please select only One controller";
+        }
+        return "success";
+    }
+
+    private Map<Product, Integer> mergeSetLists() {
+        Map<Product, Integer> mergedList = new HashMap<>();
+    
+        if (locoList != null) {
+            mergedList.putAll(locoList);
+        }
+        if (trackPackList != null) {
+            mergedList.putAll(trackPackList);
+        }
+        if (rollList != null) {
+            mergedList.putAll(rollList);
+        }
+        if (ctrlList != null) {
+            mergedList.putAll(ctrlList);
+        }
+        return mergedList;
+    }
+
+    private String checkTrackPackEmpty() {
+        if (trackList == null || trackList.isEmpty()) {
+            return "Please select at least ONE track";
+        }
+        return "success";
     }
 }

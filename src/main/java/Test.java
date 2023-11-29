@@ -37,7 +37,7 @@ import helper.UserSession;
 
 public class Test {
     public static void main(String[] args) {
-        // performDatabaseOperations();
+        performDatabaseOperations();
         // User user = UserDAO.findUserByEmail("manager@manager.com");
         // UserSession.getInstance().setCurrentUser(user);
         // Address address = AddressService.getAddressByUser();
@@ -54,10 +54,10 @@ public class Test {
         // System.out.println(bankDetail.getSecurityCode());
 
         
-        User user = UserDAO.findUserByEmail("testemail@gmail.com");
-        UserSession.getInstance().setCurrentUser(user);
-        Cart cart = new Cart(2);
-        System.out.println(cart.getCartItems().size());
+        // User user = UserDAO.findUserByEmail("testemail@gmail.com");
+        // UserSession.getInstance().setCurrentUser(user);
+        // Cart cart = new Cart(2);
+        // System.out.println(cart.getCartItems().size());
         
         // CartService.addToCart(5, 5, 1);
         // CartService.addToCart(5, 3, 2);
@@ -72,6 +72,7 @@ public class Test {
         try (Connection connection = DatabaseConnectionHandler.getConnection()) {            
             // Brand brand = new Brand("Bachmann", "UK");
             // brand.setBrandID(1);
+            BoxedSetDAO.deleteBoxedSet(19);
             
             // // Test ProductDAO 
             // Product product = new Product(brand, "Test Insert", "T000", 8.8, "??", 0);

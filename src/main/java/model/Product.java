@@ -244,7 +244,7 @@ public class Product {
      * @return The product type as a string, or null if the product code is invalid.
      */
     public String getProductType() {
-        char typeIndicator = productCode.charAt(0);
+        char typeIndicator = Character.toUpperCase(productCode.charAt(0));
 
         switch (typeIndicator) {
             case 'R':
@@ -260,7 +260,7 @@ public class Product {
             case 'P':
                 return "Track Pack";
             default:
-                return null; // Invalid type indicator
+                return null;
         }
     }
 

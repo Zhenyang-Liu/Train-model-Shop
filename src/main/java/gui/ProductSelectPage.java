@@ -3,6 +3,9 @@ package gui;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
+
+import gui.ProductManagePage.ProductTableModel;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,11 +21,19 @@ public class ProductSelectPage extends JDialog {
     private JTable allProductsTable;
     private String productType;
     private BoxedSet boxedSet;
+    private JPanel rightPanel; 
+    private boolean selectSingleController = false;
 
-    public ProductSelectPage(Dialog parent, String productType) {
+    public Map<Product, Integer> getSelection(){
+        return boxedSet.getContain();
+    }
+
+    public ProductSelectPage(Dialog parent, String productType, Map<Product,Integer> itemList, boolean selectSingle) {
         super(parent, "Select Products", true);
         this.productType = productType;
         this.boxedSet = new BoxedSet();
+        boxedSet.setContain(itemList);
+        this.selectSingleController = selectSingle;
         initComponents();
     }
 
@@ -41,7 +52,7 @@ public class ProductSelectPage extends JDialog {
         gbc.gridy = 0;
         leftPanel.add(createLeftPanel(productType), gbc);
 
-        JPanel rightPanel = new JPanel(new GridBagLayout());
+        rightPanel = new JPanel(new GridBagLayout());
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -70,7 +81,7 @@ public class ProductSelectPage extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
     
-        JLabel titleLabel = new JLabel("Product Management", JLabel.CENTER);
+        JLabel titleLabel = new JLabel("Product Selection", JLabel.CENTER);
         titleLabel.setFont(new Font(titleLabel.getFont().getFontName(), Font.BOLD, 26));
         titleLabel.setForeground(new Color(0x003366));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -133,12 +144,11 @@ public class ProductSelectPage extends JDialog {
         ButtonColumnListener listener = new ButtonColumnListener() {
             @Override
             public void onButtonClicked(int row, int column) {
-                Product selectedProduct = tableModel.getProductAt(row);
                 SwingUtilities.invokeLater(() -> {
-                    // TODO: Add
+                    handleAddButtonClicked(row);
                 });
             }
-        };
+        };        
 
         allProductsTable.getColumn("Add").setCellRenderer(new ButtonRenderer());
         allProductsTable.getColumn("Add").setCellEditor(new ButtonEditor(new JCheckBox(), listener));
@@ -160,7 +170,7 @@ public class ProductSelectPage extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
     
-        JLabel itemsTitleLabel = new JLabel("Order Items");
+        JLabel itemsTitleLabel = new JLabel("Selected "+productType);
         setTextStyle(itemsTitleLabel, true, 16);
         rightPanel.add(itemsTitleLabel, gbc);
         gbc.gridy++;
@@ -210,60 +220,6 @@ public class ProductSelectPage extends JDialog {
         return panel;
     }
 
-    private JPanel createProductPanel() {
-        JPanel productPanel = new JPanel();
-        productPanel.setLayout(new BorderLayout());
-    
-        ProductTableModel tableModel = new ProductTableModel();
-        allProductsTable = new JTable(tableModel);
-    
-        ButtonColumnListener listener = new ButtonColumnListener() {
-            @Override
-            public void onButtonClicked(int row, int column) {
-                Product addProduct = tableModel.getProductAt(row);
-                SwingUtilities.invokeLater(() -> {
-                    // TODO: "Add"
-                });
-            }
-        };
-    
-        allProductsTable.getColumn("Add").setCellRenderer(new ButtonRenderer());
-        allProductsTable.getColumn("Add").setCellEditor(new ButtonEditor(new JCheckBox(), listener));
-    
-        JScrollPane scrollPane = new JScrollPane(allProductsTable);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    
-        productPanel.add(scrollPane, BorderLayout.CENTER);
-    
-        return productPanel;
-    }
-
-    private JPanel createProductFilterPanel() {
-        JPanel filterPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.CENTER;
-
-        JLabel filterLabel = new JLabel("Filter by Type:");
-        filterPanel.add(filterLabel, gbc);
-        
-        String[] productTypes = {"All", "Track", "Locomotive", "Rolling Stock", "Controller", "Train Set", "Track Pack"};
-        JComboBox<String> productTypeComboBox = new JComboBox<>(productTypes);
-        productTypeComboBox.addActionListener(e -> {
-            String selectedType = (String) productTypeComboBox.getSelectedItem();
-            loadProductData(selectedType);
-        });
-    
-        gbc.gridx = 1;
-        filterPanel.add(productTypeComboBox, gbc);
-    
-        return filterPanel;
-    }
-
     private void performSearch(String searchType, String searchTerm) {
         // TODO: applySearch
     }
@@ -279,6 +235,55 @@ public class ProductSelectPage extends JDialog {
         model.fireTableDataChanged();
     }
 
+    private void updateRightPanel() {
+        rightPanel.removeAll();
+        addOrderItemsToWindow(rightPanel, boxedSet.getContain());
+        
+        rightPanel.revalidate();
+        rightPanel.repaint();
+    }
+
+    private void handleAddButtonClicked(int row) {
+        if (selectSingleController) {
+            Product selectedProduct = ((ProductTableModel) allProductsTable.getModel()).getProductAt(row);
+            boxedSet.getContain().clear();
+            boxedSet.addProduct(selectedProduct, 1);
+            updateRightPanel();
+        } else {
+            Product selectedProduct = ((ProductTableModel) allProductsTable.getModel()).getProductAt(row);
+            int maxQuantity = selectedProduct.getStockQuantity();
+            String quantityString = JOptionPane.showInputDialog(
+                this, 
+                "Enter quantity (Max: " + maxQuantity + "):", 
+                "Select Quantity", 
+                JOptionPane.PLAIN_MESSAGE
+            );
+        
+            try {
+                int quantity = Integer.parseInt(quantityString);
+                if (quantity > 0 && quantity <= maxQuantity) {
+                    boxedSet.addProduct(selectedProduct, quantity);
+                    updateRightPanel();
+                } else {
+                    JOptionPane.showMessageDialog(
+                        this, 
+                        "Invalid quantity. Please enter a number between 1 and " + maxQuantity + ".", 
+                        "Invalid Input", 
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(
+                    this, 
+                    "Invalid input. Please enter a valid number.", 
+                    "Invalid Input", 
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+    }
+
+    // JTable Model
     class ProductTableModel extends AbstractTableModel {
         private final String[] columnNames = { "Brand", "Name", "Code", "Price", "Quantity", "Add"};
         private ArrayList<Product> productList;
@@ -289,7 +294,7 @@ public class ProductSelectPage extends JDialog {
         }
     
         private void loadInitialData() {
-            this.productList = ProductService.getAllProducts();
+            this.productList = ProductService.getAllProductsByType(productType);
         }
     
         @Override
@@ -412,8 +417,5 @@ public class ProductSelectPage extends JDialog {
         addProductPage.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        // new ProductSelectionPage("Type");
-    }
 }
 
