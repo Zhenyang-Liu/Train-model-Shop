@@ -397,13 +397,18 @@ public class BasketPage extends JFrame {
             public void stateChanged(ChangeEvent e) {
                 int currentQuantity = (Integer) itemSpinner.getValue();
                 if (currentQuantity == 0){
-                    Container parent = trolleyCardPanel.getParent();
-                    parent.remove(trolleyCardPanel);
-                    parent.revalidate();
-                    parent.repaint();
+                    if(CartService.removeFromCart(cartItem.getItemID())){
+                        Container parent = trolleyCardPanel.getParent();
+                        parent.remove(trolleyCardPanel);
+                        parent.revalidate();
+                        parent.repaint();
 
-                    if (reloadListener != null) {
-                        reloadListener.reloadProducts();
+                        if (reloadListener != null) {
+                            reloadListener.reloadProducts();
+                            System.out.println("Remove button clicked!");
+                        }
+                    }else{
+                        //TODO: Missing logic if update failed
                     }
                 } else if (currentQuantity > 0) {
                     if (cartItem.getProductStock() >= currentQuantity){
