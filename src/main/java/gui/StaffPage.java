@@ -6,7 +6,6 @@ import javax.swing.table.TableCellRenderer;
 
 import DAO.ControllerDAO;
 import DAO.LocomotiveDAO;
-import DAO.OrderDAO;
 import DAO.RollingStockDAO;
 import DAO.TrackDAO;
 import DAO.UserDAO;
@@ -18,7 +17,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import model.*;
-import service.OrderService;
 import service.ProductService;
 
 public class StaffPage extends JFrame {
@@ -38,7 +36,6 @@ public class StaffPage extends JFrame {
         mainPanel.setLayout(cardLayout);
 
         mainPanel.add(createProductPanel(), "Product");
-        mainPanel.add(createOrderPanel(), "Order");
 
         add(mainPanel, BorderLayout.CENTER);
     }
@@ -112,56 +109,9 @@ public class StaffPage extends JFrame {
         productPanel.add(splitPane, BorderLayout.CENTER);
 
         return productPanel;
-    }
-
-    private JPanel createOrderPanel() {
-        JPanel orderPanel = new JPanel(new BorderLayout());
-        JPanel leftPanel = createOrderFilterPanel();
-    
-        OrderTableModel tableModel = new OrderTableModel(OrderService.getAllOrders());
-        JTable orderTable = new JTable(tableModel);
-    
-        ButtonColumnListener listener = (row, column) -> {
-            Order selectedOrder = tableModel.getOrderAt(row);
-
-            SwingUtilities.invokeLater(() -> {
-                OrderDetailPage frame = new OrderDetailPage(selectedOrder);
-                frame.setVisible(true);
-            });
-        };
-    
-        orderTable.getColumn("Details").setCellRenderer(new ButtonRenderer());
-        orderTable.getColumn("Details").setCellEditor(new ButtonEditor(new JCheckBox(), listener));
-    
-        JScrollPane scrollPane = new JScrollPane(orderTable);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, scrollPane);
-        splitPane.setDividerLocation(150);
-        orderPanel.add(splitPane, BorderLayout.CENTER);
-    
-        return orderPanel;
-    }   
+    }  
 
     //
-    private JPanel createOrderFilterPanel(){
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-        leftPanel.add(Box.createVerticalGlue());
-        
-        Dimension buttonSize = new Dimension(100, 30);
-        JButton allButton = createButton("All", buttonSize, e -> loadOrderData("all"));
-        JButton confirmedButton = createButton("Confirmed", buttonSize, e -> loadOrderData("confirmed"));
-        JButton fulfilledButton = createButton("Fulfilled", buttonSize, e -> loadOrderData("fulfilled"));
-    
-        leftPanel.add(allButton);
-        leftPanel.add(confirmedButton);
-        leftPanel.add(fulfilledButton);
-        leftPanel.add(Box.createVerticalGlue());
-
-        return leftPanel;
-    }
 
     private JPanel createProductCard(Product product) {
         JPanel card = new JPanel();
@@ -378,7 +328,16 @@ public class StaffPage extends JFrame {
         private ArrayList<Order> orders;
     
         public OrderTableModel(ArrayList<Order> orders) {
-            this.orders = orders;
+            setOrders(orders);
+        }
+    
+        public void setOrders(ArrayList<Order> orders) {
+            if (orders != null && !orders.isEmpty()) {
+                this.orders = orders;
+            } else {
+                this.orders = new ArrayList<>();
+                this.orders.add(null);
+            }
         }
     
         @Override
@@ -398,9 +357,13 @@ public class StaffPage extends JFrame {
     
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
+            if (orders.get(rowIndex) == null) {
+                return columnIndex == 0 ? "There is no satisfied order" : "";
+            }
+    
             Order order = orders.get(rowIndex);
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        
+    
             switch (columnIndex) {
                 case 0: return order.getOrderID();
                 case 1: return order.getUserID();
@@ -412,12 +375,13 @@ public class StaffPage extends JFrame {
                 default: return null;
             }
         }
-        
-        public Order getOrderAt(int rowIndex) {
-            return orders.get(rowIndex);
+    
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return orders.get(row) != null && column == 6;
         }
-    }        
-
+    }
+    
     class ButtonRenderer extends JButton implements TableCellRenderer {
         public ButtonRenderer() {
             setOpaque(true);
@@ -433,7 +397,6 @@ public class StaffPage extends JFrame {
 
     class ButtonEditor extends DefaultCellEditor {
         private JButton button;
-        private String label;
         private boolean isPushed;
         private ButtonColumnListener listener;
         private int row, column;
@@ -443,51 +406,33 @@ public class StaffPage extends JFrame {
             this.button = new JButton();
             this.button.setOpaque(true);
             this.listener = listener;
-            this.button.addActionListener(e -> fireEditingStopped());
+            this.button.addActionListener(e -> {
+                isPushed = true;
+                fireEditingStopped();
+            });
         }
     
+        @Override
         public Component getTableCellEditorComponent(JTable table, Object value,
                 boolean isSelected, int row, int column) {
-            if (isSelected) {
-                button.setForeground(table.getSelectionForeground());
-                button.setBackground(table.getSelectionBackground());
-            } else {
-                button.setForeground(table.getForeground());
-                button.setBackground(table.getBackground());
-            }
-            label = (value == null) ? "" : value.toString();
-            button.setText(label);
-            isPushed = true;
             this.row = row;
             this.column = column;
+            button.setText(value == null ? "" : value.toString());
             return button;
         }
     
+        @Override
         public Object getCellEditorValue() {
             if (isPushed) {
                 listener.onButtonClicked(row, column);
             }
             isPushed = false;
-            return label;
-        }
-    
-        public boolean stopCellEditing() {
-            isPushed = false;
-            return super.stopCellEditing();
-        }
-    
-        protected void fireEditingStopped() {
-            super.fireEditingStopped();
+            return super.getCellEditorValue();
         }
     }
     
     public interface ButtonColumnListener {
         void onButtonClicked(int row, int column);
-    }
-    
-
-    private void loadOrderData(String roleFilter) {
-
     }
 
     // Method for creating Buttons

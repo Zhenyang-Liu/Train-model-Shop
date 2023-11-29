@@ -6,6 +6,7 @@ import java.util.Map;
 import model.Cart;
 import model.Order;
 import model.Product;
+import model.Order.OrderStatus;
 import DAO.AddressDAO;
 import DAO.OrderDAO;
 import exception.*;
@@ -70,6 +71,20 @@ public class OrderService {
                 throw new AuthorizationException("Access denied. Only Staff can manage orders.");
             }
             ArrayList<Order> orders = OrderDAO.findAllOrder();
+
+            return orders;
+        } catch (DatabaseException e) {
+            ExceptionHandler.printErrorMessage(e);
+            return null;
+        }
+    }
+
+    public static ArrayList<Order> getOrdersByStatus(String statusFilter) {
+        try{
+            if (!PermissionService.hasPermission("MANAGE_ORDERS")){
+                throw new AuthorizationException("Access denied. Only Staff can manage orders.");
+            }
+            ArrayList<Order> orders = OrderDAO.findOrderByStatus(OrderStatus.fromName(statusFilter).getStatus());
 
             return orders;
         } catch (DatabaseException e) {
