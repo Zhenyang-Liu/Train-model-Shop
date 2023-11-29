@@ -279,9 +279,10 @@ public class Product {
             e.printStackTrace();
         }
         // Get the base64 of either the stored image or the default image and return
-        boolean imageExists = this.imageBase64 != null && this.imageBase64 != "";
+        boolean imageExists = this.imageBase64 != null && !this.imageBase64.equals("");
         String imageIcon = imageExists ? this.imageBase64 : ImageUtils.toBase64(new File(defaultImage));
-        Logging.getLogger().info("Creating image for product " + productID);
+        Logging.getLogger().info("Creating image for product " + productID + " image stored in database:" 
+                        + this.imageBase64 + "." + "(" + (imageExists ? "image exists" : "image not found") + ")");
         return ImageUtils.imageToIcon(imageIcon);
     }
 
