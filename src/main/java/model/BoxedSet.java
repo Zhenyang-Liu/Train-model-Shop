@@ -68,6 +68,17 @@ public class BoxedSet extends Product{
     }
 
     public void addProduct(Product product, int quantity) {
-        this.contain.put(product, quantity);
+        boolean productExists = false;
+        for (Product existingProduct : contain.keySet()) {
+            if (existingProduct.getProductID() == product.getProductID()) {
+                int existingQuantity = contain.get(existingProduct);
+                contain.put(existingProduct, existingQuantity + quantity);
+                productExists = true;
+                break;
+            }
+        }
+        if (!productExists) {
+            contain.put(product, quantity);
+        }
     }
 }

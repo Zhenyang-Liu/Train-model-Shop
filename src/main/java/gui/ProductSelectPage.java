@@ -3,39 +3,64 @@ package gui;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
-
-import DAO.UserDAO;
-import helper.UserSession;
-
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import model.*;
+import model.BoxedSet;
+import model.Product;
 import service.ProductService;
 
-public class ProductManagePage extends JFrame {
-    private JTable productTable;
-    private String currentTypeFilter;
+public class ProductSelectPage extends JDialog {
+    private JTable allProductsTable;
+    private String productType;
+    private BoxedSet boxedSet;
 
-    public ProductManagePage() {
-        setTitle("Product Management");
+    public ProductSelectPage(Dialog parent, String productType) {
+        super(parent, "Select Products", true);
+        this.productType = productType;
+        this.boxedSet = new BoxedSet();
+        initComponents();
+    }
+
+    private void initComponents() {
+        setTitle("Select " + productType);
         setSize(800, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        setMinimumSize(new Dimension(800, 600));
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    
+        JPanel leftPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        leftPanel.add(createLeftPanel(productType), gbc);
 
-        JPanel topPanel = createTopPanel();
-        add(topPanel, BorderLayout.NORTH);
-
-        JPanel productPanel = createProductPanel();
-        add(productPanel, BorderLayout.CENTER);
-
-        JPanel filterPanel = createProductFilterPanel();
-        add(filterPanel, BorderLayout.SOUTH);
+        JPanel rightPanel = new JPanel(new GridBagLayout());
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        addOrderItemsToWindow(rightPanel, boxedSet.getContain());
+    
+        JScrollPane scrollPane = new JScrollPane(rightPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(10);
+    
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, scrollPane);
+        splitPane.setResizeWeight(0.4); 
+    
+        add(createTopPanel(), BorderLayout.NORTH);
+        add(splitPane, BorderLayout.CENTER);
         
+        pack();
         setLocationRelativeTo(null);
-        setVisible(true);
-
-        loadProductData("all");
     }
 
     private JPanel createTopPanel() {
@@ -79,7 +104,7 @@ public class ProductManagePage extends JFrame {
         clearButton.addActionListener(e -> {
             searchField.setText("");
             searchComboBox.setSelectedIndex(0);
-            loadProductData(currentTypeFilter);
+            loadProductData(productType);
         });
         gbc.gridx = 3;
         gbc.gridy = 1;
@@ -98,27 +123,114 @@ public class ProductManagePage extends JFrame {
         return topPanel;
     }
 
-    private JPanel createProductPanel() {
-        JPanel productPanel = new JPanel();
+    private JPanel createLeftPanel(String productType) {
+        JPanel productPanel = new JPanel(new BorderLayout());
         productPanel.setLayout(new BorderLayout());
-    
+
         ProductTableModel tableModel = new ProductTableModel();
-        productTable = new JTable(tableModel);
-    
+        allProductsTable = new JTable(tableModel);
+
         ButtonColumnListener listener = new ButtonColumnListener() {
             @Override
             public void onButtonClicked(int row, int column) {
                 Product selectedProduct = tableModel.getProductAt(row);
                 SwingUtilities.invokeLater(() -> {
-                    // TODO: Deteail function
+                    // TODO: Add
+                });
+            }
+        };
+
+        allProductsTable.getColumn("Add").setCellRenderer(new ButtonRenderer());
+        allProductsTable.getColumn("Add").setCellEditor(new ButtonEditor(new JCheckBox(), listener));
+
+        JScrollPane scrollPane = new JScrollPane(allProductsTable);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+    
+        productPanel.add(scrollPane, BorderLayout.CENTER);
+    
+        return productPanel;
+    }
+
+    private void addOrderItemsToWindow(JPanel rightPanel, Map<Product, Integer> items) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+    
+        JLabel itemsTitleLabel = new JLabel("Order Items");
+        setTextStyle(itemsTitleLabel, true, 16);
+        rightPanel.add(itemsTitleLabel, gbc);
+        gbc.gridy++;
+    
+        if (items == null || items.isEmpty()) {
+            JLabel noItemsLabel = new JLabel("You have not selected any " + productType);
+            setTextStyle(noItemsLabel, false, 14);
+            rightPanel.add(noItemsLabel, gbc);
+            return;
+        }
+    
+        for (Map.Entry<Product, Integer> entry : items.entrySet()) {
+            JPanel itemPanel = createOrderItemPanel(entry.getKey(), entry.getValue());
+            rightPanel.add(itemPanel, gbc);
+            gbc.gridy++;
+        }
+    }    
+
+    private void setTextStyle(JLabel label, boolean isHeader, int fontSize) {
+        label.setFont(new Font(label.getFont().getName(), isHeader ? Font.BOLD : Font.PLAIN, fontSize));
+    }
+
+    private JPanel createOrderItemPanel(Product product, int quantity) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // 设置边距
+    
+        String htmlContent = String.format(
+            "<html><body style='text-align: left;'>"
+            + "%s<br>"
+            + "%s | %s<br>"
+            + "\u00A3%.2f x %d<br>"
+            + "<b>Line Cost:</b> \u00A3%.2f"
+            + "</body></html>",
+            product.getProductName(),
+            product.getBrand(),
+            product.getProductCode(),
+            product.getRetailPrice(),
+            quantity,
+            product.getRetailPrice() * quantity
+        );
+    
+        JLabel contentLabel = new JLabel(htmlContent);
+        contentLabel.setFont(new Font(contentLabel.getFont().getName(), Font.PLAIN, 14));
+        panel.add(contentLabel, BorderLayout.WEST);
+    
+        return panel;
+    }
+
+    private JPanel createProductPanel() {
+        JPanel productPanel = new JPanel();
+        productPanel.setLayout(new BorderLayout());
+    
+        ProductTableModel tableModel = new ProductTableModel();
+        allProductsTable = new JTable(tableModel);
+    
+        ButtonColumnListener listener = new ButtonColumnListener() {
+            @Override
+            public void onButtonClicked(int row, int column) {
+                Product addProduct = tableModel.getProductAt(row);
+                SwingUtilities.invokeLater(() -> {
+                    // TODO: "Add"
                 });
             }
         };
     
-        productTable.getColumn("Details").setCellRenderer(new ButtonRenderer());
-        productTable.getColumn("Details").setCellEditor(new ButtonEditor(new JCheckBox(), listener));
+        allProductsTable.getColumn("Add").setCellRenderer(new ButtonRenderer());
+        allProductsTable.getColumn("Add").setCellEditor(new ButtonEditor(new JCheckBox(), listener));
     
-        JScrollPane scrollPane = new JScrollPane(productTable);
+        JScrollPane scrollPane = new JScrollPane(allProductsTable);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     
@@ -162,14 +274,13 @@ public class ProductManagePage extends JFrame {
     }    
 
     private void updateTableModel(ArrayList<Product> products) {
-        ProductTableModel model = (ProductTableModel) productTable.getModel();
+        ProductTableModel model = (ProductTableModel) allProductsTable.getModel();
         model.setProductList(products);
         model.fireTableDataChanged();
-    }   
-  
-    // Inner Class
+    }
+
     class ProductTableModel extends AbstractTableModel {
-        private final String[] columnNames = { "Brand", "Name", "Code", "Price", "Quantity", "Details"};
+        private final String[] columnNames = { "Brand", "Name", "Code", "Price", "Quantity", "Add"};
         private ArrayList<Product> productList;
     
         public ProductTableModel() {
@@ -205,7 +316,7 @@ public class ProductManagePage extends JFrame {
                 case 2: return product.getProductCode();
                 case 3: return String.format("\u00A3%.2f", product.getRetailPrice());
                 case 4: return product.getStockQuantity();
-                case 5: return "Details";
+                case 5: return "Add";
                 default: return null;
             }
         }
@@ -293,20 +404,16 @@ public class ProductManagePage extends JFrame {
     }
 
     private void openAddProductDialog() {
-        AddProductPage addProductPage = new AddProductPage(this);
+        //TODO: add quantity
+        AddProductPage addProductPage = new AddProductPage(null);
         addProductPage.pack();
         addProductPage.setSize(500, 400);
         addProductPage.setLocationRelativeTo(null);
         addProductPage.setVisible(true);
     }
-    
-    public static void main(String[] args) {
-        User user = UserDAO.findUserByEmail("manager@manager.com");
-        UserSession.getInstance().setCurrentUser(user);
 
-        SwingUtilities.invokeLater(() -> {
-            ProductManagePage frame = new ProductManagePage();
-            frame.setVisible(true);
-        });
+    public static void main(String[] args) {
+        // new ProductSelectionPage("Type");
     }
 }
+

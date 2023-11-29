@@ -62,6 +62,7 @@ public class AddProductPage extends JDialog {
     private void updateInputFields() {
         inputPanel.removeAll();
         GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(0, 0, 2, 0);
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
@@ -120,10 +121,10 @@ public class AddProductPage extends JDialog {
                 addInputField("Digital Type:", digitalComboBox, gbc);
                 break;
             case "Train Set":
-                // TODO:
+                trainSetPanel(gbc);
                 break;
             case "Track Pack":
-                // TODO:
+                trackPackPanel(gbc);
                 break;
         }
 
@@ -131,9 +132,40 @@ public class AddProductPage extends JDialog {
         inputPanel.repaint();
     }
 
+    private void trainSetPanel(GridBagConstraints gbc){
+        JButton locoSelectButton = createButton("Select Locomotives");
+        JButton rollSelectButton = createButton("Select Rollingstocks");
+        JButton traPaSelectButton = createButton("Select Track Packs");
+        JButton ctrlSelectButton = createButton("Select Controller");
+
+        locoSelectButton.addActionListener(e -> openProductSelectDialog("Locomotive"));
+        rollSelectButton.addActionListener(e -> openProductSelectDialog("Rolling Stock"));
+        traPaSelectButton.addActionListener(e -> openProductSelectDialog("Track Pack"));
+        ctrlSelectButton.addActionListener(e -> openProductSelectDialog("Controller"));
+
+        addInputField("", locoSelectButton, gbc);
+        addInputField("", rollSelectButton, gbc);
+        addInputField("", traPaSelectButton, gbc);
+        addInputField("", ctrlSelectButton, gbc);
+        
+    }
+
+    private void trackPackPanel(GridBagConstraints gbc){
+        JButton trackSelectButton = createButton("Select Tracks");
+        trackSelectButton.addActionListener(e -> openProductSelectDialog("Track"));
+        addInputField("", trackSelectButton, gbc);
+    }
+
     private void addInputField(String label, JComponent component, GridBagConstraints gbc) {
         inputPanel.add(new JLabel(label), gbc);
         inputPanel.add(component, gbc);
+    }
+
+    private JButton createButton(String text){
+        JButton button = new JButton(text);
+        button.setBackground(new Color(0x204688));
+        button.setForeground(Color.WHITE);
+        return button;
     }
 
     private void openEraSelectDialog(List<Integer> eras) {
@@ -141,6 +173,11 @@ public class AddProductPage extends JDialog {
         eraSelect.setVisible(true);
         List<Integer> selectedEras = eraSelect.getSelectedEras();
         setSelectedEra(selectedEras);
+    }
+
+    private void openProductSelectDialog(String type) {
+        ProductSelectPage productSelect = new ProductSelectPage(this, type);
+        productSelect.setVisible(true);
     }
 
     private void setSelectedEra(List<Integer> eraList) {
