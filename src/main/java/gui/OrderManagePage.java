@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import model.Order;
 import model.User;
 import service.OrderService;
+import service.UserService;
 
 public class OrderManagePage extends JFrame {
     private JTable orderTable;
@@ -40,36 +41,52 @@ public class OrderManagePage extends JFrame {
         loadOrderData("all");
     }
 
-
     private JPanel createTopPanel() {
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
-        
+    
         JLabel titleLabel = new JLabel("Order Management", JLabel.CENTER);
-        titleLabel.setFont(new Font(titleLabel.getFont().getFontName(), Font.BOLD, 20));
+        titleLabel.setFont(new Font(titleLabel.getFont().getFontName(), Font.BOLD, 26)); // 标题字体加大
+        titleLabel.setForeground(new Color(0x003366)); // 标题颜色
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
         topPanel.add(titleLabel, gbc);
-        // TODO: Search box unfinished
-        JTextField searchField = new JTextField(20);
+    
+        String[] searchOptions = {"Email", "OrderID"};
+        JComboBox<String> searchComboBox = new JComboBox<>(searchOptions);
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
-        topPanel.add(searchField, gbc);
-
-        JButton searchButton1 = new JButton("Search 1");
+        topPanel.add(searchComboBox, gbc);
+    
+        JTextField searchField = new JTextField(20);
         gbc.gridx = 1;
         gbc.gridy = 1;
-        topPanel.add(searchButton1, gbc);
-
-        JButton searchButton2 = new JButton("Search 2");
+        topPanel.add(searchField, gbc);
+    
+        JButton searchButton = new JButton("Search");
+        searchButton.setBackground(new Color(0x204688));
+        searchButton.setForeground(Color.WHITE);
         gbc.gridx = 2;
         gbc.gridy = 1;
-        topPanel.add(searchButton2, gbc);
+        topPanel.add(searchButton, gbc);
+    
+        searchButton.addActionListener(e -> performSearch((String)searchComboBox.getSelectedItem(), searchField.getText()));
+    
+        JButton clearButton = new JButton("Clear");
+        clearButton.addActionListener(e -> {
+            searchField.setText("");
+            searchComboBox.setSelectedIndex(0);
+            loadOrderData(currentStatusFilter);
+        });
+        gbc.gridx = 3;
+        gbc.gridy = 1;
+        topPanel.add(clearButton, gbc);
 
         return topPanel;
     }
@@ -144,6 +161,32 @@ public class OrderManagePage extends JFrame {
         return button;
     }
 
+    private void performSearch(String searchType, String searchTerm) {
+        ArrayList<Order> filteredOrders = new ArrayList<>();
+        ArrayList<Order> currentList;
+        if ("all".equalsIgnoreCase(currentStatusFilter)) {
+            currentList = OrderService.getAllOrders();
+        } else {
+            currentList = OrderService.getOrdersByStatus(currentStatusFilter);
+        }
+    
+        if ("Email".equals(searchType)) {
+            for (Order order : currentList) {
+                User user = UserService.getUserInfo(order.getUserID());
+                if (user != null && user.getEmail() != null && user.getEmail().contains(searchTerm)) {
+                    filteredOrders.add(order);
+                }
+            }
+        } else {
+            for (Order order : currentList) {
+                if (String.valueOf(order.getOrderID()).contains(searchTerm)) {
+                    filteredOrders.add(order);
+                }
+            }
+        }
+        updateTableModel(filteredOrders);
+    }    
+
     private void loadOrderData(String statusFilter) {
         ArrayList<Order> filteredOrders;
         if ("all".equalsIgnoreCase(statusFilter)) {
@@ -159,10 +202,10 @@ public class OrderManagePage extends JFrame {
         OrderTableModel model = (OrderTableModel) orderTable.getModel();
         model.setOrders(orders);
         model.fireTableDataChanged();
-    }
+    }   
 
     class OrderTableModel extends AbstractTableModel {
-        private final String[] columnNames = {"OrderID", "UserID", "Create Time", "Update Time", "Total Cost", "Status", "Details"};
+        private final String[] columnNames = {"OrderID", "UserID", "Email","Create Time", "Update Time", "Total Cost", "Status", "Details"};
         private ArrayList<Order> orders = new ArrayList<>();
     
         public OrderTableModel() {
@@ -191,11 +234,12 @@ public class OrderManagePage extends JFrame {
             switch (columnIndex) {
                 case 0: return order.getOrderID();
                 case 1: return order.getUserID();
-                case 2: return dateFormat.format(order.getCreateTime());
-                case 3: return dateFormat.format(order.getUpdateTime());
-                case 4: return String.format("%.2f", order.getTotalCost());
-                case 5: return order.getStatus();
-                case 6: return "Details";
+                case 2: return UserService.getUserInfo(order.getUserID()).getEmail();
+                case 3: return dateFormat.format(order.getCreateTime());
+                case 4: return dateFormat.format(order.getUpdateTime());
+                case 5: return String.format("%.2f", order.getTotalCost());
+                case 6: return order.getStatus();
+                case 7: return "Details";
                 default: return null;
             }
         }
@@ -215,7 +259,7 @@ public class OrderManagePage extends JFrame {
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            return column == 6;
+            return column == 7;
         }
     }        
 
@@ -276,9 +320,6 @@ public class OrderManagePage extends JFrame {
             return super.stopCellEditing();
         }
     }
-    
-    
-    
     
     public interface ButtonColumnListener {
         void onButtonClicked(int row, int column);
