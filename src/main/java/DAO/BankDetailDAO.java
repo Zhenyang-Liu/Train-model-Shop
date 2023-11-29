@@ -137,7 +137,7 @@ public class BankDetailDAO {
      */
     public static BankDetail findBankDetail(int userID) throws DatabaseException {
         String selectSQL = "SELECT * FROM Bank_Detail WHERE user_id = ?;";
-        BankDetail bankDetail = null;
+        BankDetail bankDetail = new BankDetail();
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
