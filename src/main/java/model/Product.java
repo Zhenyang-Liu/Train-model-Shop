@@ -274,7 +274,8 @@ public class Product {
             e.printStackTrace();
         }
         // Get the base64 of either the stored image or the default image and return
-        String imageIcon = this.imageBase64 != null ? this.imageBase64 : ImageUtils.toBase64(new File(defaultImage));
+        //String imageIcon = this.imageBase64 != null ? this.imageBase64 : ImageUtils.toBase64(new File(defaultImage));
+        String imageIcon = ImageUtils.toBase64(new File(defaultImage));
         return ImageUtils.imageToIcon(imageIcon);
     }
 

@@ -217,6 +217,7 @@ public class MainPage extends JFrame implements ReloadListener {
         removeButton = new JButton();
         NumButton = new JButton();
         addButton = new JButton();
+        soldoutLabel1 = new JLabel();
         bottomSeparator = compFactory.createSeparator("");
 
         //======== this ========
@@ -493,6 +494,12 @@ public class MainPage extends JFrame implements ReloadListener {
                                     new Insets(0, 0, 0, 0), 0, 0));
                             }
                             buttonPanel1.add(adjustNumPanel1);
+
+                            //---- soldoutLabel1 ----
+                            soldoutLabel1.setText("Out of Stock");
+                            soldoutLabel1.setFont(soldoutLabel1.getFont().deriveFont(soldoutLabel1.getFont().getStyle() | Font.BOLD, soldoutLabel1.getFont().getSize() + 3f));
+                            soldoutLabel1.setForeground(new Color(0xeb9e0c));
+                            buttonPanel1.add(soldoutLabel1);
                         }
                         purchasePanel1.add(buttonPanel1);
                     }
@@ -549,6 +556,7 @@ public class MainPage extends JFrame implements ReloadListener {
     private JButton removeButton;
     private JButton NumButton;
     private JButton addButton;
+    private JLabel soldoutLabel1;
     private JComponent bottomSeparator;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
@@ -728,6 +736,19 @@ public class MainPage extends JFrame implements ReloadListener {
             adjustNumPanel.setVisible(false);
         }
 
+        JLabel soldOutLabel = new JLabel();
+        soldOutLabel.setText("Out of Stock");
+        soldOutLabel.setFont(soldoutLabel1.getFont().deriveFont(soldoutLabel1.getFont().getStyle() | Font.BOLD, soldoutLabel1.getFont().getSize() + 3f));
+        soldOutLabel.setForeground(new Color(0xeb9e0c));
+        if (product.getStockQuantity() > 0){
+            soldOutLabel.setVisible(false);
+        }else{
+            soldOutLabel.setVisible(true);
+            adjustNumPanel.setVisible(false);
+            addButton.setVisible(false);
+        }
+
+
         // Adding event listeners to the "Add" button
         addButton.addActionListener(e -> {
             if (currentUser != null) {
@@ -797,6 +818,7 @@ public class MainPage extends JFrame implements ReloadListener {
         buttonPanel.add(moreButton);
         buttonPanel.add(addButton);
         buttonPanel.add(adjustNumPanel);
+        buttonPanel.add(soldOutLabel);
 
         // Add button panel to purchase panel
         purchasePanel.add(buttonPanel);
