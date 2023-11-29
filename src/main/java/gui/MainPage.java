@@ -21,6 +21,7 @@ import listeners.ReloadListener;
 import model.*;
 import model.Locomotive.DCCType;
 import service.CartService;
+import service.PermissionService;
 
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -446,7 +447,7 @@ public class MainPage extends JFrame implements ReloadListener {
                             buttonPanel1.setLayout(new FlowLayout());
 
                             //---- moreButton1 ----
-                            moreButton1.setText("Detail");
+                            moreButton1.setText(PermissionService.hasPermission(UserSession.getInstance().getCurrentUser().getUserID(), "UPDATE_PRODUCT") ? "Edit" : "Details");
                             moreButton1.setBackground(new Color(0x4e748d));
                             moreButton1.setForeground(new Color(0xe0e2e8));
                             moreButton1.setPreferredSize(new Dimension(100, 30));
@@ -820,6 +821,7 @@ public class MainPage extends JFrame implements ReloadListener {
      */
     public static void main(String[] args) {
         // User user = UserDAO.findUserByEmail("testemail@gmail.com");
+        Logging.Init(true);
         User user = UserDAO.findUserByEmail("manager@manager.com");
         UserSession.getInstance().setCurrentUser(user);
 
