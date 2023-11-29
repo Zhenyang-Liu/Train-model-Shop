@@ -21,21 +21,39 @@ new FormModel {
 				name: "topPanel"
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 					name: "accountPanel"
-					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "button_account"
-						"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/person_black_24dp.svg" )
-						"background": new java.awt.Color( 242, 242, 242, 255 )
-						addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_accountMouseClicked", true ) )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
+						name: "leftButtonPanel"
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "button_account"
+							"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/person_black_24dp.svg" )
+							"background": new java.awt.Color( 242, 242, 242, 255 )
+							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_accountMouseClicked", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "button_staff"
+							"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/assignment_black_24dp.svg" )
+							"background": new java.awt.Color( 242, 242, 242, 255 )
+							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_staffMouseClicked", true ) )
+						} )
 					}, new FormLayoutConstraints( class java.lang.String ) {
 						"value": "West"
 					} )
-					add( new FormComponent( "javax.swing.JButton" ) {
-						name: "button_cart"
-						"selectedIcon": sfield com.jformdesigner.model.FormObject NULL_VALUE
-						"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/shopping_cart_black_24dp.svg" )
-						"background": new java.awt.Color( 242, 242, 242, 255 )
-						"horizontalAlignment": 4
-						addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_cartMouseClicked", true ) )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
+						name: "rightButtonPanel"
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "button_cart"
+							"selectedIcon": sfield com.jformdesigner.model.FormObject NULL_VALUE
+							"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/shopping_cart_black_24dp.svg" )
+							"background": new java.awt.Color( 242, 242, 242, 255 )
+							"horizontalAlignment": 4
+							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_cartMouseClicked", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "button_orders"
+							"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/list_alt_black_24dp.svg" )
+							"background": new java.awt.Color( 242, 242, 242, 255 )
+							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_ordersMouseClicked", true ) )
+						} )
 					}, new FormLayoutConstraints( class java.lang.String ) {
 						"value": "East"
 					} )
