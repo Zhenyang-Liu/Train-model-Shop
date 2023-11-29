@@ -49,8 +49,8 @@ public class OrderManagePage extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
     
         JLabel titleLabel = new JLabel("Order Management", JLabel.CENTER);
-        titleLabel.setFont(new Font(titleLabel.getFont().getFontName(), Font.BOLD, 26)); // 标题字体加大
-        titleLabel.setForeground(new Color(0x003366)); // 标题颜色
+        titleLabel.setFont(new Font(titleLabel.getFont().getFontName(), Font.BOLD, 26));
+        titleLabel.setForeground(new Color(0x003366));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -237,7 +237,7 @@ public class OrderManagePage extends JFrame {
                 case 2: return UserService.getUserInfo(order.getUserID()).getEmail();
                 case 3: return dateFormat.format(order.getCreateTime());
                 case 4: return dateFormat.format(order.getUpdateTime());
-                case 5: return String.format("%.2f", order.getTotalCost());
+                case 5: return String.format("\u00A3%.2f", order.getTotalCost());
                 case 6: return order.getStatus();
                 case 7: return "Details";
                 default: return null;

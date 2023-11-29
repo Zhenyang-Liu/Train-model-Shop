@@ -182,7 +182,7 @@ public class TrackDAO extends ProductDAO {
      * @return An ArrayList of all Track objects in the database | null if can't find.
      * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Track> findAllControllers() {
+    public static ArrayList<Track> findAllTracks() {
         ArrayList<Track> tracks = new ArrayList<Track>();
         String selectSQL = "SELECT * FROM Track;";
 

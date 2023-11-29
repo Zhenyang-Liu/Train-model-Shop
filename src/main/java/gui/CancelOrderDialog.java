@@ -62,7 +62,7 @@ public class CancelOrderDialog extends JDialog {
             actionButton.addActionListener(e -> onAdd());
             actionButton.setFont(new Font("Arial", Font.BOLD, 12));
             actionButton.setForeground(Color.WHITE);
-            actionButton.setBackground(Color.RED); // Dark green color
+            actionButton.setBackground(Color.RED);
             gbc.gridx = 0;
             add(actionButton, gbc);
         }

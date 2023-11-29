@@ -3,6 +3,7 @@ package model;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DecimalFormat;
 
 import javax.swing.ImageIcon;
 
@@ -150,7 +151,10 @@ public class Product {
         if (retailPrice < 0) {
             throw new IllegalArgumentException("Retail Price cannot be negative.");
         }
-        this.retailPrice = retailPrice;
+        DecimalFormat decimalFormat = new DecimalFormat("#.00");
+        String formattedTotal = decimalFormat.format(retailPrice);
+
+        this.retailPrice = Double.parseDouble(formattedTotal);
     }
 
     /**
