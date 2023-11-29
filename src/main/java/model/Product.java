@@ -3,10 +3,12 @@ package model;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DecimalFormat;
 
 import javax.swing.ImageIcon;
 
 import helper.ImageUtils;
+import helper.Logging;
 
 public class Product {
     private int productID;
@@ -150,7 +152,10 @@ public class Product {
         if (retailPrice < 0) {
             throw new IllegalArgumentException("Retail Price cannot be negative.");
         }
-        this.retailPrice = retailPrice;
+        DecimalFormat decimalFormat = new DecimalFormat("#.00");
+        String formattedTotal = decimalFormat.format(retailPrice);
+
+        this.retailPrice = Double.parseDouble(formattedTotal);
     }
 
     /**
@@ -240,7 +245,7 @@ public class Product {
      * @return The product type as a string, or null if the product code is invalid.
      */
     public String getProductType() {
-        char typeIndicator = productCode.charAt(0);
+        char typeIndicator = Character.toUpperCase(productCode.charAt(0));
 
         switch (typeIndicator) {
             case 'R':
@@ -256,7 +261,7 @@ public class Product {
             case 'P':
                 return "Track Pack";
             default:
-                return null; // Invalid type indicator
+                return null;
         }
     }
 
@@ -274,8 +279,10 @@ public class Product {
             e.printStackTrace();
         }
         // Get the base64 of either the stored image or the default image and return
-        //String imageIcon = this.imageBase64 != null ? this.imageBase64 : ImageUtils.toBase64(new File(defaultImage));
-        String imageIcon = ImageUtils.toBase64(new File(defaultImage));
+        boolean imageExists = this.imageBase64 != null && !this.imageBase64.equals("");
+        String imageIcon = imageExists ? this.imageBase64 : ImageUtils.toBase64(new File(defaultImage));
+        Logging.getLogger().info("Creating image for product " + productID + " image stored in database:" 
+                        + this.imageBase64 + "." + "(" + (imageExists ? "image exists" : "image not found") + ")");
         return ImageUtils.imageToIcon(imageIcon);
     }
 

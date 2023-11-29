@@ -22,6 +22,8 @@ import model.*;
 import model.Locomotive.DCCType;
 import net.miginfocom.swing.MigLayout;
 import service.CartService;
+import service.PermissionService;
+
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import javax.swing.border.EmptyBorder;
@@ -40,8 +42,11 @@ import java.util.ResourceBundle;
 public class MainPage extends JFrame implements ReloadListener {
     private Filter f;
     public MainPage() {
+
         Logging.getLogger().info("Creating Main Page");
+
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         initComponents();
         f = new Filter();
         populateFilterBoxes();
@@ -218,6 +223,7 @@ public class MainPage extends JFrame implements ReloadListener {
         removeButton = new JButton();
         NumButton = new JButton();
         addButton = new JButton();
+        soldoutLabel1 = new JLabel();
         bottomSeparator = compFactory.createSeparator("");
 
         //======== this ========
@@ -857,6 +863,7 @@ public class MainPage extends JFrame implements ReloadListener {
      */
     public static void main(String[] args) {
         // User user = UserDAO.findUserByEmail("testemail@gmail.com");
+        Logging.Init(true);
         User user = UserDAO.findUserByEmail("manager@manager.com");
         UserSession.getInstance().setCurrentUser(user);
 

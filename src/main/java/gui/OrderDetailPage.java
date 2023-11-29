@@ -27,7 +27,6 @@ public class OrderDetailPage extends JFrame {
     }
 
     private void initComponents() {
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(600, 600));
         setMinimumSize(new Dimension(600, 600));

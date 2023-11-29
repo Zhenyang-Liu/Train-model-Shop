@@ -145,4 +145,29 @@ public class EraDAO {
         int[] idList = productIDs.stream().mapToInt(Integer::intValue).toArray();
         return idList;
     }
+
+    public static ArrayList<String> findAllEraDescription() throws DatabaseException {
+        String selectSQL = "SELECT description FROM Era ORDER BY era_code ASC;";
+        ArrayList<String> eraDescriptions = new ArrayList<>();
+    
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+    
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String description = resultSet.getString("description");
+                    eraDescriptions.add(description);
+                }
+            }
+        } catch (SQLTimeoutException e) {
+            Logging.getLogger().warning("Error when finding era descriptions: SQL Timed out\n Stacktrace: " + e.getMessage());
+            throw new DatabaseException("SQL Timeout Exception occurred", e);
+        } catch (SQLException e) {
+            Logging.getLogger().warning("Error when finding era descriptions: SQL Exception\nStacktrace: " + e.getMessage());
+            throw new DatabaseException("SQL Exception occurred", e);
+        }
+    
+        return eraDescriptions;
+    }
+    
 }
