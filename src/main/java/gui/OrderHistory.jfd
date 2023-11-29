@@ -12,6 +12,8 @@ new FormModel {
 			"vgap": 5
 		} ) {
 			name: "this"
+			"minimumSize": new java.awt.Dimension( 850, 700 )
+			"preferredSize": new java.awt.Dimension( 850, 700 )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "titleLabel"
 				"text": "Order History"
@@ -41,7 +43,7 @@ new FormModel {
 					name: "typePanel"
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
 						"$columnSpecs": "0"
-						"$rowSpecs": "0, 0, 0, 0, 0"
+						"$rowSpecs": "0, 0, 0, 0, 0, 0, 0"
 						"$hGap": 5
 						"$vGap": 10
 						"$alignLeft": true
@@ -49,62 +51,92 @@ new FormModel {
 					} ) {
 						name: "typeSelectionPanel"
 						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "typeLabel"
-							"text": "Order type"
-							"foreground": new java.awt.Color( 0, 51, 102, 255 )
-							"maximumSize": new java.awt.Dimension( 108, 25 )
-							"minimumSize": new java.awt.Dimension( 108, 25 )
-							"preferredSize": new java.awt.Dimension( 108, 25 )
+							name: "orderLabel"
+							"text": "Your Orders"
+							"foreground": &Color0 new java.awt.Color( 0, 51, 102, 255 )
+							"maximumSize": &Dimension0 new java.awt.Dimension( 108, 25 )
+							"minimumSize": &Dimension1 new java.awt.Dimension( 108, 25 )
+							"preferredSize": &Dimension2 new java.awt.Dimension( 108, 25 )
 							"horizontalAlignment": 0
-							"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 4, false )
+							"font": &SwingDerivedFont0 new com.jformdesigner.model.SwingDerivedFont( null, 1, 4, false )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 							"insets": new java.awt.Insets( 5, 0, 0, 0 )
+						} )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "button_all"
+							"text": "All Orders"
+							"background": new java.awt.Color( 98, 85, 191, 255 )
+							"foreground": &Color1 new java.awt.Color( 233, 228, 227, 255 )
+							"font": &SwingDerivedFont1 new com.jformdesigner.model.SwingDerivedFont( null, 1, 0, false )
+							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_allMouseClicked", true ) )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+							"gridy": 1
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "typeLabel"
+							"text": "Order type"
+							"foreground": #Color0
+							"maximumSize": #Dimension0
+							"minimumSize": #Dimension1
+							"preferredSize": #Dimension2
+							"horizontalAlignment": 0
+							"font": #SwingDerivedFont0
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+							"insets": new java.awt.Insets( 5, 0, 0, 0 )
+							"gridy": 2
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "button_pending"
 							"text": "Pending Orders"
 							"background": new java.awt.Color( 44, 143, 177, 255 )
-							"foreground": new java.awt.Color( 233, 228, 227, 255 )
-							"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 0, false )
+							"foreground": #Color1
+							"font": #SwingDerivedFont1
+							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_pendingMouseClicked", true ) )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
-							"gridy": 1
+							"gridy": 3
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "button_confirmed"
 							"text": "Confirmed Orders"
 							"background": new java.awt.Color( 49, 94, 144, 255 )
-							"foreground": &Color0 new java.awt.Color( 233, 228, 227, 255 )
-							"font": &SwingDerivedFont0 new com.jformdesigner.model.SwingDerivedFont( null, 1, 0, false )
+							"foreground": &Color2 new java.awt.Color( 233, 228, 227, 255 )
+							"font": &SwingDerivedFont2 new com.jformdesigner.model.SwingDerivedFont( null, 1, 0, false )
+							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_confirmedMouseClicked", true ) )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
-							"gridy": 2
+							"gridy": 4
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "button_fulfilled"
 							"text": "Fulfilled Orders"
 							"background": new java.awt.Color( 49, 99, 87, 255 )
-							"foreground": #Color0
-							"font": #SwingDerivedFont0
+							"foreground": #Color2
+							"font": #SwingDerivedFont2
+							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_fulfilledMouseClicked", true ) )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
-							"gridy": 3
+							"gridy": 5
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "button_cancelled"
 							"text": "Cancelled Orders"
 							"background": new java.awt.Color( 124, 36, 89, 255 )
-							"foreground": #Color0
-							"font": #SwingDerivedFont0
+							"foreground": #Color2
+							"font": #SwingDerivedFont2
+							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_cancelledMouseClicked", true ) )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
-							"gridy": 4
+							"gridy": 6
 						} )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"insets": new java.awt.Insets( 0, 10, 0, 10 )
 					} )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"hAlign": 4
-					"weightx": 0.5
+					"weightx": 1.0
 				} )
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 					name: "scrollPane"
+					"minimumSize": new java.awt.Dimension( 620, 172 )
+					"preferredSize": new java.awt.Dimension( 620, 172 )
+					"horizontalScrollBarPolicy": 31
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
 						"$columnSpecs": "0"
 						"$rowSpecs": "0, 0, 0"
@@ -114,11 +146,12 @@ new FormModel {
 						"$alignTop": true
 					} ) {
 						name: "ordersPanel"
+						"minimumSize": new java.awt.Dimension( 600, 176 )
 						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
 							name: "orderCardPanel1"
 							"border": new javax.swing.border.MatteBorder( 3, 3, 3, 3, new java.awt.Color( 0, 55, 98, 255 ) )
 							"foreground": new java.awt.Color( 0, 51, 102, 255 )
-							"preferredSize": new java.awt.Dimension( 600, 120 )
+							"preferredSize": new java.awt.Dimension( 576, 120 )
 							"maximumSize": new java.awt.Dimension( 2147483647, 100 )
 							add( new FormComponent( "javax.swing.JLabel" ) {
 								name: "orderImage1"
@@ -134,7 +167,7 @@ new FormModel {
 								"$alignTop": true
 								"$alignLeft": true
 							} ) {
-								name: "OrderInfoPanel"
+								name: "orderInfoPanel"
 								add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
 									name: "panel_orderNum"
 									add( new FormComponent( "javax.swing.JLabel" ) {
@@ -227,12 +260,13 @@ new FormModel {
 									"text": "Status:"
 								}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 									"weighty": 0.2
+									"insets": new java.awt.Insets( 5, 15, 0, 0 )
 								} )
 								add( new FormComponent( "javax.swing.JLabel" ) {
 									name: "order_status"
 									"text": "Confirmed"
 									"horizontalAlignment": 0
-									"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 4, false )
+									"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 5, false )
 									"preferredSize": new java.awt.Dimension( 100, 22 )
 									"maximumSize": new java.awt.Dimension( 150, 22 )
 									"minimumSize": new java.awt.Dimension( 150, 22 )
@@ -241,6 +275,7 @@ new FormModel {
 									"gridy": 1
 									"weighty": 0.5
 									"hAlign": 0
+									"insets": new java.awt.Insets( 0, 0, 5, 0 )
 								} )
 								add( new FormComponent( "javax.swing.JButton" ) {
 									name: "button_detail"
@@ -263,15 +298,16 @@ new FormModel {
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridx": 1
 					"insets": new java.awt.Insets( 5, 0, 0, 0 )
-					"hAlign": 5
-					"weightx": 0.5
+					"hAlign": 2
+					"weighty": 1.0
+					"weightx": 1.0
 				} )
 			}, new FormLayoutConstraints( class java.lang.String ) {
 				"value": "Center"
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 105, 145 )
-			"size": new java.awt.Dimension( 795, 625 )
+			"size": new java.awt.Dimension( 850, 700 )
 		} )
 	}
 }

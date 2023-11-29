@@ -144,6 +144,21 @@ public class CartDAO {
         }
     }
 
+    public static void deleteProduct(int productID) throws DatabaseException {
+        String deleteSQL = "DELETE FROM Cart_Item WHERE product_id = ?;";
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
+            preparedStatement.setInt(1, productID);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(),e);
+        }
+    }
+
     /**
      * Retrieves a Cart object based on its ID.
      *

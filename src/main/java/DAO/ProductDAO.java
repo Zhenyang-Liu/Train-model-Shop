@@ -126,6 +126,7 @@ public class ProductDAO {
      * @throws DatabaseException If a database access error occurs or this method is called on a closed connection.
      */
     public static void deleteProduct(int productId) throws DatabaseException {
+        BoxedSetDAO.deleteItem(productId);
         String deleteSQL = "DELETE FROM Product WHERE product_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();

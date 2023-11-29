@@ -1,39 +1,8 @@
-import model.Address;
-import model.BankDetail;
-import model.BoxedSet;
-import model.Cart;
-import model.Controller;
-import model.Gauge;
-import model.Locomotive;
-import model.Product;
-import model.RollingStock;
-import model.BoxedSet.BoxedType;
-import model.Locomotive.DCCType;
-import model.RollingStock.RollingStockType;
-import service.AddressService;
-import service.BankDetailService;
-import service.CartService;
-import service.ProductService;
-import model.User;
-import model.BoxedSet;
-
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import javax.swing.JFrame;
-
 import DAO.*;
 import exception.DatabaseException;
-import gui.ManagerPage;
-import helper.UserSession;
+
 
 public class Test {
     public static void main(String[] args) {

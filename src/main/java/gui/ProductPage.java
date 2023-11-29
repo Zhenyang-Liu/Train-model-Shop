@@ -6,7 +6,6 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -17,8 +16,11 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -28,18 +30,16 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.text.JTextComponent;
 
+import DAO.BoxedSetDAO;
 import DAO.ControllerDAO;
 import DAO.LocomotiveDAO;
 import DAO.ProductDAO;
@@ -53,6 +53,7 @@ import helper.Logging;
 import helper.UserSession;
 import model.*;
 import service.PermissionService;
+import service.ProductService;
 
 public class ProductPage extends JFrame {
 
@@ -72,25 +73,42 @@ public class ProductPage extends JFrame {
     private JComboBox<String> gaugeComboBox, dccComboBox, compartmentComboBox, digitalComboBox;
     private JButton saveProduct;
     private JButton deleteProduct;
+    private ProductManagePage managePage;
 
-    public ProductPage(Product p){
-        this.p = p;
+    public ProductPage(ProductManagePage managePage, Product product) {
+        this.managePage = managePage;
+        initializePage(product);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                if (managePage != null) {
+                    managePage.refreshTableData();
+                }
+            }
+        });
+    }
+
+    public ProductPage(Product product) {
+        initializePage(product);
+    }
+
+    private void initializePage(Product product) {
+        this.p = product;
         this.isStaff = PermissionService.hasPermission(UserSession.getInstance().getCurrentUser().getUserID(), "UPDATE_PRODUCT");
-    
+
         initComponents();
-    
-        this.setTitle((isStaff ? "Editing " : "Viewing ") + p.getProductName());
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(new Dimension(700, 500));
-        // this.setBackground(new Color(0xFFFFFF));
-        this.setResizable(true);
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+
+        setTitle((isStaff ? "Editing " : "Viewing ") + p.getProductName());
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(new Dimension(700, 500));
+        setResizable(true);
+        setLocationRelativeTo(null);
+        setVisible(true);
     }    
 
     private JPanel createDescription() {
         JPanel descriptionPanel = new JPanel(new GridBagLayout());
-        // descriptionPanel.setBackground(new Color(0xFFFFFF));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0; 
@@ -109,7 +127,6 @@ public class ProductPage extends JFrame {
         productDescription.setBorder(new EmptyBorder(5, 5, 5, 5));
         productDescription.setLineWrap(true);
         productDescription.setWrapStyleWord(true);
-        // productDescription.setBackground(new Color(0xFFFFFF));
         productDescription.setEditable(isStaff);
     
         JScrollPane scrollPane = new JScrollPane(productDescription);
@@ -136,7 +153,6 @@ public class ProductPage extends JFrame {
         Image resizedImage = originalImage.getScaledInstance(256, 140, Image.SCALE_SMOOTH);
         productImage.setIcon(new ImageIcon(resizedImage));
         productImage.setBorder(new LineBorder(Color.BLACK));
-        // productImage.setAlignmentX(Component.LEFT_ALIGNMENT);
 
     }
 
@@ -155,7 +171,6 @@ public class ProductPage extends JFrame {
 
     private JPanel initImagePanel() {
         JPanel imagePanel = new JPanel(new GridBagLayout());
-        // imagePanel.setBackground(new Color(0xFFFFFF));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -212,7 +227,6 @@ public class ProductPage extends JFrame {
 
     private JPanel initAttributePanel() {
         JPanel attributePanel = new JPanel();
-        // attributePanel.setBackground(new Color(0xFFFFFF));
         attributePanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -223,24 +237,29 @@ public class ProductPage extends JFrame {
     
         productName = new JTextField(p.getProductName());
         productCode = new JTextField(p.getProductCode());
-        productPrice = new JTextField(String.format("\u00A3%.2f", p.getRetailPrice()));
+        productPrice = new JTextField(String.format("%.2f", p.getRetailPrice()));
         productStock = new JTextField(String.valueOf(p.getStockQuantity()));
+        productBrand = new JTextField(p.getBrand());
     
         addLabelComponent("Product Name: ", productName, attributePanel, gbc);
         gbc.gridy++;
         addLabelComponent("Product Code: ", productCode, attributePanel, gbc);
         gbc.gridy++;
-        addLabelComponent("Price: ", productPrice, attributePanel, gbc);
+        addLabelComponent("Brand: ", productBrand, attributePanel, gbc);
+        gbc.gridy++;
+        addLabelComponent("Price "+"\u00A3"+": ", productPrice, attributePanel, gbc);
         gbc.gridy++;
         addLabelComponent("Stock Quantity: ", productStock, attributePanel, gbc);
         gbc.gridy++;
+
+        productCode.setEditable(false);
     
         gaugeComboBox = new JComboBox<>(new String[]{"OO", "TT", "N"});
         dccComboBox = new JComboBox<>(new String[]{"Analogue", "Ready", "Fitted", "Sound"});
         compartmentComboBox = new JComboBox<>(new String[]{"Wagon", "Carriage"});
         digitalComboBox = new JComboBox<>(new String[]{"Digital", "Analogue"});
 
-        JButton eraSelectButton = new JButton("Select Era");
+        JButton eraSelectButton = createButton("Select Era", new Color(0x003366));
         eraSelectButton.addActionListener(e -> openEraSelectDialog(eraList));
         
         String productType = this.p.getProductType();
@@ -249,10 +268,12 @@ public class ProductPage extends JFrame {
                 case "Track":
                     track = TrackDAO.findTrackByID(p.getProductID());
                     gaugeComboBox.setSelectedItem(track.getGauge());
-                    if (isStaff)
+                    if (isStaff) {
                         addLabelComponent("Gauge: ", gaugeComboBox, attributePanel, gbc);
-                    else 
+                    } else {
                         addLabelComponent("Gauge: ", new JTextField(track.getGauge()), attributePanel, gbc);
+                    } 
+                    gbc.gridy++;
                     break;
                 case "Locomotive":
                     loco = LocomotiveDAO.findLocomotiveByID(p.getProductID());
@@ -271,7 +292,14 @@ public class ProductPage extends JFrame {
                         gbc.gridy++;
                         addLabelComponent("DCC Type: ", new JTextField(loco.getDCCType().getName()), attributePanel, gbc);
                         gbc.gridy++;
-                        //TODO: display Era
+                        for(String description : ProductService.findEraDescription(loco.getEra())){
+                            JLabel d = new JLabel(description);
+                            gbc.gridwidth = 2;
+                            attributePanel.add(d, gbc);
+                            gbc.gridwidth = 1;
+                            gbc.gridy++;
+                        }
+
                     }
                     break;
                 case "Rolling Stock":
@@ -279,7 +307,6 @@ public class ProductPage extends JFrame {
                     gaugeComboBox.setSelectedItem(roll.getGauge());
                     compartmentComboBox.setSelectedItem(roll.getRollingStockType());
                     setSelectedEra(roll.getEra());
-
                     if (isStaff) {
                         addLabelComponent("Gauge: ", gaugeComboBox, attributePanel, gbc);
                         gbc.gridy++;
@@ -291,7 +318,13 @@ public class ProductPage extends JFrame {
                         gbc.gridy++;
                         addLabelComponent("Compartment Type: ", new JTextField(roll.getRollingStockType()), attributePanel, gbc);
                         gbc.gridy++;
-                        //TODO: display Era
+                        for(String description : ProductService.findEraDescription(roll.getEra())){
+                            JLabel d = new JLabel(description);
+                            gbc.gridwidth = 2;
+                            attributePanel.add(d, gbc);
+                            gbc.gridwidth = 1;
+                            gbc.gridy++;
+                        }
                     }
                     break;
                 case "Controller":
@@ -304,10 +337,30 @@ public class ProductPage extends JFrame {
                     }
                     break;
                 case "Train Set":
-                    // Add components for Train Set
+                    set = BoxedSetDAO.findBoxedSetByID(p.getProductID());
+                    addLabelComponent(productType, createStyledLabel("Include: "), attributePanel, gbc);
+                    gbc.gridy++;
+                    for(Map.Entry<Product,Integer> entry : set.getContain().entrySet()){
+                        Product setItem = entry.getKey();
+                        JLabel d = new JLabel(setItem.getProductCode()+" "+setItem.getProductName() + "  x " +String.valueOf(entry.getValue()) + " ;");
+                        gbc.gridwidth = 2;
+                        attributePanel.add(d, gbc);
+                        gbc.gridwidth = 1;
+                        gbc.gridy++;
+                    }
                     break;
                 case "Track Pack":
-                    // Add components for Track Pack
+                    set = BoxedSetDAO.findBoxedSetByID(p.getProductID());
+                    addLabelComponent(productType, createStyledLabel("Include: "), attributePanel, gbc);
+                    gbc.gridy++;
+                    for(Map.Entry<Product,Integer> entry : set.getContain().entrySet()){
+                        Product setItem = entry.getKey();
+                        JLabel d = new JLabel(setItem.getProductCode()+" "+setItem.getProductName() + "  x " +String.valueOf(entry.getValue()) + " ;");
+                        gbc.gridwidth = 2;
+                        attributePanel.add(d, gbc);
+                        gbc.gridwidth = 1;
+                        gbc.gridy++;
+                    }
                     break;
             } 
         } catch (DatabaseException ex) {
@@ -318,7 +371,6 @@ public class ProductPage extends JFrame {
 
     private JPanel initProductPanel(){
         JPanel productArea = new JPanel();
-        // productArea.setBackground(new Color(0xFFFFFF));
         productArea.setLayout(new BoxLayout(productArea, BoxLayout.X_AXIS));
         productArea.setBorder(new EmptyBorder(5, 5, 5, 5));
         
@@ -329,7 +381,6 @@ public class ProductPage extends JFrame {
 
     private JPanel initProductButtons(){
         JPanel productButtons = new JPanel();
-        // productButtons.setBackground(new Color(0xFFFFFF));
         deleteProduct = createButton("Delete product", new Color(0xBC2626));
         saveProduct = createButton("Save", new Color(0x82be73));
         saveProduct.setPreferredSize(deleteProduct.getPreferredSize());
@@ -370,34 +421,35 @@ public class ProductPage extends JFrame {
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
-        // Saving products
         if(!isStaff)
             return;
-        saveProduct.addActionListener(e -> {
-            try{
-                this.p.setProductName(productName.getText());
-                // this.p.setDescription(productDescription.getText());
-                // TODO: Update Product
-                ProductDAO.updateProduct(p);
-            }catch(DatabaseException e1){
-                Logging.getLogger().warning("Could not update product " + p.getProductID() + "\n Stacktrace: " + e1.getMessage());
-            }
-            
-        });
+        saveProduct.addActionListener(e -> {submitProduct();});
         deleteProduct.addActionListener(e -> {
-            try {
-                JOptionPane.showMessageDialog(new JFrame(), "Are you sure you want to delete this product? This cannot be undone.", "Dialog", JOptionPane.OK_CANCEL_OPTION);
-                ProductDAO.deleteProduct(p.getProductID());
-            } catch (DatabaseException e1) {
-                Logging.getLogger().warning("Could not delete product " + p.getProductID());
+            int confirm = JOptionPane.showConfirmDialog(this, 
+                "Are you sure you want to delete this product? This cannot be undone.", 
+                "Confirm Deletion", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE);
+        
+            if (confirm == JOptionPane.YES_OPTION) {
+                String deleteResult = ProductService.deteleProduct(p);
+                if ("success".equalsIgnoreCase(deleteResult)) {
+                    JOptionPane.showMessageDialog(this, 
+                        "Product " + p.getProductCode() + " deleted successfully.", 
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, 
+                        "Failed to delete product. Error: " + deleteResult, 
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
+        
     }
 
     private void initComponents() {
         Container contentPane = this.getContentPane();
         contentPane.setLayout(new BorderLayout());
-        // contentPane.setBackground(new Color(0xFFFFFF));
 
         JPanel content = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -428,11 +480,83 @@ public class ProductPage extends JFrame {
         pack();
         setLocationRelativeTo(null);
     }
+
+    private void submitProduct() {
+        String selectedType = p.getProductType();
+        JLabel errorLabel = new JLabel();
+
+        String newName = productName.getText();
+        String newCode = productCode.getText().toUpperCase();
+        String newBrand = productBrand.getText();
+        String newPrice = productPrice.getText();
+        String newQuantity = productStock.getText();
+        String newDes = productDescription.getText();
+
+        String validationResult = ProductService.validateProductInput(newName, newCode, newBrand, newPrice, newQuantity);
+        String ignore = "Product Code has existed in database.";
+        if (!validationResult.equals(ignore) && validationResult != null) {
+            JOptionPane.showMessageDialog(null,validationResult, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        p.setBrand(newBrand);
+        p.setProductCode(newCode);
+        p.setProductName(newName);
+        p.setRetailPrice(Double.parseDouble(newPrice));
+        p.setStockQuantity(Integer.parseInt(newQuantity));
+        p.setDescription(newDes);
+        String result = ProductService.updateProduct(p);
+        if (!"success".equals(result)){
+            JOptionPane.showMessageDialog(null,"Update failed. "+result, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try{
+            switch (selectedType) {
+                case "Track":
+                    String selectedGauge = gaugeComboBox.getSelectedItem().toString();
+                    Track track = new Track(p, selectedGauge);
+                    TrackDAO.updateTrack(track);
+                    break;
+                case "Controller":
+                    boolean selectedDigitalType = digitalComboBox.getSelectedItem().equals("Digital");
+                    Controller controller = new Controller(p, selectedDigitalType);
+                    ControllerDAO.updateController(controller);
+                    break;
+                case "Locomotive":
+                    String selectedDccType = dccComboBox.getSelectedItem().toString();
+                    String selectedGaugeForLoco = gaugeComboBox.getSelectedItem().toString();
+                    int[] era = eraList.stream().mapToInt(i -> i).toArray();
+                    Locomotive locomotive = new Locomotive(p, selectedGaugeForLoco,selectedDccType,era);
+                    LocomotiveDAO.updateLocomotive(locomotive);
+                    break;
+                case "Rolling Stock":
+                    String selectedCompartmentType = compartmentComboBox.getSelectedItem().toString();
+                    String selectedGaugeForRoll = gaugeComboBox.getSelectedItem().toString();
+                    int[] era1 = eraList.stream().mapToInt(i -> i).toArray();
+                    RollingStock rollingStock = new RollingStock(p,selectedCompartmentType,selectedGaugeForRoll,era1);
+                    RollingStockDAO.updateRollingStock(rollingStock);
+                    break;
+                case "Train Set":
+                    break;
+                case "Track Pack":
+                    break;
+                }
+            } catch (Exception ex) {
+                Logging.getLogger().warning("Could not update product " + p.getProductID() + "\n Stacktrace: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null,"Update failed. "+ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+        errorLabel.setVisible(false);
+        JOptionPane.showMessageDialog(this, "Product updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        setVisible(false);
+    }
     
     public static void main(String[] args){
-        // UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("manager@manager.com"));
-        UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("testemail@gmail.com"));
-        ProductPage p = new ProductPage(ProductDAO.getAllProduct().get(0));
+        UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("manager@manager.com"));
+        // UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("testemail@gmail.com"));
+        ProductPage p = new ProductPage(ProductDAO.getAllProduct().get(6));
         p.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         p.setVisible(true);
     }

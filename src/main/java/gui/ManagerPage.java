@@ -26,42 +26,43 @@ public class ManagerPage extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // top panel with title and search box
-        JPanel topPanel = new JPanel(new BorderLayout());
-        JLabel titleLabel = new JLabel("Manager Board", JLabel.CENTER);
-        topPanel.add(titleLabel, BorderLayout.NORTH);
-
-        // Search Box
-        // TODO：Searchbox unfinished
-        JPanel searchPanel = new JPanel();
-        searchPanel.add(new JTextField(20));
-        searchPanel.add(new JButton("button1"));
-        searchPanel.add(new JButton("button2"));
-        topPanel.add(searchPanel, BorderLayout.SOUTH);
-
+        JPanel topPanel = createTopPanel();
         add(topPanel, BorderLayout.NORTH);
 
-        JPanel leftPanel = createLeftPanel();
+        JPanel filterPanel = createFilterPanel();
+        add(filterPanel, BorderLayout.SOUTH);
 
-        // Display the User table
         initializeTable();
 
-        // Right Panel with JTable
         JScrollPane rightScrollPane = new JScrollPane(table);
         rightScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         rightScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-        // Dividing line
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightScrollPane);
-        splitPane.setDividerLocation(0.3);
-        add(splitPane, BorderLayout.CENTER);
+        add(rightScrollPane, BorderLayout.CENTER);
     }
 
-    // Section for leftPanel
-    private JPanel createLeftPanel() {
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-        leftPanel.add(Box.createVerticalGlue());
+    private JPanel createTopPanel() {
+        JPanel topPanel = new JPanel(new BorderLayout());
+        JLabel titleLabel = new JLabel("Manager Board", JLabel.CENTER);
+        titleLabel.setFont(new Font(titleLabel.getFont().getFontName(), Font.BOLD, 26));
+        titleLabel.setForeground(new Color(0x003366));
+        topPanel.add(titleLabel, BorderLayout.NORTH);
+
+        JPanel searchPanel = new JPanel();
+        JTextField searchField = new JTextField(20);
+        JButton searchButton = new JButton("Search");
+        searchButton.setBackground(new Color(0x204688));
+        searchButton.setForeground(Color.WHITE);
+        searchPanel.add(searchField);
+        searchPanel.add(searchButton);
+        //TODO：Search
+
+        topPanel.add(searchPanel, BorderLayout.SOUTH);
+        return topPanel;
+    }
+
+    private JPanel createFilterPanel() {
+        JPanel filterPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
     
         Dimension buttonSize = new Dimension(100, 30);
     
@@ -69,12 +70,18 @@ public class ManagerPage extends JFrame {
         JButton staffButton = createButton("Staff", buttonSize, e -> loadTableData("staff"));
         JButton allButton = createButton("All", buttonSize, e -> loadTableData(null));
     
-        leftPanel.add(customerButton);
-        leftPanel.add(staffButton);
-        leftPanel.add(allButton);
-        leftPanel.add(Box.createVerticalGlue());
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        filterPanel.add(customerButton, gbc);
     
-        return leftPanel;
+        gbc.gridx = 1;
+        filterPanel.add(staffButton, gbc);
+    
+        gbc.gridx = 2;
+        filterPanel.add(allButton, gbc);
+    
+        return filterPanel;
     }
     
     private JButton createButton(String text, Dimension size, ActionListener listener) {
@@ -84,7 +91,7 @@ public class ManagerPage extends JFrame {
         button.setPreferredSize(size);
         button.addActionListener(listener);
         return button;
-    }
+    }    
     // -------------------------------------------------------
 
     // Section for rightPanel

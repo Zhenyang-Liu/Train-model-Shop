@@ -62,15 +62,8 @@ public class TrackDAO extends ProductDAO {
             
             preparedStatement.setString(1, track.getGauge());
             preparedStatement.setInt(2, track.getProductID());
+            preparedStatement.executeUpdate();
 
-            int rowsAffected = preparedStatement.executeUpdate();
-
-            if (rowsAffected > 0) {
-                // EraDAO.deleteEra(rollingStock.getProductID());
-                // EraDAO.insertEra(rollingStock.getProductID(), rollingStock.getEra());
-            } else {
-                throw new SQLException("Update Track failed, no rows affected.");
-            }
         } catch (SQLTimeoutException e){
             throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
