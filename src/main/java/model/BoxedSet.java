@@ -41,17 +41,10 @@ public class BoxedSet extends Product{
         this.contain = new HashMap<>();
     }
 
-    public BoxedSet(Product product, String boxedType) {
+    public BoxedSet(Product product, String boxedType, Map<Product,Integer> itemList) {
         super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity(), product.getImageBase64());
         this.setBoxedType(boxedType);
-        this.contain = new HashMap<>();
-        this.setProductID(product.getProductID());
-    }
-
-    public BoxedSet(Product product, String boxedType, Map<Product, Integer> itemList) {
-        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity(), product.getImageBase64());
-        this.setBoxedType(boxedType);
-        this.contain = itemList;
+        this.setContain(itemList);
         this.setProductID(product.getProductID());
     }
 
@@ -68,7 +61,8 @@ public class BoxedSet extends Product{
     }
 
     public void setContain(Map<Product,Integer> itemList){
-        this.contain = itemList;
+        this.contain = new HashMap<>();
+        this.contain.putAll(itemList);
     }
 
     public void addProduct(Product product, int quantity) {

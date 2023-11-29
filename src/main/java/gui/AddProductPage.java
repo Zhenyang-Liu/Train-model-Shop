@@ -34,6 +34,7 @@ public class AddProductPage extends JDialog {
 
     private void initComponents() {
         setLayout(new GridBagLayout());
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.fill = GridBagConstraints.HORIZONTAL;

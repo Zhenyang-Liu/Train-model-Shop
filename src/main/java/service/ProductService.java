@@ -125,8 +125,7 @@ public class ProductService {
     public static void updateBoxedSetQuantity(int boxID) {
         try {
             BoxedSet set = BoxedSetDAO.findBoxedSetByID(boxID);
-            System.out.println(set.getBrand());
-    
+
             if (set != null) {
                 int minQuantity = Integer.MAX_VALUE;
     
@@ -134,7 +133,7 @@ public class ProductService {
                     Product product = entry.getKey();
                     int quantity = product.getStockQuantity();
                     int maxQuantity = quantity / entry.getValue();
-    
+
                     if (maxQuantity < minQuantity) {
                         minQuantity = maxQuantity;
                     }

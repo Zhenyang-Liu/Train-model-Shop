@@ -3,6 +3,8 @@ package gui;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import DAO.UserDAO;
 import helper.UserSession;
@@ -22,6 +24,8 @@ public class ProductManagePage extends JFrame {
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        currentTypeFilter = "All";
 
         JPanel topPanel = createTopPanel();
         add(topPanel, BorderLayout.NORTH);
@@ -110,7 +114,7 @@ public class ProductManagePage extends JFrame {
             public void onButtonClicked(int row, int column) {
                 Product selectedProduct = tableModel.getProductAt(row);
                 SwingUtilities.invokeLater(() -> {
-                    // TODO: Deteail function
+                    openDetailDialog(selectedProduct.getProductID(), selectedProduct.getProductType());
                 });
             }
         };
@@ -159,7 +163,11 @@ public class ProductManagePage extends JFrame {
     private void loadProductData(String filter) {
         ArrayList<Product> filteredProducts = ProductService.getAllProductsByType(filter);
         updateTableModel(filteredProducts);
-    }    
+    } 
+
+    public void refreshProductList() {
+        loadProductData(currentTypeFilter);
+    }
 
     private void updateTableModel(ArrayList<Product> products) {
         ProductTableModel model = (ProductTableModel) productTable.getModel();
@@ -298,6 +306,17 @@ public class ProductManagePage extends JFrame {
         addProductPage.setSize(500, 400);
         addProductPage.setLocationRelativeTo(null);
         addProductPage.setVisible(true);
+
+        addProductPage.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                refreshProductList();
+            }
+        });
+    }
+
+    private void openDetailDialog(int productID, String productTypeString) {
+
     }
     
     public static void main(String[] args) {

@@ -111,7 +111,7 @@ public class TrackDAO extends ProductDAO {
      * @throws DatabaseException If a database error occurs.
      */
     public static Track findTrackByID(int productID) throws DatabaseException {
-        String selectSQL = "SELECT * FROM RollingStock WHERE product_id = ?;";
+        String selectSQL = "SELECT * FROM Track WHERE product_id = ?;";
         Track track = new Track();
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -119,7 +119,7 @@ public class TrackDAO extends ProductDAO {
             preparedStatement.setInt(1, productID);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            while (resultSet.next()) {
+            if (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
                 String newGauge = resultSet.getString("gauge");
