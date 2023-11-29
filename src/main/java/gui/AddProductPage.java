@@ -109,7 +109,6 @@ public class AddProductPage extends JDialog {
         dccComboBox = new JComboBox<>(new String[]{"Analogue", "Ready", "Fitted", "Sound"});
         compartmentComboBox = new JComboBox<>(new String[]{"Wagon", "Carriage"});
         digitalComboBox = new JComboBox<>(new String[]{"Digital", "Analogue"});
-        
 
         // Additional type-specific input fields
         switch (selectedType) {
@@ -184,6 +183,10 @@ public class AddProductPage extends JDialog {
         setSelectedEra(selectedEras);
     }
 
+    private void setSelectedEra(List<Integer> eraList) {
+        this.eraList = eraList;
+    }
+
     private void openProductSelectDialog(String type, Map<Product,Integer> itemList) {
         ProductSelectPage productSelect;
         if (type.equalsIgnoreCase("controller")){
@@ -210,10 +213,6 @@ public class AddProductPage extends JDialog {
                 ctrlList = productSelect.getSelection();
                 break;
         }
-    }
-
-    private void setSelectedEra(List<Integer> eraList) {
-        this.eraList = eraList;
     }
 
     private void submitProduct() {

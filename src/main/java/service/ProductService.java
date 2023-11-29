@@ -157,4 +157,13 @@ public class ProductService {
         }
     }
 
+    public static Product findProductByID(int productID){
+        try {
+            return ProductDAO.findProductByID(productID);
+        } catch (DatabaseException e) {
+            e.printStackTrace();
+            return new Product();
+        }
+    }
+
 }
