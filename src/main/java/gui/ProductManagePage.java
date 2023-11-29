@@ -316,7 +316,16 @@ public class ProductManagePage extends JFrame {
     }
 
     private void openDetailDialog(int productID, String productTypeString) {
+        ProductPage p = new ProductPage(ProductService.findProductByID(productID));
+        p.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        p.setVisible(true);
 
+        p.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                refreshProductList();
+            }
+        });
     }
     
     public static void main(String[] args) {

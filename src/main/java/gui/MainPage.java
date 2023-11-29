@@ -180,14 +180,26 @@ public class MainPage extends JFrame implements ReloadListener {
         // TODO add your code here
     }
 
+    private void button_staffMouseClicked(MouseEvent e) {
+        // TODO add your code here
+    }
+
+    private void button_ordersMouseClicked(MouseEvent e) {
+        // TODO add your code here
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
         DefaultComponentFactory compFactory = DefaultComponentFactory.getInstance();
         topPanel = new JPanel();
         accountPanel = new JPanel();
+        leftButtonPanel = new JPanel();
         button_account = new JButton();
+        button_staff = new JButton();
+        rightButtonPanel = new JPanel();
         button_cart = new JButton();
+        button_orders = new JButton();
         separatorForAccount = compFactory.createSeparator("");
         titlePanel = new JPanel();
         mainTitle = new JLabel();
@@ -223,7 +235,6 @@ public class MainPage extends JFrame implements ReloadListener {
         removeButton = new JButton();
         NumButton = new JButton();
         addButton = new JButton();
-        soldoutLabel1 = new JLabel();
         bottomSeparator = compFactory.createSeparator("");
 
         //======== this ========
@@ -240,29 +251,63 @@ public class MainPage extends JFrame implements ReloadListener {
             {
                 accountPanel.setLayout(new BorderLayout());
 
-                //---- button_account ----
-                button_account.setIcon(new FlatSVGIcon("images/person_black_24dp.svg"));
-                button_account.setBackground(new Color(0xf2f2f2));
-                button_account.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        button_accountMouseClicked(e);
-                    }
-                });
-                accountPanel.add(button_account, BorderLayout.WEST);
+                //======== leftButtonPanel ========
+                {
+                    leftButtonPanel.setLayout(new BoxLayout(leftButtonPanel, BoxLayout.X_AXIS));
 
-                //---- button_cart ----
-                button_cart.setSelectedIcon(null);
-                button_cart.setIcon(new FlatSVGIcon("images/shopping_cart_black_24dp.svg"));
-                button_cart.setBackground(new Color(0xf2f2f2));
-                button_cart.setHorizontalAlignment(SwingConstants.RIGHT);
-                button_cart.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        button_cartMouseClicked(e);
-                    }
-                });
-                accountPanel.add(button_cart, BorderLayout.EAST);
+                    //---- button_account ----
+                    button_account.setIcon(new FlatSVGIcon("images/person_black_24dp.svg"));
+                    button_account.setBackground(new Color(0xf2f2f2));
+                    button_account.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            button_accountMouseClicked(e);
+                        }
+                    });
+                    leftButtonPanel.add(button_account);
+
+                    //---- button_staff ----
+                    button_staff.setIcon(new FlatSVGIcon("images/assignment_black_24dp.svg"));
+                    button_staff.setBackground(new Color(0xf2f2f2));
+                    button_staff.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            button_staffMouseClicked(e);
+                        }
+                    });
+                    leftButtonPanel.add(button_staff);
+                }
+                accountPanel.add(leftButtonPanel, BorderLayout.WEST);
+
+                //======== rightButtonPanel ========
+                {
+                    rightButtonPanel.setLayout(new BoxLayout(rightButtonPanel, BoxLayout.X_AXIS));
+
+                    //---- button_cart ----
+                    button_cart.setSelectedIcon(null);
+                    button_cart.setIcon(new FlatSVGIcon("images/shopping_cart_black_24dp.svg"));
+                    button_cart.setBackground(new Color(0xf2f2f2));
+                    button_cart.setHorizontalAlignment(SwingConstants.RIGHT);
+                    button_cart.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            button_cartMouseClicked(e);
+                        }
+                    });
+                    rightButtonPanel.add(button_cart);
+
+                    //---- button_orders ----
+                    button_orders.setIcon(new FlatSVGIcon("images/list_alt_black_24dp.svg"));
+                    button_orders.setBackground(new Color(0xf2f2f2));
+                    button_orders.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            button_ordersMouseClicked(e);
+                        }
+                    });
+                    rightButtonPanel.add(button_orders);
+                }
+                accountPanel.add(rightButtonPanel, BorderLayout.EAST);
             }
             topPanel.add(accountPanel);
             topPanel.add(separatorForAccount);
@@ -533,8 +578,12 @@ public class MainPage extends JFrame implements ReloadListener {
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
     private JPanel topPanel;
     private JPanel accountPanel;
+    private JPanel leftButtonPanel;
     private JButton button_account;
+    private JButton button_staff;
+    private JPanel rightButtonPanel;
     private JButton button_cart;
+    private JButton button_orders;
     private JComponent separatorForAccount;
     private JPanel titlePanel;
     private JLabel mainTitle;
@@ -862,9 +911,9 @@ public class MainPage extends JFrame implements ReloadListener {
      * Main function for testing
      */
     public static void main(String[] args) {
-        // User user = UserDAO.findUserByEmail("testemail@gmail.com");
+        User user = UserDAO.findUserByEmail("testemail@gmail.com");
         Logging.Init(true);
-        User user = UserDAO.findUserByEmail("manager@manager.com");
+        // User user = UserDAO.findUserByEmail("manager@manager.com");
         UserSession.getInstance().setCurrentUser(user);
 
         EventQueue.invokeLater(() -> {
