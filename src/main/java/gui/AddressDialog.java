@@ -38,35 +38,62 @@ public class AddressDialog extends JDialog {
         });
     }
     
-    
     private void initializeComponents() {
-        setLayout(new GridLayout(0, 2));
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
     
-        add(new JLabel("House Number:"));
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
         houseNumberField = new JTextField(10);
-        add(houseNumberField);
-
-        add(new JLabel("Road Name:"));
         roadNameField = new JTextField(20);
-        add(roadNameField);
-
-        add(new JLabel("City:"));
         cityField = new JTextField(20);
-        add(cityField);
-
-        add(new JLabel("Postcode:"));
         postcodeField = new JTextField(10);
-        add(postcodeField);
 
-        actionButton = new JButton(isEditMode ? "Update" : "Add");
+        addComponentWithLabel("House Number:", houseNumberField, gbc);
+        addComponentWithLabel("Road Name:", roadNameField, gbc);
+        addComponentWithLabel("City:", cityField, gbc);
+        addComponentWithLabel("Postcode:", postcodeField, gbc);
+
+        gbc.gridwidth = 1;
+        gbc.gridy++;
+        gbc.gridx = 0;
+        actionButton = createButton(isEditMode ? "Update" : "Add");
         actionButton.addActionListener(isEditMode ? e -> onUpdate() : e -> onAdd());
-        add(actionButton);
+        add(actionButton, gbc);
 
-        cancelButton = new JButton("Cancel");
+        gbc.gridx = 1;
+        cancelButton = createButton("Cancel");
         cancelButton.addActionListener(e -> onCancelButtonClicked());
-        add(cancelButton);
+        add(cancelButton, gbc);
 
         pack();
+    }
+
+    private void addComponentWithLabel(String labelText, JComponent component, GridBagConstraints gbc) {
+        JLabel label = createLabel(labelText);
+        add(label, gbc);
+        gbc.gridx++;
+        add(component, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+    }
+
+    private JLabel createLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setForeground(new Color(0x003366));
+        label.setFont(new Font("Arial", Font.BOLD, 12));
+        return label;
+    }
+
+    private JButton createButton(String text) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Arial", Font.BOLD, 12));
+        button.setForeground(Color.WHITE);
+        button.setBackground(text.equals("Update") ? new Color(34, 139, 34) : new Color(0x204688)); // 绿色或蓝色
+        return button;
     }
 
     private void populateFields() {

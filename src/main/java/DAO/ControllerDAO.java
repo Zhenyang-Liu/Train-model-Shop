@@ -52,9 +52,9 @@ public class ControllerDAO extends ProductDAO {
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
             preparedStatement.setInt(2, controller.getProductID());
             if (controller.getDigitalType()) {
-                preparedStatement.setInt(2, 1);
+                preparedStatement.setInt(1, 1);
             } else {
-                preparedStatement.setInt(2, 0);
+                preparedStatement.setInt(1, 0);
             }
 
             preparedStatement.executeUpdate();

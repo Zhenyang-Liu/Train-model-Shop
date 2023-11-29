@@ -13,14 +13,12 @@ import DAO.CartDAO;
 import DAO.OrderDAO;
 import DAO.ProductDAO;
 import exception.*;
-import helper.Logging;
 import helper.UserSession;
 import model.BoxedSet;
 import model.Cart;
 import model.CartItem;
 import model.Order;
 import model.Product;
-import model.User;
 
 
 public class CartService {

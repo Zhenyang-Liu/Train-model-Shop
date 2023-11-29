@@ -120,7 +120,7 @@ CREATE TABLE Order_Line (
     product_id INT NOT NULL,
     quantity INT NOT NULL,
     line_cost DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (product_id) REFERENCES Product(product_id),
+    FOREIGN KEY (product_id) REFERENCES Product(product_id) ON DELETE CASCADE,
     FOREIGN KEY (order_id) REFERENCES Orders(order_id)
 );
 
@@ -129,7 +129,7 @@ CREATE TABLE Cart_Item (
     cart_id INT NOT NULL,
     product_id INT NOT NULL,
     quantity INT NOT NULL,
-    FOREIGN KEY (product_id) REFERENCES Product(product_id),
+    FOREIGN KEY (product_id) REFERENCES Product(product_id) ON DELETE CASCADE,
     FOREIGN KEY (cart_id) REFERENCES Cart(cart_id)
 );
 
@@ -143,39 +143,39 @@ CREATE TABLE ProductEra (
     product_id INT,
     PRIMARY KEY (era_code, product_id),
     FOREIGN KEY (era_code) REFERENCES Era(era_code),
-    FOREIGN KEY (product_id) REFERENCES Product(product_id)
+    FOREIGN KEY (product_id) REFERENCES Product(product_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Track (
     product_id INT,
     gauge VARCHAR(255),
-    FOREIGN KEY (product_id) REFERENCES Product(product_id)
+    FOREIGN KEY (product_id) REFERENCES Product(product_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Controller (
     product_id INT,
     digital_type TINYINT(1),
-    FOREIGN KEY (product_id) REFERENCES Product(product_id)
+    FOREIGN KEY (product_id) REFERENCES Product(product_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Locomotive (
     product_id INT,
     gauge VARCHAR(255),
     dcc_type ENUM('Analogue', 'Ready', 'Fitted', 'Sound'),
-    FOREIGN KEY (product_id) REFERENCES Product(product_id)
+    FOREIGN KEY (product_id) REFERENCES Product(product_id) ON DELETE CASCADE
 );
 
 CREATE TABLE RollingStock (
     product_id INT,
     type ENUM('Carriage', 'Wagon'),
     gauge VARCHAR(255),
-    FOREIGN KEY (product_id) REFERENCES Product(product_id)
+    FOREIGN KEY (product_id) REFERENCES Product(product_id) ON DELETE CASCADE
 );
 
 CREATE TABLE BoxedSet (
     product_id INT,
     pack_type VARCHAR(255),
-    FOREIGN KEY (product_id) REFERENCES Product(product_id)
+    FOREIGN KEY (product_id) REFERENCES Product(product_id) ON DELETE CASCADE
 );
 
 CREATE TABLE BoxedSet_Item (
@@ -183,6 +183,6 @@ CREATE TABLE BoxedSet_Item (
     item_id INT,
     quantity INT,
     PRIMARY KEY (boxed_set_id, item_id),
-    FOREIGN KEY (boxed_set_id) REFERENCES BoxedSet(product_id),
-    FOREIGN KEY (item_id) REFERENCES Product(product_id)
+    FOREIGN KEY (boxed_set_id) REFERENCES BoxedSet(product_id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES Product(product_id) ON DELETE CASCADE
 );
