@@ -52,6 +52,11 @@ public class AccountPage extends JFrame {
     private Login userLogin;
     private BankDetail userBankDetails;
 
+    // Constants
+    private final String DEFAULT_PASSWORD = "CorrectPassword1?";
+    private final String DEFAULT_ACCOUNT_NUMBER = "1111-1111-1111-1111";
+    private final String DEFAULT_SORT_CODE = "11-11-11";
+
     /**
      * Instantiate object and create components for GUI
      */
@@ -82,11 +87,6 @@ public class AccountPage extends JFrame {
      * Updates the values of the user, login, and bank tables (if needing changed)
      */
     private void updateDetails() {
-        // Default password, account number, sort code
-        String defaultPassword = "CorrectPassword1?";
-        String defaultAccountNumber = "1111-1111-1111-1111";
-        String defaultSortCode = "11-11-11";
-
         // Get inputs
         String email = inputs.get("email").getText();
         String forename = inputs.get("forename").getText();
@@ -99,11 +99,11 @@ public class AccountPage extends JFrame {
         // Check password, account number, and sort code to see if they've been changed
         // and give them a default value if they've not (they're hashed so can't compare)
         if (password.equals("")) 
-            password = defaultPassword;
+            password = DEFAULT_PASSWORD;
         if (accountNumber.equals("xxxx-xxxx-xxxx-xxxx"))
-            accountNumber = defaultAccountNumber;
+            accountNumber = DEFAULT_ACCOUNT_NUMBER;
         if (sortCode.equals("xx-xx-xx"))
-            sortCode = defaultSortCode;
+            sortCode = DEFAULT_SORT_CODE;
 
         // Validate inputs
         String error = RegistrationPage.checkInputs(email, forename, surname, password, password);
@@ -118,17 +118,18 @@ public class AccountPage extends JFrame {
             user.setForename(forename);
             user.setSurname(surname);
             userBankDetails.setExpiryDate(expiryDate);
-            if (!password.equals(defaultPassword))
+            if (!password.equals(DEFAULT_PASSWORD))
                 userLogin.setPassword(password);
-            if (!accountNumber.equals(defaultAccountNumber))
-                userBankDetails.setCardName(defaultAccountNumber);
-            if (!sortCode.equals(defaultSortCode))
+            if (!accountNumber.equals(DEFAULT_ACCOUNT_NUMBER))
+                userBankDetails.setCardName(DEFAULT_ACCOUNT_NUMBER);
+            if (!sortCode.equals(DEFAULT_SORT_CODE))
                 userBankDetails.setSecurityCode(sortCode);
 
             // Update values in DB
             boolean updatedUser = UserDAO.updateUser(user);
             boolean updatePassword = false;
-            if (!password.equals(defaultPassword)) {
+            boolean updatedCard = false;
+            if (!password.equals(DEFAULT_PASSWORD)) {
                 try {
                     LoginDAO.updateLoginDetails(userLogin);
                     updatePassword = true;
@@ -138,7 +139,7 @@ public class AccountPage extends JFrame {
             }
 
             // Update Messages
-            if (updatedUser && updatePassword) {
+            if (updatedUser && updatePassword && updatedCard) {
                 errorLabel.setText("");
                 successLabel.setText("Successfully updated user details!");
             } else {
@@ -165,8 +166,8 @@ public class AccountPage extends JFrame {
             return "Sort code must be in format xx-xx-xx";
         if (!expiryDatePattern.matcher(expiryDate).matches() || expiryDate.length() != 5)
             return "Expiry date must be in format xx/xx";
-        // if (!BankDetailService.isValidCreditCardNumber(accountNumber))
-        //     return "Credit card is not a real card";
+        if (!BankDetailService.isValidCreditCardNumber(accountNumber) && !accountNumber.equals(DEFAULT_ACCOUNT_NUMBER))
+            return "Credit card is not a real card";
 
         return "OK";
     }
