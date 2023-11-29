@@ -172,10 +172,6 @@ public class MainPage extends JFrame implements ReloadListener {
         });
     }
 
-    private void button_accountMouseClicked(MouseEvent e) {
-        // TODO add your code here
-    }
-
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
@@ -239,7 +235,7 @@ public class MainPage extends JFrame implements ReloadListener {
                 button_account.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        button_accountMouseClicked(e);
+                        button_accountMouseClicked();
                     }
                 });
                 accountPanel.add(button_account, BorderLayout.WEST);
