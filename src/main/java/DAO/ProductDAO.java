@@ -314,6 +314,27 @@ public class ProductDAO {
         }
     }
 
+    public static String getImageForProduct(int productID){
+        String selectSQL = "SELECT product_image FROM Product WHERE product_id = ?";
+        String productImage = "";
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+
+            preparedStatement.setInt(1, productID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                productImage = resultSet.getString("product_image");
+            }
+        } catch (SQLTimeoutException e) {
+            Logging.getLogger().warning("Could not find image for product " + productID + 
+                ". SQL Timeout!\nStacktrace: " + e.getMessage());
+        } catch (SQLException e) {
+            Logging.getLogger().warning("Could not find image for product " + productID + 
+                ". SQL Exception!\nStacktrace: " + e.getMessage());
+        }
+        return productImage;
+    }
+
     /**
      * Retrieve all products in the database.
      * 

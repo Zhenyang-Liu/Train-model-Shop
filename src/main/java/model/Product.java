@@ -1,14 +1,10 @@
 package model;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 
 import javax.swing.ImageIcon;
 
 import helper.ImageUtils;
-import helper.Logging;
 
 public class Product {
     private int productID;
@@ -102,10 +98,10 @@ public class Product {
         this.productName = productName;
     }
 
-    public void setProductImage(String base64Image){
-        this.imageBase64 = base64Image;
-    }
-
+    /**
+     * 
+     * @return
+     */
     public String getImageBase64(){
         return imageBase64;
     }
@@ -208,16 +204,13 @@ public class Product {
     }
 
     /**
-     * Set the image path.
-     *
-     * @param imagePath The new image path to be set.
+     * Sets the base64 encoded string of the image associated with this product
+     * @param base64
      */
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
-
     public void setImageBase64(String base64){
         this.imageBase64 = base64;
+        // Ensure resource manager updates the product
+        ImageUtils.ResourceManager.updateImageForProduct(productID);
     }
 
 
@@ -271,18 +264,9 @@ public class Product {
      * @return Returns an ImageIcon containing the image associated with this product
      */
     public ImageIcon getProductImage() {
-        // Get the URI of the default image to use if no image is supplied
-        URI defaultImage = null;
-        try {
-            defaultImage = getClass().getResource("/images/tgv.jpeg").toURI();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
         // Get the base64 of either the stored image or the default image and return
         boolean imageExists = this.imageBase64 != null && !this.imageBase64.equals("");
-        String imageIcon = imageExists ? this.imageBase64 : ImageUtils.toBase64(new File(defaultImage));
-        Logging.getLogger().info("Creating image for product " + productID + "(" + (imageExists ? "image exists" : "image not found") + ")");
-        return ImageUtils.imageToIcon(imageIcon);
+        return ImageUtils.ResourceManager.getProductImage(imageExists ? productID : -1);
     }
 
 
