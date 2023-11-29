@@ -139,11 +139,11 @@ public class BoxedSetDAO extends ProductDAO {
             preparedStatement.setInt(1, setID);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+            if (resultSet.next()) {
+                int productID = resultSet.getInt("product_id");
+                Product newProduct = ProductDAO.findProductByID(productID);
                 String newType = resultSet.getString("pack_type");
-                set = new BoxedSet(newProduct,newType,findBoxedSetItem(productId));
+                set = new BoxedSet(newProduct,newType,findBoxedSetItem(productID));
             }
         } catch (SQLTimeoutException e) {
             throw new ConnectionException("Database connect failed",e);
@@ -186,6 +186,9 @@ public class BoxedSetDAO extends ProductDAO {
                         break;
                     case "Rolling Stock":
                         contain.put(RollingStockDAO.findProductByID(itemID), quantity);
+                        break;
+                    case "Track Pack":
+                        contain.put(BoxedSetDAO.findBoxedSetByID(itemID),quantity);
                         break;
                 } 
                 }catch(DatabaseException e){
