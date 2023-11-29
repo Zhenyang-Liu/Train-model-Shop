@@ -185,7 +185,16 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     private void button_ordersMouseClicked(MouseEvent e) {
-        // TODO add your code here
+        User currentUser = UserSession.getInstance().getCurrentUser();
+
+        if (currentUser != null) {
+            OrderHistory ordersPage = new OrderHistory();
+            ordersPage.setVisible(true);
+        } else {
+            // USER NOT LOGIN
+            LoginPage loginPage = new LoginPage();
+            loginPage.setVisible(true);
+        }
     }
 
     private void initComponents() {
