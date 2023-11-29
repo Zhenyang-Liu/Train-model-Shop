@@ -207,7 +207,7 @@ public class AddProductPage extends JDialog {
                 rollList = productSelect.getSelection();
                 break;
             case "Track Pack":
-                trackList = productSelect.getSelection();
+                trackPackList = productSelect.getSelection();
                 break;
             case "Controller":
                 ctrlList = productSelect.getSelection();
@@ -240,7 +240,6 @@ public class AddProductPage extends JDialog {
 
         Product product = new Product(brandName, productName, productCode, Double.parseDouble(retailPrice), description, Integer.parseInt(stockQuantity), "");
         boolean typeMatch = !product.getProductType().equals(selectedType);
-        System.out.println(typeMatch);
         if (typeMatch){
             errorLabel.setText("Your select type does no match the Product Code you Enter");
             errorLabel.setVisible(true);

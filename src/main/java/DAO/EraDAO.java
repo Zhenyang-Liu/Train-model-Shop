@@ -169,5 +169,30 @@ public class EraDAO {
     
         return eraDescriptions;
     }
+
+    public static String findDescriptionByCode(int eraCode) throws DatabaseException {
+        String selectSQL = "SELECT description FROM Era WHERE era_code = ?;";
+        String eraDescription = "";
+    
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+    
+            preparedStatement.setInt(1, eraCode); // 设置 era_code 参数
+    
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    eraDescription = resultSet.getString("description");
+                }
+            }
+        } catch (SQLTimeoutException e) {
+            Logging.getLogger().warning("Error when finding era description: SQL Timed out\n Stacktrace: " + e.getMessage());
+            throw new DatabaseException("SQL Timeout Exception occurred", e);
+        } catch (SQLException e) {
+            Logging.getLogger().warning("Error when finding era description: SQL Exception\nStacktrace: " + e.getMessage());
+            throw new DatabaseException("SQL Exception occurred", e);
+        }
+        return eraDescription;
+    }
+    
     
 }

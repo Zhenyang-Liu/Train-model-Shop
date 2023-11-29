@@ -110,6 +110,22 @@ public class BoxedSetDAO extends ProductDAO {
     }
 
     public static void deleteItem(int productId) throws DatabaseException{
+        String deleteSQL = "DELETE FROM BoxedSet_Item WHERE item_id = ?;";
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
+            preparedStatement.setInt(1, productId);
+
+            preparedStatement.executeUpdate();
+            
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(),e);
+        } 
+    }
+
+    public static void deleteRecord(int productId) throws DatabaseException {
         String deleteSQL = "DELETE FROM BoxedSet_Item WHERE boxed_set_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -129,6 +145,8 @@ public class BoxedSetDAO extends ProductDAO {
             throw new DatabaseException(e.getMessage(),e);
         } 
     }
+
+
 
     public static BoxedSet findBoxedSetByID(int setID) throws DatabaseException {
         String selectSQL = "SELECT * FROM BoxedSet WHERE product_id = ?;";

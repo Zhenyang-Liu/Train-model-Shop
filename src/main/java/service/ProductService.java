@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import DAO.BoxedSetDAO;
+import DAO.CartDAO;
 import DAO.ControllerDAO;
 import DAO.EraDAO;
 import DAO.LocomotiveDAO;
@@ -16,6 +17,19 @@ import model.Product;
 import model.BoxedSet.BoxedType;
 
 public class ProductService {
+
+    public static String updateProduct(Product p) {
+        try{
+            if (!PermissionService.hasPermission("MANAGE_PRODUCTS")){
+                throw new AuthorizationException("Access denied. Only Staff can manage Products.");
+            }
+            ProductDAO.updateProduct(p);
+            return "success";
+        } catch (DatabaseException e) {
+            ExceptionHandler.printErrorMessage(e);
+            return e.getMessage();
+        }
+    }
 
     public static ArrayList<Product> getAllProducts() {
         try{
@@ -122,6 +136,42 @@ public class ProductService {
         return null;
     }
 
+    public static String deteleProduct(Product p){
+        try{
+            if (!PermissionService.hasPermission("MANAGE_PRODUCTS")){
+                throw new AuthorizationException("Access denied. Only Staff can manage Products.");
+            }
+            CartDAO.deleteProduct(p.getProductID());
+            switch (p.getProductType().toLowerCase()) {
+                case "track":
+                    TrackDAO.deleteTrack(p.getProductID());
+                    break;
+                case "locomotive":
+                    LocomotiveDAO.deleteLocomotive(p.getProductID());
+                    break;
+                case "rolling stock":
+                    RollingStockDAO.deleteRollingStock(p.getProductID());
+                    break;
+                case "controller":
+                    ControllerDAO.deleteController(p.getProductID());
+                    break;
+                case "train set":
+                    BoxedSetDAO.deleteBoxedSet(p.getProductID());
+                    break;
+                case "track pack":
+                    BoxedSetDAO.deleteBoxedSet(p.getProductID());
+                    break;
+                default:
+                    return "failed";
+            }
+
+            return "success";
+        } catch (DatabaseException e) {
+            ExceptionHandler.printErrorMessage(e);
+            return null;
+        }
+    } 
+
     public static void updateBoxedSetQuantity(int boxID) {
         try {
             BoxedSet set = BoxedSetDAO.findBoxedSetByID(boxID);
@@ -151,6 +201,22 @@ public class ProductService {
     public static ArrayList<String> findAllEra(){
         try {
             return EraDAO.findAllEraDescription();
+        } catch (DatabaseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static ArrayList<String> findEraDescription(int[] list){
+        try {
+            if (!PermissionService.hasPermission("BROWSE_PRODUCTS")){
+                throw new AuthorizationException("Access denied. Only Register user can browse products.");
+            }
+            ArrayList<String> description = new ArrayList<>();
+            for (int i = 0; i<list.length; i++){
+                description.add(EraDAO.findDescriptionByCode(list[i]));
+            }
+            return description;
         } catch (DatabaseException e) {
             e.printStackTrace();
             return null;
