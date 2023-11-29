@@ -10,7 +10,10 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -70,39 +73,48 @@ public class ProductPage extends JFrame {
     public ProductPage(Product p){
         this.p = p;
         this.isStaff = PermissionService.hasPermission(UserSession.getInstance().getCurrentUser().getUserID(), "UPDATE_PRODUCT");
-
-        this.setSize(new Dimension(640, 600));
-        this.setResizable(true);
-        this.setTitle((isStaff ? "Editing " : "Viewing ") + p.getProductName());
-
+    
         initComponents();
-        // Ensure nothing is default editing
-        requestFocus();
-        setLocationRelativeTo(null);
-    }
+    
+        this.setTitle((isStaff ? "Editing " : "Viewing ") + p.getProductName());
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setSize(new Dimension(700, 500));
+        this.setBackground(new Color(0xFFFFFF));
+        this.setResizable(true);
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
+    }    
 
     private JPanel createDescription() {
-        JPanel descriptionPanel = new JPanel();
-        descriptionPanel.setLayout(new BorderLayout());
+        JPanel descriptionPanel = new JPanel(new GridBagLayout());
         descriptionPanel.setBackground(new Color(0xFFFFFF));
-
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0; 
+        gbc.weighty = 1.0; 
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+    
         JLabel label = new JLabel("Description");
         label.setFont(label.getFont().deriveFont(Font.BOLD, 14.0f));
-        descriptionPanel.add(label, BorderLayout.NORTH);
-
+        descriptionPanel.add(label, gbc);
+    
+        gbc.gridy++;
+    
         productDescription = new JTextArea(p.getDescription());
         productDescription.setBorder(new EmptyBorder(5, 5, 5, 5));
         productDescription.setLineWrap(true);
         productDescription.setWrapStyleWord(true);
         productDescription.setBackground(new Color(0xFFFFFF));
         productDescription.setEditable(isStaff);
-
+    
         JScrollPane scrollPane = new JScrollPane(productDescription);
-        scrollPane.setPreferredSize(new Dimension(100, 50));
-        descriptionPanel.add(scrollPane, BorderLayout.CENTER);
-
+        scrollPane.setPreferredSize(new Dimension(200, 100)); // 设置首选尺寸
+        descriptionPanel.add(scrollPane, gbc);
+    
         return descriptionPanel;
-    }
+    }   
 
     private JButton createButton(String text, Color c){
         JButton rButton = new JButton(text);
@@ -138,23 +150,28 @@ public class ProductPage extends JFrame {
         productImage.repaint();
     }
 
-    private JPanel initImagePanel(){
-        JPanel imagePanel = new JPanel();
+    private JPanel initImagePanel() {
+        JPanel imagePanel = new JPanel(new GridBagLayout());
         imagePanel.setBackground(new Color(0xFFFFFF));
-        imagePanel.setLayout(new BoxLayout(imagePanel, BoxLayout.Y_AXIS));
-
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+    
         createProductImage();
-        imagePanel.add(productImage);
-
-        imagePanel.add(createDescription());
-
+        imagePanel.add(productImage, gbc);
+    
+        gbc.gridy++;
+        imagePanel.add(createDescription(), gbc);
+    
         return imagePanel;
-    }
+    }    
 
-    private void addLabelComponent(String labelName, JComponent component, JPanel panel) {
+    private void addLabelComponent(String labelName, JComponent component, JPanel panel, GridBagConstraints gbc) {
         JLabel label = new JLabel(labelName);
         label.setFont(label.getFont().deriveFont(label.getFont().getStyle() | Font.BOLD, 14.0f));
-
+        
         if (component instanceof JTextArea) {
             JScrollPane scrollPane = new JScrollPane(component);
             scrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -162,97 +179,109 @@ public class ProductPage extends JFrame {
             d.width = 200;
             d.height = 100;
             scrollPane.setPreferredSize(d);
+            gbc.gridwidth = 2;
+            panel.add(scrollPane, gbc);
+            gbc.gridwidth = 1;
         } else {
             component.setBorder(new EmptyBorder(0, 0, 0, 0));
             Dimension d = component.getPreferredSize();
             d.width = 200;
             component.setPreferredSize(d);
+            panel.add(label, gbc);
+            gbc.gridx++;
+            panel.add(component, gbc);
+            gbc.gridx--;
         }
-
-        component.setBackground(new Color(0xFFFFFF));
+        
+        gbc.gridy++;
+    
         if (component instanceof JTextComponent) {
             ((JTextComponent) component).setEditable(isStaff);
         }
-
-        panel.add(label);
-        panel.add(component);
     }
 
-
-    private JPanel initAttributePanel(){
-
+    private JPanel initAttributePanel() {
         JPanel attributePanel = new JPanel();
         attributePanel.setBackground(new Color(0xFFFFFF));
-        attributePanel.setLayout(new BoxLayout(attributePanel, BoxLayout.Y_AXIS));
-        attributePanel.setMinimumSize(new Dimension(250, 300));
-        attributePanel.setMaximumSize(new Dimension(250, 300));
-        attributePanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-
+        attributePanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+    
         productName = new JTextField(p.getProductName());
         productCode = new JTextField(p.getProductCode());
         productPrice = new JTextField(String.format("\u00A3%.2f", p.getRetailPrice()));
         productStock = new JTextField(String.valueOf(p.getStockQuantity()));
-
-        addLabelComponent("Product Name: ", productName, attributePanel);
-        addLabelComponent("Product Code: ", productCode, attributePanel);
-        addLabelComponent("Price: ", productPrice, attributePanel);
-        addLabelComponent("Stock Quantity", productStock, attributePanel);
-
+    
+        addLabelComponent("Product Name: ", productName, attributePanel, gbc);
+        gbc.gridy++;
+        addLabelComponent("Product Code: ", productCode, attributePanel, gbc);
+        gbc.gridy++;
+        addLabelComponent("Price: ", productPrice, attributePanel, gbc);
+        gbc.gridy++;
+        addLabelComponent("Stock Quantity: ", productStock, attributePanel, gbc);
+        gbc.gridy++;
+    
         gaugeComboBox = new JComboBox<>(new String[]{"OO", "TT", "N"});
         dccComboBox = new JComboBox<>(new String[]{"Analogue", "Ready", "Fitted", "Sound"});
         compartmentComboBox = new JComboBox<>(new String[]{"Wagon", "Carriage"});
         digitalComboBox = new JComboBox<>(new String[]{"Digital", "Analogue"});
-
+    
         JButton eraSelectButton = new JButton("Select Era");
         eraSelectButton.addActionListener(e -> openEraSelectDialog(eraList));
         
         String productType = this.p.getProductType();
-        try{
+        try {
             switch (productType) {
                 case "Track":
                     track = TrackDAO.findTrackByID(p.getProductID());
                     gaugeComboBox.setSelectedItem(track.getGauge());
-                    addLabelComponent("Gauge:", gaugeComboBox, attributePanel);
+                    addLabelComponent("Gauge: ", gaugeComboBox, attributePanel, gbc);
                     break;
                 case "Locomotive":
                     loco = LocomotiveDAO.findLocomotiveByID(p.getProductID());
                     gaugeComboBox.setSelectedItem(loco.getGauge());
                     dccComboBox.setSelectedItem(loco.getDCCType().getName());
                     setSelectedEra(loco.getEra());
-
-                    addLabelComponent("Gauge:", gaugeComboBox, attributePanel);
-                    addLabelComponent("DCC Type:", dccComboBox, attributePanel);
-                    if(isStaff)
-                        addLabelComponent("", eraSelectButton, attributePanel);
+    
+                    addLabelComponent("Gauge: ", gaugeComboBox, attributePanel, gbc);
+                    gbc.gridy++;
+                    addLabelComponent("DCC Type: ", dccComboBox, attributePanel, gbc);
+                    if (isStaff) {
+                        gbc.gridy++;
+                        addLabelComponent("", eraSelectButton, attributePanel, gbc);
+                    }
                     break;
                 case "Rolling Stock":
                     roll = RollingStockDAO.findRollingStockByID(p.getProductID());
                     gaugeComboBox.setSelectedItem(roll.getGauge());
                     compartmentComboBox.setSelectedItem(roll.getRollingStockType());
                     setSelectedEra(roll.getEra());
-
-                    addLabelComponent("Compartment Type:", compartmentComboBox, attributePanel);
-                    addLabelComponent("Gauge:", gaugeComboBox, attributePanel);
-                    if(isStaff)
-                        addLabelComponent("", eraSelectButton, attributePanel);
+    
+                    addLabelComponent("Compartment Type: ", compartmentComboBox, attributePanel, gbc);
+                    gbc.gridy++;
+                    addLabelComponent("Gauge: ", gaugeComboBox, attributePanel, gbc);
+                    if (isStaff) {
+                        gbc.gridy++;
+                        addLabelComponent("", eraSelectButton, attributePanel, gbc);
+                    }
                     break;
                 case "Controller":
                     ctrl = ControllerDAO.findControllerByID(p.getProductID());
-                    if (ctrl.getDigitalType()){
-                        digitalComboBox.setSelectedItem("Digital");
-                    } else {
-                        digitalComboBox.setSelectedItem("Analogue");
-                    }
-                    addLabelComponent("Digital Type:", digitalComboBox, attributePanel);
+                    digitalComboBox.setSelectedItem(ctrl.getDigitalType() ? "Digital" : "Analogue");
+                    addLabelComponent("Digital Type: ", digitalComboBox, attributePanel, gbc);
                     break;
                 case "Train Set":
-
+                    // Add components for Train Set
                     break;
                 case "Track Pack":
-
+                    // Add components for Track Pack
                     break;
             } 
-        } catch (DatabaseException ex){
+        } catch (DatabaseException ex) {
             ExceptionHandler.printErrorMessage(ex);
         }
         return attributePanel;
@@ -336,29 +365,43 @@ public class ProductPage extends JFrame {
         });
     }
 
-    private void initComponents(){
+    private void initComponents() {
         Container contentPane = this.getContentPane();
         contentPane.setLayout(new BorderLayout());
-
-        JPanel content = new JPanel();
+    
+        JPanel content = new JPanel(new GridBagLayout());
         content.setBackground(new Color(0xFFFFFF));
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        content.setBorder(new EmptyBorder(15, 15, 15, 15));
-
-        content.add(initProductPanel());
-        if(isStaff)
-            content.add(initProductButtons());
-        else
+        GridBagConstraints gbc = new GridBagConstraints();
+    
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+    
+        JPanel productArea = initProductPanel();
+        content.add(productArea, gbc);
+    
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+    
+        if (isStaff) {
+            JPanel productButtons = initProductButtons();
+            content.add(productButtons, gbc);
+        } else {
             Logging.getLogger().info("Showing the standard user view of the product page");
-        
+        }
+    
         contentPane.add(content);
-
+    
         addListeners();
         pack();
+        setLocationRelativeTo(null);
     }
-
+    
     public static void main(String[] args){
-        UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("testey@gmail.com"));
+        UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("manager@manager.com"));
         ProductPage p = new ProductPage(ProductDAO.getAllProduct().get(0));
         p.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         p.setVisible(true);

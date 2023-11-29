@@ -6,7 +6,6 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import DAO.ProductDAO;
 import DAO.UserDAO;
 import helper.UserSession;
 
