@@ -8,6 +8,7 @@ import java.text.DecimalFormat;
 import javax.swing.ImageIcon;
 
 import helper.ImageUtils;
+import helper.Logging;
 
 public class Product {
     private int productID;
@@ -278,8 +279,9 @@ public class Product {
             e.printStackTrace();
         }
         // Get the base64 of either the stored image or the default image and return
-        //String imageIcon = this.imageBase64 != null ? this.imageBase64 : ImageUtils.toBase64(new File(defaultImage));
-        String imageIcon = ImageUtils.toBase64(new File(defaultImage));
+        boolean imageExists = this.imageBase64 != null && this.imageBase64 != "";
+        String imageIcon = imageExists ? this.imageBase64 : ImageUtils.toBase64(new File(defaultImage));
+        Logging.getLogger().info("Creating image for product " + productID);
         return ImageUtils.imageToIcon(imageIcon);
     }
 
