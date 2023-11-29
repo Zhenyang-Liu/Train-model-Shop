@@ -3,6 +3,7 @@ package model;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DecimalFormat;
 
 import javax.swing.ImageIcon;
 
@@ -150,7 +151,10 @@ public class Product {
         if (retailPrice < 0) {
             throw new IllegalArgumentException("Retail Price cannot be negative.");
         }
-        this.retailPrice = retailPrice;
+        DecimalFormat decimalFormat = new DecimalFormat("#.00");
+        String formattedTotal = decimalFormat.format(retailPrice);
+
+        this.retailPrice = Double.parseDouble(formattedTotal);
     }
 
     /**
@@ -240,7 +244,7 @@ public class Product {
      * @return The product type as a string, or null if the product code is invalid.
      */
     public String getProductType() {
-        char typeIndicator = productCode.charAt(0);
+        char typeIndicator = Character.toUpperCase(productCode.charAt(0));
 
         switch (typeIndicator) {
             case 'R':
@@ -256,7 +260,7 @@ public class Product {
             case 'P':
                 return "Track Pack";
             default:
-                return null; // Invalid type indicator
+                return null;
         }
     }
 
@@ -274,7 +278,8 @@ public class Product {
             e.printStackTrace();
         }
         // Get the base64 of either the stored image or the default image and return
-        String imageIcon = this.imageBase64 != null ? this.imageBase64 : ImageUtils.toBase64(new File(defaultImage));
+        //String imageIcon = this.imageBase64 != null ? this.imageBase64 : ImageUtils.toBase64(new File(defaultImage));
+        String imageIcon = ImageUtils.toBase64(new File(defaultImage));
         return ImageUtils.imageToIcon(imageIcon);
     }
 

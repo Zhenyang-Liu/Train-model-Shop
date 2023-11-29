@@ -48,6 +48,8 @@ public class ManagerPage extends JFrame {
 
         // Right Panel with JTable
         JScrollPane rightScrollPane = new JScrollPane(table);
+        rightScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        rightScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         // Dividing line
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightScrollPane);

@@ -32,7 +32,7 @@ public class BoxedSet extends Product{
     }
 
     public BoxedSet() {
-
+        this.contain = new HashMap<>();
     }
 
     public BoxedSet(String brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String boxedType, String image) {
@@ -67,7 +67,24 @@ public class BoxedSet extends Product{
         return contain;
     }
 
+    public void setContain(Map<Product,Integer> itemList){
+        this.contain = itemList;
+    }
+
     public void addProduct(Product product, int quantity) {
-        this.contain.put(product, quantity);
+        boolean productExists = false;
+        if (contain != null){
+            for (Product existingProduct : contain.keySet()) {
+                if (existingProduct.getProductID() == product.getProductID()) {
+                    int existingQuantity = contain.get(existingProduct);
+                    contain.put(existingProduct, existingQuantity + quantity);
+                    productExists = true;
+                    break;
+                }
+            }
+        } 
+        if (!productExists) {
+            contain.put(product, quantity);
+        }
     }
 }

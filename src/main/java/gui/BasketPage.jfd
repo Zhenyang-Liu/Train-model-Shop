@@ -66,6 +66,7 @@ new FormModel {
 							"foreground": new java.awt.Color( 0, 51, 102, 255 )
 							"preferredSize": new java.awt.Dimension( 600, 120 )
 							"maximumSize": new java.awt.Dimension( 2147483647, 100 )
+							"visible": false
 							add( new FormComponent( "javax.swing.JLabel" ) {
 								name: "itemImage1"
 								"text": new FormMessage( null, "BasketPage.itemImage1.text" )
@@ -114,7 +115,9 @@ new FormModel {
 									"y": 65
 								} )
 							} )
-						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+							"insets": new java.awt.Insets( 0, 0, 5, 0 )
+						} )
 					} )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 					"gridx": 1

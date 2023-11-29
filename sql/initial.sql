@@ -91,8 +91,9 @@ CREATE TABLE Orders (
     create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     total_cost DECIMAL(10, 2) NOT NULL,
-    status ENUM('Pending', 'Confirmed', 'Fulfilled') NOT NULL,
+    status ENUM('Pending', 'Confirmed', 'Fulfilled', 'Cancelled') NOT NULL;
     bank_detail_state INT NOT NULL,
+    reason VARCHAR(255) DEFAULT NULL;
     FOREIGN KEY (user_id) REFERENCES User(user_id),
     FOREIGN KEY (delivery_address_id) REFERENCES Address(address_id)
 );

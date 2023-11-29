@@ -32,6 +32,7 @@ import helper.Logging;
 import model.BankDetail;
 import model.Login;
 import model.User;
+import service.BankDetailService;
 
 /**
  * Written by: Julian Jones
@@ -44,6 +45,7 @@ public class AccountPage extends JFrame {
     private JPanel DetailsPanel;
     private JPanel ButtonPanel;
     private JLabel errorLabel;
+    private JLabel successLabel;
     private JPasswordField passwordInput;
     private HashMap<String, JTextField> inputs;
     private User user;
@@ -98,7 +100,7 @@ public class AccountPage extends JFrame {
         // and give them a default value if they've not (they're hashed so can't compare)
         if (password.equals("")) 
             password = defaultPassword;
-        if (accountNumber.equals("xxxx-xxxx-xxx-xxx"))
+        if (accountNumber.equals("xxxx-xxxx-xxxx-xxxx"))
             accountNumber = defaultAccountNumber;
         if (sortCode.equals("xx-xx-xx"))
             sortCode = defaultSortCode;
@@ -110,9 +112,39 @@ public class AccountPage extends JFrame {
             errorLabel.setText(error);
         } else if (!cardError.equals("OK")) {
             errorLabel.setText(cardError);
-        }
+        } else {
+            // Update values in objects
+            user.setEmail(email);
+            user.setForename(forename);
+            user.setSurname(surname);
+            userBankDetails.setExpiryDate(expiryDate);
+            if (!password.equals(defaultPassword))
+                userLogin.setPassword(password);
+            if (!accountNumber.equals(defaultAccountNumber))
+                userBankDetails.setCardName(defaultAccountNumber);
+            if (!sortCode.equals(defaultSortCode))
+                userBankDetails.setSecurityCode(sortCode);
 
-        // TODO: UPDATE IN DB
+            // Update values in DB
+            boolean updatedUser = UserDAO.updateUser(user);
+            boolean updatePassword = false;
+            if (!password.equals(defaultPassword)) {
+                try {
+                    LoginDAO.updateLoginDetails(userLogin);
+                    updatePassword = true;
+                } catch (SQLException e) {
+                    errorLabel.setText("Could not update password.");
+                }
+            }
+
+            // Update Messages
+            if (updatedUser && updatePassword) {
+                errorLabel.setText("");
+                successLabel.setText("Successfully updated user details!");
+            } else {
+                errorLabel.setText("Unknown error updating user details... Please report to admin");
+            }
+        }
     }
 
     /**
@@ -124,15 +156,17 @@ public class AccountPage extends JFrame {
      */
     private String validateCard(String accountNumber, String sortCode, String expiryDate) {
         // Account number, sort code, and expiry date
-        Pattern accountNumberPattern = Pattern.compile("^[1-9]{4}-[1-9]{4}-[1-9]{4}-[1-9]{4}$");
-        Pattern sortCodePattern = Pattern.compile("^[1-9]{2}-[1-9]{2}-[1-9]{2}$");
-        Pattern expiryDatePattern = Pattern.compile("^[1-9]{2}/[1-9]{2}$");
+        Pattern accountNumberPattern = Pattern.compile("^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$");
+        Pattern sortCodePattern = Pattern.compile("^[0-9]{2}-[0-9]{2}-[0-9]{2}$");
+        Pattern expiryDatePattern = Pattern.compile("^[0-9]{2}/[0-9]{2}$");
         if (!accountNumberPattern.matcher(accountNumber).matches() || accountNumber.length() != 19)
             return "Account number must be in format xxxx-xxxx-xxxx-xxxx";
         if (!sortCodePattern.matcher(sortCode).matches() || sortCode.length() != 8)
             return "Sort code must be in format xx-xx-xx";
         if (!expiryDatePattern.matcher(expiryDate).matches() || expiryDate.length() != 5)
             return "Expiry date must be in format xx/xx";
+        // if (!BankDetailService.isValidCreditCardNumber(accountNumber))
+        //     return "Credit card is not a real card";
 
         return "OK";
     }
@@ -148,6 +182,7 @@ public class AccountPage extends JFrame {
         TitlePanel = new JPanel();
         ButtonPanel = new JPanel();
         errorLabel = new JLabel();
+        successLabel = new JLabel();
         inputs = new HashMap<>();
 
         // Set size and layout
@@ -192,9 +227,11 @@ public class AccountPage extends JFrame {
         TitleSeparator.setBackground(new Color(0x7f7272));
         TitlePanel.add(TitleSeparator);
 
-        // Add error messages
+        // Add error and success messages
         errorLabel.setForeground(new Color(0xb13437));
+        successLabel.setForeground(new Color(0x32a852));
         TitlePanel.add(errorLabel);
+        TitlePanel.add(successLabel);
 
         // Add to Main Dialogue 
         MainDialoguePanel.add(TitlePanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
@@ -227,7 +264,7 @@ public class AccountPage extends JFrame {
         // Bank section, uses another panel
         JPanel BankPanel = new JPanel();
         JLabel bankLabel = new JLabel("Bank Details:");
-        JTextField accountNumber = new JTextField("xxxxxxxxxxxxxxxx");
+        JTextField accountNumber = new JTextField("xxxx-xxxx-xxxx-xxxx");
         JTextField sortCode = new JTextField("xx-xx-xx");
         JTextField expiryDate = new JTextField(userBankDetails.getExpiryDate());
         setTextStyle(bankLabel, false);

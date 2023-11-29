@@ -144,6 +144,27 @@ public class OrderDAO {
         }
     }
 
+    public static void cancelOrder(Order order) throws DatabaseException {
+        String updateSQL = "UPDATE Orders SET "
+           + "update_time = ?, status = ?, reason = ? "
+           + "WHERE order_id = ?;";
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
+            preparedStatement.setTimestamp(1, order.getUpdateTime());
+            preparedStatement.setString(2, "Cancelled");
+            preparedStatement.setString(3, order.getReason());
+            preparedStatement.setInt(4, order.getOrderID());
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(),e);
+        }
+    }
+
     /**
      * Retrieves an order from the database by its ID.
      *
@@ -172,8 +193,9 @@ public class OrderDAO {
                 String status = resultSet.getString("status");
                 Map<Product,Integer> itemList = findOrderItems(orderID);
                 boolean validBankDetail = resultSet.getInt("bank_detail_state") == 1;
+                String reason = resultSet.getString("reason");
 
-                return new Order(orderID, userID, addressID, createTime, updateTime, total_cost, status,itemList,validBankDetail);
+                return new Order(orderID, userID, addressID, createTime, updateTime, total_cost, status,itemList,validBankDetail,reason);
             }
 
         } catch (SQLTimeoutException e){
@@ -182,6 +204,40 @@ public class OrderDAO {
             throw new DatabaseException(e.getMessage(),e);
         }
         return null;
+    }
+
+    public static ArrayList<Order> findOrderByStatus(String statusString) throws DatabaseException {
+        String selectSQL = "SELECT * FROM Orders WHERE status = ?;";
+        ArrayList<Order> orderList = new ArrayList<>();
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+
+            preparedStatement.setString(1, statusString);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int orderID = resultSet.getInt("order_id");
+                int userID = resultSet.getInt("user_id");
+                int addressID = resultSet.getInt("delivery_address_id");
+                Timestamp createTime = resultSet.getTimestamp("create_time");
+                Timestamp updateTime = resultSet.getTimestamp("update_time");
+                double total_cost = resultSet.getDouble("total_cost");
+                String status = resultSet.getString("status");
+                Map<Product,Integer> itemList = findOrderItems(orderID);
+                boolean validBankDetail = resultSet.getInt("bank_detail_state") == 1;
+                String reason = resultSet.getString("reason");
+
+                Order order = new Order(orderID, userID, addressID, createTime, updateTime, total_cost, status,itemList,validBankDetail,reason);
+                orderList.add(order);
+            }
+
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(),e);
+        }
+        return orderList;
     }
     
     /**
@@ -252,8 +308,9 @@ public class OrderDAO {
                 String status = resultSet.getString("status");
                 Map<Product,Integer> itemList = findOrderItems(orderID);
                 boolean validBankDetail = resultSet.getInt("bank_detail_state") == 1;
+                String reason = resultSet.getString("reason");
 
-                Order order = new Order(orderID, userID, addressID, createTime, updateTime, total_cost, status,itemList,validBankDetail);
+                Order order = new Order(orderID, userID, addressID, createTime, updateTime, total_cost, status,itemList,validBankDetail,reason);
                 if (!status.equals("Pending"))
                     orderList.add(order);
             }

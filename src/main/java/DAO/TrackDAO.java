@@ -24,7 +24,7 @@ public class TrackDAO extends ProductDAO {
      */
     public static void insertTrack(Track track) throws DatabaseException {
         int productID = insertProduct(track);
-        String insertSQL = "INSERT INTO Track (product_id, gauge) VALUES (?, ?, ?);";
+        String insertSQL = "INSERT INTO Track (product_id, gauge) VALUES (?, ?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
@@ -182,7 +182,7 @@ public class TrackDAO extends ProductDAO {
      * @return An ArrayList of all Track objects in the database | null if can't find.
      * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Track> findAllControllers() {
+    public static ArrayList<Track> findAllTracks() {
         ArrayList<Track> tracks = new ArrayList<Track>();
         String selectSQL = "SELECT * FROM Track;";
 
