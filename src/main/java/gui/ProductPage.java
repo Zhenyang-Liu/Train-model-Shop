@@ -13,41 +13,57 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.text.JTextComponent;
 
+import DAO.ControllerDAO;
+import DAO.LocomotiveDAO;
 import DAO.ProductDAO;
+import DAO.RollingStockDAO;
+import DAO.TrackDAO;
 import DAO.UserDAO;
 import exception.DatabaseException;
+import exception.ExceptionHandler;
 import helper.ImageUtils;
 import helper.Logging;
 import helper.UserSession;
-import model.Product;
+import model.*;
 import service.PermissionService;
 
 public class ProductPage extends JFrame {
 
     private Product p;
+    private Track track;
+    private Locomotive loco;
+    private RollingStock roll;
+    private Controller ctrl;
+    private BoxedSet set;
+    private List<Integer> eraList;
+
     private boolean isStaff;
 
-    private JTextField productName;
-    private JTextField productDescription;
-    private JTextField productPrice;
-    private JComboBox productType;
+    private JTextField productName, productPrice,productStock,productBrand,productCode;
+    private JTextArea productDescription;
     private JLabel productImage;
-    private JLabel productID;
+    private JComboBox<String> gaugeComboBox, dccComboBox, compartmentComboBox, digitalComboBox;
     private JButton saveProduct;
     private JButton deleteProduct;
 
@@ -55,21 +71,37 @@ public class ProductPage extends JFrame {
         this.p = p;
         this.isStaff = PermissionService.hasPermission(UserSession.getInstance().getCurrentUser().getUserID(), "UPDATE_PRODUCT");
 
-        this.setSize(new Dimension(640, 480));
-        this.setResizable(false);
+        this.setSize(new Dimension(640, 600));
+        this.setResizable(true);
         this.setTitle((isStaff ? "Editing " : "Viewing ") + p.getProductName());
 
         initComponents();
         // Ensure nothing is default editing
         requestFocus();
+        setLocationRelativeTo(null);
     }
 
-    private void createProductID(){
-        productID = new JLabel("Product ID: " + String.valueOf(p.getProductID()));
-        productID.setFont(productID.getFont().deriveFont(productID.getFont().getStyle() | Font.ITALIC, 14.0f));
-        productID.setForeground(new Color(0, 0, 0, 0.3f));
-        productID.setHorizontalAlignment(SwingConstants.RIGHT);
-        // productID.setAlignmentX(Component.RIGHT_ALIGNMENT);
+    private JPanel createDescription() {
+        JPanel descriptionPanel = new JPanel();
+        descriptionPanel.setLayout(new BorderLayout());
+        descriptionPanel.setBackground(new Color(0xFFFFFF));
+
+        JLabel label = new JLabel("Description");
+        label.setFont(label.getFont().deriveFont(Font.BOLD, 14.0f));
+        descriptionPanel.add(label, BorderLayout.NORTH);
+
+        productDescription = new JTextArea(p.getDescription());
+        productDescription.setBorder(new EmptyBorder(5, 5, 5, 5));
+        productDescription.setLineWrap(true);
+        productDescription.setWrapStyleWord(true);
+        productDescription.setBackground(new Color(0xFFFFFF));
+        productDescription.setEditable(isStaff);
+
+        JScrollPane scrollPane = new JScrollPane(productDescription);
+        scrollPane.setPreferredSize(new Dimension(100, 50));
+        descriptionPanel.add(scrollPane, BorderLayout.CENTER);
+
+        return descriptionPanel;
     }
 
     private JButton createButton(String text, Color c){
@@ -114,44 +146,115 @@ public class ProductPage extends JFrame {
         createProductImage();
         imagePanel.add(productImage);
 
-        createProductID();
-        imagePanel.add(productID);
+        imagePanel.add(createDescription());
 
         return imagePanel;
     }
 
-    private void addLabelTextField(String labelName, JTextField field, JPanel panel){
+    private void addLabelComponent(String labelName, JComponent component, JPanel panel) {
         JLabel label = new JLabel(labelName);
         label.setFont(label.getFont().deriveFont(label.getFont().getStyle() | Font.BOLD, 14.0f));
 
-        field.setBorder(new EmptyBorder(0, 0, 0, 0));
-        Dimension d = field.getPreferredSize();
-        d.width = 200;
-        field.setPreferredSize(d);
-        field.setBackground(new Color(0xFFFFFF));
-        field.setEditable(isStaff);
+        if (component instanceof JTextArea) {
+            JScrollPane scrollPane = new JScrollPane(component);
+            scrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
+            Dimension d = scrollPane.getPreferredSize();
+            d.width = 200;
+            d.height = 100;
+            scrollPane.setPreferredSize(d);
+        } else {
+            component.setBorder(new EmptyBorder(0, 0, 0, 0));
+            Dimension d = component.getPreferredSize();
+            d.width = 200;
+            component.setPreferredSize(d);
+        }
+
+        component.setBackground(new Color(0xFFFFFF));
+        if (component instanceof JTextComponent) {
+            ((JTextComponent) component).setEditable(isStaff);
+        }
 
         panel.add(label);
-        panel.add(field);
+        panel.add(component);
     }
+
 
     private JPanel initAttributePanel(){
 
         JPanel attributePanel = new JPanel();
-        productName = new JTextField(p.getProductName());
-        productDescription = new JTextField(p.getDescription());
-        productPrice = new JTextField("£" + String.valueOf(p.getRetailPrice()));
-
         attributePanel.setBackground(new Color(0xFFFFFF));
         attributePanel.setLayout(new BoxLayout(attributePanel, BoxLayout.Y_AXIS));
-
         attributePanel.setMinimumSize(new Dimension(250, 300));
         attributePanel.setMaximumSize(new Dimension(250, 300));
         attributePanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 
-        addLabelTextField("Product Name: ", productName, attributePanel);
-        addLabelTextField("Description: ", productDescription, attributePanel);
-        addLabelTextField("Price: ", productPrice, attributePanel);
+        productName = new JTextField(p.getProductName());
+        productCode = new JTextField(p.getProductCode());
+        productPrice = new JTextField(String.format("\u00A3%.2f", p.getRetailPrice()));
+        productStock = new JTextField(String.valueOf(p.getStockQuantity()));
+
+        addLabelComponent("Product Name: ", productName, attributePanel);
+        addLabelComponent("Product Code: ", productCode, attributePanel);
+        addLabelComponent("Price: ", productPrice, attributePanel);
+        addLabelComponent("Stock Quantity", productStock, attributePanel);
+
+        gaugeComboBox = new JComboBox<>(new String[]{"OO", "TT", "N"});
+        dccComboBox = new JComboBox<>(new String[]{"Analogue", "Ready", "Fitted", "Sound"});
+        compartmentComboBox = new JComboBox<>(new String[]{"Wagon", "Carriage"});
+        digitalComboBox = new JComboBox<>(new String[]{"Digital", "Analogue"});
+
+        JButton eraSelectButton = new JButton("Select Era");
+        eraSelectButton.addActionListener(e -> openEraSelectDialog(eraList));
+        
+        String productType = this.p.getProductType();
+        try{
+            switch (productType) {
+                case "Track":
+                    track = TrackDAO.findTrackByID(p.getProductID());
+                    gaugeComboBox.setSelectedItem(track.getGauge());
+                    addLabelComponent("Gauge:", gaugeComboBox, attributePanel);
+                    break;
+                case "Locomotive":
+                    loco = LocomotiveDAO.findLocomotiveByID(p.getProductID());
+                    gaugeComboBox.setSelectedItem(loco.getGauge());
+                    dccComboBox.setSelectedItem(loco.getDCCType().getName());
+                    setSelectedEra(loco.getEra());
+
+                    addLabelComponent("Gauge:", gaugeComboBox, attributePanel);
+                    addLabelComponent("DCC Type:", dccComboBox, attributePanel);
+                    if(isStaff)
+                        addLabelComponent("", eraSelectButton, attributePanel);
+                    break;
+                case "Rolling Stock":
+                    roll = RollingStockDAO.findRollingStockByID(p.getProductID());
+                    gaugeComboBox.setSelectedItem(roll.getGauge());
+                    compartmentComboBox.setSelectedItem(roll.getRollingStockType());
+                    setSelectedEra(roll.getEra());
+
+                    addLabelComponent("Compartment Type:", compartmentComboBox, attributePanel);
+                    addLabelComponent("Gauge:", gaugeComboBox, attributePanel);
+                    if(isStaff)
+                        addLabelComponent("", eraSelectButton, attributePanel);
+                    break;
+                case "Controller":
+                    ctrl = ControllerDAO.findControllerByID(p.getProductID());
+                    if (ctrl.getDigitalType()){
+                        digitalComboBox.setSelectedItem("Digital");
+                    } else {
+                        digitalComboBox.setSelectedItem("Analogue");
+                    }
+                    addLabelComponent("Digital Type:", digitalComboBox, attributePanel);
+                    break;
+                case "Train Set":
+
+                    break;
+                case "Track Pack":
+
+                    break;
+            } 
+        } catch (DatabaseException ex){
+            ExceptionHandler.printErrorMessage(ex);
+        }
         return attributePanel;
     }
 
@@ -177,6 +280,24 @@ public class ProductPage extends JFrame {
         return productButtons;
     }
 
+    private void openEraSelectDialog(List<Integer> eras) {
+        EraSelect eraSelect = new EraSelect(null, eras);
+        eraSelect.setVisible(true);
+        List<Integer> selectedEras = eraSelect.getSelectedEras();
+        setSelectedEra(selectedEras);
+    }
+
+    private void setSelectedEra(List<Integer> eraList) {
+        this.eraList = eraList;
+    }
+
+    private void setSelectedEra(int[] eraCollection) {
+        this.eraList = new ArrayList<>();;
+        for (int era: eraCollection){
+            eraList.add(era);
+        }
+    }
+
     private void addListeners(){
         productImage.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e){
@@ -197,7 +318,8 @@ public class ProductPage extends JFrame {
         saveProduct.addActionListener(e -> {
             try{
                 this.p.setProductName(productName.getText());
-                this.p.setDescription(productDescription.getText());
+                // this.p.setDescription(productDescription.getText());
+                // TODO: Update Product
                 ProductDAO.updateProduct(p);
             }catch(DatabaseException e1){
                 Logging.getLogger().warning("Could not update product " + p.getProductID() + "\n Stacktrace: " + e1.getMessage());
@@ -232,7 +354,6 @@ public class ProductPage extends JFrame {
         contentPane.add(content);
 
         addListeners();
-        
         pack();
     }
 

@@ -6,6 +6,7 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import DAO.ProductDAO;
 import DAO.UserDAO;
 import helper.UserSession;
 
@@ -316,7 +317,16 @@ public class ProductManagePage extends JFrame {
     }
 
     private void openDetailDialog(int productID, String productTypeString) {
+        ProductPage p = new ProductPage(ProductService.findProductByID(productID));
+        p.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        p.setVisible(true);
 
+        p.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                refreshProductList();
+            }
+        });
     }
     
     public static void main(String[] args) {

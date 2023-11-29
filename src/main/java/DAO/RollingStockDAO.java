@@ -131,9 +131,8 @@ public class RollingStockDAO extends ProductDAO {
                 Product newProduct = ProductDAO.findProductByID(productId);
                 String newGauge = resultSet.getString("gauge");
                 String newType = resultSet.getString("type");
-                int[] newEra = EraDAO.findEraByID(productId);
 
-                rollingStock = new RollingStock(newProduct, newType, newGauge, newEra);
+                rollingStock = new RollingStock(newProduct, newType, newGauge, EraDAO.findEraByID(productId));
             }
         } catch (SQLTimeoutException e){
             throw new ConnectionException("Database connect failed",e);
