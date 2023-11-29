@@ -20,8 +20,10 @@ import helper.UserSession;
 import listeners.ReloadListener;
 import model.*;
 import model.Locomotive.DCCType;
+import net.miginfocom.swing.MigLayout;
 import service.CartService;
-
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
@@ -38,11 +40,8 @@ import java.util.ResourceBundle;
 public class MainPage extends JFrame implements ReloadListener {
     private Filter f;
     public MainPage() {
-
         Logging.getLogger().info("Creating Main Page");
-
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
         initComponents();
         f = new Filter();
         populateFilterBoxes();
@@ -172,6 +171,10 @@ public class MainPage extends JFrame implements ReloadListener {
         });
     }
 
+    private void button_accountMouseClicked(MouseEvent e) {
+        // TODO add your code here
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
@@ -200,6 +203,7 @@ public class MainPage extends JFrame implements ReloadListener {
         filterBox4 = new JComboBox();
         subTypeFilterLabel = new JLabel();
         subTypeFilterBox = new JComboBox();
+        scrollPane1 = new JScrollPane();
         productPanel = new JPanel();
         productCardPanel1 = new JPanel();
         productImage1 = new JLabel();
@@ -209,11 +213,11 @@ public class MainPage extends JFrame implements ReloadListener {
         buttonPanel1 = new JPanel();
         moreButton1 = new JButton();
         addButton1 = new JButton();
+        soldoutLabel1 = new JLabel();
         adjustNumPanel1 = new JPanel();
         removeButton = new JButton();
         NumButton = new JButton();
         addButton = new JButton();
-        soldoutLabel1 = new JLabel();
         bottomSeparator = compFactory.createSeparator("");
 
         //======== this ========
@@ -236,7 +240,7 @@ public class MainPage extends JFrame implements ReloadListener {
                 button_account.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        button_accountMouseClicked();
+                        button_accountMouseClicked(e);
                     }
                 });
                 accountPanel.add(button_account, BorderLayout.WEST);
@@ -269,7 +273,7 @@ public class MainPage extends JFrame implements ReloadListener {
                 mainTitle.setForeground(new Color(0x003366));
                 mainTitle.setHorizontalAlignment(SwingConstants.CENTER);
                 mainTitle.setMaximumSize(null);
-                mainTitle.setBorder(new EmptyBorder(10, 0, 0, 0));
+                mainTitle.setBorder(new EmptyBorder(10, 0, 5, 0));
                 titlePanel.add(mainTitle);
 
                 //---- subTitle ----
@@ -386,126 +390,132 @@ public class MainPage extends JFrame implements ReloadListener {
             }
             mainPageSplitPane.setLeftComponent(filterPanel);
 
-            //======== productPanel ========
+            //======== scrollPane1 ========
             {
-                productPanel.setMaximumSize(new Dimension(300, 32767));
-                productPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
 
-                //======== productCardPanel1 ========
+                //======== productPanel ========
                 {
-                    productCardPanel1.setBorder(new LineBorder(new Color(0x002c7b), 2, true));
-                    productCardPanel1.setPreferredSize(new Dimension(260, 280));
-                    productCardPanel1.setMaximumSize(new Dimension(230, 240));
-                    productCardPanel1.setMinimumSize(new Dimension(230, 240));
-                    productCardPanel1.setVisible(false);
-                    productCardPanel1.setLayout(new GridBagLayout());
-                    ((GridBagLayout)productCardPanel1.getLayout()).columnWidths = new int[] {0, 0};
-                    ((GridBagLayout)productCardPanel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
-                    ((GridBagLayout)productCardPanel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-                    ((GridBagLayout)productCardPanel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+                    productPanel.setMaximumSize(null);
+                    productPanel.setPreferredSize(new Dimension(300, 1000));
+                    productPanel.setMinimumSize(null);
+                    productPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-                    //---- productImage1 ----
-                    productImage1.setIcon(new ImageIcon(getClass().getResource("/images/tgv.jpeg")));
-                    productImage1.setPreferredSize(new Dimension(216, 120));
-                    productImage1.setAlignmentY(0.0F);
-                    productImage1.setMaximumSize(new Dimension(216, 120));
-                    productImage1.setMinimumSize(new Dimension(216, 120));
-                    productCardPanel1.add(productImage1, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0,
-                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                        new Insets(0, 0, 0, 0), 0, 0));
-
-                    //---- productName1 ----
-                    productName1.setText(bundle.getString("MainPage.productName1.text"));
-                    productName1.setFont(productName1.getFont().deriveFont(productName1.getFont().getSize() + 4f));
-                    productName1.setHorizontalAlignment(SwingConstants.CENTER);
-                    productName1.setBorder(new MatteBorder(3, 0, 3, 0, Color.black));
-                    productName1.setPreferredSize(new Dimension(220, 30));
-                    productCardPanel1.add(productName1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.4,
-                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                        new Insets(1, 0, 0, 0), 0, 0));
-
-                    //======== purchasePanel1 ========
+                    //======== productCardPanel1 ========
                     {
-                        purchasePanel1.setBorder(new EmptyBorder(10, 5, 5, 5));
-                        purchasePanel1.setMaximumSize(new Dimension(190, 85));
-                        purchasePanel1.setLayout(new GridLayout(2, 1, 20, 10));
+                        productCardPanel1.setBorder(new LineBorder(new Color(0x002c7b), 2, true));
+                        productCardPanel1.setPreferredSize(new Dimension(260, 280));
+                        productCardPanel1.setMaximumSize(new Dimension(230, 240));
+                        productCardPanel1.setMinimumSize(new Dimension(230, 240));
+                        productCardPanel1.setLayout(new GridBagLayout());
+                        ((GridBagLayout)productCardPanel1.getLayout()).columnWidths = new int[] {0, 0};
+                        ((GridBagLayout)productCardPanel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0};
+                        ((GridBagLayout)productCardPanel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+                        ((GridBagLayout)productCardPanel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
-                        //---- productPrice1 ----
-                        productPrice1.setText(bundle.getString("MainPage.productPrice1.text"));
-                        productPrice1.setFont(productPrice1.getFont().deriveFont(productPrice1.getFont().getSize() + 7f));
-                        productPrice1.setPreferredSize(new Dimension(80, 25));
-                        productPrice1.setHorizontalAlignment(SwingConstants.CENTER);
-                        purchasePanel1.add(productPrice1);
+                        //---- productImage1 ----
+                        productImage1.setIcon(new ImageIcon(getClass().getResource("/images/tgv.jpeg")));
+                        productImage1.setPreferredSize(new Dimension(216, 120));
+                        productImage1.setAlignmentY(0.0F);
+                        productImage1.setMaximumSize(new Dimension(216, 120));
+                        productImage1.setMinimumSize(new Dimension(216, 120));
+                        productCardPanel1.add(productImage1, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0,
+                            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                            new Insets(0, 0, 0, 0), 0, 0));
 
-                        //======== buttonPanel1 ========
+                        //---- productName1 ----
+                        productName1.setText(bundle.getString("MainPage.productName1.text"));
+                        productName1.setFont(productName1.getFont().deriveFont(productName1.getFont().getSize() + 4f));
+                        productName1.setHorizontalAlignment(SwingConstants.CENTER);
+                        productName1.setBorder(new MatteBorder(3, 0, 3, 0, Color.black));
+                        productName1.setPreferredSize(new Dimension(220, 30));
+                        productCardPanel1.add(productName1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.4,
+                            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                            new Insets(1, 0, 0, 0), 0, 0));
+
+                        //======== purchasePanel1 ========
                         {
-                            buttonPanel1.setPreferredSize(new Dimension(240, 40));
-                            buttonPanel1.setLayout(new FlowLayout());
+                            purchasePanel1.setBorder(new EmptyBorder(10, 5, 5, 5));
+                            purchasePanel1.setMaximumSize(new Dimension(190, 85));
+                            purchasePanel1.setLayout(new GridLayout(2, 1, 20, 10));
 
-                            //---- moreButton1 ----
-                            moreButton1.setText("Detail");
-                            moreButton1.setBackground(new Color(0x4e748d));
-                            moreButton1.setForeground(new Color(0xe0e2e8));
-                            moreButton1.setPreferredSize(new Dimension(100, 30));
-                            buttonPanel1.add(moreButton1);
+                            //---- productPrice1 ----
+                            productPrice1.setText(bundle.getString("MainPage.productPrice1.text"));
+                            productPrice1.setFont(productPrice1.getFont().deriveFont(productPrice1.getFont().getSize() + 7f));
+                            productPrice1.setPreferredSize(new Dimension(80, 25));
+                            productPrice1.setHorizontalAlignment(SwingConstants.CENTER);
+                            purchasePanel1.add(productPrice1);
 
-                            //---- addButton1 ----
-                            addButton1.setText(bundle.getString("MainPage.addButton1.text"));
-                            addButton1.setBackground(new Color(0x55a15a));
-                            addButton1.setForeground(new Color(0xe0e2e8));
-                            addButton1.setPreferredSize(new Dimension(100, 30));
-                            buttonPanel1.add(addButton1);
-
-                            //======== adjustNumPanel1 ========
+                            //======== buttonPanel1 ========
                             {
-                                adjustNumPanel1.setLayout(new GridBagLayout());
-                                ((GridBagLayout)adjustNumPanel1.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
-                                ((GridBagLayout)adjustNumPanel1.getLayout()).rowHeights = new int[] {0, 0};
-                                ((GridBagLayout)adjustNumPanel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
-                                ((GridBagLayout)adjustNumPanel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+                                buttonPanel1.setPreferredSize(new Dimension(240, 40));
+                                buttonPanel1.setLayout(new FlowLayout());
 
-                                //---- removeButton ----
-                                removeButton.setBackground(new Color(0xb13437));
-                                removeButton.setForeground(new Color(0xe0e2e8));
-                                removeButton.setFont(removeButton.getFont().deriveFont(removeButton.getFont().getSize() + 7f));
-                                removeButton.setIcon(new FlatSVGIcon("images/remove_white_18dp.svg"));
-                                adjustNumPanel1.add(removeButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                                    new Insets(0, 0, 0, 5), 0, 0));
+                                //---- moreButton1 ----
+                                moreButton1.setText("Detail");
+                                moreButton1.setBackground(new Color(0x4e748d));
+                                moreButton1.setForeground(new Color(0xe0e2e8));
+                                moreButton1.setPreferredSize(new Dimension(100, 30));
+                                buttonPanel1.add(moreButton1);
 
-                                //---- NumButton ----
-                                NumButton.setText("NUM");
-                                NumButton.setPreferredSize(new Dimension(50, 23));
-                                adjustNumPanel1.add(NumButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                                    new Insets(0, 0, 0, 5), 0, 0));
+                                //---- addButton1 ----
+                                addButton1.setText(bundle.getString("MainPage.addButton1.text"));
+                                addButton1.setBackground(new Color(0x55a15a));
+                                addButton1.setForeground(new Color(0xe0e2e8));
+                                addButton1.setPreferredSize(new Dimension(100, 30));
+                                buttonPanel1.add(addButton1);
 
-                                //---- addButton ----
-                                addButton.setBackground(new Color(0x55a15a));
-                                addButton.setForeground(new Color(0xe0e2e8));
-                                addButton.setFont(addButton.getFont().deriveFont(addButton.getFont().getSize() + 7f));
-                                addButton.setIcon(new FlatSVGIcon("images/add_white_18dp.svg"));
-                                adjustNumPanel1.add(addButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-                                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                                    new Insets(0, 0, 0, 0), 0, 0));
+                                //---- soldoutLabel1 ----
+                                soldoutLabel1.setText("Out of Stock");
+                                soldoutLabel1.setFont(soldoutLabel1.getFont().deriveFont(soldoutLabel1.getFont().getStyle() | Font.BOLD, soldoutLabel1.getFont().getSize() + 3f));
+                                soldoutLabel1.setForeground(new Color(0x85816c));
+                                buttonPanel1.add(soldoutLabel1);
+
+                                //======== adjustNumPanel1 ========
+                                {
+                                    adjustNumPanel1.setLayout(new GridBagLayout());
+                                    ((GridBagLayout)adjustNumPanel1.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+                                    ((GridBagLayout)adjustNumPanel1.getLayout()).rowHeights = new int[] {0, 0, 0};
+                                    ((GridBagLayout)adjustNumPanel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+                                    ((GridBagLayout)adjustNumPanel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
+
+                                    //---- removeButton ----
+                                    removeButton.setBackground(new Color(0xb13437));
+                                    removeButton.setForeground(new Color(0xe0e2e8));
+                                    removeButton.setFont(removeButton.getFont().deriveFont(removeButton.getFont().getSize() + 7f));
+                                    removeButton.setIcon(new FlatSVGIcon("images/remove_white_18dp.svg"));
+                                    adjustNumPanel1.add(removeButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                                        new Insets(0, 0, 5, 5), 0, 0));
+
+                                    //---- NumButton ----
+                                    NumButton.setText("NUM");
+                                    NumButton.setPreferredSize(new Dimension(50, 23));
+                                    adjustNumPanel1.add(NumButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+                                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                                        new Insets(0, 0, 5, 5), 0, 0));
+
+                                    //---- addButton ----
+                                    addButton.setBackground(new Color(0x55a15a));
+                                    addButton.setForeground(new Color(0xe0e2e8));
+                                    addButton.setFont(addButton.getFont().deriveFont(addButton.getFont().getSize() + 7f));
+                                    addButton.setIcon(new FlatSVGIcon("images/add_white_18dp.svg"));
+                                    adjustNumPanel1.add(addButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+                                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                                        new Insets(0, 0, 5, 0), 0, 0));
+                                }
+                                buttonPanel1.add(adjustNumPanel1);
                             }
-                            buttonPanel1.add(adjustNumPanel1);
-
-                            //---- soldoutLabel1 ----
-                            soldoutLabel1.setText("Out of Stock");
-                            soldoutLabel1.setFont(soldoutLabel1.getFont().deriveFont(soldoutLabel1.getFont().getStyle() | Font.BOLD, soldoutLabel1.getFont().getSize() + 3f));
-                            soldoutLabel1.setForeground(new Color(0xeb9e0c));
-                            buttonPanel1.add(soldoutLabel1);
+                            purchasePanel1.add(buttonPanel1);
                         }
-                        purchasePanel1.add(buttonPanel1);
+                        productCardPanel1.add(purchasePanel1, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
+                            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                            new Insets(0, 0, 0, 0), 0, 0));
                     }
-                    productCardPanel1.add(purchasePanel1, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
-                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                        new Insets(0, 0, 0, 0), 0, 0));
+                    productPanel.add(productCardPanel1);
                 }
-                productPanel.add(productCardPanel1);
+                scrollPane1.setViewportView(productPanel);
             }
-            mainPageSplitPane.setRightComponent(productPanel);
+            mainPageSplitPane.setRightComponent(scrollPane1);
         }
         contentPane.add(mainPageSplitPane, BorderLayout.CENTER);
         contentPane.add(bottomSeparator, BorderLayout.SOUTH);
@@ -539,6 +549,7 @@ public class MainPage extends JFrame implements ReloadListener {
     private JComboBox filterBox4;
     private JLabel subTypeFilterLabel;
     private JComboBox subTypeFilterBox;
+    private JScrollPane scrollPane1;
     private JPanel productPanel;
     private JPanel productCardPanel1;
     private JLabel productImage1;
@@ -548,23 +559,31 @@ public class MainPage extends JFrame implements ReloadListener {
     private JPanel buttonPanel1;
     private JButton moreButton1;
     private JButton addButton1;
+    private JLabel soldoutLabel1;
     private JPanel adjustNumPanel1;
     private JButton removeButton;
     private JButton NumButton;
     private JButton addButton;
-    private JLabel soldoutLabel1;
     private JComponent bottomSeparator;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
     private void customizeComponents() {
-        /**
-       ImageIcon originalIcon = new ImageIcon("TrainShop\\src\\main\\images\\tgv.jpeg");
-       Image originalImage = originalIcon.getImage();
-       Image resizedImage = originalImage.getScaledInstance(productImage1.getWidth(), productImage1.getHeight(), Image.SCALE_SMOOTH);
-       productImage1.setIcon(new ImageIcon(resizedImage));
-         */
-
+        productPanel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                adjustPreferredSize(productPanel);
+            }
+        });
     }
+    private static void adjustPreferredSize(JPanel panel) {
+        int width = panel.getWidth();
+        int preferredHeight = 1000000/width ;
+
+        panel.setPreferredSize(new Dimension(300, preferredHeight));
+
+        panel.revalidate();
+    }
+
 
     private void loadProducts() {
         new SwingWorker<ArrayList<Product>, Void>() {
@@ -735,7 +754,7 @@ public class MainPage extends JFrame implements ReloadListener {
         JLabel soldOutLabel = new JLabel();
         soldOutLabel.setText("Out of Stock");
         soldOutLabel.setFont(soldoutLabel1.getFont().deriveFont(soldoutLabel1.getFont().getStyle() | Font.BOLD, soldoutLabel1.getFont().getSize() + 3f));
-        soldOutLabel.setForeground(new Color(0xeb9e0c));
+        soldOutLabel.setForeground(new Color(0x85816c));
         if (product.getStockQuantity() > 0){
             soldOutLabel.setVisible(false);
         }else{
