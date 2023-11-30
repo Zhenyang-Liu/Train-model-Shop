@@ -21,36 +21,43 @@ new FormModel {
 				name: "topPanel"
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 					name: "accountPanel"
-					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
 						name: "leftButtonPanel"
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "button_account"
 							"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/person_black_24dp.svg" )
 							"background": new java.awt.Color( 242, 242, 242, 255 )
+							"margin": new java.awt.Insets( 2, 2, 2, 2 )
 							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_accountMouseClicked", true ) )
-						}, new FormLayoutConstraints( class java.lang.String ) {
-							"value": "West"
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "button_staff"
+							name: "button_staff_products"
 							"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/store_black_24dp.svg" )
 							"background": new java.awt.Color( 242, 242, 242, 255 )
-							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_staffMouseClicked", true ) )
-						}, new FormLayoutConstraints( class java.lang.String ) {
-							"value": "Center"
+							"margin": new java.awt.Insets( 2, 2, 2, 2 )
+							"visible": false
+							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_staff_productsMouseClicked", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "button_staff_orders"
+							"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/manageOrders_black_24dp.svg" )
+							"background": new java.awt.Color( 242, 242, 242, 255 )
+							"margin": new java.awt.Insets( 2, 2, 2, 2 )
+							"visible": false
+							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_staff_ordersMouseClicked", true ) )
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "button_manger"
 							"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/supervisor_account_black_24dp.svg" )
 							"background": new java.awt.Color( 242, 242, 242, 255 )
+							"margin": new java.awt.Insets( 2, 2, 2, 2 )
+							"visible": false
 							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_mangerMouseClicked", true ) )
-						}, new FormLayoutConstraints( class java.lang.String ) {
-							"value": "East"
 						} )
 					}, new FormLayoutConstraints( class java.lang.String ) {
 						"value": "West"
 					} )
-					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
 						name: "rightButtonPanel"
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "button_cart"
@@ -58,17 +65,15 @@ new FormModel {
 							"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/shopping_cart_black_24dp.svg" )
 							"background": new java.awt.Color( 242, 242, 242, 255 )
 							"horizontalAlignment": 4
+							"margin": new java.awt.Insets( 2, 2, 2, 2 )
 							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_cartMouseClicked", true ) )
-						}, new FormLayoutConstraints( class java.lang.String ) {
-							"value": "Before"
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "button_orders"
 							"icon": new com.jformdesigner.model.SwingIcon( 0, "/images/assignment_black_24dp.svg" )
 							"background": new java.awt.Color( 242, 242, 242, 255 )
+							"margin": new java.awt.Insets( 2, 2, 2, 2 )
 							addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_ordersMouseClicked", true ) )
-						}, new FormLayoutConstraints( class java.lang.String ) {
-							"value": "Center"
 						} )
 					}, new FormLayoutConstraints( class java.lang.String ) {
 						"value": "East"
@@ -167,6 +172,9 @@ new FormModel {
 					} )
 					add( new FormComponent( "javax.swing.JComboBox" ) {
 						name: "sortOptions"
+						auxiliary() {
+							"JavaCodeGenerator.customCreateCode": "new JComboBox<>();;"
+						}
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 1
 						"weightx": 1.0
@@ -182,6 +190,9 @@ new FormModel {
 					} )
 					add( new FormComponent( "javax.swing.JComboBox" ) {
 						name: "priceFilterBox"
+						auxiliary() {
+							"JavaCodeGenerator.customCreateCode": "new JComboBox<>();"
+						}
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 3
 						"weightx": 1.0
@@ -197,6 +208,9 @@ new FormModel {
 					} )
 					add( new FormComponent( "javax.swing.JComboBox" ) {
 						name: "typeFilterBox"
+						auxiliary() {
+							"JavaCodeGenerator.customCreateCode": "new JComboBox<>();"
+						}
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 5
 						"weightx": 1.0
@@ -211,7 +225,10 @@ new FormModel {
 						"weightx": 1.0
 					} )
 					add( new FormComponent( "javax.swing.JComboBox" ) {
-						name: "filterBox4"
+						name: "brandFilterBox"
+						auxiliary() {
+							"JavaCodeGenerator.customCreateCode": "new JComboBox<>();"
+						}
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 7
 						"weightx": 1.0
@@ -227,6 +244,9 @@ new FormModel {
 					} )
 					add( new FormComponent( "javax.swing.JComboBox" ) {
 						name: "subTypeFilterBox"
+						auxiliary() {
+							"JavaCodeGenerator.customCreateCode": "new JComboBox<>();"
+						}
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 9
 						"weightx": 1.0

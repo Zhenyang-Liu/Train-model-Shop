@@ -7,14 +7,9 @@ import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
 
-import javax.swing.JFrame;
-
 import exception.ConnectionException;
 import exception.DatabaseException;
-import gui.AccountPage;
-import gui.ProductPage;
 import helper.Logging;
-import helper.UserSession;
 import model.Controller;
 import model.Product;
 
@@ -79,7 +74,6 @@ public class ControllerDAO extends ProductDAO {
 
             int rowsAffected = preparedStatement.executeUpdate();
             
-            // Print to Test
             if (rowsAffected > 0) {
                 ProductDAO.deleteProduct(productId);
                 Logging.getLogger().info("Controller with ID " + productId + " was deleted successfully.");

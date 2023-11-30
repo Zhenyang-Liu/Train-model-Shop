@@ -6,6 +6,8 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import model.BoxedSet;
 import model.Product;
@@ -84,8 +86,7 @@ public class ProductSelectPage extends JDialog {
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         topPanel.add(titleLabel, gbc);
     
-        //TODO: Unfinished
-        String[] searchOptions = {"Brand", "Product Code"};
+        String[] searchOptions = {"Brand", "Name", "Code"};
         JComboBox<String> searchComboBox = new JComboBox<>(searchOptions);
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -216,7 +217,30 @@ public class ProductSelectPage extends JDialog {
     }
 
     private void performSearch(String searchType, String searchTerm) {
-        // TODO: applySearch
+        ArrayList<Product> currentList = ProductService.getAllProductsByType(productType);
+
+        Predicate<Product> filterPredicate;
+        switch (searchType) {
+            case "Brand":
+                filterPredicate = product -> product.getBrand() != null && product.getBrand().contains(searchTerm);
+                break;
+            case "Name":
+                filterPredicate = product -> product.getProductName() != null && product.getProductName().contains(searchTerm);
+                break;
+            case "Code":
+                filterPredicate = product -> product.getProductCode() != null && product.getProductCode().contains(searchTerm);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid search type");
+        }
+
+        ArrayList<Product> filteredProducts = new ArrayList<>(
+            currentList.stream()
+                       .filter(filterPredicate)
+                       .collect(Collectors.toList())
+        );
+
+        updateTableModel(filteredProducts);
     }
 
     private void loadProductData(String filter) {

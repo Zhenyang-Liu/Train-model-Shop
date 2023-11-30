@@ -8,11 +8,12 @@ import java.awt.event.WindowEvent;
 
 import DAO.DatabaseConnectionHandler;
 
-public class Main {
+public class App {
     public static void main(String[] args) {
         try{
             System.out.println("Welcome to TrainShop!");
 
+            Logging.Init(false);
             // Create Main Page Object
             MainPage mainPage = new MainPage();
 
@@ -27,6 +28,8 @@ public class Main {
             mainPage.setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
+        }finally{
+            Logging.Close();
         }
     }
 }

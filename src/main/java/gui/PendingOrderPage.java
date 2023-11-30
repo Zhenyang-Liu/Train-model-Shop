@@ -35,16 +35,28 @@ public class PendingOrderPage extends JFrame {
         addProductCards();
         updateAddressPanel();
         updatePaymentPanel();
+        updateCVVPanel();
         totalPrice.setText(String.format("\u00A3%.2f", order.getTotalCost()));
     }
 
     private void confirmButtonMouseClicked(MouseEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-    
+        if (order.getOrderItems().isEmpty()) {
+            this.dispose();
+            int confirmCancel = JOptionPane.showConfirmDialog(this,"This order is empty. Do you want to cancel the order?",
+                "Confirm Cancellation",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
+            if (confirmCancel == JOptionPane.YES_OPTION){
+                OrderService.cancelOrder(order, "Empty Order");
+            }
+            dispose();
+            return;
+        }
         if (!isAddressExist) {
             JOptionPane.showMessageDialog(parentFrame, "Please add an address", "Error", JOptionPane.ERROR_MESSAGE);
         } else if (!isPaymentExist) {
             JOptionPane.showMessageDialog(parentFrame, "Please add a payment card", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if(!isCVVProvided){
+            JOptionPane.showMessageDialog(parentFrame, "Please enter security code", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             order.setAddressID(address.getID());
             order.setBankDetailState(isPaymentExist);
@@ -85,8 +97,8 @@ public class PendingOrderPage extends JFrame {
     
             if (confirmReturnToCart == JOptionPane.YES_OPTION) {
                 OrderService.returnToCart(order);
-            }
-    
+            } 
+            OrderService.cancelOrder(order, "Self Cancelled");
             dispose();
         }
     }
@@ -127,10 +139,28 @@ public class PendingOrderPage extends JFrame {
         bankDetailDialog.setVisible(true);
 
         if (bankDetailDialog.isInputValid()) {
+            isCVVProvided = false;
             updatePaymentPanel();
+            updateCVVPanel();
         }
     }
 
+    private void cvvAddButtonMouseClicked(MouseEvent e) {
+        String cvv = JOptionPane.showInputDialog(this, "Enter CVV:");
+        if (cvv == null || cvv.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "CVV is required", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (!isValidCVV(cvv)) {
+            JOptionPane.showMessageDialog(this, "Invalid CVV", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            isCVVProvided = true;
+            updateCVVPanel();
+        }
+    }
+
+    private boolean isValidCVV(String cvv) {
+        return cvv.matches("\\d{3}");
+    }
+    
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
@@ -148,6 +178,10 @@ public class PendingOrderPage extends JFrame {
         paymentText = new JLabel();
         paymentAddButton = new JButton();
         paymentEditButton = new JButton();
+        cvvPanel = new JPanel();
+        cvvLabel = new JLabel();
+        cvvText = new JLabel();
+        cvvEnterButton = new JButton();
         pendingOrderScrollPanel = new JScrollPane();
         pendingOrderItemsPanel = new JPanel();
         pendingOrderCardPanel = new JPanel();
@@ -196,9 +230,9 @@ public class PendingOrderPage extends JFrame {
                 {
                     customerInfoPanel.setLayout(new GridBagLayout());
                     ((GridBagLayout)customerInfoPanel.getLayout()).columnWidths = new int[] {0, 0};
-                    ((GridBagLayout)customerInfoPanel.getLayout()).rowHeights = new int[] {0, 0, 0};
+                    ((GridBagLayout)customerInfoPanel.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
                     ((GridBagLayout)customerInfoPanel.getLayout()).columnWeights = new double[] {0.0, 1.0E-4};
-                    ((GridBagLayout)customerInfoPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
+                    ((GridBagLayout)customerInfoPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
 
                     //======== addressPanel ========
                     {
@@ -244,7 +278,7 @@ public class PendingOrderPage extends JFrame {
                         addressPanel.add(addressEditButton);
                     }
                     customerInfoPanel.add(addressPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
-                        GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+                        GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                         new Insets(0, 0, 5, 0), 0, 0));
 
                     //======== paymentPanel ========
@@ -292,6 +326,41 @@ public class PendingOrderPage extends JFrame {
                         paymentPanel.add(paymentEditButton);
                     }
                     customerInfoPanel.add(paymentPanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+                        GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                        new Insets(20, 0, 5, 0), 0, 0));
+
+                    //======== cvvPanel ========
+                    {
+                        cvvPanel.setMaximumSize(new Dimension(300, 200));
+                        cvvPanel.setMinimumSize(new Dimension(260, 150));
+                        cvvPanel.setLayout(new BoxLayout(cvvPanel, BoxLayout.Y_AXIS));
+
+                        //---- cvvLabel ----
+                        cvvLabel.setText("CVV");
+                        cvvLabel.setForeground(new Color(0x003366));
+                        cvvLabel.setFont(cvvLabel.getFont().deriveFont(cvvLabel.getFont().getStyle() | Font.BOLD, cvvLabel.getFont().getSize() + 5f));
+                        cvvPanel.add(cvvLabel);
+
+                        //---- cvvText ----
+                        cvvText.setMinimumSize(new Dimension(100, 100));
+                        cvvText.setMaximumSize(null);
+                        cvvPanel.add(cvvText);
+
+                        //---- cvvEnterButton ----
+                        cvvEnterButton.setText("Enter CVV");
+                        cvvEnterButton.setForeground(new Color(0xe9e4e3));
+                        cvvEnterButton.setBackground(new Color(0x55a15a));
+                        cvvEnterButton.setFont(cvvEnterButton.getFont().deriveFont(cvvEnterButton.getFont().getStyle() & ~Font.BOLD));
+                        cvvEnterButton.setPreferredSize(new Dimension(140, 23));
+                        cvvEnterButton.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mouseClicked(MouseEvent e) {
+                                cvvAddButtonMouseClicked(e);
+                            }
+                        });
+                        cvvPanel.add(cvvEnterButton);
+                    }
+                    customerInfoPanel.add(cvvPanel, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
                         GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                         new Insets(20, 0, 0, 0), 0, 0));
                 }
@@ -447,7 +516,6 @@ public class PendingOrderPage extends JFrame {
     }
 
     private void updatePaymentPanel() {
-        //---- paymentTextField ----
         this.bankDetail = BankDetailService.findBankDetail();
         if (bankDetail != null){
             String formattedText = "<html><body>"
@@ -460,15 +528,12 @@ public class PendingOrderPage extends JFrame {
             paymentText.setText(formattedText);
             isPaymentExist = true;
         } else {
-            //---- paymentAddButton ----
             paymentEditButton.setVisible(false);
             paymentAddButton.setText("Add a Card");
             isPaymentExist = false;
         }
 
-        //======== paymentEditPanel ========
         if (isPaymentExist) {
-            //---- paymentEditButton ----
             paymentEditButton.setVisible(true);
             paymentAddButton.setVisible(false);
         }
@@ -500,6 +565,21 @@ public class PendingOrderPage extends JFrame {
             addressEditButton.setVisible(true);
         }
     }
+    
+    private void updateCVVPanel() {
+        if (!isPaymentExist){
+            isCVVProvided = false;
+        }
+        if (!isCVVProvided){
+            cvvText.setText("CVV: Empty");
+            cvvText.setForeground(Color.RED);
+        } else{
+            cvvText.setText("CVV: Entered");
+            cvvText.setForeground(new Color(0x008000)); // Green color
+        }
+        cvvEnterButton.setVisible(!isCVVProvided);
+    }
+    
 
     private JPanel createProductCard(Product product, int quantity) {
         JPanel cardPanel = new JPanel();
@@ -585,6 +665,10 @@ public class PendingOrderPage extends JFrame {
     private JLabel paymentText;
     private JButton paymentAddButton;
     private JButton paymentEditButton;
+    private JPanel cvvPanel;
+    private JLabel cvvLabel;
+    private JLabel cvvText;
+    private JButton cvvEnterButton;
     private JScrollPane pendingOrderScrollPanel;
     private JPanel pendingOrderItemsPanel;
     private JPanel pendingOrderCardPanel;
@@ -606,4 +690,5 @@ public class PendingOrderPage extends JFrame {
     private Order order;
     private boolean isPaymentExist;
     private boolean isAddressExist;
+    private boolean isCVVProvided;
 }
