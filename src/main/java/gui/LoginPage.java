@@ -72,6 +72,8 @@ public class LoginPage extends JFrame {
                     backButtonMouseClicked();
                     return "OK";
                 }
+            } else {
+                return "User is already logged in";
             }
 
         } catch (SQLException e) {

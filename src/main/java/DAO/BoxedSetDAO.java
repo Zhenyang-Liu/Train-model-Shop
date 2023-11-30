@@ -19,6 +19,12 @@ import model.Product;
 
 public class BoxedSetDAO extends ProductDAO {
 
+    /**
+     * Inserts a new boxed set into the database.
+     *
+     * @param set The BoxedSet object to insert.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static void insertBoxedSet(BoxedSet set) throws DatabaseException {
         String insertSQL = "INSERT INTO BoxedSet (product_id, pack_type) VALUES (?, ?);";
         int productID = insertProduct(set);
@@ -44,6 +50,12 @@ public class BoxedSetDAO extends ProductDAO {
         }
     }
 
+    /**
+     * Inserts items of a boxed set into the database.
+     *
+     * @param boxedSet The BoxedSet object whose items are to be inserted.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static void insertBoxedSetItems(BoxedSet boxedSet) throws DatabaseException{
         String insertSQL = "INSERT INTO BoxedSet_Item (boxed_set_id, item_id, quantity) VALUES (?, ?, ?);";
     
@@ -66,6 +78,12 @@ public class BoxedSetDAO extends ProductDAO {
         }
     }
 
+    /**
+     * Updates the details of an existing boxed set in the database.
+     *
+     * @param boxedSet The BoxedSet object to update.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static void updateBoxedSetItems(BoxedSet boxedSet) throws DatabaseException {
         ProductDAO.updateProduct(boxedSet);
         String updateSQL = "UPDATE BoxedSet SET pack_type = ? WHERE product_id = ?;";
@@ -86,6 +104,12 @@ public class BoxedSetDAO extends ProductDAO {
         }
     }
 
+    /**
+     * Deletes a boxed set from the database.
+     *
+     * @param productId The product ID of the boxed set to delete.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static void deleteBoxedSet(int productId) throws DatabaseException {
         String deleteSQL = "DELETE FROM BoxedSet WHERE product_id = ?;";
 
@@ -109,6 +133,12 @@ public class BoxedSetDAO extends ProductDAO {
         } 
     }
 
+    /**
+     * Deletes items of a specific boxed set from the database.
+     *
+     * @param productId The product ID of the items to delete.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static void deleteItem(int productId) throws DatabaseException{
         String deleteSQL = "DELETE FROM BoxedSet_Item WHERE item_id = ?;";
 
@@ -125,6 +155,12 @@ public class BoxedSetDAO extends ProductDAO {
         } 
     }
 
+    /**
+     * Deletes records of a boxed set from the database.
+     *
+     * @param productId The product ID of the boxed set whose records are to be deleted.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static void deleteRecord(int productId) throws DatabaseException {
         String deleteSQL = "DELETE FROM BoxedSet_Item WHERE boxed_set_id = ?;";
 
@@ -146,8 +182,13 @@ public class BoxedSetDAO extends ProductDAO {
         } 
     }
 
-
-
+    /**
+     * Finds a boxed set by its ID.
+     *
+     * @param setID The ID of the boxed set to find.
+     * @return The BoxedSet object found, or a new BoxedSet object if not found.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static BoxedSet findBoxedSetByID(int setID) throws DatabaseException {
         String selectSQL = "SELECT * FROM BoxedSet WHERE product_id = ?;";
         BoxedSet set = new BoxedSet();
@@ -171,6 +212,12 @@ public class BoxedSetDAO extends ProductDAO {
         return set;
     }
 
+    /**
+     * Finds the items of a specific boxed set.
+     *
+     * @param setID The ID of the boxed set whose items are to be found.
+     * @return A Map of Product to Integer representing the items and their quantities in the boxed set.
+     */
     public static Map<Product, Integer> findBoxedSetItem(int setID) {
         String selectSQL = "SELECT * FROM BoxedSet_Item WHERE boxed_set_id = ?;";
         Map<Product, Integer> contain = new HashMap<>();
@@ -223,6 +270,11 @@ public class BoxedSetDAO extends ProductDAO {
         return contain;
     }
 
+    /**
+     * Retrieves all boxed sets from the database.
+     *
+     * @return An ArrayList of BoxedSet objects.
+     */
     public static ArrayList<BoxedSet> findAllBoxedSet() {
         String selectSQL = "SELECT * FROM BoxedSet;";
         ArrayList<BoxedSet> setList = new ArrayList<>();
@@ -254,6 +306,12 @@ public class BoxedSetDAO extends ProductDAO {
         return setList;
     }
     
+    /**
+     * Retrieves boxed sets of a specific type from the database.
+     *
+     * @param type The type of boxed sets to retrieve.
+     * @return An ArrayList of BoxedSet objects of the specified type.
+     */
     public static ArrayList<BoxedSet> findBoxedSetByType(BoxedType type) {
         String selectSQL = "SELECT * FROM BoxedSet WHERE pack_type = ?;";
         ArrayList<BoxedSet> setList = new ArrayList<>();
@@ -284,6 +342,5 @@ public class BoxedSetDAO extends ProductDAO {
         }
         return setList;
     }
-
 
 }

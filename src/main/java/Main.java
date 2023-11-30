@@ -1,4 +1,4 @@
-package controller;
+
 import gui.MainPage;
 import helper.Logging;
 
@@ -8,13 +8,13 @@ import java.awt.event.WindowEvent;
 
 import DAO.DatabaseConnectionHandler;
 
-public class App {
+public class Main {
     public static void main(String[] args) {
         try{
             System.out.println("Welcome to TrainShop!");
-
             Logging.Init(false);
             // Create Main Page Object
+            // TODO: Make login load first!
             MainPage mainPage = new MainPage();
 
             mainPage.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -28,8 +28,6 @@ public class App {
             mainPage.setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
-        }finally{
-            Logging.Close();
         }
     }
 }

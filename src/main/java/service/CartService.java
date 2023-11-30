@@ -23,6 +23,15 @@ import model.Product;
 
 public class CartService {
 
+    /**
+     * Creates a new cart for the current user.
+     *
+     * This method first checks if the current user has permission to edit their own cart. 
+     * If the permission is granted, it creates a new cart for the user in the database. 
+     * Returns true if the cart is successfully created, or false if a DatabaseException occurs.
+     *
+     * @return true if the cart is successfully created; false otherwise.
+     */
     public static boolean createCart() {
         try {
             int userID = UserSession.getInstance().getCurrentUser().getUserID();
@@ -37,6 +46,7 @@ public class CartService {
             return false;
         }
     }
+
     /**
      * Adds a product to a specified cart.
      *
@@ -244,68 +254,90 @@ public class CartService {
      */
     public static int checkoutCart(int cartID) {
         try {
+            // Retrieve cart from database using the given cart ID
             Cart cart = CartDAO.findCartByID(cartID);
+
+            // Get the user ID of the cart holder
             int holderID = cart.getUserID();
-            if (!PermissionService.hasPermission(holderID,"EDIT_OWN_CART")){
+
+            // Check if the user has permission to edit their own cart
+            if (!PermissionService.hasPermission(holderID, "EDIT_OWN_CART")) {
                 throw new AuthorizationException("Access denied. Users can only access their own carts.");
             }
-            if (cart == null || cart.getUserID() ==-1 ) {
+
+            // Validate that the cart exists and is not empty
+            if (cart == null || cart.getUserID() == -1) {
                 throw new DatabaseException("Cart is empty or not exist.");
             }
-            
+
+            // Initialize maps and sets to track items and quantities
             Map<Product, Integer> itemList = new HashMap<>();
             Map<Product, Integer> checkList = new HashMap<>();
             Set<Integer> boxedSetList = new HashSet<>();
 
+            // Process each item in the cart
             for (CartItem item : cart.getCartItems()) {
                 String itemType = item.getItem().getProductType();
+
+                // Special handling for boxed sets (Train Set or Track Pack)
                 if ("Train Set".equals(itemType) || "Track Pack".equals(itemType)) {
                     BoxedSet set = BoxedSetDAO.findBoxedSetByID(item.getItem().getProductID());
-                    for (Map.Entry<Product,Integer> setItem : set.getContain().entrySet()){
-                        addProductToMap(checkList, setItem.getKey(), setItem.getValue()*item.getQuantity());
+                    for (Map.Entry<Product, Integer> setItem : set.getContain().entrySet()) {
+                        addProductToMap(checkList, setItem.getKey(), setItem.getValue() * item.getQuantity());
                         boxedSetList.add(setItem.getKey().getProductID());
                     }
                 } else {
+                    // Add regular items to the checkList
                     addProductToMap(checkList, item.getItem(), item.getQuantity());
                 }
+                // Record each item in the itemList
                 itemList.put(item.getItem(), item.getQuantity());
             }
 
-            // Check the Stock
-            if (!checkStock(checkList)){
-                return -1; // stock not enough
-            } 
-            
+            // Check if the stock is sufficient for the order
+            if (!checkStock(checkList)) {
+                return -1; // Stock not enough
+            }
+
             Map<Product, Integer> successList = new HashMap<>();
 
-            for (Map.Entry<Product,Integer> entry : checkList.entrySet()){
+            // Attempt to reduce stock for each product
+            for (Map.Entry<Product, Integer> entry : checkList.entrySet()) {
                 int productID = entry.getKey().getProductID();
                 int quantity = entry.getValue();
-                if (reduceStock(productID, quantity)){
+                if (reduceStock(productID, quantity)) {
                     successList.put(entry.getKey(), entry.getValue());
                 } else {
+                    // Restore stock in case of failure and exit
                     restoreStock(successList);
+                    return -1;
                 }
             }
 
+            // Update boxed set quantities
             Iterator<Integer> iterator = boxedSetList.iterator();
             while (iterator.hasNext()) {
                 int setID = iterator.next();
                 ProductService.updateBoxedSetQuantity(setID);
             }
-            
-            // Address ID is default to -1. This should be setted in confirmOrder(); 
+
+            // Create a new order with the collected items
             Order order = new Order(holderID, -1, itemList, false);
+
+            // Insert the order into the database and get the order ID
             int orderID = OrderDAO.insertOrder(order);
             if (orderID > 0) {
+                // Empty the cart if the order is successful
                 for (CartItem item : cart.getCartItems()) {
                     removeFromCart(item.getItemID());
                 }
                 return orderID;
             } else {
+                // Return -2 if order insertion fails
                 return -2;
             }
         } catch (DatabaseException e) {
+            // Handle any database exceptions and return -3
             ExceptionHandler.printErrorMessage(e);
             return -3;
         }

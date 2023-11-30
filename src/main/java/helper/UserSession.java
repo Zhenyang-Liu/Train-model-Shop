@@ -59,6 +59,5 @@ public class UserSession {
 
     // // when log out
     // UserSession.getInstance().clear();
-
 }
 

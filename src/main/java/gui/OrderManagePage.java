@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import model.Order;
 import model.User;
 import service.OrderService;
-import service.UserService;
 
 public class OrderManagePage extends JFrame {
     private JTable orderTable;
@@ -172,7 +171,7 @@ public class OrderManagePage extends JFrame {
     
         if ("Email".equals(searchType)) {
             for (Order order : currentList) {
-                User user = UserService.getUserInfo(order.getUserID());
+                User user = OrderService.getUserInfo(order.getUserID());
                 if (user != null && user.getEmail() != null && user.getEmail().contains(searchTerm)) {
                     filteredOrders.add(order);
                 }
@@ -233,7 +232,7 @@ public class OrderManagePage extends JFrame {
         
             switch (columnIndex) {
                 case 0: return order.getOrderID();
-                case 1: return UserService.getUserInfo(order.getUserID()).getEmail();
+                case 1: return OrderService.getUserInfo(order.getUserID()).getEmail();
                 case 2: return dateFormat.format(order.getCreateTime());
                 case 3: return dateFormat.format(order.getUpdateTime());
                 case 4: return String.format("\u00A3%.2f", order.getTotalCost());

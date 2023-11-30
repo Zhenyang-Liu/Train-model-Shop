@@ -52,6 +52,17 @@ public class EncryptionKeysDAO {
         return keyID;
     }
 
+    /**
+     * Inserts a user-key association into the database.
+     *
+     * This method creates a new entry in the User_Key table linking a specific user to a specific key.
+     * It ensures the association is successfully added to the database, throwing an exception if no rows are affected.
+     *
+     * @param userID The ID of the user.
+     * @param keyID The ID of the key to be associated with the user.
+     * @return The key ID if the operation is successful.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static int insertUserKey(int userID, int keyID) throws DatabaseException {
         String insertSQL = "INSERT INTO User_Key (user_id,key_id) VALUES (?,?);";
 
