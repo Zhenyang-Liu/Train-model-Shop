@@ -24,7 +24,7 @@ public class ProductManagePage extends JFrame {
     public ProductManagePage() {
         setTitle("Product Management");
         setSize(800, 600);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setLayout(new BorderLayout());
 
         currentTypeFilter = "All";
@@ -126,7 +126,7 @@ public class ProductManagePage extends JFrame {
     
         JScrollPane scrollPane = new JScrollPane(productTable);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
     
         productPanel.add(scrollPane, BorderLayout.CENTER);
     
