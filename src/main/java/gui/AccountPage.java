@@ -108,21 +108,9 @@ public class AccountPage extends JFrame {
 
             // Update values in DB
             boolean updatedUser = UserDAO.updateUser(user);
-            boolean updatePassword = false;
-            boolean updatedCard = false;
-            if (!password.equals(DEFAULT_PASSWORD)) {
-                try {
-                    LoginDAO.updateLoginDetails(userLogin);
-                    updatePassword = true;
-                } catch (SQLException e) {
-                    errorLabel.setText("Could not update password.");
-                }
-            } else {
-                updatePassword = true;
-            }
 
             // Update Messages
-            if (updatedUser && updatePassword && updatedCard) {
+            if (updatedUser) {
                 errorLabel.setText("");
                 successLabel.setText("Successfully updated user details!");
             } else {
