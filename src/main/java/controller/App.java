@@ -8,7 +8,7 @@ import java.awt.event.WindowEvent;
 
 import DAO.DatabaseConnectionHandler;
 
-public class Main {
+public class App {
     public static void main(String[] args) {
         try{
             System.out.println("Welcome to TrainShop!");

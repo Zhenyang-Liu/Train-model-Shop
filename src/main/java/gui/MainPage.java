@@ -52,10 +52,11 @@ public class MainPage extends JFrame implements ReloadListener {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         initComponents();
+        customizeComponents();
         f = new Filter();
         populateFilterBoxes();
         loadProducts();
-        customizeComponents();
+
         button_accountMouseClicked();
     }
 
@@ -64,11 +65,16 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     public void setButtonsByRole(){
+        System.out.println(PermissionService.hasPermission("ASSIGN_STAFF_ROLE"));
         if (PermissionService.hasPermission("ASSIGN_STAFF_ROLE")){
             button_manger.setVisible(true);
         } else if (PermissionService.hasPermission("MANAGE_ORDERS")) {
-            button_staff.setVisible(true);
+            button_staff_products.setVisible(true);
+            button_staff_orders.setVisible(true);
+        }else {
         }
+        leftButtonPanel.revalidate();
+        leftButtonPanel.repaint();
     }
 
     private void button_accountMouseClicked() {
@@ -77,6 +83,7 @@ public class MainPage extends JFrame implements ReloadListener {
                 LoginPage loginPage = new LoginPage();;
                 loginPage.setVisible(true);
                 loginPage.setLoginSuccessListener(this::loadProducts);
+                loginPage.setRoleButtonsListener(this::setButtonsByRole);
             } else {
                 int userID = UserSession.getInstance().getCurrentUser().getUserID();
                 AccountPage accountPage = new AccountPage(userID);
@@ -166,10 +173,10 @@ public class MainPage extends JFrame implements ReloadListener {
 
     private void populateBrandFilters(){
         ArrayList<String> toAdd = ProductDAO.findAllBrand();
-        filterBox4.addItem(f.new BrandFilter(null, "All"));
+        brandFilterBox.addItem(f.new BrandFilter(null, "All"));
         for(String b: toAdd)
-            filterBox4.addItem(f.new BrandFilter(b));
-        filterBox4.addItemListener(e -> {
+            brandFilterBox.addItem(f.new BrandFilter(b));
+        brandFilterBox.addItemListener(e -> {
             loadProducts();
         });
     }
@@ -187,9 +194,8 @@ public class MainPage extends JFrame implements ReloadListener {
         });
     }
 
-    private void button_staffMouseClicked(MouseEvent e) {
-        OrderManagePage orderManagePage = new OrderManagePage();
-        orderManagePage.setVisible(true);
+    private void button_accountMouseClicked(MouseEvent e) {
+        button_accountMouseClicked();
     }
 
     private void button_ordersMouseClicked(MouseEvent e) {
@@ -205,8 +211,19 @@ public class MainPage extends JFrame implements ReloadListener {
         }
     }
 
+    private void button_staff_productsMouseClicked(MouseEvent e) {
+        ProductManagePage productManagePage = new ProductManagePage();
+        productManagePage.setVisible(true);
+    }
+
+    private void button_staff_ordersMouseClicked(MouseEvent e) {
+        OrderManagePage orderManagePage = new OrderManagePage();
+        orderManagePage.setVisible(true);
+    }
+
     private void button_mangerMouseClicked(MouseEvent e) {
-        // TODO add your code here
+        ManagerPage managerPage = new ManagerPage();
+        managerPage.setVisible(true);
     }
 
     private void initComponents() {
@@ -217,7 +234,8 @@ public class MainPage extends JFrame implements ReloadListener {
         accountPanel = new JPanel();
         leftButtonPanel = new JPanel();
         button_account = new JButton();
-        button_staff = new JButton();
+        button_staff_products = new JButton();
+        button_staff_orders = new JButton();
         button_manger = new JButton();
         rightButtonPanel = new JPanel();
         button_cart = new JButton();
@@ -233,13 +251,13 @@ public class MainPage extends JFrame implements ReloadListener {
         mainPageSplitPane = new JSplitPane();
         filterPanel = new JPanel();
         sortLabel = new JLabel();
-        sortOptions = new JComboBox<>();
+        sortOptions = new JComboBox<>();;
         priceFilterLabel = new JLabel();
         priceFilterBox = new JComboBox<>();
         typeFilterLabel = new JLabel();
         typeFilterBox = new JComboBox<>();
         brandFilterLabel = new JLabel();
-        filterBox4 = new JComboBox<>();
+        brandFilterBox = new JComboBox<>();
         subTypeFilterLabel = new JLabel();
         subTypeFilterBox = new JComboBox<>();
         scrollPane1 = new JScrollPane();
@@ -275,70 +293,90 @@ public class MainPage extends JFrame implements ReloadListener {
 
                 //======== leftButtonPanel ========
                 {
-                    leftButtonPanel.setLayout(new BorderLayout());
+                    leftButtonPanel.setLayout(new FlowLayout());
 
                     //---- button_account ----
                     button_account.setIcon(new FlatSVGIcon("images/person_black_24dp.svg"));
                     button_account.setBackground(new Color(0xf2f2f2));
+                    button_account.setMargin(new Insets(2, 2, 2, 2));
                     button_account.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            button_accountMouseClicked();
+                            button_accountMouseClicked(e);
                         }
                     });
-                    leftButtonPanel.add(button_account, BorderLayout.WEST);
+                    leftButtonPanel.add(button_account);
 
-                    //---- button_staff ----
-                    button_staff.setIcon(new FlatSVGIcon("images/store_black_24dp.svg"));
-                    button_staff.setBackground(new Color(0xf2f2f2));
-                    button_staff.addMouseListener(new MouseAdapter() {
+                    //---- button_staff_products ----
+                    button_staff_products.setIcon(new FlatSVGIcon("images/store_black_24dp.svg"));
+                    button_staff_products.setBackground(new Color(0xf2f2f2));
+                    button_staff_products.setMargin(new Insets(2, 2, 2, 2));
+                    button_staff_products.setVisible(false);
+                    button_staff_products.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            button_staffMouseClicked(e);
+                            button_staff_productsMouseClicked(e);
                         }
                     });
-                    leftButtonPanel.add(button_staff, BorderLayout.CENTER);
+                    leftButtonPanel.add(button_staff_products);
+
+                    //---- button_staff_orders ----
+                    button_staff_orders.setIcon(new FlatSVGIcon("images/manageOrders_black_24dp.svg"));
+                    button_staff_orders.setBackground(new Color(0xf2f2f2));
+                    button_staff_orders.setMargin(new Insets(2, 2, 2, 2));
+                    button_staff_orders.setVisible(false);
+                    button_staff_orders.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            button_staff_ordersMouseClicked(e);
+                        }
+                    });
+                    leftButtonPanel.add(button_staff_orders);
 
                     //---- button_manger ----
                     button_manger.setIcon(new FlatSVGIcon("images/supervisor_account_black_24dp.svg"));
                     button_manger.setBackground(new Color(0xf2f2f2));
+                    button_manger.setMargin(new Insets(2, 2, 2, 2));
+                    button_manger.setVisible(false);
                     button_manger.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
                             button_mangerMouseClicked(e);
                         }
                     });
-                    leftButtonPanel.add(button_manger, BorderLayout.EAST);
+                    leftButtonPanel.add(button_manger);
                 }
                 accountPanel.add(leftButtonPanel, BorderLayout.WEST);
 
                 //======== rightButtonPanel ========
                 {
-                    rightButtonPanel.setLayout(new BorderLayout());
+                    rightButtonPanel.setLayout(new FlowLayout());
 
                     //---- button_cart ----
                     button_cart.setSelectedIcon(null);
                     button_cart.setIcon(new FlatSVGIcon("images/shopping_cart_black_24dp.svg"));
                     button_cart.setBackground(new Color(0xf2f2f2));
                     button_cart.setHorizontalAlignment(SwingConstants.RIGHT);
+                    button_cart.setMargin(new Insets(2, 2, 2, 2));
                     button_cart.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
                             button_cartMouseClicked(e);
                         }
                     });
-                    rightButtonPanel.add(button_cart, BorderLayout.LINE_START);
+                    rightButtonPanel.add(button_cart);
 
                     //---- button_orders ----
                     button_orders.setIcon(new FlatSVGIcon("images/assignment_black_24dp.svg"));
                     button_orders.setBackground(new Color(0xf2f2f2));
+                    button_orders.setMargin(new Insets(2, 2, 2, 2));
                     button_orders.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
                             button_ordersMouseClicked(e);
                         }
                     });
-                    rightButtonPanel.add(button_orders, BorderLayout.CENTER);
+                    rightButtonPanel.add(button_orders);
                 }
                 accountPanel.add(rightButtonPanel, BorderLayout.EAST);
             }
@@ -459,7 +497,7 @@ public class MainPage extends JFrame implements ReloadListener {
                 filterPanel.add(brandFilterLabel, new GridBagConstraints(0, 6, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
-                filterPanel.add(filterBox4, new GridBagConstraints(0, 7, 1, 1, 1.0, 0.0,
+                filterPanel.add(brandFilterBox, new GridBagConstraints(0, 7, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
 
@@ -613,7 +651,8 @@ public class MainPage extends JFrame implements ReloadListener {
     private JPanel accountPanel;
     private JPanel leftButtonPanel;
     private JButton button_account;
-    private JButton button_staff;
+    private JButton button_staff_products;
+    private JButton button_staff_orders;
     private JButton button_manger;
     private JPanel rightButtonPanel;
     private JButton button_cart;
@@ -629,15 +668,15 @@ public class MainPage extends JFrame implements ReloadListener {
     private JSplitPane mainPageSplitPane;
     private JPanel filterPanel;
     private JLabel sortLabel;
-    private JComboBox<Filter.SortBy> sortOptions;
+    private JComboBox sortOptions;
     private JLabel priceFilterLabel;
-    private JComboBox<Filter.PriceRange> priceFilterBox;
+    private JComboBox priceFilterBox;
     private JLabel typeFilterLabel;
-    private JComboBox<Filter.TypeFilter> typeFilterBox;
+    private JComboBox typeFilterBox;
     private JLabel brandFilterLabel;
-    private JComboBox<Filter.BrandFilter> filterBox4;
+    private JComboBox brandFilterBox;
     private JLabel subTypeFilterLabel;
-    private JComboBox<Enum> subTypeFilterBox;
+    private JComboBox subTypeFilterBox;
     private JScrollPane scrollPane1;
     private JPanel productPanel;
     private JPanel productCardPanel1;
@@ -680,7 +719,7 @@ public class MainPage extends JFrame implements ReloadListener {
             protected ArrayList<Product> doInBackground() throws Exception {
                 // Get products from the database in the background thread
                 Filter.PriceRange pr = (Filter.PriceRange)priceFilterBox.getSelectedItem();
-                Filter.BrandFilter br = (Filter.BrandFilter)filterBox4.getSelectedItem();
+                Filter.BrandFilter br = (Filter.BrandFilter)brandFilterBox.getSelectedItem();
                 Filter.SortBy sb = (Filter.SortBy)sortOptions.getSelectedItem();
                 Filter.TypeFilter tp = (Filter.TypeFilter)typeFilterBox.getSelectedItem();
                 return ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax(), br.getBrand(), sb.getDbHandle(), sb.isAscending(), tp.getDbTable());

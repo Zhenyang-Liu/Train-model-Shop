@@ -119,7 +119,7 @@ new FormModel {
 								"text": "Edit the payment"
 								"background": #Color3
 								"foreground": #Color4
-								"preferredSize": &Dimension4 new java.awt.Dimension( 140, 23 )
+								"preferredSize": new java.awt.Dimension( 140, 23 )
 								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "paymentEditButtonMouseClicked", true ) )
 							} )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
@@ -154,14 +154,6 @@ new FormModel {
 								"font": #SwingDerivedFont1
 								"preferredSize": #Dimension3
 								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "paymentAddButtonMouseClicked", true ) )
-							} )
-							add( new FormComponent( "javax.swing.JButton" ) {
-								name: "cvvEditButton"
-								"text": "Edit CVV"
-								"background": #Color3
-								"foreground": #Color4
-								"preferredSize": #Dimension4
-								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "paymentEditButtonMouseClicked", true ) )
 							} )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 							"hAlign": 2

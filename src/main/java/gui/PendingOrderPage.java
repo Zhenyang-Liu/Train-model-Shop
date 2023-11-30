@@ -152,7 +152,6 @@ public class PendingOrderPage extends JFrame {
         cvvLabel = new JLabel();
         cvvText = new JLabel();
         cvvEnterButton = new JButton();
-        cvvEditButton = new JButton();
         pendingOrderScrollPanel = new JScrollPane();
         pendingOrderItemsPanel = new JPanel();
         pendingOrderCardPanel = new JPanel();
@@ -330,19 +329,6 @@ public class PendingOrderPage extends JFrame {
                             }
                         });
                         cvvPanel.add(cvvEnterButton);
-
-                        //---- cvvEditButton ----
-                        cvvEditButton.setText("Edit CVV");
-                        cvvEditButton.setBackground(new Color(0x00a5f3));
-                        cvvEditButton.setForeground(new Color(0xe9e4e3));
-                        cvvEditButton.setPreferredSize(new Dimension(140, 23));
-                        cvvEditButton.addMouseListener(new MouseAdapter() {
-                            @Override
-                            public void mouseClicked(MouseEvent e) {
-                                paymentEditButtonMouseClicked(e);
-                            }
-                        });
-                        cvvPanel.add(cvvEditButton);
                     }
                     customerInfoPanel.add(cvvPanel, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
                         GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
@@ -642,7 +628,6 @@ public class PendingOrderPage extends JFrame {
     private JLabel cvvLabel;
     private JLabel cvvText;
     private JButton cvvEnterButton;
-    private JButton cvvEditButton;
     private JScrollPane pendingOrderScrollPanel;
     private JPanel pendingOrderItemsPanel;
     private JPanel pendingOrderCardPanel;

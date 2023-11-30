@@ -6,6 +6,7 @@ package gui;
 
 import helper.UserSession;
 import listeners.ReloadListener;
+import listeners.SetRoleButtons;
 import model.Login;
 import model.User;
 
@@ -30,8 +31,12 @@ public class LoginPage extends JFrame {
     }
 
     private ReloadListener loginSuccessListener;
+    private SetRoleButtons setRoleButtonsListener;
     public void setLoginSuccessListener(ReloadListener listener) {
         this.loginSuccessListener = listener;
+    }
+    public void setRoleButtonsListener(SetRoleButtons listener) {
+        this.setRoleButtonsListener = listener;
     }
 
     private void button_to_registerPageMouseClicked(MouseEvent e) {
@@ -58,6 +63,9 @@ public class LoginPage extends JFrame {
                     // Reload products for user
                     if (loginSuccessListener != null) {
                         loginSuccessListener.reloadProducts();
+                    }
+                    if (setRoleButtonsListener != null) {
+                        setRoleButtonsListener.setButtonsByRole();
                     }
 
                     // Return true as everything went successful

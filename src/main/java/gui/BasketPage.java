@@ -16,6 +16,7 @@ import javax.swing.event.ChangeListener;
 import exception.DatabaseException;
 import helper.Logging;
 import listeners.ReloadListener;
+import listeners.SetRoleButtons;
 import model.Cart;
 import model.CartItem;
 import model.Product;
@@ -29,9 +30,11 @@ import static DAO.OrderDAO.findOrderByID;
 public class BasketPage extends JFrame {
     private Cart cart;
     private ReloadListener reloadListener;
+
     public void setReloadListener(ReloadListener listener) {
         this.reloadListener = listener;
     }
+
 
     public BasketPage(int userID) {
         this.cart = CartService.getCartDetails(userID);
