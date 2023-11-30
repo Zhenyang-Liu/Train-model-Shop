@@ -13,6 +13,7 @@ import com.jgoodies.forms.factories.DefaultComponentFactory;
 import java.awt.*;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
+import java.util.HashMap;
 
 import exception.DatabaseException;
 import helper.Filter;
@@ -45,11 +46,12 @@ import java.util.ResourceBundle;
  */
 public class MainPage extends JFrame implements ReloadListener {
     private Filter f;
+    private HashMap<Integer, JPanel> productPanelCache; 
     public MainPage() {
 
         Logging.getLogger().info("Creating Main Page");
-
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.productPanelCache = new HashMap<>();
 
         initComponents();
         customizeComponents();
@@ -766,10 +768,13 @@ private void populateBrandFilters(){
                 boolean sfB = subTypeFilterBox.isVisible();
                 Filter.SubFilter sf2 = (Filter.SubFilter)subTypeFilterBox2.getSelectedItem();
                 boolean sfB2 = subTypeFilterBox2.isVisible();
-                return ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax(),
+                double bTime = System.nanoTime();
+                ArrayList<Product> r = ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax(),
                                         br.getBrand(), sb.getDbHandle(), sb.isAscending(), tp.getDbTable(),
                                             (sfB ? sf.toString() : ""), (sfB ? sf.getDbColumn() : ""),
                                                 (sfB2 ? sf2.toString() : ""), (sfB2 ? sf2.getDbColumn() : ""));
+                Logging.getLogger().info("TIMER: Took " + (System.nanoTime() - bTime) / 1e6 + "ms to search products");
+                return r;
             }
 
             @Override
@@ -780,12 +785,14 @@ private void populateBrandFilters(){
                     ArrayList<Product> productList = get();
                     // Updating the GUI with a Product List
                     for (Product product : productList) {
-                        // Create cards for each product
-                        JPanel productCard = createProductCard(product);
+                        // Add product panel to cache if it exists
+                        if(!productPanelCache.containsKey(product.getProductID())){
+                            productPanelCache.put(product.getProductID(), createProductCard(product));
+                        }
+                        JPanel productCard = productPanelCache.get(product.getProductID());
                         // Add the card to the container
                         productPanel.add(productCard);
                     }
-
                     productPanel.revalidate();
                     productPanel.repaint();
 
