@@ -25,12 +25,10 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import DAO.BankDetailDAO;
 import DAO.LoginDAO;
 import DAO.UserDAO;
 import exception.DatabaseException;
 import helper.Logging;
-import helper.UserSession;
 import model.BankDetail;
 import model.Login;
 import model.User;
@@ -53,6 +51,7 @@ public class AccountPage extends JFrame {
     private HashMap<String, JTextField> inputs;
     private User user;
     private Login userLogin;
+    private final String DEFAULT_PASSWORD = "CorrectPassword1?";
 
     /**
      * Instantiate object and create components for GUI
@@ -95,7 +94,6 @@ public class AccountPage extends JFrame {
         if (password.equals("")) 
             password = defaultPassword;
 
-
         // Validate inputs
         String error = RegistrationPage.checkInputs(email, forename, surname, password, password);
         if (!error.equals("OK")) {
@@ -105,14 +103,14 @@ public class AccountPage extends JFrame {
             user.setEmail(email);
             user.setForename(forename);
             user.setSurname(surname);
-            // userBankDetails.setExpiryDate(expiryDate);
             if (!password.equals(defaultPassword))
                 userLogin.setPassword(password);
 
             // Update values in DB
             boolean updatedUser = UserDAO.updateUser(user);
             boolean updatePassword = false;
-            if (!password.equals(defaultPassword)) {
+            boolean updatedCard = false;
+            if (!password.equals(DEFAULT_PASSWORD)) {
                 try {
                     LoginDAO.updateLoginDetails(userLogin);
                     updatePassword = true;
@@ -123,7 +121,7 @@ public class AccountPage extends JFrame {
                 updatePassword = true;
             }
             // Update Messages
-            if (updatedUser && updatePassword) {
+            if (updatedUser && updatePassword && updatedCard) {
                 errorLabel.setText("");
                 successLabel.setText("Successfully updated user details!");
             } else {
