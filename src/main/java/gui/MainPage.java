@@ -771,8 +771,8 @@ private void populateBrandFilters(){
                 double bTime = System.nanoTime();
                 ArrayList<Product> r = ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax(),
                                         br.getBrand(), sb.getDbHandle(), sb.isAscending(), tp.getDbTable(),
-                                            (sfB ? sf.toString() : ""), (sfB ? sf.getDbColumn() : ""),
-                                                (sfB2 ? sf2.toString() : ""), (sfB2 ? sf2.getDbColumn() : ""));
+                                            (sf != null ? sf.toString() : ""), (sf != null ? sf.getDbColumn() : ""),
+                                                (sf2 != null ? sf2.toString() : ""), (sf2 != null ? sf2.getDbColumn() : ""));
                 Logging.getLogger().info("TIMER: Took " + (System.nanoTime() - bTime) / 1e6 + "ms to search products");
                 return r;
             }
