@@ -7,9 +7,14 @@ import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
 
+import javax.swing.JFrame;
+
 import exception.ConnectionException;
 import exception.DatabaseException;
+import gui.AccountPage;
+import gui.ProductPage;
 import helper.Logging;
+import helper.UserSession;
 import model.Controller;
 import model.Product;
 
