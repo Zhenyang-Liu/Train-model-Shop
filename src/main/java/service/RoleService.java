@@ -75,10 +75,12 @@ public class RoleService {
             }
             Map<User,String> list = new LinkedHashMap<>();
             ArrayList<User> users = UserDAO.findAllUser();
-
+    
             for (User user : users) {
                 String role = AuthenticationDAO.findRoleByID(user.getUserID());
-                list.put(user, role);
+                if (role != null) { 
+                    list.put(user, role);
+                }
             }
             return list;
         } catch (DatabaseException e) {
@@ -86,7 +88,7 @@ public class RoleService {
             return null;
         }
     }
-
+    
     /**
      * Retrieves a specific user with their role.
      *

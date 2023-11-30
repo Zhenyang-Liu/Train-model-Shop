@@ -1,5 +1,6 @@
-package controller;
+
 import gui.MainPage;
+import helper.Logging;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -11,8 +12,9 @@ public class Main {
     public static void main(String[] args) {
         try{
             System.out.println("Welcome to TrainShop!");
-
+            Logging.Init(false);
             // Create Main Page Object
+            // TODO: Make login load first!
             MainPage mainPage = new MainPage();
 
             mainPage.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -20,6 +22,7 @@ public class Main {
                 @Override
                 public void windowClosing(WindowEvent e) {
                     DatabaseConnectionHandler.shutdown();
+                    Logging.Close();
                 }
             });
             mainPage.setVisible(true);

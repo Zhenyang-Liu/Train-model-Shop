@@ -5,13 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
-
-import java.util.ArrayList;
-import java.util.Collections;
+import helper.Logging;
 
 public class EraDAO {
     
@@ -36,12 +36,11 @@ public class EraDAO {
 
             int[] batchResults = preparedStatement.executeBatch();
             
-            // print to Test
             for (int i = 0; i < batchResults.length; i++) {
                 if (batchResults[i] == PreparedStatement.EXECUTE_FAILED) {
-                    System.err.println("Insert operation failed for record at index " + i);
+                    Logging.getLogger().warning("Insert operation failed for record at index " + i);
                 } else {
-                    System.out.println("Insert operation succeeded for record at index " + i);
+                    Logging.getLogger().info("Insert operation succeeded for record at index " + i);
                 }
             }
 
@@ -83,7 +82,7 @@ public class EraDAO {
      * @return An array of era codes associated with the product.
      * @throws DatabaseException If a database error occurs.
      */
-    public static int[] findEraByID(int productID) throws DatabaseException {
+    public static int[] findEraByID(int productID) {
         String selectSQL = "SELECT era_code FROM ProductEra WHERE product_id = ?;";
         List<Integer> eraList = new ArrayList<>();
         
@@ -97,10 +96,12 @@ public class EraDAO {
                     eraList.add(eraCode);
                 }
             }
-        } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLTimeoutException e) {
+            Logging.getLogger().warning("Error when finding eras for product: " + productID + 
+                "SQL Timed out\n Stacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding eras for product: " + productID + 
+                "SQL Excepted :0\nStacktrace: " + e.getMessage());
         }
 
         int[] era = eraList.stream().mapToInt(Integer::intValue).toArray();
@@ -114,7 +115,7 @@ public class EraDAO {
      * @return An array of product IDs associated with the era codes.
      * @throws DatabaseException If a database error occurs.
      */
-    public static int[] findIDByEra(int[] eraList) throws DatabaseException {
+    public static int[] findIDByEra(int[] eraList) {
         String selectSQL = "SELECT DISTINCT product_id FROM ProductEra WHERE era_code IN (" + 
                                       String.join(",", Collections.nCopies(eraList.length, "?")) + ")";
         List<Integer> productIDs = new ArrayList<>();
@@ -132,13 +133,84 @@ public class EraDAO {
                     productIDs.add(productID);
                 }
             }
-        } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLTimeoutException e) {
+            Logging.getLogger().warning("Error when finding products for eras:" + 
+                "SQL Timed out\n Stacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding products for eras:" + 
+                "SQL Excepted :0\nStacktrace: " + e.getMessage());
         }
 
         int[] idList = productIDs.stream().mapToInt(Integer::intValue).toArray();
         return idList;
     }
+
+    /**
+     * Retrieves a list of all era descriptions in the database, sorted by era code.
+     *
+     * This method queries the Era table and extracts the description of each era,
+     * returning a list of these descriptions ordered by era code.
+     * It logs a warning and throws an exception in case of SQL timeouts or other SQL exceptions.
+     *
+     * @return An ArrayList of Strings containing descriptions of each era.
+     * @throws DatabaseException If a database error occurs.
+     */
+    public static ArrayList<String> findAllEraDescription() throws DatabaseException {
+        String selectSQL = "SELECT description FROM Era ORDER BY era_code ASC;";
+        ArrayList<String> eraDescriptions = new ArrayList<>();
+    
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+    
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String description = resultSet.getString("description");
+                    eraDescriptions.add(description);
+                }
+            }
+        } catch (SQLTimeoutException e) {
+            Logging.getLogger().warning("Error when finding era descriptions: SQL Timed out\n Stacktrace: " + e.getMessage());
+            throw new DatabaseException("SQL Timeout Exception occurred", e);
+        } catch (SQLException e) {
+            Logging.getLogger().warning("Error when finding era descriptions: SQL Exception\nStacktrace: " + e.getMessage());
+            throw new DatabaseException("SQL Exception occurred", e);
+        }
+    
+        return eraDescriptions;
+    }
+
+    /**
+     * Retrieves the description of a specific era based on its era code.
+     *
+     * This method queries the Era table for the description corresponding to the provided era code.
+     * It logs a warning and throws an exception in case of SQL timeouts or other SQL exceptions.
+     *
+     * @param eraCode The era code for which the description is being retrieved.
+     * @return A String containing the description of the specified era, or an empty string if not found.
+     * @throws DatabaseException If a database error occurs.
+     */
+    public static String findDescriptionByCode(int eraCode) throws DatabaseException {
+        String selectSQL = "SELECT description FROM Era WHERE era_code = ?;";
+        String eraDescription = "";
+    
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+    
+            preparedStatement.setInt(1, eraCode); // 设置 era_code 参数
+    
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    eraDescription = resultSet.getString("description");
+                }
+            }
+        } catch (SQLTimeoutException e) {
+            Logging.getLogger().warning("Error when finding era description: SQL Timed out\n Stacktrace: " + e.getMessage());
+            throw new DatabaseException("SQL Timeout Exception occurred", e);
+        } catch (SQLException e) {
+            Logging.getLogger().warning("Error when finding era description: SQL Exception\nStacktrace: " + e.getMessage());
+            throw new DatabaseException("SQL Exception occurred", e);
+        }
+        return eraDescription;
+    }
+    
 }

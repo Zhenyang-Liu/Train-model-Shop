@@ -5,7 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import model.*;
+import helper.Logging;
+import model.Login;
 
 public class LoginDAO{
     /**
@@ -22,7 +23,7 @@ public class LoginDAO{
             PreparedStatement preparedStatement = connection.prepareStatement(stmt)) {
 
             if(doesLoginExist(login.getUserID())){
-                System.out.println("Login information for this user " + login.getUserID() + " already exists in the database.");
+                Logging.getLogger().warning("Login information for this user " + login.getUserID() + " already exists in the database.");
                 return false;
             }
             preparedStatement.setInt(1, login.getUserID());
@@ -53,7 +54,7 @@ public class LoginDAO{
             "last_login_attempt = ?, lockout_enabled = ?, lockout_end = ? WHERE user_id = ?";
 
         if(!doesLoginExist(login.getUserID())){
-            System.out.println("No login exists in the database with the given userID.");
+            Logging.getLogger().warning("No login exists in the database with the given userID " + login.getUserID());
             return false;
         }
 
@@ -111,7 +112,6 @@ public class LoginDAO{
             return login;
 
         } catch (SQLException e) {
-            e.printStackTrace();
             throw e;
         }
     }
@@ -128,7 +128,7 @@ public class LoginDAO{
             Login dbLoginDetails = findLoginByUserID(userID);
             return dbLoginDetails.getPasswordHash().equals(passwordhash);
         } catch(SQLException e){
-            e.printStackTrace();
+            Logging.getLogger().warning("Error while checking password for user " + userID + "\nStacktrace: " + e.getMessage());
             return false;
         }
     }
@@ -144,7 +144,7 @@ public class LoginDAO{
             return deleteFromGenericID("DELETE FROM login WHERE user_id = ?", userID);
         }
         catch(SQLException e){
-            e.printStackTrace();
+            Logging.getLogger().warning("Error while deleting login details for user " + userID + "\nStacktrace: " + e.getMessage());
             return false;
         }
     }
@@ -160,7 +160,7 @@ public class LoginDAO{
             return deleteFromGenericID("DELETE FROM Login WHERE login_id = ?", loginID);
         }
         catch(SQLException e){
-            e.printStackTrace();
+            Logging.getLogger().warning("Error while checking password for login id " + loginID + "\nStacktrace: " + e.getMessage());
             return false;
         }
     }
@@ -203,10 +203,10 @@ public class LoginDAO{
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.getLogger().warning("Error while checking login exists for user " + userID + "\nStacktrace: " + e.getMessage());
             throw e;
         }
         return false;
-        }
     }
+}
 

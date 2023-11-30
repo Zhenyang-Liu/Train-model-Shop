@@ -6,20 +6,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
-
-import java.util.HashMap;
-import java.util.ArrayList;
-
+import helper.Logging;
 import model.BoxedSet;
-import model.Product;
 import model.BoxedSet.BoxedType;
+import model.Product;
 
 public class BoxedSetDAO extends ProductDAO {
 
+    /**
+     * Inserts a new boxed set into the database.
+     *
+     * @param set The BoxedSet object to insert.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static void insertBoxedSet(BoxedSet set) throws DatabaseException {
         String insertSQL = "INSERT INTO BoxedSet (product_id, pack_type) VALUES (?, ?);";
         int productID = insertProduct(set);
@@ -45,6 +50,12 @@ public class BoxedSetDAO extends ProductDAO {
         }
     }
 
+    /**
+     * Inserts items of a boxed set into the database.
+     *
+     * @param boxedSet The BoxedSet object whose items are to be inserted.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static void insertBoxedSetItems(BoxedSet boxedSet) throws DatabaseException{
         String insertSQL = "INSERT INTO BoxedSet_Item (boxed_set_id, item_id, quantity) VALUES (?, ?, ?);";
     
@@ -67,6 +78,12 @@ public class BoxedSetDAO extends ProductDAO {
         }
     }
 
+    /**
+     * Updates the details of an existing boxed set in the database.
+     *
+     * @param boxedSet The BoxedSet object to update.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static void updateBoxedSetItems(BoxedSet boxedSet) throws DatabaseException {
         ProductDAO.updateProduct(boxedSet);
         String updateSQL = "UPDATE BoxedSet SET pack_type = ? WHERE product_id = ?;";
@@ -87,6 +104,12 @@ public class BoxedSetDAO extends ProductDAO {
         }
     }
 
+    /**
+     * Deletes a boxed set from the database.
+     *
+     * @param productId The product ID of the boxed set to delete.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static void deleteBoxedSet(int productId) throws DatabaseException {
         String deleteSQL = "DELETE FROM BoxedSet WHERE product_id = ?;";
 
@@ -99,9 +122,9 @@ public class BoxedSetDAO extends ProductDAO {
             
             if (rowsAffected > 0) {
                 ProductDAO.deleteProduct(productId);
-                System.out.println("BoxedSet with ID " + productId + " was deleted successfully.");
+                Logging.getLogger().info("BoxedSet with ID " + productId + " was deleted successfully.");
             } else {
-                System.out.println("No set was found with ID " + productId + " to delete.");
+                Logging.getLogger().warning("No set was found with ID " + productId + " to delete.");
             }
         } catch (SQLTimeoutException e) {
             throw new ConnectionException("Database connect failed",e);
@@ -110,7 +133,35 @@ public class BoxedSetDAO extends ProductDAO {
         } 
     }
 
+    /**
+     * Deletes items of a specific boxed set from the database.
+     *
+     * @param productId The product ID of the items to delete.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static void deleteItem(int productId) throws DatabaseException{
+        String deleteSQL = "DELETE FROM BoxedSet_Item WHERE item_id = ?;";
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
+            preparedStatement.setInt(1, productId);
+
+            preparedStatement.executeUpdate();
+            
+        } catch (SQLTimeoutException e) {
+            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(),e);
+        } 
+    }
+
+    /**
+     * Deletes records of a boxed set from the database.
+     *
+     * @param productId The product ID of the boxed set whose records are to be deleted.
+     * @throws DatabaseException if there is an issue with database access.
+     */
+    public static void deleteRecord(int productId) throws DatabaseException {
         String deleteSQL = "DELETE FROM BoxedSet_Item WHERE boxed_set_id = ?;";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -120,9 +171,9 @@ public class BoxedSetDAO extends ProductDAO {
             int rowsAffected = preparedStatement.executeUpdate();
             
             if (rowsAffected > 0) {
-                System.out.println("Item of set with ID " + productId + " was deleted successfully.");
+                Logging.getLogger().info("Item of set with ID " + productId + " was deleted successfully.");
             } else {
-                System.out.println("No item was found in set ID " + productId + " to delete.");
+                Logging.getLogger().warning("No item was found in set ID " + productId + " to delete.");
             }
         } catch (SQLTimeoutException e) {
             throw new ConnectionException("Database connect failed",e);
@@ -131,6 +182,13 @@ public class BoxedSetDAO extends ProductDAO {
         } 
     }
 
+    /**
+     * Finds a boxed set by its ID.
+     *
+     * @param setID The ID of the boxed set to find.
+     * @return The BoxedSet object found, or a new BoxedSet object if not found.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static BoxedSet findBoxedSetByID(int setID) throws DatabaseException {
         String selectSQL = "SELECT * FROM BoxedSet WHERE product_id = ?;";
         BoxedSet set = new BoxedSet();
@@ -140,11 +198,11 @@ public class BoxedSetDAO extends ProductDAO {
             preparedStatement.setInt(1, setID);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+            if (resultSet.next()) {
+                int productID = resultSet.getInt("product_id");
+                Product newProduct = ProductDAO.findProductByID(productID);
                 String newType = resultSet.getString("pack_type");
-                set = new BoxedSet(newProduct,newType,findBoxedSetItem(productId));
+                set = new BoxedSet(newProduct,newType,findBoxedSetItem(productID));
             }
         } catch (SQLTimeoutException e) {
             throw new ConnectionException("Database connect failed",e);
@@ -154,7 +212,13 @@ public class BoxedSetDAO extends ProductDAO {
         return set;
     }
 
-    public static Map<Product, Integer> findBoxedSetItem(int setID) throws DatabaseException {
+    /**
+     * Finds the items of a specific boxed set.
+     *
+     * @param setID The ID of the boxed set whose items are to be found.
+     * @return A Map of Product to Integer representing the items and their quantities in the boxed set.
+     */
+    public static Map<Product, Integer> findBoxedSetItem(int setID) {
         String selectSQL = "SELECT * FROM BoxedSet_Item WHERE boxed_set_id = ?;";
         Map<Product, Integer> contain = new HashMap<>();
 
@@ -166,10 +230,16 @@ public class BoxedSetDAO extends ProductDAO {
             while (resultSet.next()) {
                 int itemID = resultSet.getInt("item_id");
                 int quantity = resultSet.getInt("quantity");
-
-                Product item = ProductDAO.findProductByID(itemID);
-
-                switch (item.getProductType()) {
+                Product item = null;
+                try{
+                    item = ProductDAO.findProductByID(itemID);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error finding item" + itemID + " when getting items for box set " +
+                        setID + "\nStacktrace: " + e.getMessage());
+                    continue;
+                }
+                try{
+                    switch (item.getProductType()) {
                     case "Track":
                         contain.put(TrackDAO.findTrackByID(itemID), quantity);
                         break;
@@ -182,17 +252,30 @@ public class BoxedSetDAO extends ProductDAO {
                     case "Rolling Stock":
                         contain.put(RollingStockDAO.findProductByID(itemID), quantity);
                         break;
-                }              
+                    case "Track Pack":
+                        contain.put(BoxedSetDAO.findBoxedSetByID(itemID),quantity);
+                        break;
+                } 
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Could not find " + item.getProductType() + " for itemID " + itemID + 
+                        "\nStacktrace: " + e.getMessage());
+                }
+                             
             }
         } catch (SQLTimeoutException e) {
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding items for box set " + setID + " SQL Timeout\nStacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding items for box set " + setID + " SQL Excepted\nStacktrace: " + e.getMessage());
         }
         return contain;
     }
 
-    public static ArrayList<BoxedSet> findAllBoxedSet() throws DatabaseException {
+    /**
+     * Retrieves all boxed sets from the database.
+     *
+     * @return An ArrayList of BoxedSet objects.
+     */
+    public static ArrayList<BoxedSet> findAllBoxedSet() {
         String selectSQL = "SELECT * FROM BoxedSet;";
         ArrayList<BoxedSet> setList = new ArrayList<>();
 
@@ -202,22 +285,34 @@ public class BoxedSetDAO extends ProductDAO {
 
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+                Product newProduct = null;
+                try{
+                    newProduct = ProductDAO.findProductByID(productId);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding all boxed sets: could not find product " + productId + "\n Stacktrace: " + e.getMessage());
+                    continue;
+                }
+                
                 String newType = resultSet.getString("pack_type");
                 
                 BoxedSet set = new BoxedSet(newProduct,newType,findBoxedSetItem(productId));
                 setList.add(set);
             }
-            return setList;
-
         } catch (SQLTimeoutException e) {
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error getting all boxed sets: SQL Timed out\n Stacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error getting all boxed sets: SQL Exception\nStacktrace: " + e.getMessage());
         }
+        return setList;
     }
     
-    public static ArrayList<BoxedSet> findBoxedSetByType(BoxedType type) throws DatabaseException {
+    /**
+     * Retrieves boxed sets of a specific type from the database.
+     *
+     * @param type The type of boxed sets to retrieve.
+     * @return An ArrayList of BoxedSet objects of the specified type.
+     */
+    public static ArrayList<BoxedSet> findBoxedSetByType(BoxedType type) {
         String selectSQL = "SELECT * FROM BoxedSet WHERE pack_type = ?;";
         ArrayList<BoxedSet> setList = new ArrayList<>();
 
@@ -228,20 +323,24 @@ public class BoxedSetDAO extends ProductDAO {
 
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+                Product newProduct = null;
+                try{
+                    newProduct = ProductDAO.findProductByID(productId);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding all boxed sets with type " + type + ": could not find product " + productId + "\n Stacktrace: " + e.getMessage());
+                    continue;
+                }
                 String newType = resultSet.getString("pack_type");
                 
                 BoxedSet set = new BoxedSet(newProduct,newType,findBoxedSetItem(productId));
                 setList.add(set);
             }
-            return setList;
-
         } catch (SQLTimeoutException e) {
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error getting boxed sets with type" + type + ": SQL Timed out\n Stacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error getting boxed sets with type" + type + ": SQL Exception\nStacktrace: " + e.getMessage());
         }
+        return setList;
     }
-
 
 }

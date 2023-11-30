@@ -1,6 +1,7 @@
 package model;
 
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Map;
@@ -15,6 +16,7 @@ public class Order {
     private OrderStatus status;
     private final Map<Product,Integer> itemList;
     private boolean validBankDetail;
+    private String reason;
 
     public interface OrderState {
         public void nextState(Order order);
@@ -36,6 +38,12 @@ public class Order {
         },
 
         FULFILLED("Fulfilled") {
+            @Override
+            public void nextState(Order order) {
+            }
+        },
+
+        CANCELLED("Cancelled"){
             @Override
             public void nextState(Order order) {
             }
@@ -61,7 +69,7 @@ public class Order {
         }
     }
     
-    public Order(int orderID, int userID, int addressID, Timestamp createTime, Timestamp updateTime, double totalCost, String status, Map<Product, Integer> itemList, boolean validBankDetail) {
+    public Order(int orderID, int userID, int addressID, Timestamp createTime, Timestamp updateTime, double totalCost, String status, Map<Product, Integer> itemList, boolean validBankDetail, String reason) {
         this.orderID = orderID;
         this.userID = userID;
         this.addressID = addressID;
@@ -71,6 +79,7 @@ public class Order {
         this.status = OrderStatus.fromName(status);
         this.itemList = itemList;
         this.validBankDetail = validBankDetail;
+        this.reason = reason;
     }
 
     public Order(int userID, int addressID, Map<Product, Integer> itemList, boolean validBankDetail) {
@@ -145,7 +154,10 @@ public class Order {
         for (Map.Entry<Product, Integer> entry : itemList.entrySet()) {
             total += entry.getKey().getRetailPrice() * entry.getValue();
         }
-        return total;
+        DecimalFormat decimalFormat = new DecimalFormat("#.00");
+        String formattedTotal = decimalFormat.format(total);
+        
+        return Double.parseDouble(formattedTotal);
     }
 
     public OrderStatus getStatus() {
@@ -178,6 +190,14 @@ public class Order {
 
     public void setBankDetailState(boolean validBankDetail) {
         this.validBankDetail = validBankDetail;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
 }

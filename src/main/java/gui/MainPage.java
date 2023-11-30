@@ -4,6 +4,7 @@
 
 package gui;
 
+import DAO.DatabaseConnectionHandler;
 import DAO.ProductDAO;
 import DAO.UserDAO;
 
@@ -12,35 +13,52 @@ import com.jgoodies.forms.factories.DefaultComponentFactory;
 import java.awt.*;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
+import java.util.HashMap;
+
 import exception.DatabaseException;
 import helper.Filter;
+import helper.ImageUtils;
+import helper.Logging;
 import helper.UserSession;
 import listeners.ReloadListener;
 import model.*;
 import model.Locomotive.DCCType;
 import service.CartService;
+import service.PermissionService;
 
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 /**
  * @author Zhenyang Liu
+ * @author Julian Jones
+ * @author Joe Paton
+ * @author Jiawei Jiang
  */
 public class MainPage extends JFrame implements ReloadListener {
     private Filter f;
+    private HashMap<Integer, JPanel> productPanelCache; 
     public MainPage() {
+
+        Logging.getLogger().info("Creating Main Page");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.productPanelCache = new HashMap<>();
 
         initComponents();
+        customizeComponents();
         f = new Filter();
         populateFilterBoxes();
         loadProducts();
-        customizeComponents();
+
         button_accountMouseClicked();
     }
 
@@ -48,15 +66,28 @@ public class MainPage extends JFrame implements ReloadListener {
         loadProducts();
     }
 
+    public void setButtonsByRole(){
+        if (PermissionService.hasPermission("ASSIGN_STAFF_ROLE")){
+            button_manger.setVisible(true);
+        } else if (PermissionService.hasPermission("MANAGE_ORDERS")) {
+            button_staff_products.setVisible(true);
+            button_staff_orders.setVisible(true);
+        }else {
+        }
+        leftButtonPanel.revalidate();
+        leftButtonPanel.repaint();
+    }
+
     private void button_accountMouseClicked() {
-        System.out.println("Logged in: " + UserSession.getInstance().isLoggedIn());
         SwingUtilities.invokeLater(() -> {
             if (!UserSession.getInstance().isLoggedIn()) {
                 LoginPage loginPage = new LoginPage();;
                 loginPage.setVisible(true);
                 loginPage.setLoginSuccessListener(this::loadProducts);
+                loginPage.setRoleButtonsListener(this::setButtonsByRole);
             } else {
-                AccountPage accountPage = new AccountPage();
+                int userID = UserSession.getInstance().getCurrentUser().getUserID();
+                AccountPage accountPage = new AccountPage(userID);
                 accountPage.setVisible(true);
             }
         });
@@ -94,23 +125,32 @@ public class MainPage extends JFrame implements ReloadListener {
 
     private void populateSubFilters(){
         subTypeFilterBox.removeAllItems();
+        subTypeFilterBox2.removeAllItems();
         String table = ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).getDbTable();
         subTypeFilterBox.setVisible(true);
         subTypeFilterLabel.setVisible(true);
-        if(table.equals("Locomotive")){
-            subTypeFilterLabel.setText("DCC Type");
-            subTypeFilterBox.addItem(DCCType.ANALOGUE);
-            subTypeFilterBox.addItem(DCCType.FITTED);
-            subTypeFilterBox.addItem(DCCType.READY);
-            subTypeFilterBox.addItem(DCCType.SOUND);
-        }else if(table.equals("Track")){
+        subTypeFilterBox2.setVisible(true);
+        subTypeFilterLabel2.setVisible(true);
+        if(table.equals("Track") || table.equals("Locomotive")){
             subTypeFilterLabel.setText("Gauge");
-            subTypeFilterBox.addItem(Gauge.OO);
-            subTypeFilterBox.addItem(Gauge.TT);
-            subTypeFilterBox.addItem(Gauge.N);
+            subTypeFilterBox.addItem(f.new SubFilter<String>("All", ""));
+            subTypeFilterBox.addItem(f.new SubFilter<Gauge>(Gauge.OO, "gauge"));
+            subTypeFilterBox.addItem(f.new SubFilter<Gauge>(Gauge.TT, "gauge"));
+            subTypeFilterBox.addItem(f.new SubFilter<Gauge>(Gauge.N, "gauge"));
         }else{
             subTypeFilterBox.setVisible(false);
             subTypeFilterLabel.setVisible(false);
+        }
+        if(table.equals("Locomotive")){
+            subTypeFilterLabel2.setText("DCC Type");
+            subTypeFilterBox2.addItem(f.new SubFilter<String>("All", ""));
+            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.ANALOGUE, "dcc_type"));
+            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.FITTED, "dcc_type"));
+            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.READY, "dcc_type"));
+            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.SOUND, "dcc_type"));
+        }else{
+            subTypeFilterBox2.setVisible(false);
+            subTypeFilterLabel2.setVisible(false);
         }
     }
 
@@ -121,7 +161,6 @@ public class MainPage extends JFrame implements ReloadListener {
         typeFilterBox.addItem(f.new TypeFilter("BoxedSet", "Box Sets", "pack_type"));
 
         typeFilterBox.addItemListener(e -> {
-            System.out.println("Loading filters: " + e.getItem().toString());
             populateSubFilters();
             loadProducts();
         });
@@ -129,33 +168,35 @@ public class MainPage extends JFrame implements ReloadListener {
             ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).setSubFilter(e.getItem().toString());
             loadProducts();
         });
+        subTypeFilterBox2.addItemListener(e -> {
+            ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).setSubFilter(e.getItem().toString());
+            loadProducts();
+        });
     }
 
     private void populateSortOptions(){
-        sortOptions.addItem(f.new SortBy("None", ""));
-        sortOptions.addItem(f.new SortBy("Price", "retail_price"));
-        sortOptions.addItem(f.new SortBy("Name", "product_name"));
-        sortOptions.addItem(f.new SortBy("Price", "retail_price", false));
-        sortOptions.addItem(f.new SortBy("Name", "product_name", false));
+        sortOptions.addItem(f.new SortBy("Name (asc)", "product_name"));
+        sortOptions.addItem(f.new SortBy("Name (desc)", "product_name", false));
+        sortOptions.addItem(f.new SortBy("Price (asc)", "retail_price"));
+        sortOptions.addItem(f.new SortBy("Price (desc)", "retail_price", false));
 
         sortOptions.addItemListener(e -> {
             loadProducts();
         });
     }
 
-    private void populateBrandFilters(){
+private void populateBrandFilters(){
         ArrayList<String> toAdd = ProductDAO.findAllBrand();
-        filterBox4.addItem(f.new BrandFilter(null, "All"));
+        brandFilterBox.addItem(f.new BrandFilter(null, "All"));
         for(String b: toAdd)
-            filterBox4.addItem(f.new BrandFilter(b));
-        filterBox4.addItemListener(e -> {
+            brandFilterBox.addItem(f.new BrandFilter(b));
+        brandFilterBox.addItemListener(e -> {
             loadProducts();
         });
     }
 
     private void populateFilterBoxes()
     {
-        System.out.println("Filter boxes");
         populatePriceRangeFilters();
         populateBrandFilters();
         populateSortOptions();
@@ -167,14 +208,54 @@ public class MainPage extends JFrame implements ReloadListener {
         });
     }
 
+
+    private void button_ordersMouseClicked(MouseEvent e) {
+        User currentUser = UserSession.getInstance().getCurrentUser();
+
+        if (currentUser != null) {
+            OrderHistory ordersPage = new OrderHistory();
+            ordersPage.setVisible(true);
+        } else {
+            // USER NOT LOGIN
+            LoginPage loginPage = new LoginPage();
+            loginPage.setVisible(true);
+        }
+    }
+
+    private void button_staff_productsMouseClicked(MouseEvent e) {
+        ProductManagePage productManagePage = new ProductManagePage();
+        productManagePage.setVisible(true);
+    }
+
+    private void button_staff_ordersMouseClicked(MouseEvent e) {
+        OrderManagePage orderManagePage = new OrderManagePage();
+        orderManagePage.setVisible(true);
+    }
+
+    private void button_mangerMouseClicked(MouseEvent e) {
+        ManagerPage managerPage = new ManagerPage();
+        managerPage.setVisible(true);
+    }
+
+    private void button_logoutMouseClicked() {
+        // TODO add your code here
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
         DefaultComponentFactory compFactory = DefaultComponentFactory.getInstance();
         topPanel = new JPanel();
         accountPanel = new JPanel();
+        leftButtonPanel = new JPanel();
         button_account = new JButton();
+        button_logout = new JButton();
+        button_staff_products = new JButton();
+        button_staff_orders = new JButton();
+        button_manger = new JButton();
+        rightButtonPanel = new JPanel();
         button_cart = new JButton();
+        button_orders = new JButton();
         separatorForAccount = compFactory.createSeparator("");
         titlePanel = new JPanel();
         mainTitle = new JLabel();
@@ -192,9 +273,12 @@ public class MainPage extends JFrame implements ReloadListener {
         typeFilterLabel = new JLabel();
         typeFilterBox = new JComboBox<>();
         brandFilterLabel = new JLabel();
-        filterBox4 = new JComboBox<>();
+        brandFilterBox = new JComboBox<>();
         subTypeFilterLabel = new JLabel();
         subTypeFilterBox = new JComboBox<>();
+        subTypeFilterLabel2 = new JLabel();
+        subTypeFilterBox2 = new JComboBox<>();
+        scrollPane1 = new JScrollPane();
         productPanel = new JPanel();
         productCardPanel1 = new JPanel();
         productImage1 = new JLabel();
@@ -204,6 +288,7 @@ public class MainPage extends JFrame implements ReloadListener {
         buttonPanel1 = new JPanel();
         moreButton1 = new JButton();
         addButton1 = new JButton();
+        soldoutLabel1 = new JLabel();
         adjustNumPanel1 = new JPanel();
         removeButton = new JButton();
         NumButton = new JButton();
@@ -224,29 +309,106 @@ public class MainPage extends JFrame implements ReloadListener {
             {
                 accountPanel.setLayout(new BorderLayout());
 
-                //---- button_account ----
-                button_account.setIcon(new FlatSVGIcon("images/person_black_24dp.svg"));
-                button_account.setBackground(new Color(0xf2f2f2));
-                button_account.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        button_accountMouseClicked();
-                    }
-                });
-                accountPanel.add(button_account, BorderLayout.WEST);
+                //======== leftButtonPanel ========
+                {
+                    leftButtonPanel.setLayout(new FlowLayout());
 
-                //---- button_cart ----
-                button_cart.setSelectedIcon(null);
-                button_cart.setIcon(new FlatSVGIcon("images/shopping_cart_black_24dp.svg"));
-                button_cart.setBackground(new Color(0xf2f2f2));
-                button_cart.setHorizontalAlignment(SwingConstants.RIGHT);
-                button_cart.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        button_cartMouseClicked(e);
-                    }
-                });
-                accountPanel.add(button_cart, BorderLayout.EAST);
+                    //---- button_account ----
+                    button_account.setIcon(new FlatSVGIcon("images/person_black_24dp.svg"));
+                    button_account.setBackground(new Color(0xf2f2f2));
+                    button_account.setMargin(new Insets(2, 2, 2, 2));
+                    button_account.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            button_accountMouseClicked();
+                        }
+                    });
+                    leftButtonPanel.add(button_account);
+
+                    //---- button_logout ----
+                    button_logout.setMargin(new Insets(2, 2, 2, 2));
+                    button_logout.setIcon(new FlatSVGIcon("images/logout_black_24dp.svg"));
+                    button_logout.setBackground(new Color(0xf2f2f2));
+                    button_logout.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            button_logoutMouseClicked();
+                        }
+                    });
+                    leftButtonPanel.add(button_logout);
+
+                    //---- button_staff_products ----
+                    button_staff_products.setIcon(new FlatSVGIcon("images/store_black_24dp.svg"));
+                    button_staff_products.setBackground(new Color(0xf2f2f2));
+                    button_staff_products.setMargin(new Insets(2, 2, 2, 2));
+                    button_staff_products.setVisible(false);
+                    button_staff_products.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            button_staff_productsMouseClicked(e);
+                        }
+                    });
+                    leftButtonPanel.add(button_staff_products);
+
+                    //---- button_staff_orders ----
+                    button_staff_orders.setIcon(new FlatSVGIcon("images/manageOrders_black_24dp.svg"));
+                    button_staff_orders.setBackground(new Color(0xf2f2f2));
+                    button_staff_orders.setMargin(new Insets(2, 2, 2, 2));
+                    button_staff_orders.setVisible(false);
+                    button_staff_orders.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            button_staff_ordersMouseClicked(e);
+                        }
+                    });
+                    leftButtonPanel.add(button_staff_orders);
+
+                    //---- button_manger ----
+                    button_manger.setIcon(new FlatSVGIcon("images/supervisor_account_black_24dp.svg"));
+                    button_manger.setBackground(new Color(0xf2f2f2));
+                    button_manger.setMargin(new Insets(2, 2, 2, 2));
+                    button_manger.setVisible(false);
+                    button_manger.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            button_mangerMouseClicked(e);
+                        }
+                    });
+                    leftButtonPanel.add(button_manger);
+                }
+                accountPanel.add(leftButtonPanel, BorderLayout.WEST);
+
+                //======== rightButtonPanel ========
+                {
+                    rightButtonPanel.setLayout(new FlowLayout());
+
+                    //---- button_cart ----
+                    button_cart.setSelectedIcon(null);
+                    button_cart.setIcon(new FlatSVGIcon("images/shopping_cart_black_24dp.svg"));
+                    button_cart.setBackground(new Color(0xf2f2f2));
+                    button_cart.setHorizontalAlignment(SwingConstants.RIGHT);
+                    button_cart.setMargin(new Insets(2, 2, 2, 2));
+                    button_cart.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            button_cartMouseClicked(e);
+                        }
+                    });
+                    rightButtonPanel.add(button_cart);
+
+                    //---- button_orders ----
+                    button_orders.setIcon(new FlatSVGIcon("images/assignment_black_24dp.svg"));
+                    button_orders.setBackground(new Color(0xf2f2f2));
+                    button_orders.setMargin(new Insets(2, 2, 2, 2));
+                    button_orders.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            button_ordersMouseClicked(e);
+                        }
+                    });
+                    rightButtonPanel.add(button_orders);
+                }
+                accountPanel.add(rightButtonPanel, BorderLayout.EAST);
             }
             topPanel.add(accountPanel);
             topPanel.add(separatorForAccount);
@@ -263,7 +425,7 @@ public class MainPage extends JFrame implements ReloadListener {
                 mainTitle.setForeground(new Color(0x003366));
                 mainTitle.setHorizontalAlignment(SwingConstants.CENTER);
                 mainTitle.setMaximumSize(null);
-                mainTitle.setBorder(new EmptyBorder(10, 0, 0, 0));
+                mainTitle.setBorder(new EmptyBorder(10, 0, 5, 0));
                 titlePanel.add(mainTitle);
 
                 //---- subTitle ----
@@ -326,9 +488,9 @@ public class MainPage extends JFrame implements ReloadListener {
                 filterPanel.setFont(filterPanel.getFont().deriveFont(filterPanel.getFont().getSize() + 2f));
                 filterPanel.setLayout(new GridBagLayout());
                 ((GridBagLayout)filterPanel.getLayout()).columnWidths = new int[] {0, 0};
-                ((GridBagLayout)filterPanel.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                ((GridBagLayout)filterPanel.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
                 ((GridBagLayout)filterPanel.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-                ((GridBagLayout)filterPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+                ((GridBagLayout)filterPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
                 //---- sortLabel ----
                 sortLabel.setText(bundle.getString("MainPage.sortLabel.text"));
@@ -365,7 +527,7 @@ public class MainPage extends JFrame implements ReloadListener {
                 filterPanel.add(brandFilterLabel, new GridBagConstraints(0, 6, 1, 1, 1.0, 0.0,
                     GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
                     new Insets(5, 0, 5, 0), 0, 0));
-                filterPanel.add(filterBox4, new GridBagConstraints(0, 7, 1, 1, 1.0, 0.0,
+                filterPanel.add(brandFilterBox, new GridBagConstraints(0, 7, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
 
@@ -377,123 +539,144 @@ public class MainPage extends JFrame implements ReloadListener {
                 filterPanel.add(subTypeFilterBox, new GridBagConstraints(0, 9, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
+
+                //---- subTypeFilterLabel2 ----
+                subTypeFilterLabel2.setText(bundle.getString("MainPage.subTypeFilterLabel2.text"));
+                filterPanel.add(subTypeFilterLabel2, new GridBagConstraints(0, 10, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                    new Insets(5, 0, 5, 0), 0, 0));
+                filterPanel.add(subTypeFilterBox2, new GridBagConstraints(0, 11, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 0, 0), 0, 0));
             }
             mainPageSplitPane.setLeftComponent(filterPanel);
 
-            //======== productPanel ========
+            //======== scrollPane1 ========
             {
-                productPanel.setMaximumSize(new Dimension(300, 32767));
-                productPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
 
-                //======== productCardPanel1 ========
+                //======== productPanel ========
                 {
-                    productCardPanel1.setBorder(new LineBorder(new Color(0x002c7b), 2, true));
-                    productCardPanel1.setPreferredSize(new Dimension(260, 280));
-                    productCardPanel1.setMaximumSize(new Dimension(230, 240));
-                    productCardPanel1.setMinimumSize(new Dimension(230, 240));
-                    productCardPanel1.setVisible(false);
-                    productCardPanel1.setLayout(new GridBagLayout());
-                    ((GridBagLayout)productCardPanel1.getLayout()).columnWidths = new int[] {0, 0};
-                    ((GridBagLayout)productCardPanel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
-                    ((GridBagLayout)productCardPanel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-                    ((GridBagLayout)productCardPanel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+                    productPanel.setMaximumSize(null);
+                    productPanel.setPreferredSize(new Dimension(300, 1000));
+                    productPanel.setMinimumSize(null);
+                    productPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-                    //---- productImage1 ----
-                    productImage1.setIcon(new ImageIcon(getClass().getResource("/images/tgv.jpeg")));
-                    productImage1.setPreferredSize(new Dimension(216, 120));
-                    productImage1.setAlignmentY(0.0F);
-                    productImage1.setMaximumSize(new Dimension(216, 120));
-                    productImage1.setMinimumSize(new Dimension(216, 120));
-                    productCardPanel1.add(productImage1, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0,
-                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                        new Insets(0, 0, 0, 0), 0, 0));
-
-                    //---- productName1 ----
-                    productName1.setText(bundle.getString("MainPage.productName1.text"));
-                    productName1.setFont(productName1.getFont().deriveFont(productName1.getFont().getSize() + 4f));
-                    productName1.setHorizontalAlignment(SwingConstants.CENTER);
-                    productName1.setBorder(new MatteBorder(3, 0, 3, 0, Color.black));
-                    productName1.setPreferredSize(new Dimension(220, 30));
-                    productCardPanel1.add(productName1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.4,
-                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                        new Insets(1, 0, 0, 0), 0, 0));
-
-                    //======== purchasePanel1 ========
+                    //======== productCardPanel1 ========
                     {
-                        purchasePanel1.setBorder(new EmptyBorder(10, 5, 5, 5));
-                        purchasePanel1.setMaximumSize(new Dimension(190, 85));
-                        purchasePanel1.setLayout(new GridLayout(2, 1, 20, 10));
+                        productCardPanel1.setBorder(new LineBorder(new Color(0x002c7b), 2, true));
+                        productCardPanel1.setPreferredSize(new Dimension(260, 280));
+                        productCardPanel1.setMaximumSize(new Dimension(230, 240));
+                        productCardPanel1.setMinimumSize(new Dimension(230, 240));
+                        productCardPanel1.setLayout(new GridBagLayout());
+                        ((GridBagLayout)productCardPanel1.getLayout()).columnWidths = new int[] {0, 0};
+                        ((GridBagLayout)productCardPanel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0};
+                        ((GridBagLayout)productCardPanel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+                        ((GridBagLayout)productCardPanel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
-                        //---- productPrice1 ----
-                        productPrice1.setText(bundle.getString("MainPage.productPrice1.text"));
-                        productPrice1.setFont(productPrice1.getFont().deriveFont(productPrice1.getFont().getSize() + 7f));
-                        productPrice1.setPreferredSize(new Dimension(80, 25));
-                        productPrice1.setHorizontalAlignment(SwingConstants.CENTER);
-                        purchasePanel1.add(productPrice1);
+                        //---- productImage1 ----
+                        productImage1.setIcon(new ImageIcon(getClass().getResource("/images/tgv.jpeg")));
+                        productImage1.setPreferredSize(new Dimension(216, 120));
+                        productImage1.setAlignmentY(0.0F);
+                        productImage1.setMaximumSize(new Dimension(216, 120));
+                        productImage1.setMinimumSize(new Dimension(216, 120));
+                        productCardPanel1.add(productImage1, new GridBagConstraints(0, 0, 1, 1, 0.0, 1.0,
+                            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                            new Insets(0, 0, 0, 0), 0, 0));
 
-                        //======== buttonPanel1 ========
+                        //---- productName1 ----
+                        productName1.setText(bundle.getString("MainPage.productName1.text"));
+                        productName1.setFont(productName1.getFont().deriveFont(productName1.getFont().getSize() + 4f));
+                        productName1.setHorizontalAlignment(SwingConstants.CENTER);
+                        productName1.setBorder(new MatteBorder(3, 0, 3, 0, Color.black));
+                        productName1.setPreferredSize(new Dimension(220, 30));
+                        productCardPanel1.add(productName1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.4,
+                            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                            new Insets(1, 0, 0, 0), 0, 0));
+
+                        //======== purchasePanel1 ========
                         {
-                            buttonPanel1.setPreferredSize(new Dimension(240, 40));
-                            buttonPanel1.setLayout(new FlowLayout());
+                            purchasePanel1.setBorder(new EmptyBorder(10, 5, 5, 5));
+                            purchasePanel1.setMaximumSize(new Dimension(190, 85));
+                            purchasePanel1.setLayout(new GridLayout(2, 1, 20, 10));
 
-                            //---- moreButton1 ----
-                            moreButton1.setText("Detail");
-                            moreButton1.setBackground(new Color(0x4e748d));
-                            moreButton1.setForeground(new Color(0xe0e2e8));
-                            moreButton1.setPreferredSize(new Dimension(100, 30));
-                            buttonPanel1.add(moreButton1);
+                            //---- productPrice1 ----
+                            productPrice1.setText(bundle.getString("MainPage.productPrice1.text"));
+                            productPrice1.setFont(productPrice1.getFont().deriveFont(productPrice1.getFont().getSize() + 7f));
+                            productPrice1.setPreferredSize(new Dimension(80, 25));
+                            productPrice1.setHorizontalAlignment(SwingConstants.CENTER);
+                            purchasePanel1.add(productPrice1);
 
-                            //---- addButton1 ----
-                            addButton1.setText(bundle.getString("MainPage.addButton1.text"));
-                            addButton1.setBackground(new Color(0x55a15a));
-                            addButton1.setForeground(new Color(0xe0e2e8));
-                            addButton1.setPreferredSize(new Dimension(100, 30));
-                            buttonPanel1.add(addButton1);
-
-                            //======== adjustNumPanel1 ========
+                            //======== buttonPanel1 ========
                             {
-                                adjustNumPanel1.setLayout(new GridBagLayout());
-                                ((GridBagLayout)adjustNumPanel1.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
-                                ((GridBagLayout)adjustNumPanel1.getLayout()).rowHeights = new int[] {0, 0};
-                                ((GridBagLayout)adjustNumPanel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
-                                ((GridBagLayout)adjustNumPanel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+                                buttonPanel1.setPreferredSize(new Dimension(240, 40));
+                                buttonPanel1.setLayout(new FlowLayout());
 
-                                //---- removeButton ----
-                                removeButton.setBackground(new Color(0xb13437));
-                                removeButton.setForeground(new Color(0xe0e2e8));
-                                removeButton.setFont(removeButton.getFont().deriveFont(removeButton.getFont().getSize() + 7f));
-                                removeButton.setIcon(new FlatSVGIcon("images/remove_white_18dp.svg"));
-                                adjustNumPanel1.add(removeButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                                    new Insets(0, 0, 0, 5), 0, 0));
+                                //---- moreButton1 ----
+                                moreButton1.setText("Detail");
+                                moreButton1.setBackground(new Color(0x4e748d));
+                                moreButton1.setForeground(new Color(0xe0e2e8));
+                                moreButton1.setPreferredSize(new Dimension(100, 30));
+                                buttonPanel1.add(moreButton1);
 
-                                //---- NumButton ----
-                                NumButton.setText("NUM");
-                                NumButton.setPreferredSize(new Dimension(50, 23));
-                                adjustNumPanel1.add(NumButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                                    new Insets(0, 0, 0, 5), 0, 0));
+                                //---- addButton1 ----
+                                addButton1.setText(bundle.getString("MainPage.addButton1.text"));
+                                addButton1.setBackground(new Color(0x55a15a));
+                                addButton1.setForeground(new Color(0xe0e2e8));
+                                addButton1.setPreferredSize(new Dimension(100, 30));
+                                buttonPanel1.add(addButton1);
 
-                                //---- addButton ----
-                                addButton.setBackground(new Color(0x55a15a));
-                                addButton.setForeground(new Color(0xe0e2e8));
-                                addButton.setFont(addButton.getFont().deriveFont(addButton.getFont().getSize() + 7f));
-                                addButton.setIcon(new FlatSVGIcon("images/add_white_18dp.svg"));
-                                adjustNumPanel1.add(addButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-                                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                                    new Insets(0, 0, 0, 0), 0, 0));
+                                //---- soldoutLabel1 ----
+                                soldoutLabel1.setText("Out of Stock");
+                                soldoutLabel1.setFont(soldoutLabel1.getFont().deriveFont(soldoutLabel1.getFont().getStyle() | Font.BOLD, soldoutLabel1.getFont().getSize() + 3f));
+                                soldoutLabel1.setForeground(new Color(0x85816c));
+                                buttonPanel1.add(soldoutLabel1);
+
+                                //======== adjustNumPanel1 ========
+                                {
+                                    adjustNumPanel1.setLayout(new GridBagLayout());
+                                    ((GridBagLayout)adjustNumPanel1.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+                                    ((GridBagLayout)adjustNumPanel1.getLayout()).rowHeights = new int[] {0, 0, 0};
+                                    ((GridBagLayout)adjustNumPanel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+                                    ((GridBagLayout)adjustNumPanel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
+
+                                    //---- removeButton ----
+                                    removeButton.setBackground(new Color(0xb13437));
+                                    removeButton.setForeground(new Color(0xe0e2e8));
+                                    removeButton.setFont(removeButton.getFont().deriveFont(removeButton.getFont().getSize() + 7f));
+                                    removeButton.setIcon(new FlatSVGIcon("images/remove_white_18dp.svg"));
+                                    adjustNumPanel1.add(removeButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+                                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                                        new Insets(0, 0, 5, 5), 0, 0));
+
+                                    //---- NumButton ----
+                                    NumButton.setText("NUM");
+                                    NumButton.setPreferredSize(new Dimension(50, 23));
+                                    adjustNumPanel1.add(NumButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+                                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                                        new Insets(0, 0, 5, 5), 0, 0));
+
+                                    //---- addButton ----
+                                    addButton.setBackground(new Color(0x55a15a));
+                                    addButton.setForeground(new Color(0xe0e2e8));
+                                    addButton.setFont(addButton.getFont().deriveFont(addButton.getFont().getSize() + 7f));
+                                    addButton.setIcon(new FlatSVGIcon("images/add_white_18dp.svg"));
+                                    adjustNumPanel1.add(addButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+                                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                                        new Insets(0, 0, 5, 0), 0, 0));
+                                }
+                                buttonPanel1.add(adjustNumPanel1);
                             }
-                            buttonPanel1.add(adjustNumPanel1);
+                            purchasePanel1.add(buttonPanel1);
                         }
-                        purchasePanel1.add(buttonPanel1);
+                        productCardPanel1.add(purchasePanel1, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
+                            GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                            new Insets(0, 0, 0, 0), 0, 0));
                     }
-                    productCardPanel1.add(purchasePanel1, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
-                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                        new Insets(0, 0, 0, 0), 0, 0));
+                    productPanel.add(productCardPanel1);
                 }
-                productPanel.add(productCardPanel1);
+                scrollPane1.setViewportView(productPanel);
             }
-            mainPageSplitPane.setRightComponent(productPanel);
+            mainPageSplitPane.setRightComponent(scrollPane1);
         }
         contentPane.add(mainPageSplitPane, BorderLayout.CENTER);
         contentPane.add(bottomSeparator, BorderLayout.SOUTH);
@@ -505,8 +688,15 @@ public class MainPage extends JFrame implements ReloadListener {
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
     private JPanel topPanel;
     private JPanel accountPanel;
+    private JPanel leftButtonPanel;
     private JButton button_account;
+    private JButton button_logout;
+    private JButton button_staff_products;
+    private JButton button_staff_orders;
+    private JButton button_manger;
+    private JPanel rightButtonPanel;
     private JButton button_cart;
+    private JButton button_orders;
     private JComponent separatorForAccount;
     private JPanel titlePanel;
     private JLabel mainTitle;
@@ -518,15 +708,18 @@ public class MainPage extends JFrame implements ReloadListener {
     private JSplitPane mainPageSplitPane;
     private JPanel filterPanel;
     private JLabel sortLabel;
-    private JComboBox<Filter.SortBy> sortOptions;
+    private JComboBox sortOptions;
     private JLabel priceFilterLabel;
-    private JComboBox<Filter.PriceRange> priceFilterBox;
+    private JComboBox priceFilterBox;
     private JLabel typeFilterLabel;
-    private JComboBox<Filter.TypeFilter> typeFilterBox;
+    private JComboBox typeFilterBox;
     private JLabel brandFilterLabel;
-    private JComboBox<Filter.BrandFilter> filterBox4;
+    private JComboBox brandFilterBox;
     private JLabel subTypeFilterLabel;
-    private JComboBox<Enum> subTypeFilterBox;
+    private JComboBox subTypeFilterBox;
+    private JLabel subTypeFilterLabel2;
+    private JComboBox subTypeFilterBox2;
+    private JScrollPane scrollPane1;
     private JPanel productPanel;
     private JPanel productCardPanel1;
     private JLabel productImage1;
@@ -536,6 +729,7 @@ public class MainPage extends JFrame implements ReloadListener {
     private JPanel buttonPanel1;
     private JButton moreButton1;
     private JButton addButton1;
+    private JLabel soldoutLabel1;
     private JPanel adjustNumPanel1;
     private JButton removeButton;
     private JButton NumButton;
@@ -544,14 +738,22 @@ public class MainPage extends JFrame implements ReloadListener {
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
     private void customizeComponents() {
-        /**
-       ImageIcon originalIcon = new ImageIcon("TrainShop\\src\\main\\images\\tgv.jpeg");
-       Image originalImage = originalIcon.getImage();
-       Image resizedImage = originalImage.getScaledInstance(productImage1.getWidth(), productImage1.getHeight(), Image.SCALE_SMOOTH);
-       productImage1.setIcon(new ImageIcon(resizedImage));
-         */
-
+        productPanel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                adjustPreferredSize(productPanel);
+            }
+        });
     }
+    private static void adjustPreferredSize(JPanel panel) {
+        int width = panel.getWidth();
+        int preferredHeight = 1100000/width ;
+
+        panel.setPreferredSize(new Dimension(300, preferredHeight));
+
+        panel.revalidate();
+    }
+
 
     private void loadProducts() {
         new SwingWorker<ArrayList<Product>, Void>() {
@@ -559,10 +761,20 @@ public class MainPage extends JFrame implements ReloadListener {
             protected ArrayList<Product> doInBackground() throws Exception {
                 // Get products from the database in the background thread
                 Filter.PriceRange pr = (Filter.PriceRange)priceFilterBox.getSelectedItem();
-                Filter.BrandFilter br = (Filter.BrandFilter)filterBox4.getSelectedItem();
+                Filter.BrandFilter br = (Filter.BrandFilter)brandFilterBox.getSelectedItem();
                 Filter.SortBy sb = (Filter.SortBy)sortOptions.getSelectedItem();
                 Filter.TypeFilter tp = (Filter.TypeFilter)typeFilterBox.getSelectedItem();
-                return ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax(), br.getBrand(), sb.getDbHandle(), sb.isAscending(), tp.getDbTable());
+                Filter.SubFilter sf = (Filter.SubFilter)subTypeFilterBox.getSelectedItem();
+                boolean sfB = subTypeFilterBox.isVisible();
+                Filter.SubFilter sf2 = (Filter.SubFilter)subTypeFilterBox2.getSelectedItem();
+                boolean sfB2 = subTypeFilterBox2.isVisible();
+                double bTime = System.nanoTime();
+                ArrayList<Product> r = ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax(),
+                                        br.getBrand(), sb.getDbHandle(), sb.isAscending(), tp.getDbTable(),
+                                            (sfB ? sf.toString() : ""), (sfB ? sf.getDbColumn() : ""),
+                                                (sfB2 ? sf2.toString() : ""), (sfB2 ? sf2.getDbColumn() : ""));
+                Logging.getLogger().info("TIMER: Took " + (System.nanoTime() - bTime) / 1e6 + "ms to search products");
+                return r;
             }
 
             @Override
@@ -573,12 +785,14 @@ public class MainPage extends JFrame implements ReloadListener {
                     ArrayList<Product> productList = get();
                     // Updating the GUI with a Product List
                     for (Product product : productList) {
-                        // Create cards for each product
-                        JPanel productCard = createProductCard(product);
+                        // Add product panel to cache if it exists
+                        if(!productPanelCache.containsKey(product.getProductID())){
+                            productPanelCache.put(product.getProductID(), createProductCard(product));
+                        }
+                        JPanel productCard = productPanelCache.get(product.getProductID());
                         // Add the card to the container
                         productPanel.add(productCard);
                     }
-
                     productPanel.revalidate();
                     productPanel.repaint();
 
@@ -719,13 +933,31 @@ public class MainPage extends JFrame implements ReloadListener {
             adjustNumPanel.setVisible(false);
         }
 
+        JLabel soldOutLabel = new JLabel();
+        soldOutLabel.setText("Out of Stock");
+        soldOutLabel.setFont(soldoutLabel1.getFont().deriveFont(soldoutLabel1.getFont().getStyle() | Font.BOLD, soldoutLabel1.getFont().getSize() + 3f));
+        soldOutLabel.setForeground(new Color(0x85816c));
+        if (product.getStockQuantity() > 0){
+            soldOutLabel.setVisible(false);
+        }else{
+            soldOutLabel.setVisible(true);
+            adjustNumPanel.setVisible(false);
+            addButton.setVisible(false);
+        }
+
+
         // Adding event listeners to the "Add" button
         addButton.addActionListener(e -> {
-            if (currentUser != null) {
+            User thisUser = UserSession.getInstance().getCurrentUser();
+            if (thisUser != null) {
                 addButton.setVisible(false);
                 adjustNumPanel.setVisible(true);
                 Cart cart = CartService.getCartDetails(userID);
                 int cartID = cart.getCartID();
+                if (cartID == 0) {
+                    CartService.createCart();
+                    cartID = CartService.getCartDetails(userID).getCartID();
+                }
                 int productID = product.getProductID();
                 CartService.addToCart(cartID, productID, 1);
             }else {
@@ -784,6 +1016,7 @@ public class MainPage extends JFrame implements ReloadListener {
         buttonPanel.add(moreButton);
         buttonPanel.add(addButton);
         buttonPanel.add(adjustNumPanel);
+        buttonPanel.add(soldOutLabel);
 
         // Add button panel to purchase panel
         purchasePanel.add(buttonPanel);
@@ -806,12 +1039,22 @@ public class MainPage extends JFrame implements ReloadListener {
      * Main function for testing
      */
     public static void main(String[] args) {
-        User user = UserDAO.findUserByEmail("testemail@gmail.com");
+        // User user = UserDAO.findUserByEmail("testemail@gmail.com");
+        Logging.Init(true);
+        ImageUtils.ResourceManager.Init();
+        User user = UserDAO.findUserByEmail("manager@manager.com");
         UserSession.getInstance().setCurrentUser(user);
 
         EventQueue.invokeLater(() -> {
             try {
                 MainPage frame = new MainPage();
+                // Close logging :D
+                frame.addWindowListener(new WindowAdapter() {
+                    public void windowClosing(WindowEvent e){
+                        DatabaseConnectionHandler.shutdown();
+                        Logging.Close();
+                    }
+                });
                 frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();

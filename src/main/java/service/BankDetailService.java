@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class BankDetailService {
+    
     /**
      * Determines the type of a credit card based on its number.
      *
@@ -91,10 +92,9 @@ public class BankDetailService {
      * @param cardHolder    The name of the card holder.
      * @param cardNumber    The credit card number.
      * @param expiryDate    The expiry date of the card.
-     * @param securityCode  The security code of the card.
      * @return String       A message indicating the result of the operation.
      */
-    public static String addBankDetail(int userID, String cardHolder, String cardNumber, String expiryDate, String securityCode){
+    public static String addBankDetail(int userID, String cardHolder, String cardNumber, String expiryDate){
         try {
             // Check if user has permission to edit bank details
             if (!PermissionService.hasPermission(userID,"EDIT_OWN_BANK_DETAILS")) {
@@ -112,20 +112,18 @@ public class BankDetailService {
                 if (keyID == 0){
                     return "Generate encryption key Failed. Please try again.";
                 }
+                // Associate user with the key
+                EncryptionKeysDAO.insertUserKey(userID, keyID);
             } else {
                 return "Action Failed. Please try again.";
             }
 
-            // Associate user with the key
-            EncryptionKeysDAO.insertUserKey(userID, keyID);
-
             // Encrypt card details
             String cardName = getCreditCardType(cardNumber);
             String encryCardNumber = AESUtil.encrypt(cardNumber, keyString);
-            String encrySecurityCode = AESUtil.encrypt(securityCode, keyString);
 
             // Insert bank details into the database
-            BankDetail bankDetail = new BankDetail(userID, cardName, cardHolder, encryCardNumber, expiryDate, encrySecurityCode);
+            BankDetail bankDetail = new BankDetail(userID, cardName, cardHolder, encryCardNumber, expiryDate);
             BankDetailDAO.insertBankDetail(bankDetail);
 
         } catch (DatabaseException e){
@@ -141,15 +139,14 @@ public class BankDetailService {
     /**
      * Finds and returns the bank details of a user.
      *
-     * @param userID The ID of the user.
      * @return BankDetail The decrypted bank detail of the user, or null if an error occurs.
      */
-    public static BankDetail findBankDetail(){
+    public static BankDetail findBankDetail() {
         try {
             // Retrieve encrypted bank details from the database
             int currentUserID = UserSession.getInstance().getCurrentUser().getUserID();
             BankDetail bankDetail = BankDetailDAO.findBankDetail(currentUserID);
-            if (bankDetail == null) {
+            if (bankDetail.getBankDetailID() == 0) {
                 return null;
             }
 
@@ -161,11 +158,9 @@ public class BankDetailService {
             // Decrypt bank details
             String keyString = EncryptionKeysDAO.findKey(EncryptionKeysDAO.findUserKey(currentUserID));
             String cardNumber = AESUtil.decrypt(bankDetail.getCardNumber(), keyString);
-            String securityCode = AESUtil.decrypt(bankDetail.getSecurityCode(), keyString);
 
             // Set decrypted values in the bank detail object
             bankDetail.setCardNumber(cardNumber);
-            bankDetail.setSecurityCode(securityCode);
             return bankDetail;
 
         } catch (DatabaseException e){
@@ -184,10 +179,9 @@ public class BankDetailService {
      * @param cardHolder    The updated name of the card holder.
      * @param cardNumber    The updated credit card number.
      * @param expiryDate    The updated expiry date of the card.
-     * @param securityCode  The updated security code of the card.
      * @return String       A message indicating the result of the operation.
      */
-    public static String updateBankDetail(int userID, String cardHolder, String cardNumber, String expiryDate, String securityCode) {
+    public static String updateBankDetail(int userID, String cardHolder, String cardNumber, String expiryDate) {
         try {
             // Check if the user has permission to edit their bank details
             if (!PermissionService.hasPermission(userID, "EDIT_OWN_BANK_DETAILS")) {
@@ -204,10 +198,9 @@ public class BankDetailService {
             // Encrypt the updated card details
             String cardName = getCreditCardType(cardNumber);
             String encryCardNumber = AESUtil.encrypt(cardNumber, keyString);
-            String encrySecurityCode = AESUtil.encrypt(securityCode, keyString);
 
             // Update the bank details in the database
-            BankDetail bankDetail = new BankDetail(userID, cardName, cardHolder, encryCardNumber, expiryDate, encrySecurityCode);
+            BankDetail bankDetail = new BankDetail(userID, cardName, cardHolder, encryCardNumber, expiryDate);
             BankDetailDAO.updateBankDetail(bankDetail);
 
         } catch (DatabaseException e) {
@@ -226,10 +219,9 @@ public class BankDetailService {
      * @param cardHolder   The name of the card holder.
      * @param cardNumber   The credit card number.
      * @param expiryDate   The expiry date of the card in mm/yy format.
-     * @param securityCode The security code of the card.
      * @return String      A message indicating whether the bank details are valid or not.
      */
-    public static String checkBankDetail(String cardHolder, String cardNumber, String expiryDate, String securityCode) {
+    public static String checkBankDetail(String cardHolder, String cardNumber, String expiryDate) {
         // Check if the card number is valid
         if (!isValidCreditCardNumber(cardNumber)) {
             
@@ -237,19 +229,15 @@ public class BankDetailService {
         }
 
         // Check the card type
-        String cardType = getCreditCardType(cardNumber);
-        if ("Unknown".equals(cardType)) {
-            return "Card type cannot be determined. Change a card";
-        }
+        // Notice: 
+        // String cardType = getCreditCardType(cardNumber);
+        // if ("Unknown".equals(cardType)) {
+        //     return "Card type cannot be determined. Change a card";
+        // }
 
         // Check the expiry date format and if it's a future date.
         if (!expiryDate.matches("\\d{2}/\\d{2}") || !isFutureDate(expiryDate)) {
             return "Invalid expiry date. Ensure it's in mm/yy format and is a future date.";
-        }
-
-        // Check the security code
-        if (!securityCode.matches("\\d{3}")) {
-            return "Invalid security code. Should be 3digits.";
         }
 
         // All checks passed

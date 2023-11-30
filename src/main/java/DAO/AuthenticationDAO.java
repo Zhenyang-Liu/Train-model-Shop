@@ -12,6 +12,7 @@ import java.util.HashSet;
 import exception.ConnectionException;
 import exception.DatabaseException;
 import exception.NotFoundException;
+import helper.Logging;
 
 public class AuthenticationDAO {
 
@@ -25,7 +26,7 @@ public class AuthenticationDAO {
      * @return A Set of strings, where each string represents a permission name.
      * @throws DatabaseException if there is an issue with database access.
      */
-    public static Set<String> getUserPermissions(int userID) throws DatabaseException {
+    public static Set<String> getUserPermissions(int userID) {
         Set<String> permissions = new HashSet<>();
         String selectSQL = "SELECT p.permission_name FROM Permission p " +
                      "JOIN Role_Permission rp ON p.permission_id = rp.permission_id " +
@@ -42,9 +43,9 @@ public class AuthenticationDAO {
                 }
             }
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error getting user permissions: SQL timed out\n Stacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error getting user permissions: SQL exception\n Stacktrace: " + e.getMessage());
         }
         return permissions;
     }
@@ -69,11 +70,14 @@ public class AuthenticationDAO {
             int rowsAffected = preparedStatement.executeUpdate();
             
             if (rowsAffected == 0) {
+                Logging.getLogger().warning("Insert Role failed, no rows affected.");
                 throw new SQLException("Insert Role failed, no rows affected.");
             }
         } catch (SQLTimeoutException e) {
+            Logging.getLogger().warning("Database connection failed\nStackTrace: " + e.getMessage());
             throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
+            Logging.getLogger().warning("Failed to add default role\nStackTrace: " + e.getMessage());
             throw new DatabaseException(e.getMessage(),e);
         }
     }
@@ -128,6 +132,17 @@ public class AuthenticationDAO {
         }
     }
 
+    /**
+     * Retrieves the role name associated with a specific user ID.
+     *
+     * This method queries the database to find the role name assigned to the user with the specified user ID.
+     * It joins the User_Role and Role tables to determine the role name.
+     * Returns the role name if found, or null if the user does not have an assigned role or in case of an SQL error.
+     *
+     * @param userID The ID of the user whose role name is to be retrieved.
+     * @return The role name associated with the user, or null if not found or in case of an error.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static String findRoleByID(int userID) throws DatabaseException {
         String roleName = null;
         String selectSQL = "SELECT Role.role_name " +

@@ -6,6 +6,7 @@ package gui;
 
 import helper.UserSession;
 import listeners.ReloadListener;
+import listeners.SetRoleButtons;
 import model.Login;
 import model.User;
 
@@ -30,12 +31,15 @@ public class LoginPage extends JFrame {
     }
 
     private ReloadListener loginSuccessListener;
+    private SetRoleButtons setRoleButtonsListener;
     public void setLoginSuccessListener(ReloadListener listener) {
         this.loginSuccessListener = listener;
     }
+    public void setRoleButtonsListener(SetRoleButtons listener) {
+        this.setRoleButtonsListener = listener;
+    }
 
     private void button_to_registerPageMouseClicked(MouseEvent e) {
-        // TODO add your code here
         RegistrationPage registrationPage = new RegistrationPage();
         registrationPage.setVisible(true);
 
@@ -53,20 +57,23 @@ public class LoginPage extends JFrame {
             Login userLogin = LoginDAO.findLoginByUserID(user.getUserID());
 
             if (!UserSession.getInstance().isLoggedIn() && UserDAO.doesUserExist(email)) {
-                System.out.println("Matching passwords..");
                 if (userLogin.doesPasswordMatch(password)) {
-                    System.out.println("Passwords work!");
                     UserSession.getInstance().setCurrentUser(user);
 
                     // Reload products for user
                     if (loginSuccessListener != null) {
                         loginSuccessListener.reloadProducts();
                     }
+                    if (setRoleButtonsListener != null) {
+                        setRoleButtonsListener.setButtonsByRole();
+                    }
 
                     // Return true as everything went successful
                     backButtonMouseClicked();
                     return "OK";
                 }
+            } else {
+                return "User is already logged in";
             }
 
         } catch (SQLException e) {

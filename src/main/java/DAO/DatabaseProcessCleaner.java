@@ -2,12 +2,20 @@ package DAO;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.sql.SQLException;
+import helper.Logging;
 
 public class DatabaseProcessCleaner {
 
+    /**
+     * Terminates all "sleep" state processes in the database.
+     *
+     * This method connects to the database and retrieves a list of all current processes.
+     * It then iterates through these processes and terminates any that are in the "sleep" state.
+     * Successful and unsuccessful termination attempts are logged.
+     */
     public static void killSleepProcesses() {
         try (Connection conn = DatabaseConnectionHandler.getConnection();
              Statement stmt = conn.createStatement()) {
@@ -24,9 +32,9 @@ public class DatabaseProcessCleaner {
                 if ("Sleep".equals(command)) {
                     try (Statement killStmt = conn.createStatement()) {
                         killStmt.execute("KILL " + id);
-                        System.out.println("Killed process with ID: " + id);
+                        Logging.getLogger().info("Killed process with ID: " + id);
                     } catch (SQLException e) {
-                        System.out.println("Failed to kill process with ID: " + id);
+                        Logging.getLogger().warning("Failed to kill process with ID: " + id);
                     }
                 }
             }

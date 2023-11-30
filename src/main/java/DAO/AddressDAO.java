@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import exception.*;
+import helper.Logging;
 import model.Address;
 
 public class AddressDAO {
@@ -144,7 +145,17 @@ public class AddressDAO {
         return address;
     }
 
-    public static ArrayList<Address> findByPostcode(String postcode) throws DatabaseException {
+    /**
+     * Retrieves a list of addresses matching a specific postcode.
+     *
+     * This method queries the database for all addresses that match the given postcode.
+     * It constructs a list of Address objects, each representing an address in the database with the specified postcode.
+     * In case of a database access issue, it logs the error using the Logging service.
+     *
+     * @param postcode The postcode used to filter addresses.
+     * @return An ArrayList of Address objects that match the specified postcode.
+     */
+    public static ArrayList<Address> findByPostcode(String postcode) {
         String selectSQL = "SELECT * FROM Address WHERE postcode = ?;";
         ArrayList<Address> addressList = new ArrayList<>();
 
@@ -165,9 +176,9 @@ public class AddressDAO {
                 addressList.add(address);
             }
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error finding address by postcode: SQL Timed out. Stacktrace: \n" + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error finding address by postcode: SQL Exception. Stacktrace: \n" + e.getMessage());
         }
         return addressList;
     }
@@ -213,6 +224,16 @@ public class AddressDAO {
         return address;
     }
 
+    /**
+     * Retrieves the address ID associated with a specific user from the database.
+     *
+     * This method queries the User_Address table to find the address ID linked to the given user ID.
+     * Returns the address ID if found, or 0 if the user does not have an associated address or in case of an SQL error.
+     *
+     * @param userID The ID of the user whose address ID is to be retrieved.
+     * @return The address ID associated with the user, or 0 if not found or in case of an error.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static int findAddressIDByUser(int userID) throws DatabaseException {
         String selectSQL = "SELECT address_id FROM User_Address WHERE user_id = ?;";
         int addressID = 0;

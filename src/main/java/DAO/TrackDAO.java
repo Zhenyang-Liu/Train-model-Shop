@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
+import helper.Logging;
 import model.Gauge;
 import model.Track;
 import model.Product;
@@ -23,7 +24,7 @@ public class TrackDAO extends ProductDAO {
      */
     public static void insertTrack(Track track) throws DatabaseException {
         int productID = insertProduct(track);
-        String insertSQL = "INSERT INTO Track (product_id, gauge) VALUES (?, ?, ?);";
+        String insertSQL = "INSERT INTO Track (product_id, gauge) VALUES (?, ?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
@@ -61,15 +62,8 @@ public class TrackDAO extends ProductDAO {
             
             preparedStatement.setString(1, track.getGauge());
             preparedStatement.setInt(2, track.getProductID());
+            preparedStatement.executeUpdate();
 
-            int rowsAffected = preparedStatement.executeUpdate();
-
-            if (rowsAffected > 0) {
-                // EraDAO.deleteEra(rollingStock.getProductID());
-                // EraDAO.insertEra(rollingStock.getProductID(), rollingStock.getEra());
-            } else {
-                throw new SQLException("Update Track failed, no rows affected.");
-            }
         } catch (SQLTimeoutException e){
             throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
@@ -110,7 +104,7 @@ public class TrackDAO extends ProductDAO {
      * @throws DatabaseException If a database error occurs.
      */
     public static Track findTrackByID(int productID) throws DatabaseException {
-        String selectSQL = "SELECT * FROM RollingStock WHERE product_id = ?;";
+        String selectSQL = "SELECT * FROM Track WHERE product_id = ?;";
         Track track = new Track();
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -118,7 +112,7 @@ public class TrackDAO extends ProductDAO {
             preparedStatement.setInt(1, productID);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            while (resultSet.next()) {
+            if (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
                 Product newProduct = ProductDAO.findProductByID(productId);
                 String newGauge = resultSet.getString("gauge");
@@ -140,7 +134,7 @@ public class TrackDAO extends ProductDAO {
      * @return An ArrayList of track objects that match the specified gauge | null if can't find.
      * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Track> findTracksByGauge(Gauge gauge) throws DatabaseException{
+    public static ArrayList<Track> findTracksByGauge(Gauge gauge) {
         String selectSQL = "SELECT * FROM Track WHERE gauge = ?;";
         ArrayList<Track> tracks = new ArrayList<Track>();
 
@@ -152,16 +146,25 @@ public class TrackDAO extends ProductDAO {
 
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+                Product newProduct = null;
+                try{
+                    newProduct = ProductDAO.findProductByID(productId);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding controllers by gauge " + gauge + ". Could not find product " + productId + 
+                        "\n Stacktrace: " + e.getMessage());
+                    continue;
+                }
                 String newGauge = resultSet.getString("gauge");
 
                 Track track = new Track(newProduct, newGauge);
                 tracks.add(track);
             }
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding all tracks by gauge " + gauge +  
+                ": SQL Timed out\nStacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding all tracks by gauge " + gauge +  
+                ": SQL Exception Occurred\nStacktrace: " + e.getMessage());
         }
         return tracks;
     }
@@ -172,7 +175,7 @@ public class TrackDAO extends ProductDAO {
      * @return An ArrayList of all Track objects in the database | null if can't find.
      * @throws DatabaseException If a database error occurs.
      */
-    public static ArrayList<Track> findAllControllers() throws DatabaseException {
+    public static ArrayList<Track> findAllTracks() {
         ArrayList<Track> tracks = new ArrayList<Track>();
         String selectSQL = "SELECT * FROM Track;";
 
@@ -183,16 +186,23 @@ public class TrackDAO extends ProductDAO {
 
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
-                Product newProduct = ProductDAO.findProductByID(productId);
+                Product newProduct = null;
+                try{
+                    newProduct = ProductDAO.findProductByID(productId);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding all controllers. Could not find product " + productId + 
+                        "\n Stacktrace: " + e.getMessage());
+                    continue;
+                }
                 String newGauge = resultSet.getString("gauge");
 
                 Track track = new Track(newProduct, newGauge);
                 tracks.add(track);
             }
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding all controllers: SQL Timed out\nStacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding all controllers: SQL Exception Occured\nStacktrace: " + e.getMessage());
         }
         return tracks;
     }

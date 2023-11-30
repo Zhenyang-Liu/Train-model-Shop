@@ -4,7 +4,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
-import java.util.Arrays;
+
+import helper.Logging;
 
 
 public class Login{
@@ -126,7 +127,6 @@ public class Login{
         SecureRandom random = new SecureRandom();
         random.nextBytes(salt);
         this.setPasswordSalt(new String(salt));
-        System.out.println("Created acount, salt used: " + Arrays.toString(salt));
         this.setPasswordHash(hash(password, getPasswordSalt()));
     }
 
@@ -153,10 +153,9 @@ public class Login{
         try{
             md = MessageDigest.getInstance("SHA-512");
         }catch(NoSuchAlgorithmException e){
-            System.out.println("Could not use SHA-512 uh oh");
+            Logging.getLogger().warning("Could not use SHA-512 to hash uh-oh not cool");
             return "";
         };
-        System.out.println("Hashing: " + toHash + salt);
         return bytesToHex(md.digest((toHash + salt).getBytes()));
     }
 
@@ -167,7 +166,6 @@ public class Login{
      * @return True if the password matches the hashed password stored else False
      */
     public boolean doesPasswordMatch(String password){
-        System.out.println("Hashed password: " + new String(hash(password, getPasswordSalt()) + "Stored: " + new String(getPasswordHash())));
         return hash(password, getPasswordSalt()).equals(getPasswordHash());
     }
 

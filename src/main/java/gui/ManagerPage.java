@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import model.User;
 import service.RoleService;
@@ -23,43 +24,60 @@ public class ManagerPage extends JFrame {
     public ManagerPage() {
         setTitle("Manager Board");
         setSize(800, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // top panel with title and search box
-        JPanel topPanel = new JPanel(new BorderLayout());
-        JLabel titleLabel = new JLabel("Manager Board", JLabel.CENTER);
-        topPanel.add(titleLabel, BorderLayout.NORTH);
-
-        // Search Box
-        // TODO：Searchbox unfinished
-        JPanel searchPanel = new JPanel();
-        searchPanel.add(new JTextField(20));
-        searchPanel.add(new JButton("button1"));
-        searchPanel.add(new JButton("button2"));
-        topPanel.add(searchPanel, BorderLayout.SOUTH);
-
+        JPanel topPanel = createTopPanel();
         add(topPanel, BorderLayout.NORTH);
 
-        JPanel leftPanel = createLeftPanel();
+        JPanel filterPanel = createFilterPanel();
+        add(filterPanel, BorderLayout.SOUTH);
 
-        // Display the User table
         initializeTable();
 
-        // Right Panel with JTable
         JScrollPane rightScrollPane = new JScrollPane(table);
-
-        // Dividing line
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightScrollPane);
-        splitPane.setDividerLocation(0.3);
-        add(splitPane, BorderLayout.CENTER);
+        rightScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        rightScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        add(rightScrollPane, BorderLayout.CENTER);
     }
 
-    // Section for leftPanel
-    private JPanel createLeftPanel() {
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-        leftPanel.add(Box.createVerticalGlue());
+    private JPanel createTopPanel() {
+        JPanel topPanel = new JPanel(new BorderLayout());
+        JLabel titleLabel = new JLabel("Manager Board", JLabel.CENTER);
+        titleLabel.setFont(new Font(titleLabel.getFont().getFontName(), Font.BOLD, 26));
+        titleLabel.setForeground(new Color(0x003366));
+        topPanel.add(titleLabel, BorderLayout.NORTH);
+
+        String[] searchOptions = {"Name", "Email", "UserID"};
+        JComboBox<String> searchTypeComboBox = new JComboBox<>(searchOptions);
+
+        JPanel searchPanel = new JPanel();
+        JTextField searchField = new JTextField(20);
+        JButton searchButton = new JButton("Search");
+        searchButton.setBackground(new Color(0x204688));
+        searchButton.setForeground(Color.WHITE);
+        searchButton.addActionListener(e -> performSearch(
+            (String) searchTypeComboBox.getSelectedItem(),
+            searchField.getText()
+        ));
+
+        JButton clearButton = new JButton("Clear");
+        clearButton.addActionListener(e -> {
+            searchField.setText("");
+            loadTableData(currentRoleFilter);
+        });
+    
+        searchPanel.add(searchTypeComboBox);
+        searchPanel.add(searchField);
+        searchPanel.add(searchButton);
+        searchPanel.add(clearButton);
+        topPanel.add(searchPanel, BorderLayout.SOUTH);
+        return topPanel;
+    }
+
+    private JPanel createFilterPanel() {
+        JPanel filterPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
     
         Dimension buttonSize = new Dimension(100, 30);
     
@@ -67,12 +85,18 @@ public class ManagerPage extends JFrame {
         JButton staffButton = createButton("Staff", buttonSize, e -> loadTableData("staff"));
         JButton allButton = createButton("All", buttonSize, e -> loadTableData(null));
     
-        leftPanel.add(customerButton);
-        leftPanel.add(staffButton);
-        leftPanel.add(allButton);
-        leftPanel.add(Box.createVerticalGlue());
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        filterPanel.add(customerButton, gbc);
     
-        return leftPanel;
+        gbc.gridx = 1;
+        filterPanel.add(staffButton, gbc);
+    
+        gbc.gridx = 2;
+        filterPanel.add(allButton, gbc);
+    
+        return filterPanel;
     }
     
     private JButton createButton(String text, Dimension size, ActionListener listener) {
@@ -82,10 +106,8 @@ public class ManagerPage extends JFrame {
         button.setPreferredSize(size);
         button.addActionListener(listener);
         return button;
-    }
-    // -------------------------------------------------------
+    } 
 
-    // Section for rightPanel
     private void initializeTable() {
         String[] columnNames = {"UserID", "Email Address", "Forename", "Surname", "Role", "Action"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
@@ -137,6 +159,44 @@ public class ManagerPage extends JFrame {
     private void reloadTableData() {
         loadTableData(currentRoleFilter);
     } 
+
+    private void performSearch(String searchType, String searchTerm) {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0);
+
+        Map<User, String> userList = RoleService.getAllUserWithRole();
+
+        // Filter the list with currentRoleFilter
+        Stream<Map.Entry<User, String>> filteredStream = userList.entrySet().stream()
+            .filter(entry -> currentRoleFilter == null || entry.getValue().equalsIgnoreCase(currentRoleFilter));
+
+        filteredStream.filter(entry -> matchSearchCriteria(entry, searchType, searchTerm))
+            .forEach(entry -> {
+                User user = entry.getKey();
+                model.addRow(new Object[]{
+                    user.getUserID(),
+                    user.getEmail(),
+                    user.getForename(),
+                    user.getSurname(),
+                    entry.getValue(),
+                    getActionButtonLabelByRole(entry.getValue())
+                });
+            });
+    }
+    
+    private boolean matchSearchCriteria(Map.Entry<User, String> entry, String searchType, String searchTerm) {
+        User user = entry.getKey();
+        switch (searchType) {
+            case "Name":
+                return user.getForename().contains(searchTerm) || user.getSurname().contains(searchTerm);
+            case "Email":
+                return user.getEmail().contains(searchTerm);
+            case "UserID":
+                return String.valueOf(user.getUserID()).contains(searchTerm);
+            default:
+                return false;
+        }
+    }
 
     private String getActionButtonLabelByRole(String role) {
         if ("customer".equalsIgnoreCase(role)) {

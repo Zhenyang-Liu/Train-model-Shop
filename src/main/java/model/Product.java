@@ -1,9 +1,6 @@
 package model;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.text.DecimalFormat;
 
 import javax.swing.ImageIcon;
 
@@ -35,13 +32,14 @@ public class Product {
      * @param stockQuantity The stock quantity of the product.
      */
     public Product(String brand, String productName, String productCode,
-                   double d, String description, int stockQuantity) {
+                   double d, String description, int stockQuantity, String image) {
         this.setBrand(brand);
         this.setProductName(productName);
         this.setProductCode(productCode);
         this.setRetailPrice(d);
         this.setDescription(description);
         this.setStockQuantity(stockQuantity);
+        this.setImageBase64(image);
     }
 
     // Getter and Setter
@@ -100,8 +98,12 @@ public class Product {
         this.productName = productName;
     }
 
-    public void setProductImage(String base64Image){
-        this.imageBase64 = base64Image;
+    /**
+     * 
+     * @return
+     */
+    public String getImageBase64(){
+        return imageBase64;
     }
 
     /**
@@ -146,7 +148,10 @@ public class Product {
         if (retailPrice < 0) {
             throw new IllegalArgumentException("Retail Price cannot be negative.");
         }
-        this.retailPrice = retailPrice;
+        DecimalFormat decimalFormat = new DecimalFormat("#.00");
+        String formattedTotal = decimalFormat.format(retailPrice);
+
+        this.retailPrice = Double.parseDouble(formattedTotal);
     }
 
     /**
@@ -199,12 +204,14 @@ public class Product {
     }
 
     /**
-     * Set the image path.
-     *
-     * @param imagePath The new image path to be set.
+     * Sets the base64 encoded string of the image associated with this product
+     * @param base64
      */
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public void setImageBase64(String base64){
+        this.imageBase64 = base64;
+        // Ensure resource manager updates the product
+        if(base64 != null && !base64.isEmpty())
+            ImageUtils.ResourceManager.updateImageForProduct(productID);
     }
 
 
@@ -232,7 +239,7 @@ public class Product {
      * @return The product type as a string, or null if the product code is invalid.
      */
     public String getProductType() {
-        char typeIndicator = productCode.charAt(0);
+        char typeIndicator = Character.toUpperCase(productCode.charAt(0));
 
         switch (typeIndicator) {
             case 'R':
@@ -248,7 +255,7 @@ public class Product {
             case 'P':
                 return "Track Pack";
             default:
-                return null; // Invalid type indicator
+                return null;
         }
     }
 
@@ -258,16 +265,9 @@ public class Product {
      * @return Returns an ImageIcon containing the image associated with this product
      */
     public ImageIcon getProductImage() {
-        // Get the URI of the default image to use if no image is supplied
-        URI defaultImage = null;
-        try {
-            defaultImage = getClass().getResource("/images/tgv.jpeg").toURI();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
         // Get the base64 of either the stored image or the default image and return
-        String imageIcon = this.imageBase64 != null ? this.imageBase64 : ImageUtils.toBase64(new File(defaultImage));
-        return ImageUtils.imageToIcon(imageIcon);
+        boolean imageExists = this.imageBase64 != null && !this.imageBase64.equals("");
+        return ImageUtils.ResourceManager.getProductImage(imageExists ? productID : -1);
     }
 
 

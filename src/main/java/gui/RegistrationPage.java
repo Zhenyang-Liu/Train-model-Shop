@@ -4,15 +4,22 @@
 
 package gui;
 
+import DAO.AddressDAO;
 import DAO.AuthenticationDAO;
 import DAO.LoginDAO;
 import DAO.UserDAO;
 import exception.DatabaseException;
 import helper.UserSession;
+import helper.Logging;
+import model.Address;
 import model.Login;
 import model.User;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import org.slf4j.Logger;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -48,31 +55,41 @@ public class RegistrationPage extends JFrame {
      * @param password the password of the login account, different to user
      */
     private String submitButtonClicked(String email, String forename, String surname, String address, String password) {
+        // Insert user
         if (!UserDAO.doesUserExist(email)) {
             User newUser = new User(email, forename, surname, address);
-            boolean hasCreatedUser = UserDAO.insertUser(newUser);
-
-            if (hasCreatedUser) {
-                UserSession.getInstance().setCurrentUser(newUser);
-                System.out.println("User has logged in (id = " + newUser.getUserID() + ")");
-
-                // Attempt to set default role
-                try {
-                    AuthenticationDAO.setDefaultRole(newUser.getUserID());
-                } catch (DatabaseException e) {
-                    return "Error adding users role";
-                }
-
-                // Create login, and login user
-                Login newLogin = new Login(newUser.getUserID());
-                newLogin.setPassword(password);
-                boolean loginSuccess = LoginDAO.insertLoginDetails(newLogin);
-                if (loginSuccess)
-                    return "OK";
-                else
-                    UserSession.getInstance().clear();
-                return "Error creating user login, they may already exist!";
+            Logging.getLogger().info("User has logged in (id = " + newUser.getUserID() + ")");
+            
+            // Check to see if address has been added
+            if (addressDialog == null || addressDialog.isInputValid()) {
+                return "Address has not been set.";
             }
+            
+            // Attempt to set default role
+            UserDAO.insertUser(newUser);
+            try {
+                AuthenticationDAO.setDefaultRole(newUser.getUserID());
+                UserSession.getInstance().setCurrentUser(newUser);
+            } catch (DatabaseException e) {
+                return "Error adding users role";
+            }
+
+            // Create login, and login user
+            Login newLogin = new Login(newUser.getUserID());
+            newLogin.setPassword(password);
+            boolean loginSuccess = LoginDAO.insertLoginDetails(newLogin);
+            if (loginSuccess) {
+                try {
+                    AddressDAO.insertAddress(newUser.getUserID(), addressDialog.getNewAddress());
+                } catch (DatabaseException e) {
+                    Logging.getLogger().warning("Could not add address into database\nStackTrace: " + e.getMessage());
+                }
+                return "OK";
+            }
+            else {
+                UserSession.getInstance().clear();
+            }
+            return "Error creating user login, they may already exist!";
         }
 
         // User was not created because the email already exists
@@ -88,7 +105,7 @@ public class RegistrationPage extends JFrame {
      * @param passwordValidate inputted password confirm, will be checked against password
      * @return a string for the error message or "OK" if everything is good
      */
-    private String checkInputs(String email, String forename, String surname, String password, String passwordValidate) {
+    public static String checkInputs(String email, String forename, String surname, String password, String passwordValidate) {
         // Emails
         Pattern emailPattern = Pattern.compile("^[A-z0-9._%+-]+@+[A-z0-9_%+-]+.[A-z_-]{2,}$");
         if (!emailPattern.matcher(email).matches())
@@ -138,8 +155,16 @@ public class RegistrationPage extends JFrame {
         this.dispose();
     }
 
+    /**
+     * Open edit address dialogue box
+     */
+    private void onEditAddress() {
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        addressDialog = new AddressDialog(parentFrame, new Address(), false, true);
+        addressDialog.setVisible(true);
+    }
+
     private void RegisterSubmitButtonMouseClicked(MouseEvent e) {
-        // TODO add your code here
         String fieldsError = checkInputs(emailTextField.getText(), firstNameTextField.getText(), lastNameTextField.getText(), new String(passwordField_create.getPassword()), new String(passwordField_confirm.getPassword()));
         if (fieldsError == "OK") {
             String userCreationError = submitButtonClicked(emailTextField.getText(), firstNameTextField.getText(), lastNameTextField.getText(), "", new String(passwordField_confirm.getPassword()));
@@ -149,7 +174,7 @@ public class RegistrationPage extends JFrame {
                 errorLabel.setText(userCreationError);
         }
         else {
-            System.out.println("Inputs were not valid: " + fieldsError);
+            Logging.getLogger().warning("Inputs were not valid: " + fieldsError);
             errorLabel.setText(fieldsError);
         }
     }
@@ -267,7 +292,7 @@ public class RegistrationPage extends JFrame {
                 //======== RegisterFormPanel ========
                 {
                     RegisterFormPanel.setPreferredSize(new Dimension(200, 275));
-                    RegisterFormPanel.setLayout(new GridLayout(10, 1, 5, 5));
+                    RegisterFormPanel.setLayout(new GridLayout(12, 1, 4, 4));
 
                     //---- label_Email ----
                     label_Email.setText(bundle.getString("RegistrationPage.label_Email.text"));
@@ -302,6 +327,15 @@ public class RegistrationPage extends JFrame {
                     label_confirmPassword.setFont(label_confirmPassword.getFont().deriveFont(label_confirmPassword.getFont().getSize() + 3f));
                     RegisterFormPanel.add(label_confirmPassword);
                     RegisterFormPanel.add(passwordField_confirm);
+
+                    // Address Section
+                    JLabel addressLabel = new JLabel("Address:");
+                    JButton addressButton = new JButton("Add Address");
+                    addressButton.addActionListener(e -> onEditAddress());
+                    addressLabel.setFont(addressLabel.getFont().deriveFont(addressLabel.getFont().getSize() + 3f));
+                    addressButton.setText("Edit Address");
+                    RegisterFormPanel.add(addressLabel);
+                    RegisterFormPanel.add(addressButton);
                 }
                 RegisterContentPanel.add(RegisterFormPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
                     GridBagConstraints.CENTER, GridBagConstraints.NONE,
@@ -336,5 +370,6 @@ public class RegistrationPage extends JFrame {
     private JPasswordField passwordField_create;
     private JLabel label_confirmPassword;
     private JPasswordField passwordField_confirm;
+    private AddressDialog addressDialog;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }

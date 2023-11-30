@@ -7,13 +7,13 @@ public class Controller extends Product {
 
     }
 
-    public Controller(String brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, boolean isDigital) {
-        super(brand, productName, productCode, retailPrice, description, stockQuantity);
+    public Controller(String brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, boolean isDigital, String image) {
+        super(brand, productName, productCode, retailPrice, description, stockQuantity, image);
         this.setDigitalType(isDigital);
     }
 
     public Controller(Product product, boolean isDigital) {
-        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity());
+        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity(), product.getImageBase64());
         this.setDigitalType(isDigital);
         this.setProductID(product.getProductID());
     }

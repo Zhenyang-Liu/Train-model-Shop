@@ -1,15 +1,15 @@
 INSERT INTO Era (era_code, description) VALUES
-    (1, 'Era 1'),
-    (2, 'Era 2'),
-    (3, 'Era 3'),
-    (4, 'Era 4'),
-    (5, 'Era 5'),
-    (6, 'Era 6'),
-    (7, 'Era 7'),
-    (8, 'Era 8'),
-    (9, 'Era 9'),
-    (10, 'Era 10'),
-    (11, 'Era 11');
+    (1, 'Era 1: 1804 - 1874 Pioneering'),
+    (2, 'Era 2: 1875 - 1922 Pre-Grouping'),
+    (3, 'Era 3: 1923 - 1947: The Big Four'),
+    (4, 'Era 4: 1948 - 1956: British Railways Steam (Early Crest Livery'),
+    (5, 'Era 5: 1957 - 1966: British Railways Steam (Late Crest Livery)'),
+    (6, 'Era 6: 1967 - 1971: British Railways Corporate Blue (Pre-TOPS)'),
+    (7, 'Era 7: 1972 - 1982: British Railways Corporate Blue (Post-TOPS)'),
+    (8, 'Era 8: 1983 - 1994: British Rail Sectorisation'),
+    (9, 'Era 9: 1995 - 2004: Initial Privatisation'),
+    (10, 'Era 10: 2005 - 2015: Rebuilding of the Railways'),
+    (11, 'Era 11: 2016 - 2026: Current Era');
 
 INSERT INTO Role (role_name) VALUES
     ('CUSTOMER'),

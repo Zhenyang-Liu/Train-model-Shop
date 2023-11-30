@@ -13,6 +13,7 @@ import java.util.Map;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
+import helper.Logging;
 import model.Order;
 import model.Product;
 
@@ -143,6 +144,27 @@ public class OrderDAO {
         }
     }
 
+    public static void cancelOrder(Order order) throws DatabaseException {
+        String updateSQL = "UPDATE Orders SET "
+           + "update_time = ?, status = ?, reason = ? "
+           + "WHERE order_id = ?;";
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
+            preparedStatement.setTimestamp(1, order.getUpdateTime());
+            preparedStatement.setString(2, "Cancelled");
+            preparedStatement.setString(3, order.getReason());
+            preparedStatement.setInt(4, order.getOrderID());
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(),e);
+        }
+    }
+
     /**
      * Retrieves an order from the database by its ID.
      *
@@ -171,8 +193,9 @@ public class OrderDAO {
                 String status = resultSet.getString("status");
                 Map<Product,Integer> itemList = findOrderItems(orderID);
                 boolean validBankDetail = resultSet.getInt("bank_detail_state") == 1;
+                String reason = resultSet.getString("reason");
 
-                return new Order(orderID, userID, addressID, createTime, updateTime, total_cost, status,itemList,validBankDetail);
+                return new Order(orderID, userID, addressID, createTime, updateTime, total_cost, status,itemList,validBankDetail,reason);
             }
 
         } catch (SQLTimeoutException e){
@@ -181,6 +204,40 @@ public class OrderDAO {
             throw new DatabaseException(e.getMessage(),e);
         }
         return null;
+    }
+
+    public static ArrayList<Order> findOrderByStatus(String statusString) throws DatabaseException {
+        String selectSQL = "SELECT * FROM Orders WHERE status = ?;";
+        ArrayList<Order> orderList = new ArrayList<>();
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+
+            preparedStatement.setString(1, statusString);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int orderID = resultSet.getInt("order_id");
+                int userID = resultSet.getInt("user_id");
+                int addressID = resultSet.getInt("delivery_address_id");
+                Timestamp createTime = resultSet.getTimestamp("create_time");
+                Timestamp updateTime = resultSet.getTimestamp("update_time");
+                double total_cost = resultSet.getDouble("total_cost");
+                String status = resultSet.getString("status");
+                Map<Product,Integer> itemList = findOrderItems(orderID);
+                boolean validBankDetail = resultSet.getInt("bank_detail_state") == 1;
+                String reason = resultSet.getString("reason");
+
+                Order order = new Order(orderID, userID, addressID, createTime, updateTime, total_cost, status,itemList,validBankDetail,reason);
+                orderList.add(order);
+            }
+
+        } catch (SQLTimeoutException e){
+            throw new ConnectionException("Database connect failed",e);
+        } catch (SQLException e) {
+            throw new DatabaseException(e.getMessage(),e);
+        }
+        return orderList;
     }
     
     /**
@@ -192,7 +249,7 @@ public class OrderDAO {
      * @return A Map of Product to Integer representing the items and their quantities in the order.
      * @throws DatabaseException if there is an issue with database access.
      */
-    public static Map<Product,Integer> findOrderItems(int orderID) throws DatabaseException {
+    public static Map<Product,Integer> findOrderItems(int orderID) {
         String selectSQL = "SELECT * FROM Order_Line WHERE order_id = ?;";
         Map<Product,Integer> itemList = new HashMap<>();
 
@@ -206,14 +263,21 @@ public class OrderDAO {
                 int productID = resultSet.getInt("product_id");
                 int quantity = resultSet.getInt("quantity");
 
-                itemList.put(ProductDAO.findProductByID(productID),quantity);
+                try{
+                    itemList.put(ProductDAO.findProductByID(productID),quantity);
+                }catch(DatabaseException e){
+                    Logging.getLogger().warning("Error when finding order items for order no. " + orderID + 
+                        " Could not find product " + productID + "\nStacktrace: " + e.getMessage());
+                }
             }
             
 
         } catch (SQLTimeoutException e){
-            throw new ConnectionException("Database connect failed",e);
+            Logging.getLogger().warning("Error when finding order items for order no. " + orderID + 
+                        " SQL Timed out\nStacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(),e);
+            Logging.getLogger().warning("Error when finding order items for order no. " + orderID + 
+                        " SQL Excepted\nStacktrace: " + e.getMessage());
         }
         return itemList;
     }
@@ -226,7 +290,7 @@ public class OrderDAO {
      * @return An ArrayList of Order objects representing all orders in the database.
      * @throws DatabaseException if there is an issue with database access.
      */
-    public static ArrayList<Order> findAllOrder() throws DatabaseException {
+    public static ArrayList<Order> findAllOrder()  {
         String selectSQL = "SELECT * FROM Orders;";
         ArrayList<Order> orderList = new ArrayList<>();
     
@@ -244,15 +308,50 @@ public class OrderDAO {
                 String status = resultSet.getString("status");
                 Map<Product,Integer> itemList = findOrderItems(orderID);
                 boolean validBankDetail = resultSet.getInt("bank_detail_state") == 1;
+                String reason = resultSet.getString("reason");
 
-                Order order = new Order(orderID, userID, addressID, createTime, updateTime, total_cost, status,itemList,validBankDetail);
+                Order order = new Order(orderID, userID, addressID, createTime, updateTime, total_cost, status,itemList,validBankDetail,reason);
                 if (!status.equals("Pending"))
                     orderList.add(order);
             }
-        } catch (SQLTimeoutException e) {
-            throw new ConnectionException("Database connect failed", e);
+        } catch (SQLTimeoutException e){
+            Logging.getLogger().warning("Error when finding all orders: SQL Timed out\nStacktrace: " + e.getMessage());
         } catch (SQLException e) {
-            throw new DatabaseException(e.getMessage(), e);
+            Logging.getLogger().warning("Error when finding all orders: SQL Excepted\nStacktrace: " + e.getMessage());
+        }
+        return orderList;
+    }
+
+    public static ArrayList<Order> findUserAllOrder(int userID)  {
+        String selectSQL = "SELECT * FROM Orders WHERE user_id = ?;";
+        ArrayList<Order> orderList = new ArrayList<>();
+    
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement checkStatement = connection.prepareStatement(selectSQL)) {
+
+            checkStatement.setInt(1, userID);
+            ResultSet resultSet = checkStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int orderID = resultSet.getInt("order_id");
+                userID = resultSet.getInt("user_id");
+                int addressID = resultSet.getInt("delivery_address_id");
+                Timestamp createTime = resultSet.getTimestamp("create_time");
+                Timestamp updateTime = resultSet.getTimestamp("update_time");
+                double total_cost = resultSet.getDouble("total_cost");
+                String status = resultSet.getString("status");
+                Map<Product,Integer> itemList = findOrderItems(orderID);
+                boolean validBankDetail = resultSet.getInt("bank_detail_state") == 1;
+                String reason = resultSet.getString("reason");
+
+                Order order = new Order(orderID, userID, addressID, createTime, updateTime, total_cost, status,itemList,validBankDetail,reason);
+                
+                orderList.add(order);
+            }
+        } catch (SQLTimeoutException e){
+            Logging.getLogger().warning("Error when finding all orders: SQL Timed out\nStacktrace: " + e.getMessage());
+        } catch (SQLException e) {
+            Logging.getLogger().warning("Error when finding all orders: SQL Excepted\nStacktrace: " + e.getMessage());
         }
         return orderList;
     }

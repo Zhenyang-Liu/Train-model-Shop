@@ -5,9 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
+import java.util.ArrayList;
+
 import exception.ConnectionException;
 import exception.DatabaseException;
-import java.util.ArrayList;
+import helper.Logging;
 import model.User;
 
 public class UserDAO {
@@ -27,7 +29,7 @@ public class UserDAO {
         PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
             // Make sure the user is not in the database before adding
             if (doesUserExist(newUser.getUserID())) {
-                System.out.println("User not added, they are already in the database");
+                Logging.getLogger().warning("User not added, they are already in the database");
                 return false;
             }
             
@@ -40,13 +42,37 @@ public class UserDAO {
 
             // Run SQL command
             preparedStatement.executeUpdate();
-            System.out.println("Successfully added user into database!");
+            Logging.getLogger().info("Successfully added user into database!");
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.getLogger().warning("Error while inserting new user: SQL Excepted\nStacktrace: " + e.getMessage());
         }
 
         // Default return false as nothing above matched
+        return false;
+    }
+
+    /**
+     * Deletes a user from the database
+     * @param user the user to delete
+     */
+    public static boolean deleteUser(User user) {
+        String deleteSQL = "DELETE FROM User WHERE user_id = ?";
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
+            // Make sure the user is in the database before deleting
+            if (!doesUserExist(user.getUserID())) {
+                Logging.getLogger().warning("User not added, they are already in the database");
+                return false;
+            }
+
+            // Delete user
+            preparedStatement.setInt(1, user.getUserID());
+            preparedStatement.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            Logging.getLogger().warning("Error while deleting ser: SQL Excepted\nStacktrace: " + e.getMessage());
+        }
         return false;
     }
 
@@ -57,7 +83,7 @@ public class UserDAO {
      * @return {@code true} if the user exists, {@code false} otherwise
      * @throws SQLException If there was an error during query
      */
-    public static boolean doesUserExist(int userID) {
+    public static boolean doesUserExist(int userID){
         String checkSQL = "SELECT COUNT(*) FROM User WHERE user_id = ?";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -69,10 +95,9 @@ public class UserDAO {
                     return results.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.getLogger().warning("Could not check if user " + userID + " existed as SQL Excepted\nStacktrace: " + e.getMessage());
         }
 
-        // Default return false as nothing above matched
         return false;
     }
 
@@ -83,7 +108,7 @@ public class UserDAO {
      * @return {@code true} if the user exists, {@code false} otherwise
      * @throws SQLException If there was an error during query
      */
-    public static boolean doesUserExist(String email) {
+    public static boolean doesUserExist(String email){
         String checkSQL = "SELECT COUNT(*) FROM User WHERE email = ?";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -95,10 +120,9 @@ public class UserDAO {
                     return results.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.getLogger().warning("Could not check if user " + email + " existed as SQL Excepted\nStacktrace: " + e.getMessage());
         }
 
-        // Default return false as nothing above matched
         return false;
     }
 
@@ -153,6 +177,31 @@ public class UserDAO {
             throw new DatabaseException(e.getMessage(), e);
         }
         return user;
+    }
+
+    /**
+     * Updates the user based of a new user object
+     * @param user the user object to update the values for
+     * @return true if success, false if not
+     */
+    public static boolean updateUser(User user) {
+        if (doesUserExist(user.getUserID())){
+            String getSQL = "UPDATE User SET email = ?, forename = ?, surname = ?, address = ? WHERE user_id = ?";
+            try (Connection connection = DatabaseConnectionHandler.getConnection();
+            PreparedStatement sqlStatement = connection.prepareStatement(getSQL)) {
+                sqlStatement.setString(1, user.getEmail());
+                sqlStatement.setString(2, user.getForename());
+                sqlStatement.setString(3, user.getSurname());
+                sqlStatement.setString(4, user.getAddress());
+                sqlStatement.setInt(5, user.getUserID());
+                sqlStatement.executeUpdate();
+                return true;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return false;
     }
 
     /**

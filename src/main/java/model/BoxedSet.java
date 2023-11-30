@@ -32,26 +32,19 @@ public class BoxedSet extends Product{
     }
 
     public BoxedSet() {
-
+        this.contain = new HashMap<>();
     }
 
-    public BoxedSet(String brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String boxedType) {
-        super(brand, productName, productCode, retailPrice, description, stockQuantity);
+    public BoxedSet(String brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String boxedType, String image) {
+        super(brand, productName, productCode, retailPrice, description, stockQuantity, image);
         this.setBoxedType(boxedType);
         this.contain = new HashMap<>();
     }
 
-    public BoxedSet(Product product, String boxedType) {
-        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity());
+    public BoxedSet(Product product, String boxedType, Map<Product,Integer> itemList) {
+        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity(), product.getImageBase64());
         this.setBoxedType(boxedType);
-        this.contain = new HashMap<>();
-        this.setProductID(product.getProductID());
-    }
-
-    public BoxedSet(Product product, String boxedType, Map<Product, Integer> itemList) {
-        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity());
-        this.setBoxedType(boxedType);
-        this.contain = itemList;
+        this.setContain(itemList);
         this.setProductID(product.getProductID());
     }
 
@@ -67,7 +60,25 @@ public class BoxedSet extends Product{
         return contain;
     }
 
+    public void setContain(Map<Product,Integer> itemList){
+        this.contain = new HashMap<>();
+        this.contain.putAll(itemList);
+    }
+
     public void addProduct(Product product, int quantity) {
-        this.contain.put(product, quantity);
+        boolean productExists = false;
+        if (contain != null){
+            for (Product existingProduct : contain.keySet()) {
+                if (existingProduct.getProductID() == product.getProductID()) {
+                    int existingQuantity = contain.get(existingProduct);
+                    contain.put(existingProduct, existingQuantity + quantity);
+                    productExists = true;
+                    break;
+                }
+            }
+        } 
+        if (!productExists) {
+            contain.put(product, quantity);
+        }
     }
 }

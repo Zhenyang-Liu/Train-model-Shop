@@ -10,13 +10,14 @@ import javax.swing.text.PlainDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class BankDetailDialog extends JDialog {
     private JTextField cardHolderField;
     private JTextField cardNumberField;
     private JTextField expiryDateField;
     private JTextField expiryYearField;
-    private JTextField securityCodeField;
     private JButton actionButton;
     private JButton cancelButton;
 
@@ -41,48 +42,88 @@ public class BankDetailDialog extends JDialog {
             populateFields();
         }
         setLocationRelativeTo(parent);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                onCancelButtonClicked();
+            }
+        });
     }
     
     private void initializeComponents() {
-        setLayout(new GridLayout(0, 2));
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
     
-        add(new JLabel("Card Holder:"));
-        cardHolderField = new JTextField(20);
-        add(cardHolderField);
-    
-        add(new JLabel("Card Number:"));
-        cardNumberField = new JTextField(16);
-        ((PlainDocument) cardNumberField.getDocument()).setDocumentFilter(new NumericDocumentFilter());
-        add(cardNumberField);
-    
-        add(new JLabel("Expiry Date:"));
-    
-        JPanel expiryPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        expiryDateField = new JTextField(2); // month
-        expiryYearField = new JTextField(2); // year
-        ((PlainDocument) expiryDateField.getDocument()).setDocumentFilter(new NumericDocumentFilter());
-        ((PlainDocument) expiryYearField.getDocument()).setDocumentFilter(new NumericDocumentFilter());
-        expiryPanel.add(expiryDateField);
-        expiryPanel.add(new JLabel("/"));
-        expiryPanel.add(expiryYearField);
-        add(expiryPanel);
-    
-        add(new JLabel("Security Code:"));
-        securityCodeField = new JTextField(3);
-        ((PlainDocument) securityCodeField.getDocument()).setDocumentFilter(new NumericDocumentFilter());
-        add(securityCodeField);
-    
-        actionButton = new JButton(isEditMode ? "Update" : "Add");
-        actionButton.addActionListener(isEditMode ? e -> onUpdate() : e -> onAdd());
-        add(actionButton);
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(e -> dispose());
-        add(cancelButton);
+        addComponentWithLabel("Card Holder:", cardHolderField = new JTextField(20), gbc);
+        addComponentWithLabel("Card Number:", cardNumberField = new JTextField(16), gbc);
+        addComponentWithLabel("Expiry Date:", createExpiryPanel(), gbc);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 0));
+
+        actionButton = createButton(isEditMode ? "Update" : "Add", new Color(34, 139, 34));
+        actionButton.addActionListener(isEditMode ? e -> onUpdate() : e -> onAdd());
+        buttonPanel.add(actionButton);
+
+        cancelButton = createButton("Cancel", new Color(0x204688));
+        cancelButton.addActionListener(e -> onCancelButtonClicked());
+        buttonPanel.add(cancelButton);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.PAGE_END;
+        add(buttonPanel, gbc);
 
         pack();
     }
-    
+
+    private JButton createButton(String text, Color backgroundColor) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Arial", Font.BOLD, 12));
+        button.setForeground(Color.WHITE);
+        button.setBackground(backgroundColor);
+        return button;
+    }
+
+    private void addComponentWithLabel(String labelText, JComponent component, GridBagConstraints gbc) {
+        JLabel label = createLabel(labelText);
+        add(label, gbc);
+        gbc.gridx++;
+        add(component, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+    }
+
+    private JLabel createLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setForeground(new Color(0x003366));
+        label.setFont(new Font("Arial", Font.BOLD, 12));
+        return label;
+    }
+
+    private JPanel createExpiryPanel() {
+        JPanel expiryPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        expiryDateField = new JTextField(2); // month
+        expiryYearField = new JTextField(2); // year
+        setNumericFilter(expiryDateField);
+        setNumericFilter(expiryYearField);
+        expiryPanel.add(expiryDateField);
+        expiryPanel.add(new JLabel("/"));
+        expiryPanel.add(expiryYearField);
+        return expiryPanel;
+    }
+
+    private void setNumericFilter(JTextField textField) {
+        ((PlainDocument) textField.getDocument()).setDocumentFilter(new NumericDocumentFilter());
+    }
+
     class NumericDocumentFilter extends javax.swing.text.DocumentFilter {
         @Override
         public void insertString(DocumentFilter.FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
@@ -105,13 +146,13 @@ public class BankDetailDialog extends JDialog {
      * Validates the user input and adds the new bank details to the database. Closes the dialog if the operation is successful.
      */
     private void onAdd() {
-        String message = BankDetailService.checkBankDetail(getCardHolder(), getCardNumber(), getExpiryDate(), getSecurityCode());
+        String message = BankDetailService.checkBankDetail(getCardHolder(), getCardNumber(), getExpiryDate());
         
         if (!"Bank details are valid.".equals(message)) {
             JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             int currentUserID = UserSession.getInstance().getCurrentUser().getUserID();
-            String insertBankDetail = BankDetailService.addBankDetail(currentUserID, getCardHolder(), getCardNumber(), getExpiryDate(), getSecurityCode());
+            String insertBankDetail = BankDetailService.addBankDetail(currentUserID, getCardHolder(), getCardNumber(), getExpiryDate());
             if (insertBankDetail != "success") {
                 JOptionPane.showMessageDialog(this, insertBankDetail, "Error", JOptionPane.ERROR_MESSAGE);
             } else {
@@ -127,13 +168,13 @@ public class BankDetailDialog extends JDialog {
      * Validates the user input and updates the existing bank details in the database. Closes the dialog if the operation is successful.
      */
     private void onUpdate() {
-        String message = BankDetailService.checkBankDetail(getCardHolder(), getCardNumber(), getExpiryDate(), getSecurityCode());
+        String message = BankDetailService.checkBankDetail(getCardHolder(), getCardNumber(), getExpiryDate());
         
         if (!"Bank details are valid.".equals(message)) {
             JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             int currentUserID = UserSession.getInstance().getCurrentUser().getUserID();
-            String updateBankDetail = BankDetailService.updateBankDetail(currentUserID, getCardHolder(), getCardNumber(), getExpiryDate(), getSecurityCode());
+            String updateBankDetail = BankDetailService.updateBankDetail(currentUserID, getCardHolder(), getCardNumber(), getExpiryDate());
             if (updateBankDetail != "success") {
                 JOptionPane.showMessageDialog(this, updateBankDetail, "Error", JOptionPane.ERROR_MESSAGE);
             } else {
@@ -154,13 +195,16 @@ public class BankDetailDialog extends JDialog {
                 expiryYearField.setText(expiry[1]); 
             }
     
-            securityCodeField.setText(bankDetail.getSecurityCode());
         }
+    }
+
+    private void onCancelButtonClicked() {
+        isInputValid = false;
+        dispose();
     }
     
     public String getCardHolder() { return cardHolderField.getText(); }
     public String getCardNumber() { return cardNumberField.getText(); }
     public String getExpiryDate() { return expiryDateField.getText()+"/"+ expiryYearField.getText(); }
-    public String getSecurityCode() { return securityCodeField.getText(); }
     public boolean isInputValid() { return isInputValid; }
 }

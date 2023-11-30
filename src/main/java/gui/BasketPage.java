@@ -5,6 +5,7 @@
 package gui;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -12,25 +13,71 @@ import javax.swing.border.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import exception.DatabaseException;
+import helper.Logging;
 import listeners.ReloadListener;
+import listeners.SetRoleButtons;
+import model.Cart;
 import model.CartItem;
 import model.Product;
 import service.CartService;
-import model.Cart;
+
+import static DAO.OrderDAO.findOrderByID;
 
 /**
  * @author Zhenyang Liu
  */
 public class BasketPage extends JFrame {
+    private Cart cart;
     private ReloadListener reloadListener;
+
     public void setReloadListener(ReloadListener listener) {
         this.reloadListener = listener;
     }
 
+
     public BasketPage(int userID) {
+        this.cart = CartService.getCartDetails(userID);
         initComponents();
         loadUserCart(userID);
     }
+
+    private void checkOutButtonMouseClicked(MouseEvent e) {
+        int orderID = CartService.checkoutCart(cart.getCartID());
+        if (orderID == -1) {
+            // Stock issue
+            JOptionPane.showMessageDialog(this,
+                    "Stock is insufficient to complete the order.",
+                    "Stock Issue",
+                    JOptionPane.ERROR_MESSAGE);
+        } else if (orderID == -2) {
+            // Issue in creating order
+            JOptionPane.showMessageDialog(this,
+                    "There was a problem creating the order. Please try again later.",
+                    "Order Creation Failed",
+                    JOptionPane.ERROR_MESSAGE);
+        } else if (orderID == -3) {
+            // Database or other exception
+            JOptionPane.showMessageDialog(this,
+                    "An error occurred processing your request. Please contact support or try again later.",
+                    "System Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } else {
+            // Order created successfully
+            try {
+                this.dispose();
+                PendingOrderPage pendingOrderPage = new PendingOrderPage(findOrderByID(orderID));
+                pendingOrderPage.setVisible(true);
+            }catch(DatabaseException e1){
+                Logging.getLogger().warning("Could not find create pending order page at orderID " + orderID + "\nStacktrace: " + e1.getMessage());
+                JOptionPane.showMessageDialog(this,
+                        "An error occurred while fetching order details.",
+                        "Order Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
@@ -120,6 +167,7 @@ public class BasketPage extends JFrame {
                         trolleyCardPanel.setForeground(new Color(0x003366));
                         trolleyCardPanel.setPreferredSize(new Dimension(600, 120));
                         trolleyCardPanel.setMaximumSize(new Dimension(2147483647, 100));
+                        trolleyCardPanel.setVisible(false);
                         trolleyCardPanel.setLayout(new BoxLayout(trolleyCardPanel, BoxLayout.X_AXIS));
 
                         //---- itemImage1 ----
@@ -182,7 +230,7 @@ public class BasketPage extends JFrame {
                     }
                     trolleyItemsPanel.add(trolleyCardPanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
                         GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                        new Insets(0, 0, 0, 0), 0, 0));
+                        new Insets(0, 0, 5, 0), 0, 0));
                 }
                 trolleyScrollPanel.setViewportView(trolleyItemsPanel);
             }
@@ -225,6 +273,12 @@ public class BasketPage extends JFrame {
             checkOutButton.setBackground(new Color(0x55a15a));
             checkOutButton.setForeground(new Color(0xe9e4e3));
             checkOutButton.setFont(checkOutButton.getFont().deriveFont(checkOutButton.getFont().getStyle() | Font.BOLD, checkOutButton.getFont().getSize() + 2f));
+            checkOutButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    checkOutButtonMouseClicked(e);
+                }
+            });
             trolleyButtonPanel.add(checkOutButton);
         }
         contentPane.add(trolleyButtonPanel, BorderLayout.SOUTH);
@@ -252,11 +306,15 @@ public class BasketPage extends JFrame {
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
     private void loadUserCart(int userID) {
-        Cart cart = CartService.getCartDetails(userID);
-        if (cart != null){
+        if (cart.getCartID() == 0){
+            CartService.createCart();
+            cart = CartService.getCartDetails(userID);
+        }
+        if (cart.getCartItems().size() > 0){
             loadTrolleyItems(cart.getCartItems()); // Load cart items into the trolley view
-        } else{
-            // TODO: Missing logic when action failed
+        } else {
+            JLabel noItemLabel = new JLabel("There is no item in your cart.");
+            trolleyItemsPanel.add(noItemLabel);
         }
     }
 
@@ -328,7 +386,7 @@ public class BasketPage extends JFrame {
         adjustPanel.setLayout(null); // Null layout for absolute positioning
 
         // Create and configure the spinner for product quantity
-        JSpinner itemSpinner = new JSpinner(new SpinnerNumberModel(quantity, 1, null, 1));
+        JSpinner itemSpinner = new JSpinner(new SpinnerNumberModel(quantity, 0, null, 1));
         itemSpinner.setPreferredSize(new Dimension(40, 10));
         itemSpinner.setMinimumSize(new Dimension(30, 10));
         itemSpinner.setBorder(new MatteBorder(1, 1, 1, 1, Color.black));
@@ -339,13 +397,45 @@ public class BasketPage extends JFrame {
             @Override
             public void stateChanged(ChangeEvent e) {
                 int currentQuantity = (Integer) itemSpinner.getValue();
+                if (currentQuantity == 0){
+                    if(CartService.removeFromCart(cartItem.getItemID())){
+                        Container parent = trolleyCardPanel.getParent();
+                        parent.remove(trolleyCardPanel);
+                        parent.revalidate();
+                        parent.repaint();
 
-                if(CartService.updateCartItem(cartItem.getItemID(), currentQuantity)){
-                    if (reloadListener != null) {
-                        reloadListener.reloadProducts();
+                        if (reloadListener != null) {
+                            reloadListener.reloadProducts();
+                            System.out.println("Remove button clicked!");
+                        }
+                    }else{
+                        //TODO: Missing logic if update failed
                     }
-                }else{
-                    //TODO: Missing logic if update failed
+                } else if (currentQuantity > 0) {
+                    if (cartItem.getProductStock() >= currentQuantity){
+                        if(CartService.updateCartItem(cartItem.getItemID(), currentQuantity)){
+                            if (reloadListener != null) {
+                                reloadListener.reloadProducts();
+                            }
+                        }else{
+                            JOptionPane.showMessageDialog(null,
+                                    "Illegal Operation",
+                                    "Update Failed",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    }else {
+                        itemSpinner.setValue(cartItem.getProductStock());
+                        JOptionPane.showMessageDialog(null,
+                                "Max stock quantity reached",
+                                "Update Failed",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }
+
+                } else {
+                    JOptionPane.showMessageDialog(null,
+                            "Illegal Quantity",
+                            "Update Failed",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -357,6 +447,25 @@ public class BasketPage extends JFrame {
         itemRemoveButton.setBackground(new Color(0xd54945));
         adjustPanel.add(itemRemoveButton);
         itemRemoveButton.setBounds(25, 50, 90, 35);
+
+        itemRemoveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(CartService.removeFromCart(cartItem.getItemID())){
+                    Container parent = trolleyCardPanel.getParent();
+                    parent.remove(trolleyCardPanel);
+                    parent.revalidate();
+                    parent.repaint();
+
+                    if (reloadListener != null) {
+                        reloadListener.reloadProducts();
+                        System.out.println("Remove button clicked!");
+                    }
+                }else{
+                    //TODO: Missing logic if update failed
+                }
+            }
+        });
 
         // Compute the preferred size of the adjustPanel based on its components
         Dimension preferredSize = new Dimension();

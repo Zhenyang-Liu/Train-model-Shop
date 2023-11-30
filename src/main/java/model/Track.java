@@ -18,13 +18,13 @@ public class Track extends Product {
      * @param stockQuantity The stock quantity of the product.
      * @param gauge        The gauge of the track.
      */
-    public Track(String brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String gauge) {
-        super(brand, productName, productCode, retailPrice, description, stockQuantity);
+    public Track(String brand, String productName, String productCode, float retailPrice, String description, int stockQuantity, String gauge, String image) {
+        super(brand, productName, productCode, retailPrice, description, stockQuantity, image);
         this.setGauge(gauge);
     }
 
     public Track(Product product, String gauge) {
-        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity());
+        super(product.getBrand(), product.getProductName(), product.getProductCode(), product.getRetailPrice(), product.getDescription(), product.getStockQuantity(), product.getImageBase64());
         this.setGauge(gauge);
         this.setProductID(product.getProductID());
     }
