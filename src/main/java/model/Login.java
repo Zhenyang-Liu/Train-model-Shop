@@ -16,12 +16,6 @@ public class Login{
     private String passwordHash;
     private String passwordSalt;
 
-    private int failedAttempts;
-    private Timestamp lastLoginAttempt;
-
-    private boolean lockoutEnabled;
-    private Timestamp lockoutEnd;
-
     public Login() {}
 
     public Login(int userID) {
@@ -169,82 +163,4 @@ public class Login{
         return hash(password, getPasswordSalt()).equals(getPasswordHash());
     }
 
-    /**
-     * Sets the number of failed login attempts for this user
-     *
-     * @param failedAttempts the number of attemps the user is currently at
-     */
-    public void setFailedAttempts(int failedAttempts){
-        this.failedAttempts = failedAttempts;
-    }
-
-    /**
-     * Increases the number of failed attempts for this user by 1
-     */
-    public void incrementFailedAttempts(){
-        this.failedAttempts++;
-    }
-
-    /**
-     * Gets the number of failed attempts
-     *
-     * @return the number of failed attempts
-     */
-    public int getFailedAttempts(){
-        return this.failedAttempts;
-    }
-
-    /**
-     * Sets the time the user last attempted to login
-     *
-     * @param time the time the user last attempted to login
-     */
-    public void setLastLoginAttempt(Timestamp time){
-        this.lastLoginAttempt = time;
-    }
-
-    /**
-     * Gets the time the user last attempted to logi
-     *
-     * @return the timestamp of the last login attempt
-     */
-    public Timestamp getLastLoginAttempt(){
-        return this.lastLoginAttempt;
-    }
-
-    /**
-     * Flags the user's account as locked or unlocked
-     *
-     * @param lockoutEnabled whether the account is locked or unlocked
-     */
-    public void setLockoutEnabled(boolean lockoutEnabled){
-        this.lockoutEnabled = lockoutEnabled;
-    }
-
-    /**
-     * Checks whether the account is locked
-     *
-     * @return whether lockout is enabled for this login
-     */
-    public boolean isLockoutEnabled(){
-        return this.lockoutEnabled;
-    }
-
-    /**
-     * Sets the time at which this account will be unlocked
-     *
-     * @param time the time for the account to be unlocked
-     */
-    public void setLockoutEnd(Timestamp time){
-        this.lockoutEnd = time;
-    }
-
-    /**
-     * Gets the time at which this account will be unlocked
-     *
-     * @return the timestamp at which the user's account will be unlocked
-     */
-    public Timestamp getLockoutEnd(){
-        return this.lockoutEnd;
-    }
 }

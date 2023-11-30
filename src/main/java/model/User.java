@@ -9,24 +9,21 @@ public class User {
     private String email;
     private String forename;
     private String surname;
-    private String address;
 
     public User() {}
 
-    public User(String email, String forename, String surname, String address) {
+    public User(String email, String forename, String surname) {
         this.userID = generateUserID();
         this.email = email;
         this.forename = forename;
         this.surname = surname;
-        this.address = address;
     }
 
-    public User(int id, String email, String forename, String surname, String address) {
+    public User(int id, String email, String forename, String surname) {
         this.userID = id;
         this.email = email;
         this.forename = forename;
         this.surname = surname;
-        this.address = address;
     }
 
     /**
@@ -124,21 +121,4 @@ public class User {
         this.surname = surname;
     }
 
-    /**
-     * Gets the users current address
-     * 
-     * @return the users current address
-     */
-    public String getAddress() {
-        return address;
-    }
-
-    /**
-     * Sets user address
-     * 
-     * @param address the new address
-     */
-    public void setAddress(String address) {
-        this.address = address;
-    }
 }
