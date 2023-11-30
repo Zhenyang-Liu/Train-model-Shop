@@ -23,7 +23,7 @@ public class OrderManagePage extends JFrame {
     public OrderManagePage() {
         setTitle("Order Management");
         setSize(800, 600);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setLayout(new BorderLayout());
 
         JPanel topPanel = createTopPanel();
@@ -120,7 +120,7 @@ public class OrderManagePage extends JFrame {
     
         JScrollPane scrollPane = new JScrollPane(orderTable);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
     
         orderPanel.add(scrollPane, gbc);
         return orderPanel;

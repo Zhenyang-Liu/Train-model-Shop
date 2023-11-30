@@ -22,7 +22,7 @@ public class BankDetailDAO {
     public static void insertBankDetail(BankDetail bankDetail) throws DatabaseException {
         String insertSQL = "INSERT INTO Bank_Detail "
             + "(card_name, card_holder_name, card_number, expiry_date, user_id) "
-            + "VALUES (?,?,?,?,?,?);";
+            + "VALUES (?,?,?,?,?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
