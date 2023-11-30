@@ -24,7 +24,7 @@ public class ManagerPage extends JFrame {
     public ManagerPage() {
         setTitle("Manager Board");
         setSize(800, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
         JPanel topPanel = createTopPanel();
