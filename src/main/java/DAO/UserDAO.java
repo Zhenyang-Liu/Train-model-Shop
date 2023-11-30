@@ -97,7 +97,7 @@ public class UserDAO {
         } catch (SQLException e) {
             Logging.getLogger().warning("Could not check if user " + userID + " existed as SQL Excepted\nStacktrace: " + e.getMessage());
         }
-        // Default return false as nothing above matched
+
         return false;
     }
 
@@ -123,7 +123,6 @@ public class UserDAO {
             Logging.getLogger().warning("Could not check if user " + email + " existed as SQL Excepted\nStacktrace: " + e.getMessage());
         }
 
-        // Default return false as nothing above matched
         return false;
     }
 

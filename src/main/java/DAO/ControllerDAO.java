@@ -15,6 +15,12 @@ import model.Product;
 
 public class ControllerDAO extends ProductDAO {
 
+    /**
+     * Inserts a new controller into the database.
+     *
+     * @param controller The Controller object to insert.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static void insertController(Controller controller) throws DatabaseException {
         int productID = insertProduct(controller);
         String insertSQL = "INSERT INTO Controller (product_id, digital_type) VALUES (?, ?);";
@@ -40,10 +46,14 @@ public class ControllerDAO extends ProductDAO {
         } catch (SQLException e) {
             throw new DatabaseException(e.getMessage(),e);
         }
-
-       
     }
 
+    /**
+     * Updates an existing controller in the database.
+     *
+     * @param controller The Controller object to update.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static void updateController(Controller controller) throws DatabaseException {
         ProductDAO.updateProduct(controller);
         String updateSQL = "UPDATE Controller SET digital_type = ? WHERE product_id = ?;";
@@ -65,6 +75,12 @@ public class ControllerDAO extends ProductDAO {
         }
     }
 
+    /**
+     * Deletes a controller from the database.
+     *
+     * @param productId The product ID of the controller to delete.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static void deleteController(int productId) throws DatabaseException {
         String deleteSQL = "DELETE FROM Controller WHERE product_id = ?;";
 
@@ -88,6 +104,13 @@ public class ControllerDAO extends ProductDAO {
     
     }
 
+    /**
+     * Retrieves a controller from the database by its product ID.
+     *
+     * @param productID The product ID of the controller to find.
+     * @return The Controller object found, or a new Controller object if not found.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static Controller findControllerByID(int productID) throws DatabaseException {
         String selectSQL = "SELECT * FROM Controller WHERE product_id = ?";
         Controller controller = new Controller();
@@ -110,6 +133,12 @@ public class ControllerDAO extends ProductDAO {
         return controller;
     }
     
+    /**
+     * Retrieves controllers from the database by their type (digital or analogue).
+     *
+     * @param isDigital Boolean indicating whether to find digital controllers (true) or analogue controllers (false).
+     * @return An ArrayList of Controller objects matching the specified type.
+     */
     public static ArrayList<Controller> findControllersByType(boolean isDigital) {
         ArrayList<Controller> controllers = new ArrayList<Controller>();
         String  selectSQL = "SELECT * FROM Controller WHERE digital_type = ?;";
@@ -148,6 +177,11 @@ public class ControllerDAO extends ProductDAO {
         return controllers;
     }
     
+    /**
+     * Retrieves all controllers from the database.
+     *
+     * @return An ArrayList of Controller objects.
+     */
     public static ArrayList<Controller> findAllControllers() {
         ArrayList<Controller> controllers = new ArrayList<Controller>();
         String  selectSQL = "SELECT * FROM Controller;";

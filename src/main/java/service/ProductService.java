@@ -17,7 +17,13 @@ import model.Product;
 import model.BoxedSet.BoxedType;
 
 public class ProductService {
-
+    
+    /**
+     * Updates a product in the database.
+     *
+     * @param p The Product object to update.
+     * @return A string indicating the success or failure of the operation.
+     */
     public static String updateProduct(Product p) {
         try{
             if (!PermissionService.hasPermission("MANAGE_PRODUCTS")){
@@ -31,6 +37,13 @@ public class ProductService {
         }
     }
 
+    /**
+     * Retrieves all products from the database.
+     *
+     * This function is specific designed for product manage dashboard.
+     * 
+     * @return An ArrayList of Product objects.
+     */
     public static ArrayList<Product> getAllProducts() {
         try{
             if (!PermissionService.hasPermission("MANAGE_PRODUCTS")){
@@ -45,6 +58,12 @@ public class ProductService {
         }
     }
 
+    /**
+     * Retrieves products by their type.
+     *
+     * @param type The type of products to retrieve.
+     * @return An ArrayList of Product objects of the specified type.
+     */
     public static ArrayList<Product> getAllProductsByType(String type) {
         try{
             if (!PermissionService.hasPermission("MANAGE_PRODUCTS")){
@@ -89,6 +108,16 @@ public class ProductService {
         }
     }
 
+    /**
+     * Validates the input for a new or updated product.
+     *
+     * @param productName The product's name.
+     * @param productCode The product's code.
+     * @param brandName The product's brand name.
+     * @param retailPrice The retail price of the product.
+     * @param stockQuantity The stock quantity of the product.
+     * @return A string indicating any validation errors, or null if the input is valid.
+     */
     public static String validateProductInput(String productName, String productCode, String brandName, 
                                             String retailPrice, String stockQuantity) {
         if (productName == null || productName.trim().isEmpty()) {
@@ -136,6 +165,12 @@ public class ProductService {
         return null;
     }
 
+    /**
+     * Deletes a product from the database.
+     *
+     * @param p The Product object to delete.
+     * @return A string indicating the success or failure of the operation.
+     */
     public static String deleteProduct(Product p){
         try{
             if (!PermissionService.hasPermission("MANAGE_PRODUCTS")){
@@ -172,6 +207,11 @@ public class ProductService {
         }
     } 
 
+    /**
+     * Updates the quantity of boxed sets based on the stock of individual products.
+     *
+     * @param boxID The ID of the boxed set.
+     */
     public static void updateBoxedSetQuantity(int boxID) {
         try {
             BoxedSet set = BoxedSetDAO.findBoxedSetByID(boxID);
@@ -198,6 +238,11 @@ public class ProductService {
         }
     }    
 
+    /**
+     * Finds all eras from the database.
+     *
+     * @return An ArrayList of era descriptions.
+     */
     public static ArrayList<String> findAllEra(){
         try {
             return EraDAO.findAllEraDescription();
@@ -207,6 +252,12 @@ public class ProductService {
         }
     }
 
+    /**
+     * Finds descriptions for a list of era codes.
+     *
+     * @param list An array of era codes.
+     * @return An ArrayList of era descriptions.
+     */
     public static ArrayList<String> findEraDescription(int[] list){
         try {
             if (!PermissionService.hasPermission("BROWSE_PRODUCTS")){
@@ -223,6 +274,12 @@ public class ProductService {
         }
     }
 
+    /**
+     * Finds a product by its ID.
+     *
+     * @param productID The ID of the product to find.
+     * @return The Product object, or a new Product object if not found.
+     */
     public static Product findProductByID(int productID){
         try {
             return ProductDAO.findProductByID(productID);

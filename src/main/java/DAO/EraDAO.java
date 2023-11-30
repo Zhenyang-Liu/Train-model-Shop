@@ -36,7 +36,6 @@ public class EraDAO {
 
             int[] batchResults = preparedStatement.executeBatch();
             
-            // print to Test
             for (int i = 0; i < batchResults.length; i++) {
                 if (batchResults[i] == PreparedStatement.EXECUTE_FAILED) {
                     Logging.getLogger().warning("Insert operation failed for record at index " + i);
@@ -146,6 +145,16 @@ public class EraDAO {
         return idList;
     }
 
+    /**
+     * Retrieves a list of all era descriptions in the database, sorted by era code.
+     *
+     * This method queries the Era table and extracts the description of each era,
+     * returning a list of these descriptions ordered by era code.
+     * It logs a warning and throws an exception in case of SQL timeouts or other SQL exceptions.
+     *
+     * @return An ArrayList of Strings containing descriptions of each era.
+     * @throws DatabaseException If a database error occurs.
+     */
     public static ArrayList<String> findAllEraDescription() throws DatabaseException {
         String selectSQL = "SELECT description FROM Era ORDER BY era_code ASC;";
         ArrayList<String> eraDescriptions = new ArrayList<>();
@@ -170,6 +179,16 @@ public class EraDAO {
         return eraDescriptions;
     }
 
+    /**
+     * Retrieves the description of a specific era based on its era code.
+     *
+     * This method queries the Era table for the description corresponding to the provided era code.
+     * It logs a warning and throws an exception in case of SQL timeouts or other SQL exceptions.
+     *
+     * @param eraCode The era code for which the description is being retrieved.
+     * @return A String containing the description of the specified era, or an empty string if not found.
+     * @throws DatabaseException If a database error occurs.
+     */
     public static String findDescriptionByCode(int eraCode) throws DatabaseException {
         String selectSQL = "SELECT description FROM Era WHERE era_code = ?;";
         String eraDescription = "";
@@ -193,6 +212,5 @@ public class EraDAO {
         }
         return eraDescription;
     }
-    
     
 }
