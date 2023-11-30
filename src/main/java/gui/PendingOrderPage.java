@@ -588,7 +588,11 @@ public class PendingOrderPage extends JFrame {
         cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.X_AXIS));
 
         JLabel itemImage = new JLabel();
-        itemImage.setIcon(new ImageIcon(getClass().getResource("/images/tgv.jpeg")));
+        ImageIcon originalIcon = product.getProductImage();
+        Image originalImage = originalIcon.getImage();
+        Image resizedImage = originalImage.getScaledInstance(160, 120, Image.SCALE_SMOOTH);
+        itemImage.setIcon(new ImageIcon(resizedImage));
+
         itemImage.setPreferredSize(new Dimension(160, 120));
         itemImage.setMaximumSize(new Dimension(160, 120));
         cardPanel.add(itemImage);
