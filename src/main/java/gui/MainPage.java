@@ -16,6 +16,7 @@ import javax.swing.*;
 
 import exception.DatabaseException;
 import helper.Filter;
+import helper.ImageUtils;
 import helper.Logging;
 import helper.UserSession;
 import listeners.ReloadListener;
@@ -127,15 +128,15 @@ public class MainPage extends JFrame implements ReloadListener {
         subTypeFilterLabel.setVisible(true);
         if(table.equals("Locomotive")){
             subTypeFilterLabel.setText("DCC Type");
-            subTypeFilterBox.addItem(DCCType.ANALOGUE);
-            subTypeFilterBox.addItem(DCCType.FITTED);
-            subTypeFilterBox.addItem(DCCType.READY);
-            subTypeFilterBox.addItem(DCCType.SOUND);
+            subTypeFilterBox.addItem(f.new SubFilter<DCCType>(DCCType.ANALOGUE, "dcc_type"));
+            subTypeFilterBox.addItem(f.new SubFilter<DCCType>(DCCType.FITTED, "dcc_type"));
+            subTypeFilterBox.addItem(f.new SubFilter<DCCType>(DCCType.READY, "dcc_type"));
+            subTypeFilterBox.addItem(f.new SubFilter<DCCType>(DCCType.SOUND, "dcc_type"));
         }else if(table.equals("Track")){
             subTypeFilterLabel.setText("Gauge");
-            subTypeFilterBox.addItem(Gauge.OO);
-            subTypeFilterBox.addItem(Gauge.TT);
-            subTypeFilterBox.addItem(Gauge.N);
+            subTypeFilterBox.addItem(f.new SubFilter<Gauge>(Gauge.OO, "gauge"));
+            subTypeFilterBox.addItem(f.new SubFilter<Gauge>(Gauge.TT, "gauge"));
+            subTypeFilterBox.addItem(f.new SubFilter<Gauge>(Gauge.N, "gauge"));
         }else{
             subTypeFilterBox.setVisible(false);
             subTypeFilterLabel.setVisible(false);
@@ -169,7 +170,7 @@ public class MainPage extends JFrame implements ReloadListener {
         });
     }
 
-    private void populateBrandFilters(){
+private void populateBrandFilters(){
         ArrayList<String> toAdd = ProductDAO.findAllBrand();
         brandFilterBox.addItem(f.new BrandFilter(null, "All"));
         for(String b: toAdd)
@@ -246,7 +247,7 @@ public class MainPage extends JFrame implements ReloadListener {
         mainPageSplitPane = new JSplitPane();
         filterPanel = new JPanel();
         sortLabel = new JLabel();
-        sortOptions = new JComboBox<>();;
+        sortOptions = new JComboBox<>();
         priceFilterLabel = new JLabel();
         priceFilterBox = new JComboBox<>();
         typeFilterLabel = new JLabel();
@@ -717,7 +718,11 @@ public class MainPage extends JFrame implements ReloadListener {
                 Filter.BrandFilter br = (Filter.BrandFilter)brandFilterBox.getSelectedItem();
                 Filter.SortBy sb = (Filter.SortBy)sortOptions.getSelectedItem();
                 Filter.TypeFilter tp = (Filter.TypeFilter)typeFilterBox.getSelectedItem();
-                return ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax(), br.getBrand(), sb.getDbHandle(), sb.isAscending(), tp.getDbTable());
+                Filter.SubFilter sf = (Filter.SubFilter)subTypeFilterBox.getSelectedItem();
+                boolean sfB = subTypeFilterBox.isVisible();
+                return ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax(),
+                                        br.getBrand(), sb.getDbHandle(), sb.isAscending(), tp.getDbTable(),
+                                            (sfB ? sf.toString() : ""), (sfB ? sf.getDbColumn() : ""));
             }
 
             @Override
@@ -981,6 +986,7 @@ public class MainPage extends JFrame implements ReloadListener {
     public static void main(String[] args) {
         // User user = UserDAO.findUserByEmail("testemail@gmail.com");
         Logging.Init(true);
+        ImageUtils.ResourceManager.Init();
         User user = UserDAO.findUserByEmail("manager@manager.com");
         UserSession.getInstance().setCurrentUser(user);
 

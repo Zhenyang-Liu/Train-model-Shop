@@ -173,7 +173,7 @@ new FormModel {
 					add( new FormComponent( "javax.swing.JComboBox" ) {
 						name: "sortOptions"
 						auxiliary() {
-							"JavaCodeGenerator.customCreateCode": "new JComboBox<>();;"
+							"JavaCodeGenerator.customCreateCode": "new JComboBox<>();"
 						}
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"gridy": 1

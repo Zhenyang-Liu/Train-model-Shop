@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
+import helper.Filter;
 import helper.Logging;
 import model.*;
 
@@ -243,13 +244,15 @@ public class ProductDAO {
         return rVal;
     }
 
-    private static String constructSQLQuery(String searchQuery, float minPrice, float maxPrice, String brand, String sortBy, boolean asc, String type){
+    private static String constructSQLQuery(String searchQuery, float minPrice, float maxPrice, String brand, String sortBy, boolean asc, String type, String sfColumn){
         String sqlString = "SELECT * FROM Product ";
         if(type != "")
             sqlString += " INNER JOIN " + type + " ON Product.product_id = " + type + ".product_id";
         sqlString += " WHERE product_name LIKE ? AND ? <= retail_price AND retail_price <= ?";
         if(brand != null && !brand.isEmpty() && !brand.equals("All"))
             sqlString += " AND brand_name = ?";
+        if(!sfColumn.isEmpty())
+            sqlString += "AND " + type + "." + sfColumn + " = ?";
         if(sortBy != "")
             sqlString += " ORDER BY " + sortBy + (asc ? " ASC" : " DESC");
         return sqlString;
@@ -265,8 +268,12 @@ public class ProductDAO {
      * @return
      * @throws SQLException
      */
-    private static PreparedStatement constructPreparedStatement(Connection connection, String searchQuery, float minPrice, float maxPrice, String brand, String sortBy, boolean asc, String type) throws SQLException{
-        String sqlString = constructSQLQuery(searchQuery, minPrice, maxPrice, brand, sortBy, asc, type);
+    private static PreparedStatement constructPreparedStatement(Connection connection, String searchQuery, 
+                                                                    float minPrice, float maxPrice, 
+                                                                        String brand, String sortBy, 
+                                                                            boolean asc, String type,
+                                                                                String sfValue, String sfColumn) throws SQLException{
+        String sqlString = constructSQLQuery(searchQuery, minPrice, maxPrice, brand, sortBy, asc, type, sfColumn);
         Integer cExtraIndex = 1;
 
         PreparedStatement pStatement = connection.prepareStatement(sqlString);
@@ -277,6 +284,8 @@ public class ProductDAO {
             pStatement.setString(3 + cExtraIndex, brand);
             cExtraIndex++;
         }
+        if(!sfValue.isBlank() && !sfColumn.isBlank())
+            pStatement.setString(3 + cExtraIndex, sfValue);
         return pStatement;
     }
 
@@ -287,7 +296,7 @@ public class ProductDAO {
      * @return an array list of the products that match the search query
      */
     public static ArrayList<Product> filterProducts(String searchQuery){
-        return filterProducts(searchQuery, 0, -1, "", "", true, "");
+        return filterProducts(searchQuery, 0, -1, "", "", true, "", "", "");
     }
 
     /**
@@ -299,9 +308,9 @@ public class ProductDAO {
      * @param maxPrice
      * @return
      */
-    public static ArrayList<Product> filterProducts(String searchQuery, float minPrice, float maxPrice, String brand, String sortBy, boolean asc, String type){
+    public static ArrayList<Product> filterProducts(String searchQuery, float minPrice, float maxPrice, String brand, String sortBy, boolean asc, String type, String sfValue, String sfColumn){
         try(Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = constructPreparedStatement(connection, searchQuery, minPrice, maxPrice, brand, sortBy, asc, type)) {
+            PreparedStatement preparedStatement = constructPreparedStatement(connection, searchQuery, minPrice, maxPrice, brand, sortBy, asc, type, sfValue, sfColumn)) {
             // Return the array of products from the result set
             Logging.getLogger().info("Filtering products with query: " + preparedStatement.toString());
             return arrayFromResultSet(preparedStatement.executeQuery());
