@@ -257,7 +257,7 @@ public class AccountPage extends JFrame {
     private void onEditAddress() {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         boolean isEdit = !AddressService.isAddressEmpty(AddressService.getAddressByUser());
-        AddressDialog addressDialog = new AddressDialog(parentFrame, AddressService.getAddressByUser(),isEdit);
+        AddressDialog addressDialog = new AddressDialog(parentFrame, AddressService.getAddressByUser(),isEdit, false);
         addressDialog.setVisible(true);
     }
 

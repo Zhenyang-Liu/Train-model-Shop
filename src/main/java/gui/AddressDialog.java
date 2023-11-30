@@ -17,12 +17,15 @@ public class AddressDialog extends JDialog {
     private JButton cancelButton;
 
     private boolean isEditMode;
+    private boolean isNewUser;
     private Address address;
+    private Address newAddress;
     private boolean isInputValid;
 
-    public AddressDialog(Frame parent, Address address, boolean isEditMode) {
+    public AddressDialog(Frame parent, Address address, boolean isEditMode, boolean isNewUser) {
         super(parent, isEditMode ? "Edit Address" : "Add Address", true);
         this.isEditMode = isEditMode;
+        this.isNewUser = isNewUser;
         this.address = address;
         this.isInputValid = false;
         initializeComponents();
@@ -109,12 +112,16 @@ public class AddressDialog extends JDialog {
         if (!AddressService.isValidUKPostcode(getPostcode())) {
             JOptionPane.showMessageDialog(null, "Invalid Post Code", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
-            Address address = new Address(getHouseNumber(), getRoadName(), getCity(), getPostcode());
-            boolean isAddSuccess = AddressService.addAddress(address);
-            if (!isAddSuccess) {
-                JOptionPane.showMessageDialog(null, "Add Address failed", "Error", JOptionPane.ERROR_MESSAGE);
+            newAddress = new Address(getHouseNumber(), getRoadName(), getCity(), getPostcode());
+            if (!isNewUser) {
+                boolean isAddSuccess = AddressService.addAddress(newAddress);
+                if (!isAddSuccess) {
+                    JOptionPane.showMessageDialog(null, "Add Address failed", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    isInputValid = true;
+                    dispose();
+                }
             } else {
-                isInputValid = true;
                 dispose();
             }
         }
@@ -122,7 +129,7 @@ public class AddressDialog extends JDialog {
 
     private void onUpdate() {
         if (!AddressService.isValidUKPostcode(getPostcode())) {
-            JOptionPane.showMessageDialog(null, "Invalid Post Code", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Invalid Post Code, must be in form XX XXX", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             Address address = new Address(getHouseNumber(), getRoadName(), getCity(), getPostcode());
             boolean isAddSuccess = AddressService.updateAddress(address);
@@ -144,5 +151,6 @@ public class AddressDialog extends JDialog {
     public String getRoadName() { return roadNameField.getText(); }
     public String getCity() { return cityField.getText(); }
     public String getPostcode() { return postcodeField.getText(); }
+    public Address getNewAddress() { return newAddress; }
     public boolean isInputValid() { return isInputValid; }
 }

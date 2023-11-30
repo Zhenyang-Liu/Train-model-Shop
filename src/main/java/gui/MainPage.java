@@ -302,7 +302,7 @@ private void populateBrandFilters(){
                     button_account.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            button_accountMouseClicked(e);
+                            button_accountMouseClicked();
                         }
                     });
                     leftButtonPanel.add(button_account);

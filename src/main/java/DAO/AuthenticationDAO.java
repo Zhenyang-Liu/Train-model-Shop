@@ -70,11 +70,14 @@ public class AuthenticationDAO {
             int rowsAffected = preparedStatement.executeUpdate();
             
             if (rowsAffected == 0) {
+                Logging.getLogger().warning("Insert Role failed, no rows affected.");
                 throw new SQLException("Insert Role failed, no rows affected.");
             }
         } catch (SQLTimeoutException e) {
+            Logging.getLogger().warning("Database connection failed\nStackTrace: " + e.getMessage());
             throw new ConnectionException("Database connect failed",e);
         } catch (SQLException e) {
+            Logging.getLogger().warning("Failed to add default role\nStackTrace: " + e.getMessage());
             throw new DatabaseException(e.getMessage(),e);
         }
     }
