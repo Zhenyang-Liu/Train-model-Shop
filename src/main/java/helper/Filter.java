@@ -16,7 +16,7 @@ public class Filter {
         @Override
         public String toString()
         {
-            return this.name + (isAscending ? " ^" : " v");
+            return this.name;
         }
 
         public String getDbHandle()
