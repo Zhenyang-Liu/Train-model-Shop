@@ -19,9 +19,7 @@ import listeners.ReloadListener;
 import model.Cart;
 import model.CartItem;
 import model.Product;
-import model.User;
 import service.CartService;
-import model.Cart;
 
 import static DAO.OrderDAO.findOrderByID;
 

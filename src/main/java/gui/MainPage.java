@@ -22,7 +22,6 @@ import helper.UserSession;
 import listeners.ReloadListener;
 import model.*;
 import model.Locomotive.DCCType;
-import net.miginfocom.swing.MigLayout;
 import service.CartService;
 import service.PermissionService;
 
@@ -59,7 +58,6 @@ public class MainPage extends JFrame implements ReloadListener {
         customizeComponents();
         button_accountMouseClicked();
     }
-
 
     public void reloadProducts() {
         loadProducts();
@@ -156,11 +154,10 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     private void populateSortOptions(){
-        sortOptions.addItem(f.new SortBy("None", ""));
-        sortOptions.addItem(f.new SortBy("Price", "retail_price"));
-        sortOptions.addItem(f.new SortBy("Name", "product_name"));
-        sortOptions.addItem(f.new SortBy("Price", "retail_price", false));
-        sortOptions.addItem(f.new SortBy("Name", "product_name", false));
+        sortOptions.addItem(f.new SortBy("Name (asc)", "product_name"));
+        sortOptions.addItem(f.new SortBy("Name (desc)", "product_name", false));
+        sortOptions.addItem(f.new SortBy("Price (asc)", "retail_price"));
+        sortOptions.addItem(f.new SortBy("Price (desc)", "retail_price", false));
 
         sortOptions.addItemListener(e -> {
             loadProducts();
@@ -188,10 +185,6 @@ public class MainPage extends JFrame implements ReloadListener {
         searchButton.addActionListener(e -> {
             loadProducts();
         });
-    }
-
-    private void button_accountMouseClicked(MouseEvent e) {
-        // TODO add your code here
     }
 
     private void button_staffMouseClicked(MouseEvent e) {
@@ -240,15 +233,15 @@ public class MainPage extends JFrame implements ReloadListener {
         mainPageSplitPane = new JSplitPane();
         filterPanel = new JPanel();
         sortLabel = new JLabel();
-        sortOptions = new JComboBox();
+        sortOptions = new JComboBox<>();
         priceFilterLabel = new JLabel();
-        priceFilterBox = new JComboBox();
+        priceFilterBox = new JComboBox<>();
         typeFilterLabel = new JLabel();
-        typeFilterBox = new JComboBox();
+        typeFilterBox = new JComboBox<>();
         brandFilterLabel = new JLabel();
-        filterBox4 = new JComboBox();
+        filterBox4 = new JComboBox<>();
         subTypeFilterLabel = new JLabel();
-        subTypeFilterBox = new JComboBox();
+        subTypeFilterBox = new JComboBox<>();
         scrollPane1 = new JScrollPane();
         productPanel = new JPanel();
         productCardPanel1 = new JPanel();
@@ -290,7 +283,7 @@ public class MainPage extends JFrame implements ReloadListener {
                     button_account.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            button_accountMouseClicked(e);
+                            button_accountMouseClicked();
                         }
                     });
                     leftButtonPanel.add(button_account, BorderLayout.WEST);
@@ -636,15 +629,15 @@ public class MainPage extends JFrame implements ReloadListener {
     private JSplitPane mainPageSplitPane;
     private JPanel filterPanel;
     private JLabel sortLabel;
-    private JComboBox sortOptions;
+    private JComboBox<Filter.SortBy> sortOptions;
     private JLabel priceFilterLabel;
-    private JComboBox priceFilterBox;
+    private JComboBox<Filter.PriceRange> priceFilterBox;
     private JLabel typeFilterLabel;
-    private JComboBox typeFilterBox;
+    private JComboBox<Filter.TypeFilter> typeFilterBox;
     private JLabel brandFilterLabel;
-    private JComboBox filterBox4;
+    private JComboBox<Filter.BrandFilter> filterBox4;
     private JLabel subTypeFilterLabel;
-    private JComboBox subTypeFilterBox;
+    private JComboBox<Enum> subTypeFilterBox;
     private JScrollPane scrollPane1;
     private JPanel productPanel;
     private JPanel productCardPanel1;
