@@ -14,7 +14,6 @@ import java.awt.*;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
 
-import exception.AuthorizationException;
 import exception.DatabaseException;
 import helper.Filter;
 import helper.Logging;
@@ -668,15 +667,15 @@ public class MainPage extends JFrame implements ReloadListener {
     private JSplitPane mainPageSplitPane;
     private JPanel filterPanel;
     private JLabel sortLabel;
-    private JComboBox sortOptions;
+    private JComboBox<Filter.SortBy> sortOptions;
     private JLabel priceFilterLabel;
-    private JComboBox priceFilterBox;
+    private JComboBox<Filter.PriceRange> priceFilterBox;
     private JLabel typeFilterLabel;
-    private JComboBox typeFilterBox;
+    private JComboBox<Filter.TypeFilter> typeFilterBox;
     private JLabel brandFilterLabel;
-    private JComboBox brandFilterBox;
+    private JComboBox<Filter.BrandFilter> brandFilterBox;
     private JLabel subTypeFilterLabel;
-    private JComboBox subTypeFilterBox;
+    private JComboBox<Enum> subTypeFilterBox;
     private JScrollPane scrollPane1;
     private JPanel productPanel;
     private JPanel productCardPanel1;
