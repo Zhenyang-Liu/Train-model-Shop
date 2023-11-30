@@ -120,6 +120,7 @@ public class AccountPage extends JFrame {
             } else {
                 updatePassword = true;
             }
+
             // Update Messages
             if (updatedUser && updatePassword && updatedCard) {
                 errorLabel.setText("");
@@ -247,11 +248,17 @@ public class AccountPage extends JFrame {
             new Insets(0, 0, 0, 0), 0, 0));
     }
 
+    /**
+     * Open change password dialogue box
+     */
     private void onChangePassword() {
         ChangePasswordDialog dialog = new ChangePasswordDialog(this);
         dialog.setVisible(true);
     }
  
+    /**
+     * Open edit bank details dialogue box
+     */
     private void onEditBankDetails() {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         boolean isEdit = BankDetailService.findBankDetail() != null;
@@ -259,6 +266,9 @@ public class AccountPage extends JFrame {
         bankDetailDialog.setVisible(true);
     }
 
+    /**
+     * Open edit address dialogue box
+     */
     private void onEditAddress() {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         boolean isEdit = !AddressService.isAddressEmpty(AddressService.getAddressByUser());
@@ -336,6 +346,13 @@ public class AccountPage extends JFrame {
         WindowPanel.add(ButtonPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Create a default button
+     * @param buttonLabel the text on the button
+     * @param bgColor the button background colour
+     * @param fgColor the button foreground colour
+     * @return
+     */
     private JButton makeButton(String buttonLabel, int bgColor, int fgColor) {
         JButton button = new JButton(buttonLabel);
         button.setBackground(new Color(bgColor));
