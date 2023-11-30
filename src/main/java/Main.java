@@ -1,4 +1,5 @@
 
+import gui.LoginPage;
 import gui.MainPage;
 import helper.Logging;
 
@@ -10,22 +11,27 @@ import DAO.DatabaseConnectionHandler;
 
 public class Main {
     public static void main(String[] args) {
-        try{
+        try {
             System.out.println("Welcome to TrainShop!");
             Logging.Init(false);
-            // Create Main Page Object
-            // TODO: Make login load first!
-            MainPage mainPage = new MainPage();
 
-            mainPage.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            mainPage.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    DatabaseConnectionHandler.shutdown();
-                    Logging.Close();
-                }
+            LoginPage loginPage = new LoginPage();
+            loginPage.setLoginSuccessListener(() -> {
+                MainPage mainPage = new MainPage();
+                mainPage.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                mainPage.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        DatabaseConnectionHandler.shutdown();
+                        Logging.Close();
+                    }
+                });
+                mainPage.setVisible(true);
+
+                loginPage.setVisible(false);
             });
-            mainPage.setVisible(true);
+
+            loginPage.setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
         }

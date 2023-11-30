@@ -11,6 +11,7 @@ import DAO.UserDAO;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.jgoodies.forms.factories.DefaultComponentFactory;
 import java.awt.*;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
 import java.util.HashMap;
@@ -46,7 +47,9 @@ import java.util.ResourceBundle;
  */
 public class MainPage extends JFrame implements ReloadListener {
     private Filter f;
-    private HashMap<Integer, JPanel> productPanelCache; 
+    private HashMap<Integer, JPanel> productPanelCache;
+    Map<String, JComponent> cardComponents = new HashMap<>();
+
     public MainPage() {
 
         Logging.getLogger().info("Creating Main Page");
@@ -57,13 +60,13 @@ public class MainPage extends JFrame implements ReloadListener {
         customizeComponents();
         f = new Filter();
         populateFilterBoxes();
-        loadProducts();
+        loadProducts(false);
 
         button_accountMouseClicked();
     }
 
     public void reloadProducts() {
-        loadProducts();
+        loadProducts(false);
     }
 
     public void setButtonsByRole(){
@@ -83,7 +86,7 @@ public class MainPage extends JFrame implements ReloadListener {
             if (!UserSession.getInstance().isLoggedIn()) {
                 LoginPage loginPage = new LoginPage();;
                 loginPage.setVisible(true);
-                loginPage.setLoginSuccessListener(this::loadProducts);
+                loginPage.setLoginSuccessListener(this);
                 loginPage.setRoleButtonsListener(this::setButtonsByRole);
             } else {
                 int userID = UserSession.getInstance().getCurrentUser().getUserID();
@@ -100,7 +103,7 @@ public class MainPage extends JFrame implements ReloadListener {
             int userID = currentUser.getUserID();
             BasketPage basketPage = new BasketPage(userID);
             basketPage.setVisible(true);
-            basketPage.setReloadListener(this::loadProducts);
+            basketPage.setReloadListener(this);
         } else {
             // USER NOT LOGIN
             LoginPage loginPage = new LoginPage();
@@ -119,7 +122,7 @@ public class MainPage extends JFrame implements ReloadListener {
         priceFilterBox.addItem(f.new PriceRange(500.0f, 1e10f, "£500<"));
 
         priceFilterBox.addItemListener(e -> {
-            loadProducts();
+            loadProducts(true);
         });
     }
 
@@ -162,15 +165,15 @@ public class MainPage extends JFrame implements ReloadListener {
 
         typeFilterBox.addItemListener(e -> {
             populateSubFilters();
-            loadProducts();
+            loadProducts(true);
         });
         subTypeFilterBox.addItemListener(e -> {
             ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).setSubFilter(e.getItem().toString());
-            loadProducts();
+            loadProducts(true);
         });
         subTypeFilterBox2.addItemListener(e -> {
             ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).setSubFilter(e.getItem().toString());
-            loadProducts();
+            loadProducts(true);
         });
     }
 
@@ -181,17 +184,17 @@ public class MainPage extends JFrame implements ReloadListener {
         sortOptions.addItem(f.new SortBy("Price (desc)", "retail_price", false));
 
         sortOptions.addItemListener(e -> {
-            loadProducts();
+            loadProducts(true);
         });
     }
 
-private void populateBrandFilters(){
+    private void populateBrandFilters(){
         ArrayList<String> toAdd = ProductDAO.findAllBrand();
         brandFilterBox.addItem(f.new BrandFilter(null, "All"));
         for(String b: toAdd)
             brandFilterBox.addItem(f.new BrandFilter(b));
         brandFilterBox.addItemListener(e -> {
-            loadProducts();
+            loadProducts(true);
         });
     }
 
@@ -204,7 +207,7 @@ private void populateBrandFilters(){
         populateSubFilters();
 
         searchButton.addActionListener(e -> {
-            loadProducts();
+            loadProducts(true);
         });
     }
 
@@ -755,7 +758,7 @@ private void populateBrandFilters(){
     }
 
 
-    private void loadProducts() {
+    private void loadProducts(boolean useCache) {
         new SwingWorker<ArrayList<Product>, Void>() {
             @Override
             protected ArrayList<Product> doInBackground() throws Exception {
@@ -785,12 +788,15 @@ private void populateBrandFilters(){
                     ArrayList<Product> productList = get();
                     // Updating the GUI with a Product List
                     for (Product product : productList) {
-                        // Add product panel to cache if it exists
-                        if(!productPanelCache.containsKey(product.getProductID())){
-                            productPanelCache.put(product.getProductID(), createProductCard(product));
+                        JPanel productCard;
+                        if (useCache && productPanelCache.containsKey(product.getProductID())) {
+                            productCard = productPanelCache.get(product.getProductID());
+                        } else {
+                            productCard = createProductCard(product);
+                            if (useCache) {
+                                productPanelCache.put(product.getProductID(), productCard);
+                            }
                         }
-                        JPanel productCard = productPanelCache.get(product.getProductID());
-                        // Add the card to the container
                         productPanel.add(productCard);
                     }
                     productPanel.revalidate();
@@ -948,15 +954,16 @@ private void populateBrandFilters(){
 
         // Adding event listeners to the "Add" button
         addButton.addActionListener(e -> {
-            User thisUser = UserSession.getInstance().getCurrentUser();
-            if (thisUser != null) {
+            User user = UserSession.getInstance().getCurrentUser();
+            if (user != null) {
+                int userid = user.getUserID();
                 addButton.setVisible(false);
                 adjustNumPanel.setVisible(true);
-                Cart cart = CartService.getCartDetails(userID);
+                Cart cart = CartService.getCartDetails(userid);
                 int cartID = cart.getCartID();
                 if (cartID == 0) {
                     CartService.createCart();
-                    cartID = CartService.getCartDetails(userID).getCartID();
+                    cartID = CartService.getCartDetails(userid).getCartID();
                 }
                 int productID = product.getProductID();
                 CartService.addToCart(cartID, productID, 1);

@@ -404,7 +404,6 @@ public class BasketPage extends JFrame {
 
                         if (reloadListener != null) {
                             reloadListener.reloadProducts();
-                            System.out.println("Remove button clicked!");
                         }
                     }else{
                         //TODO: Missing logic if update failed
@@ -457,7 +456,7 @@ public class BasketPage extends JFrame {
 
                     if (reloadListener != null) {
                         reloadListener.reloadProducts();
-                        System.out.println("Remove button clicked!");
+                    }else{
                     }
                 }else{
                     //TODO: Missing logic if update failed
