@@ -210,7 +210,8 @@ public class Product {
     public void setImageBase64(String base64){
         this.imageBase64 = base64;
         // Ensure resource manager updates the product
-        ImageUtils.ResourceManager.updateImageForProduct(productID);
+        if(base64 != null && !base64.isEmpty())
+            ImageUtils.ResourceManager.updateImageForProduct(productID);
     }
 
 
