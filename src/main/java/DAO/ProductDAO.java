@@ -251,7 +251,7 @@ public class ProductDAO {
         if(brand != null && !brand.isEmpty() && !brand.equals("All"))
             sqlString += " AND brand_name = ?";
         if(sortBy != "")
-            sqlString += " ORDER BY ? ?";
+            sqlString += " ORDER BY " + sortBy + (asc ? " ASC" : " DESC");
         return sqlString;
     }
  
@@ -276,11 +276,6 @@ public class ProductDAO {
         if(brand != null && !brand.isEmpty() && !brand.equals("All")){
             pStatement.setString(3 + cExtraIndex, brand);
             cExtraIndex++;
-        }
-        if(sortBy != ""){
-            pStatement.setString(3 + cExtraIndex, sortBy);
-            pStatement.setString(4 + cExtraIndex, asc ? "ASC" : "DESC");
-            cExtraIndex += 2;
         }
         return pStatement;
     }
@@ -308,6 +303,7 @@ public class ProductDAO {
         try(Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = constructPreparedStatement(connection, searchQuery, minPrice, maxPrice, brand, sortBy, asc, type)) {
             // Return the array of products from the result set
+            Logging.getLogger().info("Filtering products with query: " + preparedStatement.toString());
             return arrayFromResultSet(preparedStatement.executeQuery());
         }catch(SQLException e){
             e.printStackTrace();
