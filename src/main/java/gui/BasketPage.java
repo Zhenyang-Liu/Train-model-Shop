@@ -14,6 +14,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import exception.DatabaseException;
+import helper.ImageUtils;
 import helper.Logging;
 import listeners.ReloadListener;
 import listeners.SetRoleButtons;
@@ -357,12 +358,9 @@ public class BasketPage extends JFrame {
         trolleyCardPanel.setLayout(new BoxLayout(trolleyCardPanel, BoxLayout.X_AXIS));
 
         // Create and configure the product image label
-        JLabel itemImage = new JLabel();
         ImageIcon originalIcon = product.getProductImage();
-        Image originalImage = originalIcon.getImage();
-        Image resizedImage = originalImage.getScaledInstance(150, 100, Image.SCALE_SMOOTH);
-        itemImage.setIcon(new ImageIcon(resizedImage));
-
+        ImageIcon resizedIcon = ImageUtils.resizeAndFillImageIcon(originalIcon, 160, 120);
+        JLabel itemImage = new JLabel(resizedIcon);
 
         trolleyCardPanel.add(itemImage);
 

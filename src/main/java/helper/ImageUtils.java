@@ -1,13 +1,12 @@
 package helper;
 
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import java.awt.Color;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -142,5 +141,44 @@ public class ImageUtils {
      */
     public static ImageIcon imageFromPath(URI path){
         return imageToIcon(toBase64(new File(path)));
+    }
+
+    /**
+     * Zoom and crop the image to fit the specified size.
+     *
+     * @param originalIcon The original image icon to be processed.
+     * @param targetWidth The target width.
+     * @param targetHeight The target height.
+     * @return The scaled and possibly cropped image icon.
+     */
+    public static ImageIcon resizeAndFillImageIcon(ImageIcon originalIcon, int targetWidth, int targetHeight) {
+        Image originalImage = originalIcon.getImage();
+
+
+        double aspectRatio = (double) originalImage.getWidth(null) / originalImage.getHeight(null);
+        double targetRatio = (double) targetWidth / targetHeight;
+
+        int newWidth;
+        int newHeight;
+
+        if (aspectRatio > targetRatio) {
+            newHeight = targetHeight;
+            newWidth = (int) (newHeight * aspectRatio);
+        } else {
+            newWidth = targetWidth;
+            newHeight = (int) (newWidth / aspectRatio);
+        }
+
+        Image resizedImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+
+        BufferedImage croppedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = croppedImage.createGraphics();
+
+        int x = (targetWidth - newWidth) / 2;
+        int y = (targetHeight - newHeight) / 2;
+        g2d.drawImage(resizedImage, x, y, null);
+        g2d.dispose();
+
+        return new ImageIcon(croppedImage);
     }
 }

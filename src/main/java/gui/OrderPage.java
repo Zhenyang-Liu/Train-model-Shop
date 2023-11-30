@@ -4,14 +4,7 @@
 
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -26,6 +19,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
+import helper.ImageUtils;
 import model.Address;
 import model.Order;
 import model.Product;
@@ -96,8 +90,9 @@ public class OrderPage extends JFrame {
         cardPanel.setPreferredSize(new Dimension(590, 120));
         cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.X_AXIS));
 
-        JLabel itemImage = new JLabel();
-        itemImage.setIcon(new ImageIcon(getClass().getResource("/images/tgv.jpeg")));
+        ImageIcon originalIcon = product.getProductImage();
+        ImageIcon resizedIcon = ImageUtils.resizeAndFillImageIcon(originalIcon, 160, 120);
+        JLabel itemImage = new JLabel(resizedIcon);
         itemImage.setPreferredSize(new Dimension(160, 120));
         itemImage.setMaximumSize(new Dimension(160, 120));
         cardPanel.add(itemImage);
