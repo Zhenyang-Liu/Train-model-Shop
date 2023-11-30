@@ -74,7 +74,6 @@ public class ControllerDAO extends ProductDAO {
 
             int rowsAffected = preparedStatement.executeUpdate();
             
-            // Print to Test
             if (rowsAffected > 0) {
                 ProductDAO.deleteProduct(productId);
                 Logging.getLogger().info("Controller with ID " + productId + " was deleted successfully.");

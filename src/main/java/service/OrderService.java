@@ -52,7 +52,8 @@ public class OrderService {
 
     public static boolean cancelOrder(Order order, String reason) {
         try{
-            if (!PermissionService.hasPermission("MANAGE_ORDERS")){
+            if (!PermissionService.hasPermission(order.getUserID(),"VIEW_OWN_ORDERS") 
+            && !PermissionService.hasPermission("MANAGE_ORDERS")){
                 throw new AuthorizationException("Access denied. Only Staff can manage orders.");
             }
             order.setUpdateTime();

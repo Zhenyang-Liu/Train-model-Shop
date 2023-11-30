@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import model.User;
 import service.RoleService;
@@ -47,15 +48,29 @@ public class ManagerPage extends JFrame {
         titleLabel.setForeground(new Color(0x003366));
         topPanel.add(titleLabel, BorderLayout.NORTH);
 
+        String[] searchOptions = {"Name", "Email", "UserID"};
+        JComboBox<String> searchTypeComboBox = new JComboBox<>(searchOptions);
+
         JPanel searchPanel = new JPanel();
         JTextField searchField = new JTextField(20);
         JButton searchButton = new JButton("Search");
         searchButton.setBackground(new Color(0x204688));
         searchButton.setForeground(Color.WHITE);
+        searchButton.addActionListener(e -> performSearch(
+            (String) searchTypeComboBox.getSelectedItem(),
+            searchField.getText()
+        ));
+
+        JButton clearButton = new JButton("Clear");
+        clearButton.addActionListener(e -> {
+            searchField.setText("");
+            loadTableData(currentRoleFilter);
+        });
+    
+        searchPanel.add(searchTypeComboBox);
         searchPanel.add(searchField);
         searchPanel.add(searchButton);
-        //TODO：Search
-
+        searchPanel.add(clearButton);
         topPanel.add(searchPanel, BorderLayout.SOUTH);
         return topPanel;
     }
@@ -91,10 +106,8 @@ public class ManagerPage extends JFrame {
         button.setPreferredSize(size);
         button.addActionListener(listener);
         return button;
-    }    
-    // -------------------------------------------------------
+    } 
 
-    // Section for rightPanel
     private void initializeTable() {
         String[] columnNames = {"UserID", "Email Address", "Forename", "Surname", "Role", "Action"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
@@ -146,6 +159,44 @@ public class ManagerPage extends JFrame {
     private void reloadTableData() {
         loadTableData(currentRoleFilter);
     } 
+
+    private void performSearch(String searchType, String searchTerm) {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0);
+
+        Map<User, String> userList = RoleService.getAllUserWithRole();
+
+        // Filter the list with currentRoleFilter
+        Stream<Map.Entry<User, String>> filteredStream = userList.entrySet().stream()
+            .filter(entry -> currentRoleFilter == null || entry.getValue().equalsIgnoreCase(currentRoleFilter));
+
+        filteredStream.filter(entry -> matchSearchCriteria(entry, searchType, searchTerm))
+            .forEach(entry -> {
+                User user = entry.getKey();
+                model.addRow(new Object[]{
+                    user.getUserID(),
+                    user.getEmail(),
+                    user.getForename(),
+                    user.getSurname(),
+                    entry.getValue(),
+                    getActionButtonLabelByRole(entry.getValue())
+                });
+            });
+    }
+    
+    private boolean matchSearchCriteria(Map.Entry<User, String> entry, String searchType, String searchTerm) {
+        User user = entry.getKey();
+        switch (searchType) {
+            case "Name":
+                return user.getForename().contains(searchTerm) || user.getSurname().contains(searchTerm);
+            case "Email":
+                return user.getEmail().contains(searchTerm);
+            case "UserID":
+                return String.valueOf(user.getUserID()).contains(searchTerm);
+            default:
+                return false;
+        }
+    }
 
     private String getActionButtonLabelByRole(String role) {
         if ("customer".equalsIgnoreCase(role)) {
