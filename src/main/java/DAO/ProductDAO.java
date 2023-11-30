@@ -244,16 +244,18 @@ public class ProductDAO {
         return rVal;
     }
 
-    private static String constructSQLQuery(String searchQuery, float minPrice, float maxPrice, String brand, String sortBy, boolean asc, String type, String sfColumn){
+    private static String constructSQLQuery(String searchQuery, float minPrice, float maxPrice, String brand, String sortBy, boolean asc, String type, String sfColumn, String sfColumn2){
         String sqlString = "SELECT * FROM Product ";
-        if(type != "")
+        if(!type.isEmpty())
             sqlString += " INNER JOIN " + type + " ON Product.product_id = " + type + ".product_id";
         sqlString += " WHERE product_name LIKE ? AND ? <= retail_price AND retail_price <= ?";
         if(brand != null && !brand.isEmpty() && !brand.equals("All"))
             sqlString += " AND brand_name = ?";
         if(!sfColumn.isEmpty())
-            sqlString += "AND " + type + "." + sfColumn + " = ?";
-        if(sortBy != "")
+            sqlString += " AND " + type + "." + sfColumn + " = ?";
+        if(!sfColumn2.isEmpty())
+            sqlString += " AND " + type + "." + sfColumn2 + " = ?";
+        if(!sortBy.isEmpty())
             sqlString += " ORDER BY " + sortBy + (asc ? " ASC" : " DESC");
         return sqlString;
     }
@@ -272,8 +274,9 @@ public class ProductDAO {
                                                                     float minPrice, float maxPrice, 
                                                                         String brand, String sortBy, 
                                                                             boolean asc, String type,
-                                                                                String sfValue, String sfColumn) throws SQLException{
-        String sqlString = constructSQLQuery(searchQuery, minPrice, maxPrice, brand, sortBy, asc, type, sfColumn);
+                                                                                String sfValue, String sfColumn,
+                                                                                    String sfValue2, String sfColumn2) throws SQLException{
+        String sqlString = constructSQLQuery(searchQuery, minPrice, maxPrice, brand, sortBy, asc, type, sfColumn, sfColumn2);
         Integer cExtraIndex = 1;
 
         PreparedStatement pStatement = connection.prepareStatement(sqlString);
@@ -284,8 +287,14 @@ public class ProductDAO {
             pStatement.setString(3 + cExtraIndex, brand);
             cExtraIndex++;
         }
-        if(!sfValue.isBlank() && !sfColumn.isBlank())
+        if(!sfValue.isBlank() && !sfColumn.isBlank()){
             pStatement.setString(3 + cExtraIndex, sfValue);
+            cExtraIndex++;
+        }
+        if(!sfValue2.isBlank() && !sfColumn2.isBlank()){
+            pStatement.setString(3 + cExtraIndex, sfValue2);
+            cExtraIndex++;
+        }
         return pStatement;
     }
 
@@ -296,7 +305,7 @@ public class ProductDAO {
      * @return an array list of the products that match the search query
      */
     public static ArrayList<Product> filterProducts(String searchQuery){
-        return filterProducts(searchQuery, 0, -1, "", "", true, "", "", "");
+        return filterProducts(searchQuery, 0, -1, "", "", true, "", "", "", "", "");
     }
 
     /**
@@ -308,9 +317,12 @@ public class ProductDAO {
      * @param maxPrice
      * @return
      */
-    public static ArrayList<Product> filterProducts(String searchQuery, float minPrice, float maxPrice, String brand, String sortBy, boolean asc, String type, String sfValue, String sfColumn){
+    public static ArrayList<Product> filterProducts(String searchQuery, float minPrice, float maxPrice, 
+                                                        String brand, String sortBy, boolean asc, String type, 
+                                                            String sfValue, String sfColumn, 
+                                                                String sfValue2, String sfColumn2){
         try(Connection connection = DatabaseConnectionHandler.getConnection();
-            PreparedStatement preparedStatement = constructPreparedStatement(connection, searchQuery, minPrice, maxPrice, brand, sortBy, asc, type, sfValue, sfColumn)) {
+            PreparedStatement preparedStatement = constructPreparedStatement(connection, searchQuery, minPrice, maxPrice, brand, sortBy, asc, type, sfValue, sfColumn, sfValue2, sfColumn2)) {
             // Return the array of products from the result set
             Logging.getLogger().info("Filtering products with query: " + preparedStatement.toString());
             return arrayFromResultSet(preparedStatement.executeQuery());

@@ -123,6 +123,7 @@ public class MainPage extends JFrame implements ReloadListener {
 
     private void populateSubFilters(){
         subTypeFilterBox.removeAllItems();
+        subTypeFilterBox2.removeAllItems();
         String table = ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).getDbTable();
         subTypeFilterBox.setVisible(true);
         subTypeFilterLabel.setVisible(true);
@@ -130,6 +131,7 @@ public class MainPage extends JFrame implements ReloadListener {
         subTypeFilterLabel2.setVisible(true);
         if(table.equals("Track") || table.equals("Locomotive")){
             subTypeFilterLabel.setText("Gauge");
+            subTypeFilterBox.addItem(f.new SubFilter<String>("All", ""));
             subTypeFilterBox.addItem(f.new SubFilter<Gauge>(Gauge.OO, "gauge"));
             subTypeFilterBox.addItem(f.new SubFilter<Gauge>(Gauge.TT, "gauge"));
             subTypeFilterBox.addItem(f.new SubFilter<Gauge>(Gauge.N, "gauge"));
@@ -139,6 +141,7 @@ public class MainPage extends JFrame implements ReloadListener {
         }
         if(table.equals("Locomotive")){
             subTypeFilterLabel2.setText("DCC Type");
+            subTypeFilterBox2.addItem(f.new SubFilter<String>("All", ""));
             subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.ANALOGUE, "dcc_type"));
             subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.FITTED, "dcc_type"));
             subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.READY, "dcc_type"));
@@ -160,6 +163,10 @@ public class MainPage extends JFrame implements ReloadListener {
             loadProducts();
         });
         subTypeFilterBox.addItemListener(e -> {
+            ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).setSubFilter(e.getItem().toString());
+            loadProducts();
+        });
+        subTypeFilterBox2.addItemListener(e -> {
             ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).setSubFilter(e.getItem().toString());
             loadProducts();
         });
@@ -739,9 +746,12 @@ private void populateBrandFilters(){
                 Filter.TypeFilter tp = (Filter.TypeFilter)typeFilterBox.getSelectedItem();
                 Filter.SubFilter sf = (Filter.SubFilter)subTypeFilterBox.getSelectedItem();
                 boolean sfB = subTypeFilterBox.isVisible();
+                Filter.SubFilter sf2 = (Filter.SubFilter)subTypeFilterBox2.getSelectedItem();
+                boolean sfB2 = subTypeFilterBox2.isVisible();
                 return ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax(),
                                         br.getBrand(), sb.getDbHandle(), sb.isAscending(), tp.getDbTable(),
-                                            (sfB ? sf.toString() : ""), (sfB ? sf.getDbColumn() : ""));
+                                            (sfB ? sf.toString() : ""), (sfB ? sf.getDbColumn() : ""),
+                                                (sfB2 ? sf2.toString() : ""), (sfB2 ? sf2.getDbColumn() : ""));
             }
 
             @Override
