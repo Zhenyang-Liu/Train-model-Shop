@@ -57,7 +57,7 @@ public class RegistrationPage extends JFrame {
     private String submitButtonClicked(String email, String forename, String surname, String address, String password) {
         // Insert user
         if (!UserDAO.doesUserExist(email)) {
-            User newUser = new User(email, forename, surname, address);
+            User newUser = new User(email, forename, surname);
             Logging.getLogger().info("User has logged in (id = " + newUser.getUserID() + ")");
             
             // Check to see if address has been added
