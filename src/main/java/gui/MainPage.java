@@ -13,6 +13,8 @@ import com.jgoodies.forms.factories.DefaultComponentFactory;
 import java.awt.*;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
+
+import exception.AuthorizationException;
 import exception.DatabaseException;
 import helper.Filter;
 import helper.Logging;
@@ -58,8 +60,17 @@ public class MainPage extends JFrame implements ReloadListener {
         button_accountMouseClicked();
     }
 
+
     public void reloadProducts() {
         loadProducts();
+    }
+
+    public void setButtonsByRole(){
+        if (PermissionService.hasPermission("ASSIGN_STAFF_ROLE")){
+            button_manger.setVisible(true);
+        } else if (PermissionService.hasPermission("MANAGE_ORDERS")) {
+            button_staff.setVisible(true);
+        }
     }
 
     private void button_accountMouseClicked() {
@@ -184,7 +195,8 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     private void button_staffMouseClicked(MouseEvent e) {
-        // TODO add your code here
+        OrderManagePage orderManagePage = new OrderManagePage();
+        orderManagePage.setVisible(true);
     }
 
     private void button_ordersMouseClicked(MouseEvent e) {
