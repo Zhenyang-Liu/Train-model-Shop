@@ -35,6 +35,7 @@ public class OrderHistory extends JFrame {
     }
 
     public void loadOrderCards(ArrayList<Order> orders) {
+        ordersPanel.removeAll();
         if (!orders.isEmpty()){
             for (Order order : orders) {
                 JPanel cardPanel = createOrderCardPanel(order);
@@ -210,26 +211,28 @@ public class OrderHistory extends JFrame {
     }
 
     private void showOrderDetails(Order order) {
-        JOptionPane.showMessageDialog(this, "Order details for order ID: " + order.getOrderID());
+        if ("Pending".equals(order.getStatus().getStatus())){
+            PendingOrderPage orderPage = new PendingOrderPage(order);
+            orderPage.setVisible(true);
+        }else{
+            OrderPage orderPage = new OrderPage(order);
+            orderPage.setVisible(true);
+        }
     }
 
     private void button_allMouseClicked(MouseEvent e) {
-        ordersPanel.removeAll();
         loadOrderCards(allOrders);
     }
 
     private void button_pendingMouseClicked(MouseEvent e) {
-        ordersPanel.removeAll();
         loadOrderCards(filterOrdersByStatus(allOrders, Order.OrderStatus.PENDING));
     }
 
     private void button_confirmedMouseClicked(MouseEvent e) {
-        ordersPanel.removeAll();
         loadOrderCards(filterOrdersByStatus(allOrders, Order.OrderStatus.CONFIRMED));
     }
 
     private void button_fulfilledMouseClicked(MouseEvent e) {
-        ordersPanel.removeAll();
         loadOrderCards(filterOrdersByStatus(allOrders, Order.OrderStatus.FULFILLED));
     }
 
