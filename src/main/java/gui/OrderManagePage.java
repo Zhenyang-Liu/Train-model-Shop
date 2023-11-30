@@ -23,7 +23,7 @@ public class OrderManagePage extends JFrame {
     public OrderManagePage() {
         setTitle("Order Management");
         setSize(800, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
         JPanel topPanel = createTopPanel();

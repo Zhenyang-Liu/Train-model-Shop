@@ -945,9 +945,9 @@ public class MainPage extends JFrame implements ReloadListener {
      * Main function for testing
      */
     public static void main(String[] args) {
-        User user = UserDAO.findUserByEmail("testemail@gmail.com");
+        // User user = UserDAO.findUserByEmail("testemail@gmail.com");
         Logging.Init(true);
-        // User user = UserDAO.findUserByEmail("manager@manager.com");
+        User user = UserDAO.findUserByEmail("manager@manager.com");
         UserSession.getInstance().setCurrentUser(user);
 
         EventQueue.invokeLater(() -> {
