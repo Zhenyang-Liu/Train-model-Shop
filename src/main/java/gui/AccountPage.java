@@ -12,7 +12,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.regex.Pattern;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -29,7 +28,6 @@ import DAO.LoginDAO;
 import DAO.UserDAO;
 import exception.DatabaseException;
 import helper.Logging;
-import model.BankDetail;
 import model.Login;
 import model.User;
 import service.AddressService;
@@ -51,7 +49,6 @@ public class AccountPage extends JFrame {
     private HashMap<String, JTextField> inputs;
     private User user;
     private Login userLogin;
-    private final String DEFAULT_PASSWORD = "CorrectPassword1?";
 
     /**
      * Instantiate object and create components for GUI
