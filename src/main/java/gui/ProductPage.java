@@ -16,6 +16,8 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,19 +73,38 @@ public class ProductPage extends JFrame {
     private JComboBox<String> gaugeComboBox, dccComboBox, compartmentComboBox, digitalComboBox;
     private JButton saveProduct;
     private JButton deleteProduct;
+    private ProductManagePage managePage;
 
-    public ProductPage(Product p){
-        this.p = p;
+    public ProductPage(ProductManagePage managePage, Product product) {
+        this.managePage = managePage;
+        initializePage(product);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                if (managePage != null) {
+                    managePage.refreshTableData();
+                }
+            }
+        });
+    }
+
+    public ProductPage(Product product) {
+        initializePage(product);
+    }
+
+    private void initializePage(Product product) {
+        this.p = product;
         this.isStaff = PermissionService.hasPermission(UserSession.getInstance().getCurrentUser().getUserID(), "UPDATE_PRODUCT");
-    
+
         initComponents();
-    
-        this.setTitle((isStaff ? "Editing " : "Viewing ") + p.getProductName());
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(new Dimension(700, 500));
-        this.setResizable(true);
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+
+        setTitle((isStaff ? "Editing " : "Viewing ") + p.getProductName());
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(new Dimension(700, 500));
+        setResizable(true);
+        setLocationRelativeTo(null);
+        setVisible(true);
     }    
 
     private JPanel createDescription() {
@@ -247,10 +268,12 @@ public class ProductPage extends JFrame {
                 case "Track":
                     track = TrackDAO.findTrackByID(p.getProductID());
                     gaugeComboBox.setSelectedItem(track.getGauge());
-                    if (isStaff)
+                    if (isStaff) {
                         addLabelComponent("Gauge: ", gaugeComboBox, attributePanel, gbc);
-                    else 
+                    } else {
                         addLabelComponent("Gauge: ", new JTextField(track.getGauge()), attributePanel, gbc);
+                    } 
+                    gbc.gridy++;
                     break;
                 case "Locomotive":
                     loco = LocomotiveDAO.findLocomotiveByID(p.getProductID());
@@ -470,7 +493,8 @@ public class ProductPage extends JFrame {
         String newDes = productDescription.getText();
 
         String validationResult = ProductService.validateProductInput(newName, newCode, newBrand, newPrice, newQuantity);
-        if (validationResult != null) {
+        String ignore = "Product Code has existed in database.";
+        if (!validationResult.equals(ignore) && validationResult != null) {
             JOptionPane.showMessageDialog(null,validationResult, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -481,7 +505,7 @@ public class ProductPage extends JFrame {
         p.setRetailPrice(Double.parseDouble(newPrice));
         p.setStockQuantity(Integer.parseInt(newQuantity));
         p.setDescription(newDes);
-        String result =ProductService.updateProduct(p);
+        String result = ProductService.updateProduct(p);
         if (!"success".equals(result)){
             JOptionPane.showMessageDialog(null,"Update failed. "+result, "Error", JOptionPane.ERROR_MESSAGE);
             return;

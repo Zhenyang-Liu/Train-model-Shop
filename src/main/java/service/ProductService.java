@@ -103,14 +103,6 @@ public class ProductService {
             return "Product Code format is wrong.";
         }
 
-        try{
-            if (ProductDAO.productCodeExist(productCode)){
-              return "Product Code has existed in database.";
-            }
-        } catch (DatabaseException e){
-            return "Server Error. Please try again later.";
-        }
-
         if (brandName == null || brandName.trim().isEmpty()) {
             return "Brand name cannot be empty.";
         }
@@ -131,6 +123,14 @@ public class ProductService {
             }
         } catch (NumberFormatException e) {
             return "Stock quantity must be a valid integer.";
+        }
+
+        try{
+            if (ProductDAO.productCodeExist(productCode)){
+              return "Product Code has existed in database.";
+            }
+        } catch (DatabaseException e){
+            return "Server Error. Please try again later.";
         }
 
         return null;

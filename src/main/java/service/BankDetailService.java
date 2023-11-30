@@ -143,12 +143,12 @@ public class BankDetailService {
      * @param userID The ID of the user.
      * @return BankDetail The decrypted bank detail of the user, or null if an error occurs.
      */
-    public static BankDetail findBankDetail(){
+    public static BankDetail findBankDetail() {
         try {
             // Retrieve encrypted bank details from the database
             int currentUserID = UserSession.getInstance().getCurrentUser().getUserID();
             BankDetail bankDetail = BankDetailDAO.findBankDetail(currentUserID);
-            if (bankDetail == null) {
+            if (bankDetail.getBankDetailID() == 0) {
                 return null;
             }
 

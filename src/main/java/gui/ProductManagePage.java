@@ -147,6 +147,7 @@ public class ProductManagePage extends JFrame {
         JComboBox<String> productTypeComboBox = new JComboBox<>(productTypes);
         productTypeComboBox.addActionListener(e -> {
             String selectedType = (String) productTypeComboBox.getSelectedItem();
+            currentTypeFilter = selectedType;
             loadProductData(selectedType);
         });
     
@@ -163,7 +164,11 @@ public class ProductManagePage extends JFrame {
     private void loadProductData(String filter) {
         ArrayList<Product> filteredProducts = ProductService.getAllProductsByType(filter);
         updateTableModel(filteredProducts);
-    } 
+    }
+
+    public void refreshTableData() {
+        loadProductData(currentTypeFilter);
+    }
 
     public void refreshProductList() {
         loadProductData(currentTypeFilter);
@@ -316,16 +321,9 @@ public class ProductManagePage extends JFrame {
     }
 
     private void openDetailDialog(int productID, String productTypeString) {
-        ProductPage p = new ProductPage(ProductService.findProductByID(productID));
+        ProductPage p = new ProductPage(this, ProductService.findProductByID(productID));
         p.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         p.setVisible(true);
-
-        p.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(WindowEvent e) {
-                refreshProductList();
-            }
-        });
     }
     
     public static void main(String[] args) {

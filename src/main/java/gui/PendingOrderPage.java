@@ -558,15 +558,10 @@ public class PendingOrderPage extends JFrame {
             pendingOrderItemsPanel.add(cardPanel, gbc);
         }
     }
-
-    
-    
-
-    // TODO: Test method
     public static void main(String[] args) throws DatabaseException {
          User user = UserDAO.findUserByEmail("manager@manager.com");
         // User user = UserDAO.findUserByEmail("staff@gmail.com");
-//        User user = UserDAO.findUserByEmail("testemail@gmail.com");
+        //User user = UserDAO.findUserByEmail("testemail@gmail.com");
         UserSession.getInstance().setCurrentUser(user);
         Order order = OrderDAO.findOrderByID(13);
 
@@ -575,7 +570,6 @@ public class PendingOrderPage extends JFrame {
             frame.setVisible(true);
         });
     }
-
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
     private JLabel pendingOrderTitleLabel;
     private JPanel pendingOrderContentPanel;
