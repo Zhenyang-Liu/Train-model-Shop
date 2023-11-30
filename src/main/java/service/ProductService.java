@@ -136,7 +136,7 @@ public class ProductService {
         return null;
     }
 
-    public static String deteleProduct(Product p){
+    public static String deleteProduct(Product p){
         try{
             if (!PermissionService.hasPermission("MANAGE_PRODUCTS")){
                 throw new AuthorizationException("Access denied. Only Staff can manage Products.");

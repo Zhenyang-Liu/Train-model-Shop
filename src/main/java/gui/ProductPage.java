@@ -432,7 +432,7 @@ public class ProductPage extends JFrame {
                 JOptionPane.WARNING_MESSAGE);
         
             if (confirm == JOptionPane.YES_OPTION) {
-                String deleteResult = ProductService.deteleProduct(p);
+                String deleteResult = ProductService.deleteProduct(p);
                 if ("success".equalsIgnoreCase(deleteResult)) {
                     JOptionPane.showMessageDialog(this, 
                         "Product " + p.getProductCode() + " deleted successfully.", 
