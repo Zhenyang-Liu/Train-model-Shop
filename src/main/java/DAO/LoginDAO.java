@@ -17,8 +17,7 @@ public class LoginDAO{
      * @throws SQLException
      */
     public static boolean insertLoginDetails(Login login){
-        String stmt = "INSERT INTO Login (user_id, password_hash, password_salt, failed_attempts," +
-            "last_login_attempt, lockout_enabled, lockout_end) VALUES (?,?,?,?,?,?,?)";
+        String stmt = "INSERT INTO Login (user_id, password_hash, password_salt) VALUES (?,?,?)";
         try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(stmt)) {
 
@@ -29,10 +28,6 @@ public class LoginDAO{
             preparedStatement.setInt(1, login.getUserID());
             preparedStatement.setString(2, login.getPasswordHash());
             preparedStatement.setString(3, login.getPasswordSalt());
-            preparedStatement.setInt(4, login.getFailedAttempts());
-            preparedStatement.setTimestamp(5, login.getLastLoginAttempt());
-            preparedStatement.setBoolean(6, login.isLockoutEnabled());
-            preparedStatement.setTimestamp(7, login.getLockoutEnd());
 
             preparedStatement.executeUpdate();
             return true;
@@ -50,8 +45,7 @@ public class LoginDAO{
      * @throws SQLException
      */
     public static boolean updateLoginDetails(Login login) throws SQLException {
-        String stmt = "UPDATE Login SET password_hash = ?, password_salt = ?, failed_attempts = ?, " +
-            "last_login_attempt = ?, lockout_enabled = ?, lockout_end = ? WHERE user_id = ?";
+        String stmt = "UPDATE Login SET password_hash = ?, password_salt = ? WHERE user_id = ?";
 
         if(!doesLoginExist(login.getUserID())){
             Logging.getLogger().warning("No login exists in the database with the given userID " + login.getUserID());
@@ -62,11 +56,7 @@ public class LoginDAO{
             PreparedStatement preparedStatement = connection.prepareStatement(stmt)) {
             preparedStatement.setString(1, login.getPasswordHash());
             preparedStatement.setString(2, login.getPasswordSalt());
-            preparedStatement.setInt(3, login.getFailedAttempts());
-            preparedStatement.setTimestamp(4, login.getLastLoginAttempt());
-            preparedStatement.setBoolean(5, login.isLockoutEnabled());
-            preparedStatement.setTimestamp(6, login.getLockoutEnd());
-            preparedStatement.setInt(7, login.getUserID());
+            preparedStatement.setInt(3, login.getUserID());
 
             int affectedRows = preparedStatement.executeUpdate();
 
@@ -103,10 +93,6 @@ public class LoginDAO{
                 login.setLoginID(resultSet.getInt("login_id"));
                 login.setUserID(resultSet.getInt("user_id"));
                 login.setPassword(resultSet.getString("password_hash"), resultSet.getString("password_salt"));
-                login.setFailedAttempts(resultSet.getInt("failed_attempts"));
-                login.setLastLoginAttempt(resultSet.getTimestamp("last_login_attempt"));
-                login.setLockoutEnabled(resultSet.getBoolean("lockout_enabled"));
-                login.setLockoutEnd(resultSet.getTimestamp("lockout_end"));
             }
 
             return login;
