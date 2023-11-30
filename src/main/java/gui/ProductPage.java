@@ -100,11 +100,11 @@ public class ProductPage extends JFrame {
         initComponents();
 
         setTitle((isStaff ? "Editing " : "Viewing ") + p.getProductName());
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(new Dimension(700, 500));
         setResizable(true);
         setLocationRelativeTo(null);
         setVisible(true);
+        pack();
     }    
 
     private JPanel createDescription() {
@@ -554,8 +554,8 @@ public class ProductPage extends JFrame {
     }
     
     public static void main(String[] args){
-        UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("manager@manager.com"));
         // UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("testemail@gmail.com"));
+        UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("testey@gmail.com"));
         ProductPage p = new ProductPage(ProductDAO.getAllProduct().get(6));
         p.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         p.setVisible(true);
