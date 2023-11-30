@@ -256,6 +256,8 @@ private void populateBrandFilters(){
         brandFilterBox = new JComboBox<>();
         subTypeFilterLabel = new JLabel();
         subTypeFilterBox = new JComboBox<>();
+        subTypeFilterLabel2 = new JLabel();
+        subTypeFilterBox2 = new JComboBox<>();
         scrollPane1 = new JScrollPane();
         productPanel = new JPanel();
         productCardPanel1 = new JPanel();
@@ -454,9 +456,9 @@ private void populateBrandFilters(){
                 filterPanel.setFont(filterPanel.getFont().deriveFont(filterPanel.getFont().getSize() + 2f));
                 filterPanel.setLayout(new GridBagLayout());
                 ((GridBagLayout)filterPanel.getLayout()).columnWidths = new int[] {0, 0};
-                ((GridBagLayout)filterPanel.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                ((GridBagLayout)filterPanel.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
                 ((GridBagLayout)filterPanel.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-                ((GridBagLayout)filterPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+                ((GridBagLayout)filterPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
                 //---- sortLabel ----
                 sortLabel.setText(bundle.getString("MainPage.sortLabel.text"));
@@ -505,6 +507,15 @@ private void populateBrandFilters(){
                 filterPanel.add(subTypeFilterBox, new GridBagConstraints(0, 9, 1, 1, 1.0, 0.0,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(0, 0, 5, 0), 0, 0));
+
+                //---- subTypeFilterLabel2 ----
+                subTypeFilterLabel2.setText(bundle.getString("MainPage.subTypeFilterLabel2.text"));
+                filterPanel.add(subTypeFilterLabel2, new GridBagConstraints(0, 10, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+                    new Insets(5, 0, 5, 0), 0, 0));
+                filterPanel.add(subTypeFilterBox2, new GridBagConstraints(0, 11, 1, 1, 1.0, 0.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 0, 0), 0, 0));
             }
             mainPageSplitPane.setLeftComponent(filterPanel);
 
@@ -673,6 +684,8 @@ private void populateBrandFilters(){
     private JComboBox brandFilterBox;
     private JLabel subTypeFilterLabel;
     private JComboBox subTypeFilterBox;
+    private JLabel subTypeFilterLabel2;
+    private JComboBox subTypeFilterBox2;
     private JScrollPane scrollPane1;
     private JPanel productPanel;
     private JPanel productCardPanel1;

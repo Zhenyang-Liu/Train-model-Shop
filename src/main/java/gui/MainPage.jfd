@@ -151,7 +151,7 @@ new FormModel {
 				name: "mainPageSplitPane"
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
 					"$columnSpecs": "left:0:1.0"
-					"$rowSpecs": "0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
+					"$rowSpecs": "0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
 					"$alignTop": true
 					"$alignLeft": true
 					"$vGap": 5
@@ -251,6 +251,24 @@ new FormModel {
 						"gridy": 9
 						"weightx": 1.0
 						"hAlign": 5
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "subTypeFilterLabel2"
+						"text": new FormMessage( null, "MainPage.subTypeFilterLabel2.text" )
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 10
+						"weightx": 1.0
+						"insets": new java.awt.Insets( 5, 0, 0, 0 )
+					} )
+					add( new FormComponent( "javax.swing.JComboBox" ) {
+						name: "subTypeFilterBox2"
+						auxiliary() {
+							"JavaCodeGenerator.customCreateCode": "new JComboBox<>();"
+						}
+					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+						"gridy": 11
+						"hAlign": 5
+						"weightx": 1.0
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {
 					"value": "left"
