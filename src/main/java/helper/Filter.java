@@ -118,4 +118,24 @@ public class Filter {
         private String subFilter;
         private String subFilterDbHandle;
     }
+    public class SubFilter<T>{
+        private T value;
+        private String dbColumn;
+        public SubFilter(T value, String dbColumn){
+            this.value = value;
+            this.dbColumn = dbColumn;
+        }
+
+        public String toString(){
+            return value.toString();   
+        }
+
+        public T getValue(){
+            return this.value;
+        }
+
+        public String getDbColumn(){
+            return this.dbColumn;
+        }
+    }
 }
