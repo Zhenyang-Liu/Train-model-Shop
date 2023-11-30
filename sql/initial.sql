@@ -79,7 +79,6 @@ CREATE TABLE Bank_Detail (
     card_holder_name VARCHAR(255) NOT NULL,
     card_number VARCHAR(255) NOT NULL, 
     expiry_date VARCHAR(10) NOT NULL,
-    security_code VARCHAR(255) NOT NULL,
     user_id INT NOT NULL, 
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );

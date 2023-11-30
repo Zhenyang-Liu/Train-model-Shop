@@ -455,7 +455,7 @@ public class PendingOrderPage extends JFrame {
                 + formatCardNumber(bankDetail.getCardNumber()) + "</b><br>"
                 + bankDetail.getCardHolderName() + "</b><br>"
                 + bankDetail.getExpiryDate() + "   " 
-                + "CVV: " + bankDetail.getSecurityCode() + "</b><br>"
+                + "</b><br>"
                 + "</b><br>"+"</body></html>";
             paymentText.setText(formattedText);
             isPaymentExist = true;
