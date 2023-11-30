@@ -192,9 +192,6 @@ public class MainPage extends JFrame implements ReloadListener {
         });
     }
 
-    private void button_accountMouseClicked(MouseEvent e) {
-        button_accountMouseClicked();
-    }
 
     private void button_ordersMouseClicked(MouseEvent e) {
         User currentUser = UserSession.getInstance().getCurrentUser();
@@ -666,15 +663,15 @@ public class MainPage extends JFrame implements ReloadListener {
     private JSplitPane mainPageSplitPane;
     private JPanel filterPanel;
     private JLabel sortLabel;
-    private JComboBox<Filter.SortBy> sortOptions;
+    private JComboBox sortOptions;
     private JLabel priceFilterLabel;
-    private JComboBox<Filter.PriceRange> priceFilterBox;
+    private JComboBox priceFilterBox;
     private JLabel typeFilterLabel;
-    private JComboBox<Filter.TypeFilter> typeFilterBox;
+    private JComboBox typeFilterBox;
     private JLabel brandFilterLabel;
-    private JComboBox<Filter.BrandFilter> brandFilterBox;
+    private JComboBox brandFilterBox;
     private JLabel subTypeFilterLabel;
-    private JComboBox<Enum> subTypeFilterBox;
+    private JComboBox subTypeFilterBox;
     private JScrollPane scrollPane1;
     private JPanel productPanel;
     private JPanel productCardPanel1;
