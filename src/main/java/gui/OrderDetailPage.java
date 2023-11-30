@@ -14,7 +14,6 @@ import model.Product;
 import model.User;
 import service.AddressService;
 import service.OrderService;
-import service.UserService;
 
 public class OrderDetailPage extends JFrame {
     private Order order;
@@ -132,7 +131,7 @@ public class OrderDetailPage extends JFrame {
         gbc.gridy = 0;
         addLabelToPanel(panel, gbc, "Customer: ", "");
         gbc.gridy++;
-        User user = UserService.getUserInfo(order.getUserID()); 
+        User user = OrderService.getUserInfo(order.getUserID()); 
         if (user.getForename() != null)
             addLabelToPanel(panel, gbc, "Forename:", user.getForename());
         else

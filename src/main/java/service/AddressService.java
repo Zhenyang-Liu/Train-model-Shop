@@ -10,7 +10,8 @@ import model.User;
 import exception.*;
 import helper.*;
 
-public class AddressService {    
+public class AddressService {
+
     /**
      * Adds a new address for the current user.
      *
@@ -104,6 +105,15 @@ public class AddressService {
         }
     }
 
+    /**
+     * Retrieves the address associated with the current user.
+     *
+     * This method checks if the current user has permission to access their own address. 
+     * If permission is granted, it fetches the user's address from the database based on their user ID.
+     * Returns the Address object if found, or null if an error occurs or if the address is not found.
+     *
+     * @return The Address object for the current user, or null if an error occurs or the address is not found.
+     */
     public static Address getAddressByUser() {
         try {
             int userID = UserSession.getInstance().getCurrentUser().getUserID();
@@ -118,6 +128,15 @@ public class AddressService {
         }
     }
 
+    /**
+     * Checks if an address object is empty or not.
+     *
+     * This method determines if the provided Address object has any empty fields such as house number, city, road name, or postcode.
+     * Returns true if any of these fields are empty, indicating an incomplete address.
+     *
+     * @param address The Address object to check.
+     * @return true if any of the address fields are empty; false otherwise.
+     */
     public static boolean isAddressEmpty(Address address) {
         if (address == null) {
             return true;
@@ -142,6 +161,15 @@ public class AddressService {
         return false;
     }
 
+    /**
+     * Validates a UK postcode.
+     *
+     * This method checks if the given postcode matches the standard UK postcode format.
+     * Returns true if the postcode is valid according to the UK format; false otherwise.
+     *
+     * @param postcode The postcode string to validate.
+     * @return true if the postcode is a valid UK postcode; false otherwise.
+     */
     public static boolean isValidUKPostcode(String postcode) {
         final String UK_POSTCODE_PATTERN = "^[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}$";
         Pattern pattern = Pattern.compile(UK_POSTCODE_PATTERN);

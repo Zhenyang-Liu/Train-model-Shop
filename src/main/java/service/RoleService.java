@@ -89,7 +89,6 @@ public class RoleService {
         }
     }
     
-
     /**
      * Retrieves a specific user with their role.
      *

@@ -132,6 +132,17 @@ public class AuthenticationDAO {
         }
     }
 
+    /**
+     * Retrieves the role name associated with a specific user ID.
+     *
+     * This method queries the database to find the role name assigned to the user with the specified user ID.
+     * It joins the User_Role and Role tables to determine the role name.
+     * Returns the role name if found, or null if the user does not have an assigned role or in case of an SQL error.
+     *
+     * @param userID The ID of the user whose role name is to be retrieved.
+     * @return The role name associated with the user, or null if not found or in case of an error.
+     * @throws DatabaseException if there is an issue with database access.
+     */
     public static String findRoleByID(int userID) throws DatabaseException {
         String roleName = null;
         String selectSQL = "SELECT Role.role_name " +

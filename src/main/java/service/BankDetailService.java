@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class BankDetailService {
+    
     /**
      * Determines the type of a credit card based on its number.
      *
@@ -228,10 +229,11 @@ public class BankDetailService {
         }
 
         // Check the card type
-        String cardType = getCreditCardType(cardNumber);
-        if ("Unknown".equals(cardType)) {
-            return "Card type cannot be determined. Change a card";
-        }
+        // Notice: 
+        // String cardType = getCreditCardType(cardNumber);
+        // if ("Unknown".equals(cardType)) {
+        //     return "Card type cannot be determined. Change a card";
+        // }
 
         // Check the expiry date format and if it's a future date.
         if (!expiryDate.matches("\\d{2}/\\d{2}") || !isFutureDate(expiryDate)) {
