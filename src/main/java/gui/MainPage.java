@@ -222,6 +222,10 @@ private void populateBrandFilters(){
         managerPage.setVisible(true);
     }
 
+    private void button_logoutMouseClicked() {
+        // TODO add your code here
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
@@ -230,6 +234,7 @@ private void populateBrandFilters(){
         accountPanel = new JPanel();
         leftButtonPanel = new JPanel();
         button_account = new JButton();
+        button_logout = new JButton();
         button_staff_products = new JButton();
         button_staff_orders = new JButton();
         button_manger = new JButton();
@@ -304,6 +309,18 @@ private void populateBrandFilters(){
                         }
                     });
                     leftButtonPanel.add(button_account);
+
+                    //---- button_logout ----
+                    button_logout.setMargin(new Insets(2, 2, 2, 2));
+                    button_logout.setIcon(new FlatSVGIcon("images/logout_black_24dp.svg"));
+                    button_logout.setBackground(new Color(0xf2f2f2));
+                    button_logout.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            button_logoutMouseClicked();
+                        }
+                    });
+                    leftButtonPanel.add(button_logout);
 
                     //---- button_staff_products ----
                     button_staff_products.setIcon(new FlatSVGIcon("images/store_black_24dp.svg"));
@@ -658,6 +675,7 @@ private void populateBrandFilters(){
     private JPanel accountPanel;
     private JPanel leftButtonPanel;
     private JButton button_account;
+    private JButton button_logout;
     private JButton button_staff_products;
     private JButton button_staff_orders;
     private JButton button_manger;
