@@ -948,7 +948,8 @@ private void populateBrandFilters(){
 
         // Adding event listeners to the "Add" button
         addButton.addActionListener(e -> {
-            if (currentUser != null) {
+            User thisUser = UserSession.getInstance().getCurrentUser();
+            if (thisUser != null) {
                 addButton.setVisible(false);
                 adjustNumPanel.setVisible(true);
                 Cart cart = CartService.getCartDetails(userID);

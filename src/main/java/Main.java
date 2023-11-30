@@ -1,4 +1,4 @@
-package controller;
+
 import gui.MainPage;
 import helper.Logging;
 
@@ -14,6 +14,7 @@ public class Main {
             System.out.println("Welcome to TrainShop!");
             Logging.Init(false);
             // Create Main Page Object
+            // TODO: Make login load first!
             MainPage mainPage = new MainPage();
 
             mainPage.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

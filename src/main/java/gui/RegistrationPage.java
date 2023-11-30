@@ -61,8 +61,7 @@ public class RegistrationPage extends JFrame {
             Logging.getLogger().info("User has logged in (id = " + newUser.getUserID() + ")");
             
             // Check to see if address has been added
-            if (addressDialog == null || addressDialog.getNewAddress().isEmpty()) {
-                UserDAO.deleteUser(newUser);
+            if (addressDialog == null || addressDialog.isInputValid()) {
                 return "Address has not been set.";
             }
             
@@ -72,7 +71,6 @@ public class RegistrationPage extends JFrame {
                 AuthenticationDAO.setDefaultRole(newUser.getUserID());
                 UserSession.getInstance().setCurrentUser(newUser);
             } catch (DatabaseException e) {
-                UserDAO.deleteUser(newUser);
                 return "Error adding users role";
             }
 
@@ -85,12 +83,10 @@ public class RegistrationPage extends JFrame {
                     AddressDAO.insertAddress(newUser.getUserID(), addressDialog.getNewAddress());
                 } catch (DatabaseException e) {
                     Logging.getLogger().warning("Could not add address into database\nStackTrace: " + e.getMessage());
-                    UserDAO.deleteUser(newUser);
                 }
                 return "OK";
             }
             else {
-                UserDAO.deleteUser(newUser);
                 UserSession.getInstance().clear();
             }
             return "Error creating user login, they may already exist!";
