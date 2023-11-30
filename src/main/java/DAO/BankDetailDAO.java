@@ -21,7 +21,7 @@ public class BankDetailDAO {
      */
     public static void insertBankDetail(BankDetail bankDetail) throws DatabaseException {
         String insertSQL = "INSERT INTO Bank_Detail "
-            + "(card_name, card_holder_name, card_number, expiry_date, security_code, user_id) "
+            + "(card_name, card_holder_name, card_number, expiry_date, user_id) "
             + "VALUES (?,?,?,?,?,?);";
         
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -31,8 +31,7 @@ public class BankDetailDAO {
             preparedStatement.setString(2, bankDetail.getCardHolderName());
             preparedStatement.setString(3, bankDetail.getCardNumber());
             preparedStatement.setString(4, bankDetail.getExpiryDate());
-            preparedStatement.setString(5, bankDetail.getSecurityCode());
-            preparedStatement.setInt(6, bankDetail.getUserID());
+            preparedStatement.setInt(5, bankDetail.getUserID());
     
             int rowsAffected = preparedStatement.executeUpdate();
 
@@ -54,7 +53,7 @@ public class BankDetailDAO {
      */
     public static void updateBankDetail(BankDetail bankDetail) throws DatabaseException {
         String updateSQL = "UPDATE Bank_Detail "
-            + "SET card_name = ?, card_holder_name = ?, card_number = ?, expiry_date = ?, security_code = ? "
+            + "SET card_name = ?, card_holder_name = ?, card_number = ?, expiry_date = ?"
             + "WHERE user_id = ?;";
     
         try (Connection connection = DatabaseConnectionHandler.getConnection();
@@ -64,8 +63,7 @@ public class BankDetailDAO {
             preparedStatement.setString(2, bankDetail.getCardHolderName());
             preparedStatement.setString(3, bankDetail.getCardNumber());
             preparedStatement.setString(4, bankDetail.getExpiryDate());
-            preparedStatement.setString(5, bankDetail.getSecurityCode());
-            preparedStatement.setInt(6, bankDetail.getUserID());
+            preparedStatement.setInt(5, bankDetail.getUserID());
     
             preparedStatement.executeUpdate();
 
@@ -151,9 +149,8 @@ public class BankDetailDAO {
                 String cardHolderName = resultSet.getString("card_holder_name");
                 String cardNumber = resultSet.getString("card_number");
                 String expiryDate = resultSet.getString("expiry_date");
-                String securityCode = resultSet.getString("security_code");
 
-                bankDetail = new BankDetail(detailID,userID, cardName, cardHolderName, cardNumber, expiryDate, securityCode);
+                bankDetail = new BankDetail(detailID,userID, cardName, cardHolderName, cardNumber, expiryDate);
             }
         } catch (SQLTimeoutException e) {
             throw new ConnectionException("Database connect failed", e);
