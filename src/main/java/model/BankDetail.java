@@ -7,22 +7,20 @@ public class BankDetail {
     private String cardHolderName;
     private String cardNumber;
     private String expiryDate;
-    private String securityCode;
 
     public BankDetail() {
     }
 
-    public BankDetail(int userID, String cardName, String cardHolderName, String cardNumber, String expiryDate, String securityCode) {
+    public BankDetail(int userID, String cardName, String cardHolderName, String cardNumber, String expiryDate) {
         this.userID = userID;
         this.cardName = cardName;
         this.cardHolderName = cardHolderName;
         this.cardNumber = cardNumber;
         this.expiryDate = expiryDate;
-        this.securityCode = securityCode;
     }
 
-    public BankDetail(int bankDetailID, int userID, String cardName, String cardHolderName, String cardNumber, String expiryDate, String securityCode) {
-        this(userID, cardName, cardHolderName, cardNumber, expiryDate, securityCode);
+    public BankDetail(int bankDetailID, int userID, String cardName, String cardHolderName, String cardNumber, String expiryDate) {
+        this(userID, cardName, cardHolderName, cardNumber, expiryDate);
         this.bankDetailID = bankDetailID;
     }
 
@@ -78,14 +76,6 @@ public class BankDetail {
 
     public void setExpiryDate(int month, int year) {
         this.expiryDate = Integer.toString(month) + "/" + Integer.toString(year);
-    }
-
-    public String getSecurityCode() {
-        return securityCode;
-    }
-
-    public void setSecurityCode(String securityCode) {
-        this.securityCode = securityCode;
     }
 
 }

@@ -18,7 +18,6 @@ public class BankDetailDialog extends JDialog {
     private JTextField cardNumberField;
     private JTextField expiryDateField;
     private JTextField expiryYearField;
-    private JTextField securityCodeField;
     private JButton actionButton;
     private JButton cancelButton;
 
@@ -63,7 +62,6 @@ public class BankDetailDialog extends JDialog {
         addComponentWithLabel("Card Holder:", cardHolderField = new JTextField(20), gbc);
         addComponentWithLabel("Card Number:", cardNumberField = new JTextField(16), gbc);
         addComponentWithLabel("Expiry Date:", createExpiryPanel(), gbc);
-        addComponentWithLabel("Security Code:", securityCodeField = new JTextField(3), gbc);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 0));
@@ -105,7 +103,7 @@ public class BankDetailDialog extends JDialog {
 
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
-        label.setForeground(new Color(0x003366)); // 设置标签的颜色
+        label.setForeground(new Color(0x003366));
         label.setFont(new Font("Arial", Font.BOLD, 12));
         return label;
     }
@@ -148,13 +146,13 @@ public class BankDetailDialog extends JDialog {
      * Validates the user input and adds the new bank details to the database. Closes the dialog if the operation is successful.
      */
     private void onAdd() {
-        String message = BankDetailService.checkBankDetail(getCardHolder(), getCardNumber(), getExpiryDate(), getSecurityCode());
+        String message = BankDetailService.checkBankDetail(getCardHolder(), getCardNumber(), getExpiryDate());
         
         if (!"Bank details are valid.".equals(message)) {
             JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             int currentUserID = UserSession.getInstance().getCurrentUser().getUserID();
-            String insertBankDetail = BankDetailService.addBankDetail(currentUserID, getCardHolder(), getCardNumber(), getExpiryDate(), getSecurityCode());
+            String insertBankDetail = BankDetailService.addBankDetail(currentUserID, getCardHolder(), getCardNumber(), getExpiryDate());
             if (insertBankDetail != "success") {
                 JOptionPane.showMessageDialog(this, insertBankDetail, "Error", JOptionPane.ERROR_MESSAGE);
             } else {
@@ -170,13 +168,13 @@ public class BankDetailDialog extends JDialog {
      * Validates the user input and updates the existing bank details in the database. Closes the dialog if the operation is successful.
      */
     private void onUpdate() {
-        String message = BankDetailService.checkBankDetail(getCardHolder(), getCardNumber(), getExpiryDate(), getSecurityCode());
+        String message = BankDetailService.checkBankDetail(getCardHolder(), getCardNumber(), getExpiryDate());
         
         if (!"Bank details are valid.".equals(message)) {
             JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             int currentUserID = UserSession.getInstance().getCurrentUser().getUserID();
-            String updateBankDetail = BankDetailService.updateBankDetail(currentUserID, getCardHolder(), getCardNumber(), getExpiryDate(), getSecurityCode());
+            String updateBankDetail = BankDetailService.updateBankDetail(currentUserID, getCardHolder(), getCardNumber(), getExpiryDate());
             if (updateBankDetail != "success") {
                 JOptionPane.showMessageDialog(this, updateBankDetail, "Error", JOptionPane.ERROR_MESSAGE);
             } else {
@@ -197,7 +195,6 @@ public class BankDetailDialog extends JDialog {
                 expiryYearField.setText(expiry[1]); 
             }
     
-            securityCodeField.setText(bankDetail.getSecurityCode());
         }
     }
 
@@ -209,6 +206,5 @@ public class BankDetailDialog extends JDialog {
     public String getCardHolder() { return cardHolderField.getText(); }
     public String getCardNumber() { return cardNumberField.getText(); }
     public String getExpiryDate() { return expiryDateField.getText()+"/"+ expiryYearField.getText(); }
-    public String getSecurityCode() { return securityCodeField.getText(); }
     public boolean isInputValid() { return isInputValid; }
 }
