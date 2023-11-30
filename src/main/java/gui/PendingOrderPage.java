@@ -93,7 +93,7 @@ public class PendingOrderPage extends JFrame {
     
     private void addressAddButtonMouseClicked(MouseEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        AddressDialog addressDialog = new AddressDialog(parentFrame, null,false);
+        AddressDialog addressDialog = new AddressDialog(parentFrame, null, false, false);
         addressDialog.setVisible(true);
 
         if (addressDialog.isInputValid()) {
@@ -103,7 +103,7 @@ public class PendingOrderPage extends JFrame {
 
     private void addressEditButtonMouseClicked(MouseEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        AddressDialog addressDialog = new AddressDialog(parentFrame,address,true);
+        AddressDialog addressDialog = new AddressDialog(parentFrame, address, true, false);
         addressDialog.setVisible(true);
 
         if (addressDialog.isInputValid()) {

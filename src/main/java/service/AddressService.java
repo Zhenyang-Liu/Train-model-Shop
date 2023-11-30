@@ -24,9 +24,10 @@ public class AddressService {
     public static boolean addAddress(Address address) {
         try {
             User currentUser = UserSession.getInstance().getCurrentUser();
-            if (!PermissionService.hasPermission(currentUser.getUserID(),"EDIT_OWN_ADDRESS")){
+            if (!PermissionService.hasPermission(currentUser.getUserID(), "EDIT_OWN_ADDRESS")) {
                 throw new AuthorizationException("Access denied. Users can only access their own address.");
             }
+
             // Check whether the address has existed in the database.
             Address existAddress = AddressDAO.findByNumberAndPostcode(address.getHouseNumber(), address.getPostcode());
             if (existAddress.getHouseNumber() != null) {
@@ -40,7 +41,7 @@ public class AddressService {
             return false;
         }
     }
-
+    
     /**
      * Updates the current user's address.
      *

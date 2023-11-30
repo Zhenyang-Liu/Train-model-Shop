@@ -53,6 +53,30 @@ public class UserDAO {
     }
 
     /**
+     * Deletes a user from the database
+     * @param user the user to delete
+     */
+    public static boolean deleteUser(User user) {
+        String deleteSQL = "DELETE FROM User WHERE user_id = ?";
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
+            // Make sure the user is in the database before deleting
+            if (!doesUserExist(user.getUserID())) {
+                Logging.getLogger().warning("User not added, they are already in the database");
+                return false;
+            }
+
+            // Delete user
+            preparedStatement.setInt(1, user.getUserID());
+            preparedStatement.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            Logging.getLogger().warning("Error while deleting ser: SQL Excepted\nStacktrace: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
      * Checks to see if a user is already in the database using userID
      * 
      * @param userID the userID we are checking against

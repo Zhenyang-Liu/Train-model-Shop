@@ -62,4 +62,8 @@ public class Address {
     public void setPostcode(String postcode) {
         this.postcode = postcode;
     }
+
+    public boolean isEmpty() {
+        return getHouseNumber().isEmpty() || getRoadName().isEmpty() || getCity().isEmpty() || getPostcode().isEmpty();
+    }
 }

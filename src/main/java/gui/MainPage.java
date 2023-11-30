@@ -179,10 +179,6 @@ public class MainPage extends JFrame implements ReloadListener {
         });
     }
 
-    private void button_accountMouseClicked(MouseEvent e) {
-        // TODO add your code here
-    }
-
     private void button_staffMouseClicked(MouseEvent e) {
         // TODO add your code here
     }
@@ -278,7 +274,7 @@ public class MainPage extends JFrame implements ReloadListener {
                     button_account.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            button_accountMouseClicked(e);
+                            button_accountMouseClicked();
                         }
                     });
                     leftButtonPanel.add(button_account, BorderLayout.WEST);
