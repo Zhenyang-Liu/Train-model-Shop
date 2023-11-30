@@ -22,9 +22,9 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import DAO.BankDetailDAO;
 import DAO.LoginDAO;
 import DAO.UserDAO;
 import exception.DatabaseException;
@@ -32,6 +32,7 @@ import helper.Logging;
 import model.BankDetail;
 import model.Login;
 import model.User;
+import service.AddressService;
 import service.BankDetailService;
 
 /**
@@ -50,12 +51,7 @@ public class AccountPage extends JFrame {
     private HashMap<String, JTextField> inputs;
     private User user;
     private Login userLogin;
-    private BankDetail userBankDetails;
-
-    // Constants
     private final String DEFAULT_PASSWORD = "CorrectPassword1?";
-    private final String DEFAULT_ACCOUNT_NUMBER = "1111-1111-1111-1111";
-    private final String DEFAULT_SORT_CODE = "11-11-11";
 
     /**
      * Instantiate object and create components for GUI
@@ -65,7 +61,6 @@ public class AccountPage extends JFrame {
         try {
             user = UserDAO.findUserByID(userID);
             userLogin = LoginDAO.findLoginByUserID(userID);
-            userBankDetails = BankDetailDAO.findBankDetail(userID);
         } catch (DatabaseException | SQLException e) {
             Logging.getLogger().warning("User not logged in for account page, closing account page");
             LoginPage loginPage = new LoginPage();
@@ -87,43 +82,29 @@ public class AccountPage extends JFrame {
      * Updates the values of the user, login, and bank tables (if needing changed)
      */
     private void updateDetails() {
+        // Default password, account number, sort code
+        String defaultPassword = "CorrectPassword1?";
+
         // Get inputs
         String email = inputs.get("email").getText();
         String forename = inputs.get("forename").getText();
         String surname = inputs.get("surname").getText();
-        String accountNumber = inputs.get("accountNumber").getText();
-        String sortCode = inputs.get("sortCode").getText();
-        String expiryDate = inputs.get("expiryDate").getText();
         String password = new String(passwordInput.getPassword());
 
-        // Check password, account number, and sort code to see if they've been changed
-        // and give them a default value if they've not (they're hashed so can't compare)
         if (password.equals("")) 
-            password = DEFAULT_PASSWORD;
-        if (accountNumber.equals("xxxx-xxxx-xxxx-xxxx"))
-            accountNumber = DEFAULT_ACCOUNT_NUMBER;
-        if (sortCode.equals("xx-xx-xx"))
-            sortCode = DEFAULT_SORT_CODE;
+            password = defaultPassword;
 
         // Validate inputs
         String error = RegistrationPage.checkInputs(email, forename, surname, password, password);
-        String cardError = validateCard(accountNumber, sortCode, expiryDate);
         if (!error.equals("OK")) {
             errorLabel.setText(error);
-        } else if (!cardError.equals("OK")) {
-            errorLabel.setText(cardError);
         } else {
             // Update values in objects
             user.setEmail(email);
             user.setForename(forename);
             user.setSurname(surname);
-            userBankDetails.setExpiryDate(expiryDate);
-            if (!password.equals(DEFAULT_PASSWORD))
+            if (!password.equals(defaultPassword))
                 userLogin.setPassword(password);
-            if (!accountNumber.equals(DEFAULT_ACCOUNT_NUMBER))
-                userBankDetails.setCardName(DEFAULT_ACCOUNT_NUMBER);
-            if (!sortCode.equals(DEFAULT_SORT_CODE))
-                userBankDetails.setSecurityCode(sortCode);
 
             // Update values in DB
             boolean updatedUser = UserDAO.updateUser(user);
@@ -136,8 +117,9 @@ public class AccountPage extends JFrame {
                 } catch (SQLException e) {
                     errorLabel.setText("Could not update password.");
                 }
+            } else {
+                updatePassword = true;
             }
-
             // Update Messages
             if (updatedUser && updatePassword && updatedCard) {
                 errorLabel.setText("");
@@ -146,30 +128,6 @@ public class AccountPage extends JFrame {
                 errorLabel.setText("Unknown error updating user details... Please report to admin");
             }
         }
-    }
-
-    /**
-     * Validate card of user
-     * @param accountNumber inputted account number
-     * @param sortCode inputted sort code
-     * @param expiryDate inputted expiry date
-     * @return "OK" if the card is correct else an error message
-     */
-    private String validateCard(String accountNumber, String sortCode, String expiryDate) {
-        // Account number, sort code, and expiry date
-        Pattern accountNumberPattern = Pattern.compile("^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$");
-        Pattern sortCodePattern = Pattern.compile("^[0-9]{2}-[0-9]{2}-[0-9]{2}$");
-        Pattern expiryDatePattern = Pattern.compile("^[0-9]{2}/[0-9]{2}$");
-        if (!accountNumberPattern.matcher(accountNumber).matches() || accountNumber.length() != 19)
-            return "Account number must be in format xxxx-xxxx-xxxx-xxxx";
-        if (!sortCodePattern.matcher(sortCode).matches() || sortCode.length() != 8)
-            return "Sort code must be in format xx-xx-xx";
-        if (!expiryDatePattern.matcher(expiryDate).matches() || expiryDate.length() != 5)
-            return "Expiry date must be in format xx/xx";
-        if (!BankDetailService.isValidCreditCardNumber(accountNumber) && !accountNumber.equals(DEFAULT_ACCOUNT_NUMBER))
-            return "Credit card is not a real card";
-
-        return "OK";
     }
 
     /**
@@ -250,39 +208,62 @@ public class AccountPage extends JFrame {
         
         // Add all labels and inputs (that are generic)
         inputs.put("email", addLabelAndInput("Email:", user.getEmail(), DetailsPanel));
-        inputs.put("address", addLabelAndInput("Address:", user.getAddress(), DetailsPanel));
         inputs.put("forename", addLabelAndInput("First Name:", user.getForename(), DetailsPanel));
         inputs.put("surname", addLabelAndInput("Last Name:", user.getSurname(), DetailsPanel));
 
         // Password section, needs to be different
         JLabel passwordLabel = new JLabel("Password:");
-        passwordInput = new JPasswordField();
-        setTextStyle(passwordLabel, false);
-        DetailsPanel.add(passwordLabel);
-        DetailsPanel.add(passwordInput);
-        inputs.put("password", passwordInput);
+        JButton changePasswordButton = new JButton("Change Password");
+        changePasswordButton.addActionListener(e -> onChangePassword());
+        DetailsPanel.add(passwordLabel );
+        DetailsPanel.add(changePasswordButton);
 
-        // Bank section, uses another panel
-        JPanel BankPanel = new JPanel();
-        JLabel bankLabel = new JLabel("Bank Details:");
-        JTextField accountNumber = new JTextField("xxxx-xxxx-xxxx-xxxx");
-        JTextField sortCode = new JTextField("xx-xx-xx");
-        JTextField expiryDate = new JTextField(userBankDetails.getExpiryDate());
-        setTextStyle(bankLabel, false);
-        BankPanel.setLayout(new GridLayout(1, 3));
-        BankPanel.add(accountNumber);
-        BankPanel.add(sortCode);
-        BankPanel.add(expiryDate);
-        DetailsPanel.add(bankLabel);
-        DetailsPanel.add(BankPanel);
-        inputs.put("accountNumber", accountNumber);
-        inputs.put("sortCode", sortCode);
-        inputs.put("expiryDate", expiryDate);
+        // Bank Detail Section
+        JLabel bankDetailLabel = new JLabel("Bank Detail:");
+        JButton bankDetailButton = new JButton("Add Bank Detail");
+        bankDetailButton.addActionListener(e -> onEditBankDetails());
+        setTextStyle(bankDetailLabel, false);
+
+        if (BankDetailService.findBankDetail() != null) {
+            bankDetailButton.setText("Edit Bank Detail");
+        }
+        DetailsPanel.add(bankDetailLabel);
+        DetailsPanel.add(bankDetailButton);
+
+        // Address Section
+        JLabel addressLabel = new JLabel("Address:");
+        JButton addressButton = new JButton("Add Address");
+        addressButton.addActionListener(e -> onEditAddress());
+        setTextStyle(addressLabel, false);
+        if (!AddressService.isAddressEmpty(AddressService.getAddressByUser())){
+            addressButton.setText("Edit Address");
+        }
+        DetailsPanel.add(addressLabel);
+        DetailsPanel.add(addressButton);
 
         // Add to Main Dialogue
         MainDialoguePanel.add(DetailsPanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0,
             GridBagConstraints.CENTER, GridBagConstraints.NONE,
             new Insets(0, 0, 0, 0), 0, 0));
+    }
+
+    private void onChangePassword() {
+        ChangePasswordDialog dialog = new ChangePasswordDialog(this);
+        dialog.setVisible(true);
+    }
+ 
+    private void onEditBankDetails() {
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        boolean isEdit = BankDetailService.findBankDetail() != null;
+        BankDetailDialog bankDetailDialog = new BankDetailDialog(parentFrame,BankDetailService.findBankDetail(),isEdit);
+        bankDetailDialog.setVisible(true);
+    }
+
+    private void onEditAddress() {
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        boolean isEdit = !AddressService.isAddressEmpty(AddressService.getAddressByUser());
+        AddressDialog addressDialog = new AddressDialog(parentFrame, AddressService.getAddressByUser(),isEdit);
+        addressDialog.setVisible(true);
     }
 
     /**
@@ -363,4 +344,5 @@ public class AccountPage extends JFrame {
         button.setFont(button.getFont().deriveFont(button.getFont().getSize() + 1f));
         return button;
     }
+
 }

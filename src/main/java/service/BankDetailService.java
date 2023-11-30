@@ -148,7 +148,7 @@ public class BankDetailService {
             // Retrieve encrypted bank details from the database
             int currentUserID = UserSession.getInstance().getCurrentUser().getUserID();
             BankDetail bankDetail = BankDetailDAO.findBankDetail(currentUserID);
-            if (bankDetail == null) {
+            if (bankDetail.getBankDetailID() == 0) {
                 return null;
             }
 
