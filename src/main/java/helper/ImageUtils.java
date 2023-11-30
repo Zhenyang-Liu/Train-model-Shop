@@ -3,6 +3,9 @@ package helper;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -10,11 +13,65 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Base64;
+import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
+import DAO.ProductDAO;
+import model.Product;
+
+
 public class ImageUtils {
+
+    /**
+     * Manages image icons for trains so that they are not constantly created / destroyed
+     */
+    public class ResourceManager{
+
+        private static ImageIcon defaultImageIcon;
+        private static HashMap<Integer, ImageIcon> resources;
+
+        /**
+         * Initialises the default image and the map containing the resources
+         */
+        public static void Init(){
+            // purely to use getClass
+            Product p = new Product();
+            resources = new HashMap<>();
+            URI defaultImage = null;
+            try {
+                defaultImage = p.getClass().getResource("/images/tgv.jpeg").toURI();
+            } catch (URISyntaxException e) {
+                Logging.getLogger().info("Could not find default image when initialising the resource manager");
+            }
+            defaultImageIcon = imageFromPath(defaultImage);
+        }
+
+        /**
+         * 
+         * @param productID
+         */
+        public static void updateImageForProduct(int productID){
+            if(resources == null)
+                Init();
+            String base64 = ProductDAO.getImageForProduct(productID);
+            // Catch nullptr as this would mean image not created successfully and hence we can just return default image
+            try{
+                resources.put(productID, imageToIcon(base64));
+            }catch(NullPointerException e){
+                Logging.getLogger().warning("Could not update image for product " + productID + " as image is null!\nStacktrace: " + e.getMessage());
+            }
+        }
+
+        public static ImageIcon getProductImage(int productID){
+            if(resources == null)
+                Init();
+            if (!resources.containsKey(productID) && productID != -1)
+                updateImageForProduct(productID);
+            return resources.getOrDefault(productID, defaultImageIcon);
+        }
+    }
     /**
      * Converts a given file to a base64 encoded string
      * 
@@ -75,5 +132,15 @@ public class ImageUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Takes a resource URI and returns the image at the path as a java.swing.ImageIcon
+     * 
+     * @param path URI 
+     * @return
+     */
+    public static ImageIcon imageFromPath(URI path){
+        return imageToIcon(toBase64(new File(path)));
     }
 }

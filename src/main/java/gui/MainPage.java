@@ -13,6 +13,8 @@ import com.jgoodies.forms.factories.DefaultComponentFactory;
 import java.awt.*;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
+
+import exception.AuthorizationException;
 import exception.DatabaseException;
 import helper.Filter;
 import helper.Logging;
@@ -20,7 +22,6 @@ import helper.UserSession;
 import listeners.ReloadListener;
 import model.*;
 import model.Locomotive.DCCType;
-import net.miginfocom.swing.MigLayout;
 import service.CartService;
 import service.PermissionService;
 
@@ -38,6 +39,9 @@ import java.util.ResourceBundle;
 
 /**
  * @author Zhenyang Liu
+ * @author Julian Jones
+ * @author Joe Paton
+ * @author Jiawei Jiang
  */
 public class MainPage extends JFrame implements ReloadListener {
     private Filter f;
@@ -57,6 +61,14 @@ public class MainPage extends JFrame implements ReloadListener {
 
     public void reloadProducts() {
         loadProducts();
+    }
+
+    public void setButtonsByRole(){
+        if (PermissionService.hasPermission("ASSIGN_STAFF_ROLE")){
+            button_manger.setVisible(true);
+        } else if (PermissionService.hasPermission("MANAGE_ORDERS")) {
+            button_staff.setVisible(true);
+        }
     }
 
     private void button_accountMouseClicked() {
@@ -142,11 +154,10 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     private void populateSortOptions(){
-        sortOptions.addItem(f.new SortBy("None", ""));
-        sortOptions.addItem(f.new SortBy("Price", "retail_price"));
-        sortOptions.addItem(f.new SortBy("Name", "product_name"));
-        sortOptions.addItem(f.new SortBy("Price", "retail_price", false));
-        sortOptions.addItem(f.new SortBy("Name", "product_name", false));
+        sortOptions.addItem(f.new SortBy("Name (asc)", "product_name"));
+        sortOptions.addItem(f.new SortBy("Name (desc)", "product_name", false));
+        sortOptions.addItem(f.new SortBy("Price (asc)", "retail_price"));
+        sortOptions.addItem(f.new SortBy("Price (desc)", "retail_price", false));
 
         sortOptions.addItemListener(e -> {
             loadProducts();
@@ -176,12 +187,9 @@ public class MainPage extends JFrame implements ReloadListener {
         });
     }
 
-    private void button_accountMouseClicked(MouseEvent e) {
-        // TODO add your code here
-    }
-
     private void button_staffMouseClicked(MouseEvent e) {
-        // TODO add your code here
+        OrderManagePage orderManagePage = new OrderManagePage();
+        orderManagePage.setVisible(true);
     }
 
     private void button_ordersMouseClicked(MouseEvent e) {
@@ -197,6 +205,10 @@ public class MainPage extends JFrame implements ReloadListener {
         }
     }
 
+    private void button_mangerMouseClicked(MouseEvent e) {
+        // TODO add your code here
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
         ResourceBundle bundle = ResourceBundle.getBundle("gui.form");
@@ -206,6 +218,7 @@ public class MainPage extends JFrame implements ReloadListener {
         leftButtonPanel = new JPanel();
         button_account = new JButton();
         button_staff = new JButton();
+        button_manger = new JButton();
         rightButtonPanel = new JPanel();
         button_cart = new JButton();
         button_orders = new JButton();
@@ -220,15 +233,15 @@ public class MainPage extends JFrame implements ReloadListener {
         mainPageSplitPane = new JSplitPane();
         filterPanel = new JPanel();
         sortLabel = new JLabel();
-        sortOptions = new JComboBox();
+        sortOptions = new JComboBox<>();
         priceFilterLabel = new JLabel();
-        priceFilterBox = new JComboBox();
+        priceFilterBox = new JComboBox<>();
         typeFilterLabel = new JLabel();
-        typeFilterBox = new JComboBox();
+        typeFilterBox = new JComboBox<>();
         brandFilterLabel = new JLabel();
-        filterBox4 = new JComboBox();
+        filterBox4 = new JComboBox<>();
         subTypeFilterLabel = new JLabel();
-        subTypeFilterBox = new JComboBox();
+        subTypeFilterBox = new JComboBox<>();
         scrollPane1 = new JScrollPane();
         productPanel = new JPanel();
         productCardPanel1 = new JPanel();
@@ -262,7 +275,7 @@ public class MainPage extends JFrame implements ReloadListener {
 
                 //======== leftButtonPanel ========
                 {
-                    leftButtonPanel.setLayout(new BoxLayout(leftButtonPanel, BoxLayout.X_AXIS));
+                    leftButtonPanel.setLayout(new BorderLayout());
 
                     //---- button_account ----
                     button_account.setIcon(new FlatSVGIcon("images/person_black_24dp.svg"));
@@ -270,13 +283,13 @@ public class MainPage extends JFrame implements ReloadListener {
                     button_account.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            button_accountMouseClicked(e);
+                            button_accountMouseClicked();
                         }
                     });
-                    leftButtonPanel.add(button_account);
+                    leftButtonPanel.add(button_account, BorderLayout.WEST);
 
                     //---- button_staff ----
-                    button_staff.setIcon(new FlatSVGIcon("images/assignment_black_24dp.svg"));
+                    button_staff.setIcon(new FlatSVGIcon("images/store_black_24dp.svg"));
                     button_staff.setBackground(new Color(0xf2f2f2));
                     button_staff.addMouseListener(new MouseAdapter() {
                         @Override
@@ -284,13 +297,24 @@ public class MainPage extends JFrame implements ReloadListener {
                             button_staffMouseClicked(e);
                         }
                     });
-                    leftButtonPanel.add(button_staff);
+                    leftButtonPanel.add(button_staff, BorderLayout.CENTER);
+
+                    //---- button_manger ----
+                    button_manger.setIcon(new FlatSVGIcon("images/supervisor_account_black_24dp.svg"));
+                    button_manger.setBackground(new Color(0xf2f2f2));
+                    button_manger.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            button_mangerMouseClicked(e);
+                        }
+                    });
+                    leftButtonPanel.add(button_manger, BorderLayout.EAST);
                 }
                 accountPanel.add(leftButtonPanel, BorderLayout.WEST);
 
                 //======== rightButtonPanel ========
                 {
-                    rightButtonPanel.setLayout(new BoxLayout(rightButtonPanel, BoxLayout.X_AXIS));
+                    rightButtonPanel.setLayout(new BorderLayout());
 
                     //---- button_cart ----
                     button_cart.setSelectedIcon(null);
@@ -303,10 +327,10 @@ public class MainPage extends JFrame implements ReloadListener {
                             button_cartMouseClicked(e);
                         }
                     });
-                    rightButtonPanel.add(button_cart);
+                    rightButtonPanel.add(button_cart, BorderLayout.LINE_START);
 
                     //---- button_orders ----
-                    button_orders.setIcon(new FlatSVGIcon("images/list_alt_black_24dp.svg"));
+                    button_orders.setIcon(new FlatSVGIcon("images/assignment_black_24dp.svg"));
                     button_orders.setBackground(new Color(0xf2f2f2));
                     button_orders.addMouseListener(new MouseAdapter() {
                         @Override
@@ -314,7 +338,7 @@ public class MainPage extends JFrame implements ReloadListener {
                             button_ordersMouseClicked(e);
                         }
                     });
-                    rightButtonPanel.add(button_orders);
+                    rightButtonPanel.add(button_orders, BorderLayout.CENTER);
                 }
                 accountPanel.add(rightButtonPanel, BorderLayout.EAST);
             }
@@ -590,6 +614,7 @@ public class MainPage extends JFrame implements ReloadListener {
     private JPanel leftButtonPanel;
     private JButton button_account;
     private JButton button_staff;
+    private JButton button_manger;
     private JPanel rightButtonPanel;
     private JButton button_cart;
     private JButton button_orders;
@@ -604,15 +629,15 @@ public class MainPage extends JFrame implements ReloadListener {
     private JSplitPane mainPageSplitPane;
     private JPanel filterPanel;
     private JLabel sortLabel;
-    private JComboBox sortOptions;
+    private JComboBox<Filter.SortBy> sortOptions;
     private JLabel priceFilterLabel;
-    private JComboBox priceFilterBox;
+    private JComboBox<Filter.PriceRange> priceFilterBox;
     private JLabel typeFilterLabel;
-    private JComboBox typeFilterBox;
+    private JComboBox<Filter.TypeFilter> typeFilterBox;
     private JLabel brandFilterLabel;
-    private JComboBox filterBox4;
+    private JComboBox<Filter.BrandFilter> filterBox4;
     private JLabel subTypeFilterLabel;
-    private JComboBox subTypeFilterBox;
+    private JComboBox<Enum> subTypeFilterBox;
     private JScrollPane scrollPane1;
     private JPanel productPanel;
     private JPanel productCardPanel1;
@@ -641,7 +666,7 @@ public class MainPage extends JFrame implements ReloadListener {
     }
     private static void adjustPreferredSize(JPanel panel) {
         int width = panel.getWidth();
-        int preferredHeight = 1000000/width ;
+        int preferredHeight = 1100000/width ;
 
         panel.setPreferredSize(new Dimension(300, preferredHeight));
 

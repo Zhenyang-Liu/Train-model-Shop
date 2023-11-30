@@ -13,6 +13,7 @@ public class Main {
         try{
             System.out.println("Welcome to TrainShop!");
 
+            Logging.Init(false);
             // Create Main Page Object
             MainPage mainPage = new MainPage();
 
@@ -27,6 +28,8 @@ public class Main {
             mainPage.setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
+        }finally{
+            Logging.Close();
         }
     }
 }

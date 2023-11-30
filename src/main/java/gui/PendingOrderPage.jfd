@@ -43,7 +43,7 @@ new FormModel {
 					name: "infoPanel"
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
 						"$columnSpecs": "0"
-						"$rowSpecs": "0, 0"
+						"$rowSpecs": "0, 0, 0"
 						"$hGap": 5
 						"$vGap": 5
 						"$alignLeft": true
@@ -84,7 +84,7 @@ new FormModel {
 								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "addressEditButtonMouseClicked", true ) )
 							} )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
-							"hAlign": 4
+							"hAlign": 2
 							"weightx": 1.0
 							"vAlign": 5
 						} )
@@ -92,8 +92,8 @@ new FormModel {
 							"axis": 1
 						} ) {
 							name: "paymentPanel"
-							"maximumSize": new java.awt.Dimension( 300, 200 )
-							"minimumSize": new java.awt.Dimension( 260, 150 )
+							"maximumSize": &Dimension0 new java.awt.Dimension( 300, 200 )
+							"minimumSize": &Dimension1 new java.awt.Dimension( 260, 150 )
 							add( new FormComponent( "javax.swing.JLabel" ) {
 								name: "paymentLabel"
 								"text": "Payment method"
@@ -102,7 +102,7 @@ new FormModel {
 							} )
 							add( new FormComponent( "javax.swing.JLabel" ) {
 								name: "paymentText"
-								"minimumSize": new java.awt.Dimension( 100, 100 )
+								"minimumSize": &Dimension2 new java.awt.Dimension( 100, 100 )
 								"maximumSize": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							} )
 							add( new FormComponent( "javax.swing.JButton" ) {
@@ -111,7 +111,7 @@ new FormModel {
 								"foreground": #Color1
 								"background": #Color2
 								"font": #SwingDerivedFont1
-								"preferredSize": new java.awt.Dimension( 140, 23 )
+								"preferredSize": &Dimension3 new java.awt.Dimension( 140, 23 )
 								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "paymentAddButtonMouseClicked", true ) )
 							} )
 							add( new FormComponent( "javax.swing.JButton" ) {
@@ -119,15 +119,56 @@ new FormModel {
 								"text": "Edit the payment"
 								"background": #Color3
 								"foreground": #Color4
-								"preferredSize": new java.awt.Dimension( 140, 23 )
+								"preferredSize": &Dimension4 new java.awt.Dimension( 140, 23 )
 								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "paymentEditButtonMouseClicked", true ) )
 							} )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 							"hAlign": 2
-							"insets": new java.awt.Insets( 20, 0, 0, 0 )
+							"insets": &Insets0 new java.awt.Insets( 20, 0, 0, 0 )
 							"vAlign": 5
 							"weightx": 1.0
 							"gridy": 1
+						} )
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+							"axis": 1
+						} ) {
+							name: "cvvPanel"
+							"maximumSize": #Dimension0
+							"minimumSize": #Dimension1
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "cvvLabel"
+								"text": "CVV"
+								"foreground": #Color0
+								"font": #SwingDerivedFont0
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "cvvText"
+								"minimumSize": #Dimension2
+								"maximumSize": sfield com.jformdesigner.model.FormObject NULL_VALUE
+							} )
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "cvvEnterButton"
+								"text": "Enter CVV"
+								"foreground": #Color1
+								"background": #Color2
+								"font": #SwingDerivedFont1
+								"preferredSize": #Dimension3
+								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "paymentAddButtonMouseClicked", true ) )
+							} )
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "cvvEditButton"
+								"text": "Edit CVV"
+								"background": #Color3
+								"foreground": #Color4
+								"preferredSize": #Dimension4
+								addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "paymentEditButtonMouseClicked", true ) )
+							} )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+							"hAlign": 2
+							"insets": #Insets0
+							"vAlign": 5
+							"weightx": 1.0
+							"gridy": 2
 						} )
 					}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
 						"insets": new java.awt.Insets( 0, 10, 0, 20 )
