@@ -58,7 +58,6 @@ public class RegistrationPage extends JFrame {
         // Insert user
         if (!UserDAO.doesUserExist(email)) {
             User newUser = new User(email, forename, surname, address);
-            UserSession.getInstance().setCurrentUser(newUser);
             Logging.getLogger().info("User has logged in (id = " + newUser.getUserID() + ")");
             
             // Check to see if address has been added
@@ -71,6 +70,7 @@ public class RegistrationPage extends JFrame {
             UserDAO.insertUser(newUser);
             try {
                 AuthenticationDAO.setDefaultRole(newUser.getUserID());
+                UserSession.getInstance().setCurrentUser(newUser);
             } catch (DatabaseException e) {
                 UserDAO.deleteUser(newUser);
                 return "Error adding users role";

@@ -89,6 +89,7 @@ public class OrderService {
                 throw new AuthorizationException("Access denied. Users can only see their own order.");
             }
             ArrayList<Order> orders = OrderDAO.findUserAllOrder(userID);
+            
 
             return orders;
         } catch (DatabaseException e) {
