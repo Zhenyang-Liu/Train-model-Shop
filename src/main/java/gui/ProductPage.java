@@ -37,6 +37,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.JTextComponent;
 
 import DAO.BoxedSetDAO;
@@ -158,6 +159,9 @@ public class ProductPage extends JFrame {
 
     private void updateImage(){
         final JFileChooser fc = new JFileChooser();
+        fc.setAcceptAllFileFilterUsed(false);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Images", "jpg", "png");
+        fc.setFileFilter(filter);
         int returnVal = fc.showOpenDialog(this);
         if(returnVal != JFileChooser.APPROVE_OPTION)
             return;
