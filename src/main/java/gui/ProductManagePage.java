@@ -11,6 +11,8 @@ import helper.UserSession;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import model.*;
 import service.ProductService;
@@ -58,7 +60,7 @@ public class ProductManagePage extends JFrame {
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         topPanel.add(titleLabel, gbc);
     
-        String[] searchOptions = {"Email", "ProductID"};
+        String[] searchOptions = {"Brand", "Name", "Code"};
         JComboBox<String> searchComboBox = new JComboBox<>(searchOptions);
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -83,7 +85,7 @@ public class ProductManagePage extends JFrame {
         clearButton.addActionListener(e -> {
             searchField.setText("");
             searchComboBox.setSelectedIndex(0);
-            loadProductData(currentTypeFilter);
+            refreshProductList();
         });
         gbc.gridx = 3;
         gbc.gridy = 1;
@@ -158,8 +160,32 @@ public class ProductManagePage extends JFrame {
     }
 
     private void performSearch(String searchType, String searchTerm) {
-        // TODO: applySearch
+        ArrayList<Product> currentList = ProductService.getAllProductsByType(currentTypeFilter);
+
+        Predicate<Product> filterPredicate;
+        switch (searchType) {
+            case "Brand":
+                filterPredicate = product -> product.getBrand() != null && product.getBrand().contains(searchTerm);
+                break;
+            case "Name":
+                filterPredicate = product -> product.getProductName() != null && product.getProductName().contains(searchTerm);
+                break;
+            case "Code":
+                filterPredicate = product -> product.getProductCode() != null && product.getProductCode().contains(searchTerm);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid search type");
+        }
+
+        ArrayList<Product> filteredProducts = new ArrayList<>(
+            currentList.stream()
+                       .filter(filterPredicate)
+                       .collect(Collectors.toList())
+        );
+
+        updateTableModel(filteredProducts);
     }
+   
 
     private void loadProductData(String filter) {
         ArrayList<Product> filteredProducts = ProductService.getAllProductsByType(filter);

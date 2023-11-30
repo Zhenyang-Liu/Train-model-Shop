@@ -205,7 +205,7 @@ public class OrderManagePage extends JFrame {
     }   
 
     class OrderTableModel extends AbstractTableModel {
-        private final String[] columnNames = {"OrderID", "UserID", "Email","Create Time", "Update Time", "Total Cost", "Status", "Details"};
+        private final String[] columnNames = {"OrderID", "Email","Create Time", "Update Time", "Total Cost", "Status", "Details"};
         private ArrayList<Order> orders = new ArrayList<>();
     
         public OrderTableModel() {
@@ -233,13 +233,12 @@ public class OrderManagePage extends JFrame {
         
             switch (columnIndex) {
                 case 0: return order.getOrderID();
-                case 1: return order.getUserID();
-                case 2: return UserService.getUserInfo(order.getUserID()).getEmail();
-                case 3: return dateFormat.format(order.getCreateTime());
-                case 4: return dateFormat.format(order.getUpdateTime());
-                case 5: return String.format("\u00A3%.2f", order.getTotalCost());
-                case 6: return order.getStatus();
-                case 7: return "Details";
+                case 1: return UserService.getUserInfo(order.getUserID()).getEmail();
+                case 2: return dateFormat.format(order.getCreateTime());
+                case 3: return dateFormat.format(order.getUpdateTime());
+                case 4: return String.format("\u00A3%.2f", order.getTotalCost());
+                case 5: return order.getStatus();
+                case 6: return "Details";
                 default: return null;
             }
         }
@@ -259,7 +258,7 @@ public class OrderManagePage extends JFrame {
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            return column == 7;
+            return column == 6;
         }
     }        
 
