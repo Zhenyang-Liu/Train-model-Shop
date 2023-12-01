@@ -86,10 +86,7 @@ public class AccountPage extends JFrame {
         String email = inputs.get("email").getText();
         String forename = inputs.get("forename").getText();
         String surname = inputs.get("surname").getText();
-        String password = new String(passwordInput.getPassword());
-
-        if (password.equals("")) 
-            password = defaultPassword;
+        String password =  defaultPassword;
 
         // Validate inputs
         String error = RegistrationPage.checkInputs(email, forename, surname, password, password);
@@ -238,6 +235,7 @@ public class AccountPage extends JFrame {
      */
     private void onChangePassword() {
         ChangePasswordDialog dialog = new ChangePasswordDialog(this);
+        dialog.setAlwaysOnTop(true);
         dialog.setVisible(true);
     }
  
@@ -248,6 +246,7 @@ public class AccountPage extends JFrame {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         boolean isEdit = BankDetailService.findBankDetail() != null;
         BankDetailDialog bankDetailDialog = new BankDetailDialog(parentFrame,BankDetailService.findBankDetail(),isEdit);
+        bankDetailDialog.setAlwaysOnTop(true);
         bankDetailDialog.setVisible(true);
     }
 
@@ -258,6 +257,7 @@ public class AccountPage extends JFrame {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         boolean isEdit = !AddressService.isAddressEmpty(AddressService.getAddressByUser());
         AddressDialog addressDialog = new AddressDialog(parentFrame, AddressService.getAddressByUser(),isEdit, false);
+        addressDialog.setAlwaysOnTop(true);
         addressDialog.setVisible(true);
     }
 
