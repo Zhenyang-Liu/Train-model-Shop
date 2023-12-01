@@ -12,6 +12,8 @@ new FormModel {
 			"$locationPolicy": 1
 			"preferredSize": new java.awt.Dimension( 1080, 720 )
 			"font": new java.awt.Font( "Arial", 0, 12 )
+			"$sizePolicy": 1
+			"minimumSize": new java.awt.Dimension( 1080, 720 )
 			auxiliary() {
 				"JavaCodeGenerator.customCreate": true
 			}

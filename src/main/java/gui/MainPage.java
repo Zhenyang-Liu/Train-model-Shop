@@ -48,10 +48,10 @@ import java.util.ResourceBundle;
 public class MainPage extends JFrame implements ReloadListener {
     private Filter f;
     private HashMap<Integer, JPanel> productPanelCache;
-    Map<String, JComponent> cardComponents = new HashMap<>();
 
     public MainPage() {
-
+        //setUndecorated(true);
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         Logging.getLogger().info("Creating Main Page");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.productPanelCache = new HashMap<>();
@@ -62,7 +62,7 @@ public class MainPage extends JFrame implements ReloadListener {
         populateFilterBoxes();
         loadProducts(false);
 
-        button_accountMouseClicked();
+        //button_accountMouseClicked();
     }
 
     public void reloadProducts() {
@@ -241,7 +241,11 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     private void button_logoutMouseClicked() {
-        // TODO add your code here
+        UserSession.getInstance().clear();
+
+        WelcomePage.getInstance().setVisible(true);
+
+        this.dispose();
     }
 
     private void initComponents() {
@@ -301,6 +305,7 @@ public class MainPage extends JFrame implements ReloadListener {
         //======== this ========
         setPreferredSize(new Dimension(1080, 720));
         setFont(new Font("Arial", Font.PLAIN, 12));
+        setMinimumSize(new Dimension(1080, 720));
         var contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
 
@@ -683,7 +688,7 @@ public class MainPage extends JFrame implements ReloadListener {
         }
         contentPane.add(mainPageSplitPane, BorderLayout.CENTER);
         contentPane.add(bottomSeparator, BorderLayout.SOUTH);
-        pack();
+        setSize(1105, 720);
         setLocationRelativeTo(null);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
     }
@@ -846,7 +851,6 @@ public class MainPage extends JFrame implements ReloadListener {
 
         // Add a product image
         JLabel productImage = new JLabel();
-        //productImage.setPreferredSize(new Dimension(260, 120));
         ImageIcon originalIcon = product.getProductImage();
         Image originalImage = originalIcon.getImage();
         Image resizedImage = originalImage.getScaledInstance(256, 140, Image.SCALE_SMOOTH);
@@ -984,7 +988,10 @@ public class MainPage extends JFrame implements ReloadListener {
                 int cartID = CartService.getCartDetails(userID).getCartID();
                 int productID = product.getProductID();
                 if (!CartService.removeFromCart(cartID,productID)){
-                    //TODO: Add action failed information
+                    JOptionPane.showMessageDialog(this,
+                            "Remove from Cart failed",
+                            "Update failed",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             } else {
                 numberButton.setText(String.valueOf(num));

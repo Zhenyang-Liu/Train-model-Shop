@@ -7,26 +7,67 @@ new FormModel {
 	"i18n.keyPrefix": "WelcomePage"
 	contentType: "form/swing"
 	root: new FormRoot {
-		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class java.awt.BorderLayout ) {
-			"hgap": 5
-			"vgap": 5
-		} ) {
+		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 			name: "this"
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "label1"
-				"text": "WELCOME TO TRAINSHOP"
-			}, new FormLayoutConstraints( class java.lang.String ) {
-				"value": "North"
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "label2"
-				"text": new FormMessage( null, "WelcomePage.label2.text" )
+			"preferredSize": new java.awt.Dimension( 1200, 900 )
+			"minimumSize": new java.awt.Dimension( 1200, 900 )
+			"$locationPolicy": 1
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridBagLayout ) {
+				"$columnSpecs": "0"
+				"$rowSpecs": "0, 0, 0"
+				"$hGap": 5
+				"$vGap": 5
+				"$alignTop": true
+				"$alignLeft": true
+			} ) {
+				name: "titlePanel"
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label_welcome"
+					"text": "WELCOME TO TRAINSHOP"
+					"foreground": new java.awt.Color( 0, 51, 102, 255 )
+					"font": new com.jformdesigner.model.SwingDerivedFont( null, 3, 30, false )
+					"preferredSize": new java.awt.Dimension( 580, 42 )
+					"maximumSize": new java.awt.Dimension( 460, 42 )
+					"minimumSize": new java.awt.Dimension( 460, 42 )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"hAlign": 0
+					"weightx": 1.0
+					"insets": new java.awt.Insets( 10, 0, 0, 0 )
+					"weighty": 0.5
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+					name: "logoPanel"
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "label_logo"
+						"icon": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"preferredSize": new java.awt.Dimension( 960, 540 )
+						"horizontalAlignment": 0
+						"disabledIcon": sfield com.jformdesigner.model.FormObject NULL_VALUE
+					} )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridy": 1
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+					name: "buttonPanel"
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "button_login"
+						"text": "START SHOPPING"
+						"background": new java.awt.Color( 0, 51, 102, 255 )
+						"foreground": new java.awt.Color( 233, 228, 227, 255 )
+						"preferredSize": new java.awt.Dimension( 200, 50 )
+						"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 5, false )
+						addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "button_loginMouseClicked", false ) )
+					} )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.GridBagConstraintsEx ) {
+					"gridy": 2
+					"weighty": 0.5
+				} )
 			}, new FormLayoutConstraints( class java.lang.String ) {
 				"value": "Center"
 			} )
 		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 1115, 770 )
+			"location": new java.awt.Point( 35, 0 )
+			"size": new java.awt.Dimension( 1080, 800 )
 		} )
 	}
 }
