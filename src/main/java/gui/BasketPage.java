@@ -7,7 +7,7 @@ package gui;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.util.List;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.ChangeEvent;
@@ -330,7 +330,7 @@ public class BasketPage extends JFrame {
     }
 
     // Method to load cart items into the trolley view
-    public void loadTrolleyItems(List<CartItem> cartItems) {
+    public void loadTrolleyItems(ArrayList<CartItem> cartItems) {
         trolleyItemsPanel.removeAll(); // Clear existing content
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -420,7 +420,10 @@ public class BasketPage extends JFrame {
                             reloadListener.reloadProducts();
                         }
                     }else{
-                        //TODO: Missing logic if update failed
+                        JOptionPane.showMessageDialog(parentPage,
+                            "Remove from Cart failed",
+                            "Update failed",
+                            JOptionPane.ERROR_MESSAGE);
                     }
                 } else if (currentQuantity > 0) {
                     if (cartItem.getProductStock() >= currentQuantity){
@@ -475,7 +478,10 @@ public class BasketPage extends JFrame {
                     if(parentPage != null)
                         parentPage.invalidateProductCard(product.getProductID());
                 }else{
-                    //TODO: Missing logic if update failed
+                    JOptionPane.showMessageDialog(parentPage,
+                            "Remove from Cart failed",
+                            "Update failed",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

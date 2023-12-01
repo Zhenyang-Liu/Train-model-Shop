@@ -156,8 +156,4 @@ public class WelcomePage extends JFrame {
     private JButton button_login;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
-    public static void main(String[] args) {
-        WelcomePage frame = new WelcomePage();
-        frame.setVisible(true);
-    }
 }

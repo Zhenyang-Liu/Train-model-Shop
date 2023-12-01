@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.mysql.cj.x.protobuf.MysqlxDatatypes.Array;
-
 import exception.ConnectionException;
 import exception.DatabaseException;
 import helper.Logging;

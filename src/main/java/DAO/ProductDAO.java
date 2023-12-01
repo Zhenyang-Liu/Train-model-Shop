@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
-import helper.Filter;
 import helper.Logging;
 import model.*;
 

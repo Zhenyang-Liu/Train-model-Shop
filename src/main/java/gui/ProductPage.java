@@ -43,10 +43,8 @@ import javax.swing.text.JTextComponent;
 import DAO.BoxedSetDAO;
 import DAO.ControllerDAO;
 import DAO.LocomotiveDAO;
-import DAO.ProductDAO;
 import DAO.RollingStockDAO;
 import DAO.TrackDAO;
-import DAO.UserDAO;
 import exception.DatabaseException;
 import exception.ExceptionHandler;
 import helper.ImageUtils;
@@ -569,6 +567,7 @@ public class ProductPage extends JFrame {
         JOptionPane.showMessageDialog(this, "Product updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
         setVisible(false);
     }
+
 }
 
 
