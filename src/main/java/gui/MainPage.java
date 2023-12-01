@@ -3,24 +3,20 @@
  */
 
 package gui;
-
-import DAO.DatabaseConnectionHandler;
 import DAO.ProductDAO;
-import DAO.UserDAO;
 
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.jgoodies.forms.factories.DefaultComponentFactory;
 import java.awt.*;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
 import java.util.HashMap;
 
 import exception.DatabaseException;
 import helper.Filter;
-import helper.ImageUtils;
 import helper.Logging;
 import helper.UserSession;
+import helper.Filter.SubFilter;
 import listeners.ReloadListener;
 import model.*;
 import model.Locomotive.DCCType;
@@ -34,8 +30,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -71,7 +65,6 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     public void setButtonsByRole(){
-        System.out.println("Setting buttons this is epci epci ");
         if (PermissionService.hasPermission("ASSIGN_STAFF_ROLE")){
             button_manger.setVisible(true);
         } 
@@ -152,7 +145,7 @@ public class MainPage extends JFrame implements ReloadListener {
             subTypeFilterLabel.setVisible(false);
         }
         if(table.equals("Locomotive") || table.equals("Controller")){   
-            JComboBox jcb = table.equals("Controller") ? subTypeFilterBox : subTypeFilterBox2;
+            JComboBox<SubFilter> jcb = table.equals("Controller") ? subTypeFilterBox : subTypeFilterBox2;
             (table.equals("Controller") ? subTypeFilterLabel : subTypeFilterLabel2).setText("DCC Type");
             jcb.addItem(f.new SubFilter<String>("All", ""));
             jcb.addItem(f.new SubFilter<DCCType>(DCCType.ANALOGUE, "dcc_type"));
@@ -734,17 +727,17 @@ public class MainPage extends JFrame implements ReloadListener {
     private JSplitPane mainPageSplitPane;
     private JPanel filterPanel;
     private JLabel sortLabel;
-    private JComboBox sortOptions;
+    private JComboBox<Filter.SortBy> sortOptions;
     private JLabel priceFilterLabel;
-    private JComboBox priceFilterBox;
+    private JComboBox<Filter.PriceRange> priceFilterBox;
     private JLabel typeFilterLabel;
-    private JComboBox typeFilterBox;
+    private JComboBox<Filter.TypeFilter> typeFilterBox;
     private JLabel brandFilterLabel;
-    private JComboBox brandFilterBox;
+    private JComboBox<Filter.BrandFilter> brandFilterBox;
     private JLabel subTypeFilterLabel;
-    private JComboBox subTypeFilterBox;
+    private JComboBox<SubFilter> subTypeFilterBox;
     private JLabel subTypeFilterLabel2;
-    private JComboBox subTypeFilterBox2;
+    private JComboBox<SubFilter> subTypeFilterBox2;
     private JScrollPane scrollPane1;
     private JPanel productPanel;
     private JPanel productCardPanel1;
@@ -1117,30 +1110,4 @@ public class MainPage extends JFrame implements ReloadListener {
         return productCardPanel;
     }
 
-    /*
-     * Main function for testing
-     */
-    public static void main(String[] args) {
-        // User user = UserDAO.findUserByEmail("testemail@gmail.com");
-        Logging.Init(true);
-        ImageUtils.ResourceManager.Init();
-        User user = UserDAO.findUserByEmail("manager@manager.com");
-        UserSession.getInstance().setCurrentUser(user);
-
-        EventQueue.invokeLater(() -> {
-            try {
-                MainPage frame = new MainPage();
-                // Close logging :D
-                frame.addWindowListener(new WindowAdapter() {
-                    public void windowClosing(WindowEvent e){
-                        DatabaseConnectionHandler.shutdown();
-                        Logging.Close();
-                    }
-                });
-                frame.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
 }
