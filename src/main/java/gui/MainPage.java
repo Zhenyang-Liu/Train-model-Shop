@@ -74,10 +74,13 @@ public class MainPage extends JFrame implements ReloadListener {
         System.out.println("Setting buttons this is epci epci ");
         if (PermissionService.hasPermission("ASSIGN_STAFF_ROLE")){
             button_manger.setVisible(true);
-        } else if (PermissionService.hasPermission("MANAGE_ORDERS")) {
+        } 
+        if (PermissionService.hasPermission("MANAGE_ORDERS")) {
             button_staff_products.setVisible(true);
             button_staff_orders.setVisible(true);
-        }else {
+        }
+        if (!PermissionService.hasPermission("BROWSE_PRODUCTS")) {
+            button_logoutMouseClicked();
         }
         leftButtonPanel.revalidate();
         leftButtonPanel.repaint();
