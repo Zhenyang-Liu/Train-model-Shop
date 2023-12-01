@@ -419,9 +419,9 @@ public class BasketPage extends JFrame {
                             reloadListener.reloadProducts();
                         }
                     }else{
-                        JOptionPane.showMessageDialog(parentPage,
-                            "Remove from Cart failed",
-                            "Update failed",
+                        JOptionPane.showMessageDialog(trolleyCardPanel,
+                            "Please try again later",
+                            "System issue",
                             JOptionPane.ERROR_MESSAGE);
                     }
                 } else if (currentQuantity > 0) {
@@ -477,9 +477,9 @@ public class BasketPage extends JFrame {
                     if(parentPage != null)
                         parentPage.invalidateProductCard(product.getProductID());
                 }else{
-                    JOptionPane.showMessageDialog(parentPage,
-                            "Remove from Cart failed",
-                            "Update failed",
+                    JOptionPane.showMessageDialog(trolleyCardPanel,
+                            "Please try again later",
+                            "System issue",
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
