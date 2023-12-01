@@ -31,6 +31,7 @@ import static DAO.OrderDAO.findOrderByID;
 public class BasketPage extends JFrame {
     private Cart cart;
     private ReloadListener reloadListener;
+    private MainPage parentPage = null;
 
     public void setReloadListener(ReloadListener listener) {
         this.reloadListener = listener;
@@ -41,6 +42,11 @@ public class BasketPage extends JFrame {
         this.cart = CartService.getCartDetails(userID);
         initComponents();
         loadUserCart(userID);
+    }
+
+    public BasketPage(int userID, MainPage mainParentPage){
+        this(userID);
+        this.parentPage = mainParentPage;
     }
 
     private void checkOutButtonMouseClicked(MouseEvent e) {
@@ -394,6 +400,10 @@ public class BasketPage extends JFrame {
         itemSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
+                if(parentPage != null){
+                    Logging.getLogger().info("invalidating product card");
+                    parentPage.invalidateProductCard(product.getProductID());
+                }
                 int currentQuantity = (Integer) itemSpinner.getValue();
                 if (currentQuantity == 0){
                     if(CartService.removeFromCart(cartItem.getItemID())){
@@ -459,6 +469,8 @@ public class BasketPage extends JFrame {
                         reloadListener.reloadProducts();
                         System.out.println("Remove button clicked!");
                     }
+                    if(parentPage != null)
+                        parentPage.invalidateProductCard(product.getProductID());
                 }else{
                     //TODO: Missing logic if update failed
                 }
