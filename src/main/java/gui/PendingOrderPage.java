@@ -116,6 +116,7 @@ public class PendingOrderPage extends JFrame {
     private void addressAddButtonMouseClicked(MouseEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         AddressDialog addressDialog = new AddressDialog(parentFrame, null, false, false);
+        addressDialog.setAlwaysOnTop(true);
         addressDialog.setVisible(true);
 
         if (addressDialog.isInputValid()) {
@@ -126,6 +127,7 @@ public class PendingOrderPage extends JFrame {
     private void addressEditButtonMouseClicked(MouseEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         AddressDialog addressDialog = new AddressDialog(parentFrame, address, true, false);
+        addressDialog.setAlwaysOnTop(true);
         addressDialog.setVisible(true);
 
         if (addressDialog.isInputValid()) {
@@ -136,6 +138,7 @@ public class PendingOrderPage extends JFrame {
     private void paymentAddButtonMouseClicked(MouseEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         BankDetailDialog bankDetailDialog = new BankDetailDialog(parentFrame,bankDetail,false);
+        bankDetailDialog.setAlwaysOnTop(true);
         bankDetailDialog.setVisible(true);
 
         if (bankDetailDialog.isInputValid()) {
@@ -146,6 +149,7 @@ public class PendingOrderPage extends JFrame {
     private void paymentEditButtonMouseClicked(MouseEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         BankDetailDialog bankDetailDialog = new BankDetailDialog(parentFrame,bankDetail,true);
+        bankDetailDialog.setAlwaysOnTop(true);
         bankDetailDialog.setVisible(true);
 
         if (bankDetailDialog.isInputValid()) {
@@ -661,6 +665,7 @@ public class PendingOrderPage extends JFrame {
 
         SwingUtilities.invokeLater(() -> {
             PendingOrderPage frame = new PendingOrderPage(order);
+            frame.setAlwaysOnTop(true);
             frame.setVisible(true);
         });
     }

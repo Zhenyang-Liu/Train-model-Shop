@@ -307,14 +307,4 @@ public class ManagerPage extends JFrame {
             super.fireEditingStopped();
         }
     }    
-
-    public static void main(String[] args) {
-        User user = UserDAO.findUserByEmail("manager@manager.com");
-        UserSession.getInstance().setCurrentUser(user);
-
-        SwingUtilities.invokeLater(() -> {
-            ManagerPage frame = new ManagerPage();
-            frame.setVisible(true);
-        });
-    }
 }

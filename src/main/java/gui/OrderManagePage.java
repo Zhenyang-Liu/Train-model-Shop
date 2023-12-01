@@ -109,6 +109,7 @@ public class OrderManagePage extends JFrame {
                     OrderDetailPage frame = new OrderDetailPage(selectedOrder, () -> {
                         loadOrderData(currentStatusFilter);
                     });
+                    frame.setAlwaysOnTop(true);
                     frame.setVisible(true);
                 });
             }
@@ -329,6 +330,7 @@ public class OrderManagePage extends JFrame {
 
         SwingUtilities.invokeLater(() -> {
             OrderManagePage frame = new OrderManagePage();
+            frame.setAlwaysOnTop(true);
             frame.setVisible(true);
         });
     }

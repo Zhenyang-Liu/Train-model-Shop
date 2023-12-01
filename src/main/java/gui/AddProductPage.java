@@ -178,6 +178,7 @@ public class AddProductPage extends JDialog {
 
     private void openEraSelectDialog(List<Integer> eras) {
         EraSelect eraSelect = new EraSelect(this, eras);
+        eraSelect.setAlwaysOnTop(true);
         eraSelect.setVisible(true);
         List<Integer> selectedEras = eraSelect.getSelectedEras();
         setSelectedEra(selectedEras);
@@ -194,7 +195,7 @@ public class AddProductPage extends JDialog {
         } else {
             productSelect = new ProductSelectPage(this, type, itemList,false);
         }
-        
+        productSelect.setAlwaysOnTop(true);
         productSelect.setVisible(true);
         switch (type) {
             case "Track":

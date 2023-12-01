@@ -291,6 +291,7 @@ public class OrderDetailPage extends JFrame {
     private void cancelButtonMouseClicked(ActionEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         CancelOrderDialog cancelOrderDialog = new CancelOrderDialog(parentFrame, order, true);
+        cancelOrderDialog.setAlwaysOnTop(true);
         cancelOrderDialog.setVisible(true);
     
         if (cancelOrderDialog.isInputValid()) {
@@ -309,6 +310,7 @@ public class OrderDetailPage extends JFrame {
     private void seeCancelReasonButtonClicked(ActionEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         CancelOrderDialog cancelOrderDialog = new CancelOrderDialog(parentFrame, order,false);
+        cancelOrderDialog.setAlwaysOnTop(true);
         cancelOrderDialog.setVisible(true);
     }
 }

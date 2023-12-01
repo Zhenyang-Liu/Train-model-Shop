@@ -336,6 +336,7 @@ public class ProductManagePage extends JFrame {
         addProductPage.pack();
         addProductPage.setSize(500, 400);
         addProductPage.setLocationRelativeTo(null);
+        addProductPage.setAlwaysOnTop(true);
         addProductPage.setVisible(true);
 
         addProductPage.addWindowListener(new WindowAdapter() {
@@ -348,18 +349,8 @@ public class ProductManagePage extends JFrame {
 
     private void openDetailDialog(int productID, String productTypeString) {
         ProductPage p = new ProductPage(this, ProductService.findProductByID(productID));
-        p.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         p.setAlwaysOnTop(true);
+        p.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         p.setVisible(true);
-    }
-    
-    public static void main(String[] args) {
-        User user = UserDAO.findUserByEmail("manager@manager.com");
-        UserSession.getInstance().setCurrentUser(user);
-
-        SwingUtilities.invokeLater(() -> {
-            ProductManagePage frame = new ProductManagePage();
-            frame.setVisible(true);
-        });
     }
 }

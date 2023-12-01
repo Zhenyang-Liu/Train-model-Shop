@@ -77,6 +77,7 @@ public class BasketPage extends JFrame {
                 this.dispose();
                 PendingOrderPage pendingOrderPage = new PendingOrderPage(findOrderByID(orderID));
                 pendingOrderPage.setReloadListener(reloadListener);
+                pendingOrderPage.setAlwaysOnTop(true);
                 pendingOrderPage.setVisible(true);
             }catch(DatabaseException e1){
                 Logging.getLogger().warning("Could not find create pending order page at orderID " + orderID + "\nStacktrace: " + e1.getMessage());

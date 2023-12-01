@@ -453,6 +453,7 @@ public class ProductPage extends JFrame {
                     JOptionPane.showMessageDialog(this, 
                         "Product " + p.getProductCode() + " deleted successfully.", 
                         "Success", JOptionPane.INFORMATION_MESSAGE);
+                    dispose();
                 } else {
                     JOptionPane.showMessageDialog(this, 
                         "Failed to delete product. Error: " + deleteResult, 
@@ -567,14 +568,6 @@ public class ProductPage extends JFrame {
         errorLabel.setVisible(false);
         JOptionPane.showMessageDialog(this, "Product updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
         setVisible(false);
-    }
-    
-    public static void main(String[] args){
-        // UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("testemail@gmail.com"));
-        UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("testey@gmail.com"));
-        ProductPage p = new ProductPage(ProductDAO.getAllProduct().get(6));
-        p.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        p.setVisible(true);
     }
 }
 
