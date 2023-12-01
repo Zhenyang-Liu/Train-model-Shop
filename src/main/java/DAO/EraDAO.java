@@ -196,7 +196,7 @@ public class EraDAO {
         try (Connection connection = DatabaseConnectionHandler.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
     
-            preparedStatement.setInt(1, eraCode); // 设置 era_code 参数
+            preparedStatement.setInt(1, eraCode);
     
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {

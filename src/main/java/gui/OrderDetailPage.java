@@ -209,7 +209,7 @@ public class OrderDetailPage extends JFrame {
     private JPanel createOrderItemPanel(Product product, int quantity) {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // 设置边距
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     
         String htmlContent = String.format(
             "<html><body style='text-align: left;'>"
