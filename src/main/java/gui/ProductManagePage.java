@@ -349,6 +349,7 @@ public class ProductManagePage extends JFrame {
     private void openDetailDialog(int productID, String productTypeString) {
         ProductPage p = new ProductPage(this, ProductService.findProductByID(productID));
         p.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        p.setAlwaysOnTop(true);
         p.setVisible(true);
     }
     
