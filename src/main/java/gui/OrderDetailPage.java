@@ -280,7 +280,7 @@ public class OrderDetailPage extends JFrame {
 
     private void fulfillButtonMouseClicked(ActionEvent e) {
         if (OrderService.fulfillOrder(order)) {
-            JOptionPane.showMessageDialog(null, "Fulfill Order: "+ order.getOrderID() +" success!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Fulfill Order: "+ order.getOrderID() +" success!", "Success", JOptionPane.INFORMATION_MESSAGE);
             if (onCloseCallback != null) {
                 onCloseCallback.run();
             }
@@ -295,13 +295,13 @@ public class OrderDetailPage extends JFrame {
     
         if (cancelOrderDialog.isInputValid()) {
             if (OrderService.cancelOrder(order, cancelOrderDialog.getCancelReason())) {
-                JOptionPane.showMessageDialog(null, "Cancel Order: " + order.getOrderID() + " success!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Cancel Order: " + order.getOrderID() + " success!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 if (onCloseCallback != null) {
                     onCloseCallback.run();
                 }
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(null, "Failed to cancel order.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Failed to cancel order.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

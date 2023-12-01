@@ -171,7 +171,7 @@ public class AddressService {
      * @return true if the postcode is a valid UK postcode; false otherwise.
      */
     public static boolean isValidUKPostcode(String postcode) {
-        final String UK_POSTCODE_PATTERN = "^[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}$";
+        final String UK_POSTCODE_PATTERN = "^\\b(?i)[A-Z]{1,2}[0-9R][0-9A-Z]?[ ]?[0-9][ABD-HJLNP-UW-Z]{2}\\b$";
         Pattern pattern = Pattern.compile(UK_POSTCODE_PATTERN);
         Matcher matcher = pattern.matcher(postcode);
         return matcher.matches();

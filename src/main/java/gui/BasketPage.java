@@ -427,21 +427,21 @@ public class BasketPage extends JFrame {
                                 reloadListener.reloadProducts();
                             }
                         }else{
-                            JOptionPane.showMessageDialog(null,
+                            JOptionPane.showMessageDialog(parentPage,
                                     "Illegal Operation",
                                     "Update Failed",
                                     JOptionPane.ERROR_MESSAGE);
                         }
                     }else {
                         itemSpinner.setValue(cartItem.getProductStock());
-                        JOptionPane.showMessageDialog(null,
+                        JOptionPane.showMessageDialog(parentPage,
                                 "Max stock quantity reached",
                                 "Update Failed",
                                 JOptionPane.INFORMATION_MESSAGE);
                     }
 
                 } else {
-                    JOptionPane.showMessageDialog(null,
+                    JOptionPane.showMessageDialog(parentPage,
                             "Illegal Quantity",
                             "Update Failed",
                             JOptionPane.ERROR_MESSAGE);

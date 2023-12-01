@@ -505,7 +505,7 @@ public class ProductPage extends JFrame {
         String validationResult = ProductService.validateProductInput(newName, newCode, newBrand, newPrice, newQuantity);
         String ignore = "Product Code has existed in database.";
         if (!validationResult.equals(ignore) && validationResult != null) {
-            JOptionPane.showMessageDialog(null,validationResult, "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,validationResult, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -517,7 +517,7 @@ public class ProductPage extends JFrame {
         p.setDescription(newDes);
         String result = ProductService.updateProduct(p);
         if (!"success".equals(result)){
-            JOptionPane.showMessageDialog(null,"Update failed. "+result, "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,"Update failed. "+result, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -554,7 +554,7 @@ public class ProductPage extends JFrame {
                 }
             } catch (Exception ex) {
                 Logging.getLogger().warning("Could not update product " + p.getProductID() + "\n Stacktrace: " + ex.getMessage());
-                JOptionPane.showMessageDialog(null,"Update failed. "+ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,"Update failed. "+ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 

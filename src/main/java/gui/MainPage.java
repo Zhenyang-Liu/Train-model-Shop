@@ -1050,7 +1050,6 @@ public class MainPage extends JFrame implements ReloadListener {
             int cartID = CartService.getCartDetails(userID).getCartID();
             int productID = product.getProductID();
             int stock = product.getStockQuantity();
-            System.out.println(!CartService.updateCartItem(cartID, productID, num));
                 if (stock < num){
                     numberButton.setText(String.valueOf(stock));
                     if (stock < 1){
