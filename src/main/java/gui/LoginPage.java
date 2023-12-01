@@ -72,7 +72,9 @@ public class LoginPage extends JFrame {
                     backButtonMouseClicked();
                     return "OK";
                 }
-            } else {
+            } else if(!UserDAO.doesUserExist(email)){
+                return "email or password not valid";
+            }else {
                 return "User is already logged in";
             }
 

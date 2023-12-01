@@ -60,13 +60,13 @@ public class MainPage extends JFrame implements ReloadListener {
         customizeComponents();
         f = new Filter();
         populateFilterBoxes();
-        loadProducts(false);
+        loadProducts();
 
         //button_accountMouseClicked();
     }
 
     public void reloadProducts() {
-        loadProducts(false);
+        loadProducts();
     }
 
     public void setButtonsByRole(){
@@ -123,7 +123,7 @@ public class MainPage extends JFrame implements ReloadListener {
         priceFilterBox.addItem(f.new PriceRange(500.0f, 1e10f, "£500<"));
 
         priceFilterBox.addItemListener(e -> {
-            loadProducts(true);
+            loadProducts();
         });
     }
 
@@ -166,15 +166,15 @@ public class MainPage extends JFrame implements ReloadListener {
 
         typeFilterBox.addItemListener(e -> {
             populateSubFilters();
-            loadProducts(true);
+            loadProducts();
         });
         subTypeFilterBox.addItemListener(e -> {
             ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).setSubFilter(e.getItem().toString());
-            loadProducts(true);
+            loadProducts();
         });
         subTypeFilterBox2.addItemListener(e -> {
             ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).setSubFilter(e.getItem().toString());
-            loadProducts(true);
+            loadProducts();
         });
     }
 
@@ -185,7 +185,7 @@ public class MainPage extends JFrame implements ReloadListener {
         sortOptions.addItem(f.new SortBy("Price (desc)", "retail_price", false));
 
         sortOptions.addItemListener(e -> {
-            loadProducts(true);
+            loadProducts();
         });
     }
 
@@ -195,7 +195,7 @@ public class MainPage extends JFrame implements ReloadListener {
         for(String b: toAdd)
             brandFilterBox.addItem(f.new BrandFilter(b));
         brandFilterBox.addItemListener(e -> {
-            loadProducts(true);
+            loadProducts();
         });
     }
 
@@ -208,7 +208,7 @@ public class MainPage extends JFrame implements ReloadListener {
         populateSubFilters();
 
         searchButton.addActionListener(e -> {
-            loadProducts(true);
+            loadProducts();
         });
     }
 
@@ -769,7 +769,7 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
 
-    private void loadProducts(boolean useCache) {
+    private void loadProducts() {
         new SwingWorker<ArrayList<Product>, Void>() {
             @Override
             protected ArrayList<Product> doInBackground() throws Exception {
@@ -799,16 +799,12 @@ public class MainPage extends JFrame implements ReloadListener {
                     ArrayList<Product> productList = get();
                     // Updating the GUI with a Product List
                     for (Product product : productList) {
-                        JPanel productCard;
-                        if (useCache && productPanelCache.containsKey(product.getProductID())) {
-                            productCard = productPanelCache.get(product.getProductID());
-                        } else {
-                            productCard = createProductCard(product);
-                            if (useCache) {
-                                productPanelCache.put(product.getProductID(), productCard);
-                            }
-                        }
-                        productPanel.add(productCard);
+                        // Cache should ALWAYS be used. Re-rendering product cards that haven't changed takes too long. (>3s)
+                        // If a product is changed elsewhere in the code, please mark the product as needing a refreshed card using
+                        // invalidateProductCard(productID);
+                        if (!productPanelCache.containsKey(product.getProductID()))
+                            productPanelCache.put(product.getProductID(), createProductCard(product));
+                        productPanel.add(productPanelCache.get(product.getProductID()));
                     }
                     productPanel.revalidate();
                     productPanel.repaint();

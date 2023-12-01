@@ -418,6 +418,8 @@ public class ProductPage extends JFrame {
     }
 
     private void addListeners(){
+        if(!isStaff)
+            return;
         productImage.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e){
                 updateImage();
@@ -431,8 +433,6 @@ public class ProductPage extends JFrame {
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
-        if(!isStaff)
-            return;
         saveProduct.addActionListener(e -> {submitProduct();if(mainParentPage != null)mainParentPage.invalidateProductCard(p.getProductID());});
         deleteProduct.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(this, 

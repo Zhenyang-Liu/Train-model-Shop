@@ -84,11 +84,10 @@ public class RegistrationPage extends JFrame {
                 } catch (DatabaseException e) {
                     Logging.getLogger().warning("Could not add address into database\nStackTrace: " + e.getMessage());
                 }
+                UserSession.getInstance().clear();
                 return "OK";
             }
-            else {
-                UserSession.getInstance().clear();
-            }
+            UserSession.getInstance().clear();
             return "Error creating user login, they may already exist!";
         }
 
