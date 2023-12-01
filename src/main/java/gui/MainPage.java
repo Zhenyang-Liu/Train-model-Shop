@@ -3,6 +3,7 @@
  */
 
 package gui;
+import DAO.DatabaseConnectionHandler;
 import DAO.ProductDAO;
 
 import com.formdev.flatlaf.extras.FlatSVGIcon;
