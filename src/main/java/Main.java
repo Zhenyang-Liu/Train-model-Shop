@@ -1,4 +1,3 @@
-
 import gui.MainPage;
 import helper.Logging;
 
