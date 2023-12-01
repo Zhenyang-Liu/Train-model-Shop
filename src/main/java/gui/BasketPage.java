@@ -72,6 +72,8 @@ public class BasketPage extends JFrame {
             // Order created successfully
             try {
                 if (reloadListener != null) {reloadListener.reloadProducts();}
+                for(CartItem i: cart.getCartItems())
+                    parentPage.invalidateProductCard(i.getItem().getProductID());
                 this.dispose();
                 PendingOrderPage pendingOrderPage = new PendingOrderPage(findOrderByID(orderID));
                 pendingOrderPage.setReloadListener(reloadListener);
