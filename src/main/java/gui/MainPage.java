@@ -65,7 +65,6 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
     public void setButtonsByRole(){
-        System.out.println("Setting buttons this is epci epci ");
         if (PermissionService.hasPermission("ASSIGN_STAFF_ROLE")){
             button_manger.setVisible(true);
         } 
