@@ -419,7 +419,10 @@ public class BasketPage extends JFrame {
                             reloadListener.reloadProducts();
                         }
                     }else{
-                        //TODO: Missing logic if update failed
+                        JOptionPane.showMessageDialog(parentPage,
+                            "Remove from Cart failed",
+                            "Update failed",
+                            JOptionPane.ERROR_MESSAGE);
                     }
                 } else if (currentQuantity > 0) {
                     if (cartItem.getProductStock() >= currentQuantity){
@@ -474,7 +477,10 @@ public class BasketPage extends JFrame {
                     if(parentPage != null)
                         parentPage.invalidateProductCard(product.getProductID());
                 }else{
-                    //TODO: Missing logic if update failed
+                    JOptionPane.showMessageDialog(parentPage,
+                            "Remove from Cart failed",
+                            "Update failed",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

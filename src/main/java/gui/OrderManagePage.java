@@ -4,9 +4,6 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import DAO.UserDAO;
-import helper.UserSession;
-
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
@@ -321,15 +318,5 @@ public class OrderManagePage extends JFrame {
     
     public interface ButtonColumnListener {
         void onButtonClicked(int row, int column);
-    }
-
-    public static void main(String[] args) {
-        User user = UserDAO.findUserByEmail("manager@manager.com");
-        UserSession.getInstance().setCurrentUser(user);
-
-        SwingUtilities.invokeLater(() -> {
-            OrderManagePage frame = new OrderManagePage();
-            frame.setVisible(true);
-        });
     }
 }

@@ -10,17 +10,12 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import DAO.OrderDAO;
-import DAO.UserDAO;
-import exception.DatabaseException;
 import helper.ImageUtils;
-import helper.UserSession;
 import listeners.ReloadListener;
 import model.Address;
 import model.BankDetail;
 import model.Order;
 import model.Product;
-import model.User;
 import service.AddressService;
 import service.BankDetailService;
 import service.CartService;
@@ -651,19 +646,6 @@ public class PendingOrderPage extends JFrame {
         }
     }
 
-
-    public static void main(String[] args) throws DatabaseException {
-         User user = UserDAO.findUserByEmail("manager@manager.com");
-        // User user = UserDAO.findUserByEmail("staff@gmail.com");
-        //User user = UserDAO.findUserByEmail("testemail@gmail.com");
-        UserSession.getInstance().setCurrentUser(user);
-        Order order = OrderDAO.findOrderByID(13);
-
-        SwingUtilities.invokeLater(() -> {
-            PendingOrderPage frame = new PendingOrderPage(order);
-            frame.setVisible(true);
-        });
-    }
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
     private JLabel pendingOrderTitleLabel;
     private JPanel pendingOrderContentPanel;

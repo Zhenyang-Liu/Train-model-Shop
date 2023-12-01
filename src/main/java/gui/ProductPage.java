@@ -43,10 +43,8 @@ import javax.swing.text.JTextComponent;
 import DAO.BoxedSetDAO;
 import DAO.ControllerDAO;
 import DAO.LocomotiveDAO;
-import DAO.ProductDAO;
 import DAO.RollingStockDAO;
 import DAO.TrackDAO;
-import DAO.UserDAO;
 import exception.DatabaseException;
 import exception.ExceptionHandler;
 import helper.ImageUtils;
@@ -568,14 +566,7 @@ public class ProductPage extends JFrame {
         JOptionPane.showMessageDialog(this, "Product updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
         setVisible(false);
     }
-    
-    public static void main(String[] args){
-        // UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("testemail@gmail.com"));
-        UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("testey@gmail.com"));
-        ProductPage p = new ProductPage(ProductDAO.getAllProduct().get(6));
-        p.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        p.setVisible(true);
-    }
+
 }
 
 
