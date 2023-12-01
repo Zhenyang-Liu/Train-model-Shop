@@ -970,7 +970,15 @@ public class MainPage extends JFrame implements ReloadListener {
                     cartID = CartService.getCartDetails(userid).getCartID();
                 }
                 int productID = product.getProductID();
-                CartService.addToCart(cartID, productID, 1);
+                if (!CartService.addToCart(cartID, productID, 1)){
+                    addButton.setVisible(false);
+                    soldOutLabel.setVisible(true);
+                    JOptionPane.showMessageDialog(this,
+                            "Sorry, this product has just been sold out.",
+                            "Stock Issue",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
+
             }else {
                 // USER NOT LOGIN
                 LoginPage loginPage = new LoginPage();
@@ -994,11 +1002,33 @@ public class MainPage extends JFrame implements ReloadListener {
                             JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                numberButton.setText(String.valueOf(num));
                 int cartID = CartService.getCartDetails(userID).getCartID();
                 int productID = product.getProductID();
-                if (!CartService.updateCartItem(cartID, productID, num)){
-                    //TODO: Add action failed information
+                int stock = product.getStockQuantity();
+                if (stock < num){
+                    numberButton.setText(String.valueOf(stock));
+                    if (stock < 1){
+                        adjustNumPanel.setVisible(false);
+                        addButton.setVisible(false);
+                        soldOutLabel.setVisible(true);
+                        JOptionPane.showMessageDialog(this,
+                                "Sorry, this product has just been sold out.",
+                                "Stock Issue",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }else{
+                        JOptionPane.showMessageDialog(this,
+                                "Stocks are not sufficient.\nQuantity is automatically set to the maximum purchasable quantity.",
+                                "Stock Issue",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }else {
+                    if (!CartService.updateCartItem(cartID, productID, num)){
+                        JOptionPane.showMessageDialog(this,
+                                "Please try again later.",
+                                "System Issue",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                    numberButton.setText(String.valueOf(num));
                 }
             }
         });
@@ -1007,11 +1037,35 @@ public class MainPage extends JFrame implements ReloadListener {
         plusButton.addActionListener(e -> {
             int num = Integer.parseInt(numberButton.getText());
             num += 1;
-            numberButton.setText(String.valueOf(num));
+
             int cartID = CartService.getCartDetails(userID).getCartID();
             int productID = product.getProductID();
-                if (!CartService.updateCartItem(cartID, productID, num)){
-                    //TODO: Add action failed information
+            int stock = product.getStockQuantity();
+            System.out.println(!CartService.updateCartItem(cartID, productID, num));
+                if (stock < num){
+                    numberButton.setText(String.valueOf(stock));
+                    if (stock < 1){
+                        adjustNumPanel.setVisible(false);
+                        addButton.setVisible(false);
+                        soldOutLabel.setVisible(true);
+                        JOptionPane.showMessageDialog(this,
+                                "Sorry, this product has just been sold out.",
+                                "Stock Issue",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }else{
+                        JOptionPane.showMessageDialog(this,
+                                "Stocks are not sufficient.\nQuantity is automatically set to the maximum purchasable quantity.",
+                                "Stock Issue",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }else{
+                    if (!CartService.updateCartItem(cartID, productID, num)){
+                        JOptionPane.showMessageDialog(this,
+                                "Please try again later.",
+                                "System Issue",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                    numberButton.setText(String.valueOf(num));
                 }
         });
 
