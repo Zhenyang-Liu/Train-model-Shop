@@ -401,6 +401,7 @@ public class ProductPage extends JFrame {
 
     private void openEraSelectDialog(List<Integer> eras) {
         EraSelect eraSelect = new EraSelect(null, eras);
+        eraSelect.setAlwaysOnTop(true);
         eraSelect.setVisible(true);
         List<Integer> selectedEras = eraSelect.getSelectedEras();
         setSelectedEra(selectedEras);
