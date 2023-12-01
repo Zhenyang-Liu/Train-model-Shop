@@ -67,6 +67,7 @@ public class ProductPage extends JFrame {
     private List<Integer> eraList;
 
     private boolean isStaff;
+    private boolean viewOnly;
 
     private JTextField productName, productPrice,productStock,productBrand,productCode;
     private JTextArea productDescription;
@@ -79,6 +80,7 @@ public class ProductPage extends JFrame {
 
     public ProductPage(ProductManagePage mP, Product product) {
         this.managePage = mP;
+        this.viewOnly = false;
         initializePage(product);
 
         addWindowListener(new WindowAdapter() {
@@ -93,6 +95,7 @@ public class ProductPage extends JFrame {
 
     public ProductPage(MainPage parentMainPage, Product product) {
         mainParentPage = parentMainPage;
+        this.viewOnly = true;
         initializePage(product);
     }
 
@@ -102,8 +105,10 @@ public class ProductPage extends JFrame {
 
     private void initializePage(Product product) {
         this.p = product;
-        this.isStaff = PermissionService.hasPermission(UserSession.getInstance().getCurrentUser().getUserID(), "UPDATE_PRODUCT");
-
+        if (!viewOnly){
+            this.isStaff = PermissionService.hasPermission(UserSession.getInstance().getCurrentUser().getUserID(), "UPDATE_PRODUCT");
+        }
+        
         initComponents();
 
         setTitle((isStaff ? "Editing " : "Viewing ") + p.getProductName());
@@ -478,7 +483,7 @@ public class ProductPage extends JFrame {
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
     
-        if (isStaff) {
+        if (isStaff && !viewOnly) {
             JPanel productButtons = initProductButtons();
             content.add(productButtons, gbc);
         } else {
