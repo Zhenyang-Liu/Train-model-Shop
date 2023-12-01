@@ -300,7 +300,7 @@ public class AddProductPage extends JDialog {
 
         errorLabel.setVisible(false);
         JOptionPane.showMessageDialog(this, "Product added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-        setVisible(false);
+        dispose();
     }
 
     private String checkTrainSetEmpty() {
