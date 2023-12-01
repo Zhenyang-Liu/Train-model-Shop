@@ -215,9 +215,11 @@ public class OrderHistory extends JFrame {
     private void showOrderDetails(Order order) {
         if ("Pending".equals(order.getStatus().getStatus())){
             PendingOrderPage orderPage = new PendingOrderPage(order);
+            orderPage.setAlwaysOnTop(true);
             orderPage.setVisible(true);
         }else{
             OrderPage orderPage = new OrderPage(order);
+            orderPage.setAlwaysOnTop(true);
             orderPage.setVisible(true);
         }
     }

@@ -106,6 +106,7 @@ public class OrderManagePage extends JFrame {
                     OrderDetailPage frame = new OrderDetailPage(selectedOrder, () -> {
                         loadOrderData(currentStatusFilter);
                     });
+                    frame.setAlwaysOnTop(true);
                     frame.setVisible(true);
                 });
             }

@@ -84,6 +84,7 @@ public class MainPage extends JFrame implements ReloadListener {
         SwingUtilities.invokeLater(() -> {
             if (!UserSession.getInstance().isLoggedIn()) {
                 LoginPage loginPage = new LoginPage();;
+                loginPage.setAlwaysOnTop(true);
                 loginPage.setVisible(true);
                 loginPage.setLoginSuccessListener(this);
                 loginPage.setRoleButtonsListener(this::setButtonsByRole);
@@ -103,11 +104,13 @@ public class MainPage extends JFrame implements ReloadListener {
             Logging.getLogger().info("CREATING BASKET PAGE");
             int userID = currentUser.getUserID();
             BasketPage basketPage = new BasketPage(userID, this);
+            basketPage.setAlwaysOnTop(true);
             basketPage.setVisible(true);
             basketPage.setReloadListener(this);
         } else {
             // USER NOT LOGIN
             LoginPage loginPage = new LoginPage();
+            loginPage.setAlwaysOnTop(true);
             loginPage.setVisible(true);
         }
 
@@ -221,10 +224,12 @@ public class MainPage extends JFrame implements ReloadListener {
 
         if (currentUser != null) {
             OrderHistory ordersPage = new OrderHistory();
+            ordersPage.setAlwaysOnTop(true);
             ordersPage.setVisible(true);
         } else {
             // USER NOT LOGIN
             LoginPage loginPage = new LoginPage();
+            loginPage.setAlwaysOnTop(true);
             loginPage.setVisible(true);
         }
     }
@@ -991,6 +996,7 @@ public class MainPage extends JFrame implements ReloadListener {
             }else {
                 // USER NOT LOGIN
                 LoginPage loginPage = new LoginPage();
+                loginPage.setAlwaysOnTop(true);
                 loginPage.setVisible(true);
             }
         });

@@ -59,6 +59,7 @@ public class AccountPage extends JFrame {
         } catch (DatabaseException | SQLException e) {
             Logging.getLogger().warning("User not logged in for account page, closing account page");
             LoginPage loginPage = new LoginPage();
+            loginPage.setAlwaysOnTop(true);
             loginPage.setVisible(true);
             this.dispose();
         }

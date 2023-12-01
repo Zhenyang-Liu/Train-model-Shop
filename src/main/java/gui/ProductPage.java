@@ -451,6 +451,7 @@ public class ProductPage extends JFrame {
                     JOptionPane.showMessageDialog(this, 
                         "Product " + p.getProductCode() + " deleted successfully.", 
                         "Success", JOptionPane.INFORMATION_MESSAGE);
+                    dispose();
                 } else {
                     JOptionPane.showMessageDialog(this, 
                         "Failed to delete product. Error: " + deleteResult, 
