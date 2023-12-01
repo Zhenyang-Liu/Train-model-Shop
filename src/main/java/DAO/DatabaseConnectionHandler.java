@@ -30,6 +30,5 @@ public class DatabaseConnectionHandler {
             dataSource.close();
         }
     }
-
     
 }

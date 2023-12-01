@@ -262,7 +262,7 @@ public class MainPage extends JFrame implements ReloadListener {
         UserSession.getInstance().clear();
 
         WelcomePage.getInstance().setVisible(true);
-
+        DatabaseConnectionHandler.shutdown();
         this.dispose();
     }
 
