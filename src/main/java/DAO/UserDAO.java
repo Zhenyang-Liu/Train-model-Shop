@@ -23,7 +23,7 @@ public class UserDAO {
      */
     public static boolean insertUser(User newUser) {
         // Insert user into database as they have not already been added
-        String insertSQL = "INSERT INTO User (user_id, forename, surname, email, address) VALUES (?, ?, ?, ?, ?)";
+        String insertSQL = "INSERT INTO User (user_id, forename, surname, email) VALUES (?, ?, ?, ?)";
 
         try (Connection connection = DatabaseConnectionHandler.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
@@ -38,7 +38,6 @@ public class UserDAO {
             preparedStatement.setString(2, newUser.getForename());
             preparedStatement.setString(3, newUser.getSurname());
             preparedStatement.setString(4, newUser.getEmail());
-            preparedStatement.setString(5, newUser.getAddress());
 
             // Run SQL command
             preparedStatement.executeUpdate();
@@ -142,7 +141,6 @@ public class UserDAO {
                     user.setEmail(results.getString("email"));
                     user.setForename(results.getString("forename"));
                     user.setSurname(results.getString("surname"));
-                    user.setAddress(results.getString("address"));
                 }
                     
                 // Return the user
@@ -186,14 +184,13 @@ public class UserDAO {
      */
     public static boolean updateUser(User user) {
         if (doesUserExist(user.getUserID())){
-            String getSQL = "UPDATE User SET email = ?, forename = ?, surname = ?, address = ? WHERE user_id = ?";
+            String getSQL = "UPDATE User SET email = ?, forename = ?, surname = ? WHERE user_id = ?";
             try (Connection connection = DatabaseConnectionHandler.getConnection();
             PreparedStatement sqlStatement = connection.prepareStatement(getSQL)) {
                 sqlStatement.setString(1, user.getEmail());
                 sqlStatement.setString(2, user.getForename());
                 sqlStatement.setString(3, user.getSurname());
-                sqlStatement.setString(4, user.getAddress());
-                sqlStatement.setInt(5, user.getUserID());
+                sqlStatement.setInt(4, user.getUserID());
                 sqlStatement.executeUpdate();
                 return true;
             } catch (SQLException e) {

@@ -1,7 +1,9 @@
 CREATE TABLE User (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     forename VARCHAR(100),
-    surname VARCHAR(100)
+    surname VARCHAR(100),
+    email VARCHAR(100),
+
 );
 
 CREATE TABLE Login (
@@ -10,11 +12,7 @@ CREATE TABLE Login (
     session_code VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     password_salt VARCHAR(255),
-    failed_attempts INT DEFAULT 0,
-    last_login_attempt TIMESTAMP,
-    lockout_enabled BOOLEAN DEFAULT FALSE,
-    lockout_end TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES User(user_id)
+    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE EncryptionKeys (
@@ -26,7 +24,7 @@ CREATE TABLE User_Key (
     user_id INT UNIQUE,
     key_id INT,
     PRIMARY KEY (user_id, key_id),
-    FOREIGN KEY (user_id) REFERENCES User(user_id),
+    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE,
     FOREIGN KEY (key_id) REFERENCES EncryptionKeys(key_id)
 );
 
@@ -39,7 +37,7 @@ CREATE TABLE User_Role (
     user_id INT NOT NULL,
     role_id INT NOT NULL,
     PRIMARY KEY (user_id, role_id),
-    FOREIGN KEY (user_id) REFERENCES User(user_id),
+    FOREIGN KEY (user_id) REFERENCES User(user_id ON DELETE CASCADE),
     FOREIGN KEY (role_id) REFERENCES Role(role_id)
 );
 
@@ -79,7 +77,7 @@ CREATE TABLE Bank_Detail (
     card_holder_name VARCHAR(255) NOT NULL,
     card_number VARCHAR(255) NOT NULL, 
     expiry_date VARCHAR(10) NOT NULL,
-    user_id INT NOT NULL, 
+    user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
@@ -111,7 +109,8 @@ CREATE TABLE Product (
     product_code VARCHAR(8) NOT NULL,
     retail_price DECIMAL(10, 2) NOT NULL,
     description TEXT NOT NULL,
-    stock_quantity INT NOT NULL
+    stock_quantity INT NOT NULL,
+    product_image TEXT
 );
 
 CREATE TABLE Order_Line (

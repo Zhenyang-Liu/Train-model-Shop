@@ -13,7 +13,9 @@ import javax.swing.border.*;
 import DAO.OrderDAO;
 import DAO.UserDAO;
 import exception.DatabaseException;
+import helper.ImageUtils;
 import helper.UserSession;
+import listeners.ReloadListener;
 import model.Address;
 import model.BankDetail;
 import model.Order;
@@ -29,6 +31,11 @@ import service.OrderService;
  * @author Jiawei Jiang
  */
 public class PendingOrderPage extends JFrame {
+    private ReloadListener reloadListener;
+    public void setReloadListener(ReloadListener listener) {
+        this.reloadListener = listener;
+    }
+
     public PendingOrderPage(Order order) {
         this.order = order;
         initComponents();
@@ -97,6 +104,9 @@ public class PendingOrderPage extends JFrame {
     
             if (confirmReturnToCart == JOptionPane.YES_OPTION) {
                 OrderService.returnToCart(order);
+                if (reloadListener != null) {
+                    reloadListener.reloadProducts();
+                }
             } 
             OrderService.cancelOrder(order, "Self Cancelled");
             dispose();
@@ -587,8 +597,10 @@ public class PendingOrderPage extends JFrame {
         cardPanel.setPreferredSize(new Dimension(590, 120));
         cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.X_AXIS));
 
-        JLabel itemImage = new JLabel();
-        itemImage.setIcon(new ImageIcon(getClass().getResource("/images/tgv.jpeg")));
+        ImageIcon originalIcon = product.getProductImage();
+        ImageIcon resizedIcon = ImageUtils.resizeAndFillImageIcon(originalIcon, 160, 120);
+        JLabel itemImage = new JLabel(resizedIcon);
+
         itemImage.setPreferredSize(new Dimension(160, 120));
         itemImage.setMaximumSize(new Dimension(160, 120));
         cardPanel.add(itemImage);
@@ -638,6 +650,8 @@ public class PendingOrderPage extends JFrame {
             pendingOrderItemsPanel.add(cardPanel, gbc);
         }
     }
+
+
     public static void main(String[] args) throws DatabaseException {
          User user = UserDAO.findUserByEmail("manager@manager.com");
         // User user = UserDAO.findUserByEmail("staff@gmail.com");

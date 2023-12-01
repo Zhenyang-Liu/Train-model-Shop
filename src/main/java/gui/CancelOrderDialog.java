@@ -87,11 +87,11 @@ public class CancelOrderDialog extends JDialog {
 
     private void onAdd() {
         if (cancelReasonField.getText() == null || cancelReasonField.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Please enter a reason", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please enter a reason", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             boolean isCancelSuccess = OrderService.cancelOrder(order, getCancelReason());
             if (!isCancelSuccess) {
-                JOptionPane.showMessageDialog(null, "Add reason failed", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Add reason failed", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 isInputValid = true;
                 dispose();

@@ -439,7 +439,7 @@ public class ProductDAO {
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
+                while (resultSet.next()) {
                     brandList.add(resultSet.getString("brand_name"));
                 }
             }

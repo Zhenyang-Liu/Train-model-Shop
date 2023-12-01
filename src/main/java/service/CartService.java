@@ -281,6 +281,7 @@ public class CartService {
 
                 // Special handling for boxed sets (Train Set or Track Pack)
                 if ("Train Set".equals(itemType) || "Track Pack".equals(itemType)) {
+                    ProductService.updateBoxedSetQuantity(item.getItem().getProductID());
                     BoxedSet set = BoxedSetDAO.findBoxedSetByID(item.getItem().getProductID());
                     for (Map.Entry<Product, Integer> setItem : set.getContain().entrySet()) {
                         addProductToMap(checkList, setItem.getKey(), setItem.getValue() * item.getQuantity());

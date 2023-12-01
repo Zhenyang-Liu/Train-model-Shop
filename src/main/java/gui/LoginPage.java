@@ -41,6 +41,7 @@ public class LoginPage extends JFrame {
 
     private void button_to_registerPageMouseClicked(MouseEvent e) {
         RegistrationPage registrationPage = new RegistrationPage();
+        registrationPage.setAlwaysOnTop(true);
         registrationPage.setVisible(true);
 
         this.dispose();
@@ -72,7 +73,9 @@ public class LoginPage extends JFrame {
                     backButtonMouseClicked();
                     return "OK";
                 }
-            } else {
+            } else if(!UserDAO.doesUserExist(email)){
+                return "email or password not valid";
+            }else {
                 return "User is already logged in";
             }
 

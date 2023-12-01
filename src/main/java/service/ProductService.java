@@ -19,10 +19,16 @@ import model.BoxedSet.BoxedType;
 public class ProductService {
     
     /**
-     * Updates a product in the database.
-     *
-     * @param p The Product object to update.
-     * @return A string indicating the success or failure of the operation.
+     * Updates a product and its related boxed sets in the database.
+     * 
+     * This method first verifies if the user has the "MANAGE_PRODUCTS" permission.
+     * If the permission is granted, it proceeds to update the specified product using {@link ProductDAO#updateProduct(Product)}.
+     * It then checks for any boxed sets that include this product and updates their quantities accordingly.
+     * 
+     * @param p The Product object to be updated.
+     * @return A string indicating the success of the operation or an error message in case of a failure.
+     * @throws AuthorizationException If the user does not have the necessary permission.
+     * @throws DatabaseException If there is an error during database operations.
      */
     public static String updateProduct(Product p) {
         try{
@@ -30,6 +36,13 @@ public class ProductService {
                 throw new AuthorizationException("Access denied. Only Staff can manage Products.");
             }
             ProductDAO.updateProduct(p);
+            ArrayList<Integer> idList = BoxedSetDAO.findProductBelongTo(p.getProductID());
+            if (idList.size() > 0) {
+                for (int id : idList) {
+                    ProductService.updateBoxedSetQuantity(id);
+                }
+            }
+
             return "success";
         } catch (DatabaseException e) {
             ExceptionHandler.printErrorMessage(e);

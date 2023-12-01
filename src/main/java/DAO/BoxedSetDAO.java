@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mysql.cj.x.protobuf.MysqlxDatatypes.Array;
+
 import exception.ConnectionException;
 import exception.DatabaseException;
 import helper.Logging;
@@ -268,6 +270,41 @@ public class BoxedSetDAO extends ProductDAO {
             Logging.getLogger().warning("Error when finding items for box set " + setID + " SQL Excepted\nStacktrace: " + e.getMessage());
         }
         return contain;
+    }
+
+    /**
+     * Retrieves a list of box set IDs that include a specific item.
+     *
+     * This method performs a database query to find all unique box set IDs (`box_set_id`)
+     * where the given item ID (`item_id`) is a part of the box set. It returns an ArrayList of Integer,
+     * each representing a box set ID. The method handles SQLTimeoutException and SQLException,
+     * logging warnings if either occurs.
+     *
+     * @param itemID The item ID for which the box set IDs are to be found.
+     * @return An ArrayList of Integer containing the IDs of box sets that include the given item.
+     *         Returns an empty list if no box sets are found or in case of an SQL error.
+     */
+    public static ArrayList<Integer> findProductBelongTo(int itemID) {
+        String selectSQL = "SELECT DISTINCT box_set_id FROM BoxedSet_Item WHERE item_id = ?;";
+        ArrayList<Integer> idList = new ArrayList<>();
+
+        try (Connection connection = DatabaseConnectionHandler.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+            preparedStatement.setInt(1, itemID);
+            
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int setId = resultSet.getInt("box_set_id");
+                idList.add(setId);
+
+            }
+        } catch (SQLTimeoutException e) {
+            Logging.getLogger().warning("Error getting all boxed sets: SQL Timed out\n Stacktrace: " + e.getMessage());
+        } catch (SQLException e) {
+            Logging.getLogger().warning("Error getting all boxed sets: SQL Exception\nStacktrace: " + e.getMessage());
+        }
+        return idList; 
     }
 
     /**

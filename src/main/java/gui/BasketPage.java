@@ -14,9 +14,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import exception.DatabaseException;
+import helper.ImageUtils;
 import helper.Logging;
 import listeners.ReloadListener;
-import listeners.SetRoleButtons;
 import model.Cart;
 import model.CartItem;
 import model.Product;
@@ -30,6 +30,7 @@ import static DAO.OrderDAO.findOrderByID;
 public class BasketPage extends JFrame {
     private Cart cart;
     private ReloadListener reloadListener;
+    private MainPage parentPage = null;
 
     public void setReloadListener(ReloadListener listener) {
         this.reloadListener = listener;
@@ -40,6 +41,11 @@ public class BasketPage extends JFrame {
         this.cart = CartService.getCartDetails(userID);
         initComponents();
         loadUserCart(userID);
+    }
+
+    public BasketPage(int userID, MainPage mainParentPage){
+        this(userID);
+        this.parentPage = mainParentPage;
     }
 
     private void checkOutButtonMouseClicked(MouseEvent e) {
@@ -65,8 +71,10 @@ public class BasketPage extends JFrame {
         } else {
             // Order created successfully
             try {
+                if (reloadListener != null) {reloadListener.reloadProducts();}
                 this.dispose();
                 PendingOrderPage pendingOrderPage = new PendingOrderPage(findOrderByID(orderID));
+                pendingOrderPage.setReloadListener(reloadListener);
                 pendingOrderPage.setVisible(true);
             }catch(DatabaseException e1){
                 Logging.getLogger().warning("Could not find create pending order page at orderID " + orderID + "\nStacktrace: " + e1.getMessage());
@@ -357,12 +365,9 @@ public class BasketPage extends JFrame {
         trolleyCardPanel.setLayout(new BoxLayout(trolleyCardPanel, BoxLayout.X_AXIS));
 
         // Create and configure the product image label
-        JLabel itemImage = new JLabel();
         ImageIcon originalIcon = product.getProductImage();
-        Image originalImage = originalIcon.getImage();
-        Image resizedImage = originalImage.getScaledInstance(150, 100, Image.SCALE_SMOOTH);
-        itemImage.setIcon(new ImageIcon(resizedImage));
-
+        ImageIcon resizedIcon = ImageUtils.resizeAndFillImageIcon(originalIcon, 160, 120);
+        JLabel itemImage = new JLabel(resizedIcon);
 
         trolleyCardPanel.add(itemImage);
 
@@ -396,6 +401,10 @@ public class BasketPage extends JFrame {
         itemSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
+                if(parentPage != null){
+                    Logging.getLogger().info("invalidating product card");
+                    parentPage.invalidateProductCard(product.getProductID());
+                }
                 int currentQuantity = (Integer) itemSpinner.getValue();
                 if (currentQuantity == 0){
                     if(CartService.removeFromCart(cartItem.getItemID())){
@@ -406,7 +415,6 @@ public class BasketPage extends JFrame {
 
                         if (reloadListener != null) {
                             reloadListener.reloadProducts();
-                            System.out.println("Remove button clicked!");
                         }
                     }else{
                         //TODO: Missing logic if update failed
@@ -418,21 +426,21 @@ public class BasketPage extends JFrame {
                                 reloadListener.reloadProducts();
                             }
                         }else{
-                            JOptionPane.showMessageDialog(null,
+                            JOptionPane.showMessageDialog(parentPage,
                                     "Illegal Operation",
                                     "Update Failed",
                                     JOptionPane.ERROR_MESSAGE);
                         }
                     }else {
                         itemSpinner.setValue(cartItem.getProductStock());
-                        JOptionPane.showMessageDialog(null,
+                        JOptionPane.showMessageDialog(parentPage,
                                 "Max stock quantity reached",
                                 "Update Failed",
                                 JOptionPane.INFORMATION_MESSAGE);
                     }
 
                 } else {
-                    JOptionPane.showMessageDialog(null,
+                    JOptionPane.showMessageDialog(parentPage,
                             "Illegal Quantity",
                             "Update Failed",
                             JOptionPane.ERROR_MESSAGE);
@@ -459,8 +467,10 @@ public class BasketPage extends JFrame {
 
                     if (reloadListener != null) {
                         reloadListener.reloadProducts();
-                        System.out.println("Remove button clicked!");
+                    }else{
                     }
+                    if(parentPage != null)
+                        parentPage.invalidateProductCard(product.getProductID());
                 }else{
                     //TODO: Missing logic if update failed
                 }

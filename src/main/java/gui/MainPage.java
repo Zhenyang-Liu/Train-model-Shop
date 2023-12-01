@@ -3,10 +3,8 @@
  */
 
 package gui;
-
 import DAO.DatabaseConnectionHandler;
 import DAO.ProductDAO;
-import DAO.UserDAO;
 
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.jgoodies.forms.factories.DefaultComponentFactory;
@@ -17,9 +15,9 @@ import java.util.HashMap;
 
 import exception.DatabaseException;
 import helper.Filter;
-import helper.ImageUtils;
 import helper.Logging;
 import helper.UserSession;
+import helper.Filter.SubFilter;
 import listeners.ReloadListener;
 import model.*;
 import model.Locomotive.DCCType;
@@ -33,8 +31,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -46,9 +42,11 @@ import java.util.ResourceBundle;
  */
 public class MainPage extends JFrame implements ReloadListener {
     private Filter f;
-    private HashMap<Integer, JPanel> productPanelCache; 
-    public MainPage() {
+    private HashMap<Integer, JPanel> productPanelCache;
 
+    public MainPage() {
+        //setUndecorated(true);
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         Logging.getLogger().info("Creating Main Page");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.productPanelCache = new HashMap<>();
@@ -58,8 +56,9 @@ public class MainPage extends JFrame implements ReloadListener {
         f = new Filter();
         populateFilterBoxes();
         loadProducts();
+        setButtonsByRole();
 
-        button_accountMouseClicked();
+        //button_accountMouseClicked();
     }
 
     public void reloadProducts() {
@@ -69,10 +68,13 @@ public class MainPage extends JFrame implements ReloadListener {
     public void setButtonsByRole(){
         if (PermissionService.hasPermission("ASSIGN_STAFF_ROLE")){
             button_manger.setVisible(true);
-        } else if (PermissionService.hasPermission("MANAGE_ORDERS")) {
+        } 
+        if (PermissionService.hasPermission("MANAGE_ORDERS")) {
             button_staff_products.setVisible(true);
             button_staff_orders.setVisible(true);
-        }else {
+        }
+        if (!PermissionService.hasPermission("BROWSE_PRODUCTS")) {
+            button_logoutMouseClicked();
         }
         leftButtonPanel.revalidate();
         leftButtonPanel.repaint();
@@ -83,11 +85,12 @@ public class MainPage extends JFrame implements ReloadListener {
             if (!UserSession.getInstance().isLoggedIn()) {
                 LoginPage loginPage = new LoginPage();;
                 loginPage.setVisible(true);
-                loginPage.setLoginSuccessListener(this::loadProducts);
+                loginPage.setLoginSuccessListener(this);
                 loginPage.setRoleButtonsListener(this::setButtonsByRole);
             } else {
                 int userID = UserSession.getInstance().getCurrentUser().getUserID();
                 AccountPage accountPage = new AccountPage(userID);
+                accountPage.setAlwaysOnTop(true);
                 accountPage.setVisible(true);
             }
         });
@@ -97,10 +100,11 @@ public class MainPage extends JFrame implements ReloadListener {
         User currentUser = UserSession.getInstance().getCurrentUser();
 
         if (currentUser != null) {
+            Logging.getLogger().info("CREATING BASKET PAGE");
             int userID = currentUser.getUserID();
-            BasketPage basketPage = new BasketPage(userID);
+            BasketPage basketPage = new BasketPage(userID, this);
             basketPage.setVisible(true);
-            basketPage.setReloadListener(this::loadProducts);
+            basketPage.setReloadListener(this);
         } else {
             // USER NOT LOGIN
             LoginPage loginPage = new LoginPage();
@@ -131,7 +135,7 @@ public class MainPage extends JFrame implements ReloadListener {
         subTypeFilterLabel.setVisible(true);
         subTypeFilterBox2.setVisible(true);
         subTypeFilterLabel2.setVisible(true);
-        if(table.equals("Track") || table.equals("Locomotive")){
+        if(table.equals("Track") || table.equals("Locomotive") || table.equals("RollingStock")){
             subTypeFilterLabel.setText("Gauge");
             subTypeFilterBox.addItem(f.new SubFilter<String>("All", ""));
             subTypeFilterBox.addItem(f.new SubFilter<Gauge>(Gauge.OO, "gauge"));
@@ -141,13 +145,14 @@ public class MainPage extends JFrame implements ReloadListener {
             subTypeFilterBox.setVisible(false);
             subTypeFilterLabel.setVisible(false);
         }
-        if(table.equals("Locomotive")){
-            subTypeFilterLabel2.setText("DCC Type");
-            subTypeFilterBox2.addItem(f.new SubFilter<String>("All", ""));
-            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.ANALOGUE, "dcc_type"));
-            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.FITTED, "dcc_type"));
-            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.READY, "dcc_type"));
-            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.SOUND, "dcc_type"));
+        if(table.equals("Locomotive") || table.equals("Controller")){   
+            JComboBox<SubFilter> jcb = table.equals("Controller") ? subTypeFilterBox : subTypeFilterBox2;
+            (table.equals("Controller") ? subTypeFilterLabel : subTypeFilterLabel2).setText("DCC Type");
+            jcb.addItem(f.new SubFilter<String>("All", ""));
+            jcb.addItem(f.new SubFilter<DCCType>(DCCType.ANALOGUE, "dcc_type"));
+            jcb.addItem(f.new SubFilter<DCCType>(DCCType.FITTED, "dcc_type"));
+            jcb.addItem(f.new SubFilter<DCCType>(DCCType.READY, "dcc_type"));
+            jcb.addItem(f.new SubFilter<DCCType>(DCCType.SOUND, "dcc_type"));
         }else{
             subTypeFilterBox2.setVisible(false);
             subTypeFilterLabel2.setVisible(false);
@@ -159,6 +164,8 @@ public class MainPage extends JFrame implements ReloadListener {
         typeFilterBox.addItem(f.new TypeFilter("Locomotive", "Locomotives", "dcc_type"));
         typeFilterBox.addItem(f.new TypeFilter("Track", "Tracks", "track_type"));
         typeFilterBox.addItem(f.new TypeFilter("BoxedSet", "Box Sets", "pack_type"));
+        typeFilterBox.addItem(f.new TypeFilter("RollingStock", "Rolling Stock", ""));
+        typeFilterBox.addItem(f.new TypeFilter("Controller", "Controller", ""));
 
         typeFilterBox.addItemListener(e -> {
             populateSubFilters();
@@ -185,7 +192,7 @@ public class MainPage extends JFrame implements ReloadListener {
         });
     }
 
-private void populateBrandFilters(){
+    private void populateBrandFilters(){
         ArrayList<String> toAdd = ProductDAO.findAllBrand();
         brandFilterBox.addItem(f.new BrandFilter(null, "All"));
         for(String b: toAdd)
@@ -222,23 +229,35 @@ private void populateBrandFilters(){
         }
     }
 
+    public void invalidateProductCard(int productID){
+        this.productPanelCache.remove(productID);
+        loadProducts();
+    }
+
     private void button_staff_productsMouseClicked(MouseEvent e) {
         ProductManagePage productManagePage = new ProductManagePage();
+        productManagePage.setAlwaysOnTop(true);
         productManagePage.setVisible(true);
     }
 
     private void button_staff_ordersMouseClicked(MouseEvent e) {
         OrderManagePage orderManagePage = new OrderManagePage();
+        orderManagePage.setAlwaysOnTop(true);
         orderManagePage.setVisible(true);
     }
 
     private void button_mangerMouseClicked(MouseEvent e) {
         ManagerPage managerPage = new ManagerPage();
+        managerPage.setAlwaysOnTop(true);
         managerPage.setVisible(true);
     }
 
     private void button_logoutMouseClicked() {
-        // TODO add your code here
+        UserSession.getInstance().clear();
+
+        WelcomePage.getInstance().setVisible(true);
+        DatabaseConnectionHandler.shutdown();
+        this.dispose();
     }
 
     private void initComponents() {
@@ -298,6 +317,7 @@ private void populateBrandFilters(){
         //======== this ========
         setPreferredSize(new Dimension(1080, 720));
         setFont(new Font("Arial", Font.PLAIN, 12));
+        setMinimumSize(new Dimension(1080, 720));
         var contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
 
@@ -680,7 +700,7 @@ private void populateBrandFilters(){
         }
         contentPane.add(mainPageSplitPane, BorderLayout.CENTER);
         contentPane.add(bottomSeparator, BorderLayout.SOUTH);
-        pack();
+        setSize(1105, 720);
         setLocationRelativeTo(null);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents  @formatter:on
     }
@@ -708,17 +728,17 @@ private void populateBrandFilters(){
     private JSplitPane mainPageSplitPane;
     private JPanel filterPanel;
     private JLabel sortLabel;
-    private JComboBox sortOptions;
+    private JComboBox<Filter.SortBy> sortOptions;
     private JLabel priceFilterLabel;
-    private JComboBox priceFilterBox;
+    private JComboBox<Filter.PriceRange> priceFilterBox;
     private JLabel typeFilterLabel;
-    private JComboBox typeFilterBox;
+    private JComboBox<Filter.TypeFilter> typeFilterBox;
     private JLabel brandFilterLabel;
-    private JComboBox brandFilterBox;
+    private JComboBox<Filter.BrandFilter> brandFilterBox;
     private JLabel subTypeFilterLabel;
-    private JComboBox subTypeFilterBox;
+    private JComboBox<SubFilter> subTypeFilterBox;
     private JLabel subTypeFilterLabel2;
-    private JComboBox subTypeFilterBox2;
+    private JComboBox<SubFilter> subTypeFilterBox2;
     private JScrollPane scrollPane1;
     private JPanel productPanel;
     private JPanel productCardPanel1;
@@ -771,8 +791,8 @@ private void populateBrandFilters(){
                 double bTime = System.nanoTime();
                 ArrayList<Product> r = ProductDAO.filterProducts(searchKeywordField.getText(), pr.getMin(), pr.getMax(),
                                         br.getBrand(), sb.getDbHandle(), sb.isAscending(), tp.getDbTable(),
-                                            (sfB ? sf.toString() : ""), (sfB ? sf.getDbColumn() : ""),
-                                                (sfB2 ? sf2.toString() : ""), (sfB2 ? sf2.getDbColumn() : ""));
+                                            (sf != null ? sf.toString() : ""), (sf != null ? sf.getDbColumn() : ""),
+                                                (sf2 != null ? sf2.toString() : ""), (sf2 != null ? sf2.getDbColumn() : ""));
                 Logging.getLogger().info("TIMER: Took " + (System.nanoTime() - bTime) / 1e6 + "ms to search products");
                 return r;
             }
@@ -785,13 +805,12 @@ private void populateBrandFilters(){
                     ArrayList<Product> productList = get();
                     // Updating the GUI with a Product List
                     for (Product product : productList) {
-                        // Add product panel to cache if it exists
-                        if(!productPanelCache.containsKey(product.getProductID())){
+                        // Cache should ALWAYS be used. Re-rendering product cards that haven't changed takes too long. (>3s)
+                        // If a product is changed elsewhere in the code, please mark the product as needing a refreshed card using
+                        // invalidateProductCard(productID);
+                        if (!productPanelCache.containsKey(product.getProductID()))
                             productPanelCache.put(product.getProductID(), createProductCard(product));
-                        }
-                        JPanel productCard = productPanelCache.get(product.getProductID());
-                        // Add the card to the container
-                        productPanel.add(productCard);
+                        productPanel.add(productPanelCache.get(product.getProductID()));
                     }
                     productPanel.revalidate();
                     productPanel.repaint();
@@ -840,7 +859,6 @@ private void populateBrandFilters(){
 
         // Add a product image
         JLabel productImage = new JLabel();
-        //productImage.setPreferredSize(new Dimension(260, 120));
         ImageIcon originalIcon = product.getProductImage();
         Image originalImage = originalIcon.getImage();
         Image resizedImage = originalImage.getScaledInstance(256, 140, Image.SCALE_SMOOTH);
@@ -877,7 +895,8 @@ private void populateBrandFilters(){
         moreButton.setPreferredSize(new Dimension(100, 30));
 
         moreButton.addActionListener(e -> {
-            ProductPage p = new ProductPage(product);
+            ProductPage p = new ProductPage(this, product);
+            p.setAlwaysOnTop(true);
             p.setVisible(true);
         });
 
@@ -948,18 +967,27 @@ private void populateBrandFilters(){
 
         // Adding event listeners to the "Add" button
         addButton.addActionListener(e -> {
-            User thisUser = UserSession.getInstance().getCurrentUser();
-            if (thisUser != null) {
+            User user = UserSession.getInstance().getCurrentUser();
+            if (user != null) {
+                int userid = user.getUserID();
                 addButton.setVisible(false);
                 adjustNumPanel.setVisible(true);
-                Cart cart = CartService.getCartDetails(userID);
+                Cart cart = CartService.getCartDetails(userid);
                 int cartID = cart.getCartID();
                 if (cartID == 0) {
                     CartService.createCart();
-                    cartID = CartService.getCartDetails(userID).getCartID();
+                    cartID = CartService.getCartDetails(userid).getCartID();
                 }
                 int productID = product.getProductID();
-                CartService.addToCart(cartID, productID, 1);
+                if (!CartService.addToCart(cartID, productID, 1)){
+                    addButton.setVisible(false);
+                    soldOutLabel.setVisible(true);
+                    JOptionPane.showMessageDialog(this,
+                            "Sorry, this product has just been sold out.",
+                            "Stock Issue",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
+
             }else {
                 // USER NOT LOGIN
                 LoginPage loginPage = new LoginPage();
@@ -977,14 +1005,39 @@ private void populateBrandFilters(){
                 int cartID = CartService.getCartDetails(userID).getCartID();
                 int productID = product.getProductID();
                 if (!CartService.removeFromCart(cartID,productID)){
-                    //TODO: Add action failed information
+                    JOptionPane.showMessageDialog(this,
+                            "Remove from Cart failed",
+                            "Update failed",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                numberButton.setText(String.valueOf(num));
                 int cartID = CartService.getCartDetails(userID).getCartID();
                 int productID = product.getProductID();
-                if (!CartService.updateCartItem(cartID, productID, num)){
-                    //TODO: Add action failed information
+                int stock = product.getStockQuantity();
+                if (stock < num){
+                    numberButton.setText(String.valueOf(stock));
+                    if (stock < 1){
+                        adjustNumPanel.setVisible(false);
+                        addButton.setVisible(false);
+                        soldOutLabel.setVisible(true);
+                        JOptionPane.showMessageDialog(this,
+                                "Sorry, this product has just been sold out.",
+                                "Stock Issue",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }else{
+                        JOptionPane.showMessageDialog(this,
+                                "Stocks are not sufficient.\nQuantity is automatically set to the maximum purchasable quantity.",
+                                "Stock Issue",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }else {
+                    if (!CartService.updateCartItem(cartID, productID, num)){
+                        JOptionPane.showMessageDialog(this,
+                                "Please try again later.",
+                                "System Issue",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                    numberButton.setText(String.valueOf(num));
                 }
             }
         });
@@ -993,11 +1046,34 @@ private void populateBrandFilters(){
         plusButton.addActionListener(e -> {
             int num = Integer.parseInt(numberButton.getText());
             num += 1;
-            numberButton.setText(String.valueOf(num));
+
             int cartID = CartService.getCartDetails(userID).getCartID();
             int productID = product.getProductID();
-                if (!CartService.updateCartItem(cartID, productID, num)){
-                    //TODO: Add action failed information
+            int stock = product.getStockQuantity();
+                if (stock < num){
+                    numberButton.setText(String.valueOf(stock));
+                    if (stock < 1){
+                        adjustNumPanel.setVisible(false);
+                        addButton.setVisible(false);
+                        soldOutLabel.setVisible(true);
+                        JOptionPane.showMessageDialog(this,
+                                "Sorry, this product has just been sold out.",
+                                "Stock Issue",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }else{
+                        JOptionPane.showMessageDialog(this,
+                                "Stocks are not sufficient.\nQuantity is automatically set to the maximum purchasable quantity.",
+                                "Stock Issue",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }else{
+                    if (!CartService.updateCartItem(cartID, productID, num)){
+                        JOptionPane.showMessageDialog(this,
+                                "Please try again later.",
+                                "System Issue",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                    numberButton.setText(String.valueOf(num));
                 }
         });
 
@@ -1035,30 +1111,4 @@ private void populateBrandFilters(){
         return productCardPanel;
     }
 
-    /*
-     * Main function for testing
-     */
-    public static void main(String[] args) {
-        // User user = UserDAO.findUserByEmail("testemail@gmail.com");
-        Logging.Init(true);
-        ImageUtils.ResourceManager.Init();
-        User user = UserDAO.findUserByEmail("manager@manager.com");
-        UserSession.getInstance().setCurrentUser(user);
-
-        EventQueue.invokeLater(() -> {
-            try {
-                MainPage frame = new MainPage();
-                // Close logging :D
-                frame.addWindowListener(new WindowAdapter() {
-                    public void windowClosing(WindowEvent e){
-                        DatabaseConnectionHandler.shutdown();
-                        Logging.Close();
-                    }
-                });
-                frame.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
 }

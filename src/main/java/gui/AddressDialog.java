@@ -4,6 +4,9 @@ import model.Address;
 import service.AddressService;
 
 import javax.swing.*;
+
+import helper.Logging;
+
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -95,7 +98,7 @@ public class AddressDialog extends JDialog {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.BOLD, 12));
         button.setForeground(Color.WHITE);
-        button.setBackground(text.equals("Update") ? new Color(34, 139, 34) : new Color(0x204688)); // 绿色或蓝色
+        button.setBackground(text.equals("Update") ? new Color(34, 139, 34) : new Color(0x204688));
         return button;
     }
 
@@ -110,13 +113,15 @@ public class AddressDialog extends JDialog {
 
     private void onAdd() {
         if (!AddressService.isValidUKPostcode(getPostcode())) {
-            JOptionPane.showMessageDialog(null, "Invalid Post Code", "Error", JOptionPane.ERROR_MESSAGE);
+            Logging.getLogger().warning("Invalid postcode supplied");
+            JOptionPane.showMessageDialog(this, "Invalid Post Code", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             newAddress = new Address(getHouseNumber(), getRoadName(), getCity(), getPostcode());
             if (!isNewUser) {
                 boolean isAddSuccess = AddressService.addAddress(newAddress);
                 if (!isAddSuccess) {
-                    JOptionPane.showMessageDialog(null, "Add Address failed", "Error", JOptionPane.ERROR_MESSAGE);
+                    Logging.getLogger().warning("Could not add address to database");
+                    JOptionPane.showMessageDialog(this, "Add Address failed", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
                     isInputValid = true;
                     dispose();
@@ -129,12 +134,12 @@ public class AddressDialog extends JDialog {
 
     private void onUpdate() {
         if (!AddressService.isValidUKPostcode(getPostcode())) {
-            JOptionPane.showMessageDialog(null, "Invalid Post Code, must be in form XX XXX", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Invalid Post Code, must be in form XX XXX", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             Address address = new Address(getHouseNumber(), getRoadName(), getCity(), getPostcode());
             boolean isAddSuccess = AddressService.updateAddress(address);
             if (!isAddSuccess) {
-                JOptionPane.showMessageDialog(null, "Add Address failed", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Add Address failed", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 isInputValid = true;
                 dispose();
@@ -150,7 +155,7 @@ public class AddressDialog extends JDialog {
     public String getHouseNumber() { return houseNumberField.getText(); }
     public String getRoadName() { return roadNameField.getText(); }
     public String getCity() { return cityField.getText(); }
-    public String getPostcode() { return postcodeField.getText(); }
+    public String getPostcode() { return postcodeField.getText().toUpperCase(); }
     public Address getNewAddress() { return newAddress; }
     public boolean isInputValid() { return isInputValid; }
 }

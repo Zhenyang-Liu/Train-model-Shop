@@ -6,8 +6,10 @@ package gui;
 
 import java.awt.event.*;
 import model.Order;
+import model.Product;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.swing.*;
@@ -55,8 +57,8 @@ public class OrderHistory extends JFrame {
         orderCardPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
 
-        JLabel orderImage = new JLabel(new ImageIcon(getClass().getResource("/images/tgv.jpeg")));
-        orderImage.setPreferredSize(new Dimension(150, 120));
+        JLabel orderImage = new JLabel(new ImageIcon(createProductCollage(order)));
+        orderImage.setPreferredSize(new Dimension(160, 120));
         orderImage.setMaximumSize(new Dimension(160, 120));
         orderImage.setMinimumSize(new Dimension(160, 120));
         orderCardPanel.add(orderImage);
@@ -245,6 +247,44 @@ public class OrderHistory extends JFrame {
         return allOrders.stream()
                 .filter(order -> order.getStatus() == desiredStatus)
                 .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public BufferedImage createProductCollage(Order order) {
+        final int collageWidth = 160;
+        final int collageHeight = 120;
+
+        BufferedImage collageImage = new BufferedImage(collageWidth, collageHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = collageImage.createGraphics();
+
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, collageWidth, collageHeight);
+
+        Map<Product, Integer> products = order.getOrderItems();
+
+        int productCount = Math.min(products.size(), 4);
+        int rows = productCount > 1 ? 2 : 1;
+        int cols = productCount == 1 ? 1 : 2;
+        int imageWidth = collageWidth / cols;
+        int imageHeight = collageHeight / rows;
+
+        int count = 0;
+        Iterator<Map.Entry<Product, Integer>> iterator = products.entrySet().iterator();
+        while (iterator.hasNext() && count < productCount) {
+            Map.Entry<Product, Integer> entry = iterator.next();
+            Product product = entry.getKey();
+
+            ImageIcon icon = product.getProductImage();
+            Image image = icon.getImage().getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
+
+            int x = (count % cols) * imageWidth;
+            int y = (count / cols) * imageHeight;
+
+            g2d.drawImage(image, x, y, null);
+            count++;
+        }
+
+        g2d.dispose();
+        return collageImage;
     }
 
 

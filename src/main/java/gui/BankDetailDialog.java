@@ -204,7 +204,7 @@ public class BankDetailDialog extends JDialog {
     }
     
     public String getCardHolder() { return cardHolderField.getText(); }
-    public String getCardNumber() { return cardNumberField.getText(); }
-    public String getExpiryDate() { return expiryDateField.getText()+"/"+ expiryYearField.getText(); }
+    public String getCardNumber() { return cardNumberField.getText().strip(); }
+    public String getExpiryDate() { return expiryDateField.getText().strip()+"/"+ expiryYearField.getText().strip(); }
     public boolean isInputValid() { return isInputValid; }
 }
