@@ -7,7 +7,7 @@ package gui;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.util.List;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.ChangeEvent;
@@ -329,7 +329,7 @@ public class BasketPage extends JFrame {
     }
 
     // Method to load cart items into the trolley view
-    public void loadTrolleyItems(List<CartItem> cartItems) {
+    public void loadTrolleyItems(ArrayList<CartItem> cartItems) {
         trolleyItemsPanel.removeAll(); // Clear existing content
 
         GridBagConstraints gbc = new GridBagConstraints();
