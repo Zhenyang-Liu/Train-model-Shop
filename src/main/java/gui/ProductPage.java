@@ -75,6 +75,7 @@ public class ProductPage extends JFrame {
     private JButton saveProduct;
     private JButton deleteProduct;
     private ProductManagePage managePage;
+    private MainPage mainParentPage = null;
 
     public ProductPage(ProductManagePage managePage, Product product) {
         this.managePage = managePage;
@@ -90,7 +91,12 @@ public class ProductPage extends JFrame {
         });
     }
 
-    public ProductPage(Product product) {
+    public ProductPage(MainPage parentMainPage, Product product) {
+        mainParentPage = parentMainPage;
+        initializePage(product);
+    }
+
+    public ProductPage(Product product){
         initializePage(product);
     }
 
@@ -427,7 +433,7 @@ public class ProductPage extends JFrame {
         });
         if(!isStaff)
             return;
-        saveProduct.addActionListener(e -> {submitProduct();});
+        saveProduct.addActionListener(e -> {submitProduct();if(mainParentPage != null)mainParentPage.invalidateProductCard(p.getProductID());});
         deleteProduct.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(this, 
                 "Are you sure you want to delete this product? This cannot be undone.", 
