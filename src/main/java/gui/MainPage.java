@@ -141,7 +141,7 @@ public class MainPage extends JFrame implements ReloadListener {
         subTypeFilterLabel.setVisible(true);
         subTypeFilterBox2.setVisible(true);
         subTypeFilterLabel2.setVisible(true);
-        if(table.equals("Track") || table.equals("Locomotive")){
+        if(table.equals("Track") || table.equals("Locomotive") || table.equals("RollingStock")){
             subTypeFilterLabel.setText("Gauge");
             subTypeFilterBox.addItem(f.new SubFilter<String>("All", ""));
             subTypeFilterBox.addItem(f.new SubFilter<Gauge>(Gauge.OO, "gauge"));
@@ -151,13 +151,14 @@ public class MainPage extends JFrame implements ReloadListener {
             subTypeFilterBox.setVisible(false);
             subTypeFilterLabel.setVisible(false);
         }
-        if(table.equals("Locomotive")){
-            subTypeFilterLabel2.setText("DCC Type");
-            subTypeFilterBox2.addItem(f.new SubFilter<String>("All", ""));
-            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.ANALOGUE, "dcc_type"));
-            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.FITTED, "dcc_type"));
-            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.READY, "dcc_type"));
-            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.SOUND, "dcc_type"));
+        if(table.equals("Locomotive") || table.equals("Controller")){   
+            JComboBox jcb = table.equals("Controller") ? subTypeFilterBox : subTypeFilterBox2;
+            (table.equals("Controller") ? subTypeFilterLabel : subTypeFilterLabel2).setText("DCC Type");
+            jcb.addItem(f.new SubFilter<String>("All", ""));
+            jcb.addItem(f.new SubFilter<DCCType>(DCCType.ANALOGUE, "dcc_type"));
+            jcb.addItem(f.new SubFilter<DCCType>(DCCType.FITTED, "dcc_type"));
+            jcb.addItem(f.new SubFilter<DCCType>(DCCType.READY, "dcc_type"));
+            jcb.addItem(f.new SubFilter<DCCType>(DCCType.SOUND, "dcc_type"));
         }else{
             subTypeFilterBox2.setVisible(false);
             subTypeFilterLabel2.setVisible(false);
@@ -169,6 +170,8 @@ public class MainPage extends JFrame implements ReloadListener {
         typeFilterBox.addItem(f.new TypeFilter("Locomotive", "Locomotives", "dcc_type"));
         typeFilterBox.addItem(f.new TypeFilter("Track", "Tracks", "track_type"));
         typeFilterBox.addItem(f.new TypeFilter("BoxedSet", "Box Sets", "pack_type"));
+        typeFilterBox.addItem(f.new TypeFilter("RollingStock", "Rolling Stock", ""));
+        typeFilterBox.addItem(f.new TypeFilter("Controller", "Controller", ""));
 
         typeFilterBox.addItemListener(e -> {
             populateSubFilters();
