@@ -15,6 +15,7 @@ import DAO.UserDAO;
 import exception.DatabaseException;
 import helper.ImageUtils;
 import helper.UserSession;
+import listeners.ReloadListener;
 import model.Address;
 import model.BankDetail;
 import model.Order;
@@ -30,6 +31,11 @@ import service.OrderService;
  * @author Jiawei Jiang
  */
 public class PendingOrderPage extends JFrame {
+    private ReloadListener reloadListener;
+    public void setReloadListener(ReloadListener listener) {
+        this.reloadListener = listener;
+    }
+
     public PendingOrderPage(Order order) {
         this.order = order;
         initComponents();
@@ -98,6 +104,9 @@ public class PendingOrderPage extends JFrame {
     
             if (confirmReturnToCart == JOptionPane.YES_OPTION) {
                 OrderService.returnToCart(order);
+                if (reloadListener != null) {
+                    reloadListener.reloadProducts();
+                }
             } 
             OrderService.cancelOrder(order, "Self Cancelled");
             dispose();

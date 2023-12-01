@@ -95,7 +95,7 @@ public class AddressDialog extends JDialog {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.BOLD, 12));
         button.setForeground(Color.WHITE);
-        button.setBackground(text.equals("Update") ? new Color(34, 139, 34) : new Color(0x204688)); // 绿色或蓝色
+        button.setBackground(text.equals("Update") ? new Color(34, 139, 34) : new Color(0x204688));
         return button;
     }
 

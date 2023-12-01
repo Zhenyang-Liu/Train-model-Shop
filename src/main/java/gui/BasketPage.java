@@ -72,8 +72,10 @@ public class BasketPage extends JFrame {
         } else {
             // Order created successfully
             try {
+                if (reloadListener != null) {reloadListener.reloadProducts();}
                 this.dispose();
                 PendingOrderPage pendingOrderPage = new PendingOrderPage(findOrderByID(orderID));
+                pendingOrderPage.setReloadListener(reloadListener);
                 pendingOrderPage.setVisible(true);
             }catch(DatabaseException e1){
                 Logging.getLogger().warning("Could not find create pending order page at orderID " + orderID + "\nStacktrace: " + e1.getMessage());
@@ -414,7 +416,6 @@ public class BasketPage extends JFrame {
 
                         if (reloadListener != null) {
                             reloadListener.reloadProducts();
-                            System.out.println("Remove button clicked!");
                         }
                     }else{
                         //TODO: Missing logic if update failed
@@ -467,7 +468,7 @@ public class BasketPage extends JFrame {
 
                     if (reloadListener != null) {
                         reloadListener.reloadProducts();
-                        System.out.println("Remove button clicked!");
+                    }else{
                     }
                     if(parentPage != null)
                         parentPage.invalidateProductCard(product.getProductID());
