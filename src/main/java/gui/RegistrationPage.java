@@ -43,6 +43,7 @@ public class RegistrationPage extends JFrame {
     private void backButtonMouseClicked(MouseEvent e) {
         this.dispose();
         LoginPage loginPage = new LoginPage();
+        loginPage.setAlwaysOnTop(true);
         loginPage.setVisible(true);
     }
 
@@ -160,6 +161,7 @@ public class RegistrationPage extends JFrame {
     private void onEditAddress() {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         addressDialog = new AddressDialog(parentFrame, new Address(), false, true);
+        addressDialog.setAlwaysOnTop(true);
         addressDialog.setVisible(true);
     }
 

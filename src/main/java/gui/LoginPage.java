@@ -41,6 +41,7 @@ public class LoginPage extends JFrame {
 
     private void button_to_registerPageMouseClicked(MouseEvent e) {
         RegistrationPage registrationPage = new RegistrationPage();
+        registrationPage.setAlwaysOnTop(true);
         registrationPage.setVisible(true);
 
         this.dispose();

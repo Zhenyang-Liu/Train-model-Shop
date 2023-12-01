@@ -63,6 +63,7 @@ public class WelcomePage extends JFrame {
 
     private void button_loginMouseClicked() {
         LoginPage loginPage = new LoginPage();
+        loginPage.setAlwaysOnTop(true);
         loginPage.setLoginSuccessListener(() -> {
             this.setVisible(false);
 

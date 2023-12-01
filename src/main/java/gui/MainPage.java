@@ -93,6 +93,7 @@ public class MainPage extends JFrame implements ReloadListener {
             } else {
                 int userID = UserSession.getInstance().getCurrentUser().getUserID();
                 AccountPage accountPage = new AccountPage(userID);
+                accountPage.setAlwaysOnTop(true);
                 accountPage.setVisible(true);
             }
         });
@@ -235,16 +236,19 @@ public class MainPage extends JFrame implements ReloadListener {
 
     private void button_staff_productsMouseClicked(MouseEvent e) {
         ProductManagePage productManagePage = new ProductManagePage();
+        productManagePage.setAlwaysOnTop(true);
         productManagePage.setVisible(true);
     }
 
     private void button_staff_ordersMouseClicked(MouseEvent e) {
         OrderManagePage orderManagePage = new OrderManagePage();
+        orderManagePage.setAlwaysOnTop(true);
         orderManagePage.setVisible(true);
     }
 
     private void button_mangerMouseClicked(MouseEvent e) {
         ManagerPage managerPage = new ManagerPage();
+        managerPage.setAlwaysOnTop(true);
         managerPage.setVisible(true);
     }
 
@@ -892,6 +896,7 @@ public class MainPage extends JFrame implements ReloadListener {
 
         moreButton.addActionListener(e -> {
             ProductPage p = new ProductPage(this, product);
+            p.setAlwaysOnTop(true);
             p.setVisible(true);
         });
 
