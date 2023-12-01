@@ -97,8 +97,9 @@ public class MainPage extends JFrame implements ReloadListener {
         User currentUser = UserSession.getInstance().getCurrentUser();
 
         if (currentUser != null) {
+            Logging.getLogger().info("CREATING BASKET PAGE");
             int userID = currentUser.getUserID();
-            BasketPage basketPage = new BasketPage(userID);
+            BasketPage basketPage = new BasketPage(userID, this);
             basketPage.setVisible(true);
             basketPage.setReloadListener(this::loadProducts);
         } else {
@@ -220,6 +221,11 @@ private void populateBrandFilters(){
             LoginPage loginPage = new LoginPage();
             loginPage.setVisible(true);
         }
+    }
+
+    public void invalidateProductCard(int productID){
+        this.productPanelCache.remove(productID);
+        loadProducts();
     }
 
     private void button_staff_productsMouseClicked(MouseEvent e) {
@@ -877,7 +883,7 @@ private void populateBrandFilters(){
         moreButton.setPreferredSize(new Dimension(100, 30));
 
         moreButton.addActionListener(e -> {
-            ProductPage p = new ProductPage(product);
+            ProductPage p = new ProductPage(this, product);
             p.setVisible(true);
         });
 
