@@ -9,17 +9,10 @@ import java.awt.event.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
-import java.util.*;
 import javax.swing.*;
-import javax.swing.plaf.BorderUIResource;
 
 import DAO.DatabaseConnectionHandler;
-import DAO.UserDAO;
-import com.formdev.flatlaf.extras.*;
-import helper.ImageUtils;
 import helper.Logging;
-import helper.UserSession;
-import model.User;
 
 /**
  * @author Zhenyang Liu
