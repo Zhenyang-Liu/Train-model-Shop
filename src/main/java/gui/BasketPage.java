@@ -17,7 +17,6 @@ import exception.DatabaseException;
 import helper.ImageUtils;
 import helper.Logging;
 import listeners.ReloadListener;
-import listeners.SetRoleButtons;
 import model.Cart;
 import model.CartItem;
 import model.Product;

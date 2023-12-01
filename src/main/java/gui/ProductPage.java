@@ -77,8 +77,8 @@ public class ProductPage extends JFrame {
     private ProductManagePage managePage;
     private MainPage mainParentPage = null;
 
-    public ProductPage(ProductManagePage managePage, Product product) {
-        this.managePage = managePage;
+    public ProductPage(ProductManagePage mP, Product product) {
+        this.managePage = mP;
         initializePage(product);
 
         addWindowListener(new WindowAdapter() {

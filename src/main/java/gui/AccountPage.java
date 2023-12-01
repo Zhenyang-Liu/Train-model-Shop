@@ -18,7 +18,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -45,7 +44,6 @@ public class AccountPage extends JFrame {
     private JPanel ButtonPanel;
     private JLabel errorLabel;
     private JLabel successLabel;
-    private JPasswordField passwordInput;
     private HashMap<String, JTextField> inputs;
     private User user;
     private Login userLogin;
