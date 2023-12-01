@@ -3,6 +3,7 @@
  */
 
 package gui;
+import DAO.DatabaseConnectionHandler;
 import DAO.ProductDAO;
 
 import com.formdev.flatlaf.extras.FlatSVGIcon;
@@ -255,7 +256,7 @@ public class MainPage extends JFrame implements ReloadListener {
         UserSession.getInstance().clear();
 
         WelcomePage.getInstance().setVisible(true);
-
+        DatabaseConnectionHandler.shutdown();
         this.dispose();
     }
 
