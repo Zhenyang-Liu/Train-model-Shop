@@ -3,10 +3,7 @@
  */
 
 package gui;
-
-import DAO.DatabaseConnectionHandler;
 import DAO.ProductDAO;
-import DAO.UserDAO;
 
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.jgoodies.forms.factories.DefaultComponentFactory;
@@ -17,7 +14,6 @@ import java.util.HashMap;
 
 import exception.DatabaseException;
 import helper.Filter;
-import helper.ImageUtils;
 import helper.Logging;
 import helper.UserSession;
 import helper.Filter.SubFilter;
@@ -34,8 +30,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
