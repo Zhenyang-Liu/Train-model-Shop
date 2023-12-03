@@ -462,6 +462,10 @@ public class BasketPage extends JFrame {
                     }
                 }else{
                     //TODO: Missing logic if update failed
+                    JOptionPane.showMessageDialog(trolleyItemsPanel,
+                            "Please try again later.",
+                            "System Issue",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
