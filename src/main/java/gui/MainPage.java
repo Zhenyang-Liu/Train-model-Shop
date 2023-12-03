@@ -3,24 +3,21 @@
  */
 
 package gui;
-
 import DAO.DatabaseConnectionHandler;
 import DAO.ProductDAO;
-import DAO.UserDAO;
 
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.jgoodies.forms.factories.DefaultComponentFactory;
 import java.awt.*;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
 import java.util.HashMap;
 
 import exception.DatabaseException;
 import helper.Filter;
-import helper.ImageUtils;
 import helper.Logging;
 import helper.UserSession;
+import helper.Filter.SubFilter;
 import listeners.ReloadListener;
 import model.*;
 import model.Locomotive.DCCType;
@@ -34,8 +31,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -60,22 +55,26 @@ public class MainPage extends JFrame implements ReloadListener {
         customizeComponents();
         f = new Filter();
         populateFilterBoxes();
-        loadProducts(false);
+        loadProducts();
+        setButtonsByRole();
 
         //button_accountMouseClicked();
     }
 
     public void reloadProducts() {
-        loadProducts(false);
+        loadProducts();
     }
 
     public void setButtonsByRole(){
         if (PermissionService.hasPermission("ASSIGN_STAFF_ROLE")){
             button_manger.setVisible(true);
-        } else if (PermissionService.hasPermission("MANAGE_ORDERS")) {
+        } 
+        if (PermissionService.hasPermission("MANAGE_ORDERS")) {
             button_staff_products.setVisible(true);
             button_staff_orders.setVisible(true);
-        }else {
+        }
+        if (!PermissionService.hasPermission("BROWSE_PRODUCTS")) {
+            button_logoutMouseClicked();
         }
         leftButtonPanel.revalidate();
         leftButtonPanel.repaint();
@@ -85,12 +84,14 @@ public class MainPage extends JFrame implements ReloadListener {
         SwingUtilities.invokeLater(() -> {
             if (!UserSession.getInstance().isLoggedIn()) {
                 LoginPage loginPage = new LoginPage();;
+                loginPage.setAlwaysOnTop(true);
                 loginPage.setVisible(true);
                 loginPage.setLoginSuccessListener(this);
                 loginPage.setRoleButtonsListener(this::setButtonsByRole);
             } else {
                 int userID = UserSession.getInstance().getCurrentUser().getUserID();
                 AccountPage accountPage = new AccountPage(userID);
+                accountPage.setAlwaysOnTop(true);
                 accountPage.setVisible(true);
             }
         });
@@ -100,13 +101,16 @@ public class MainPage extends JFrame implements ReloadListener {
         User currentUser = UserSession.getInstance().getCurrentUser();
 
         if (currentUser != null) {
+            Logging.getLogger().info("CREATING BASKET PAGE");
             int userID = currentUser.getUserID();
-            BasketPage basketPage = new BasketPage(userID);
+            BasketPage basketPage = new BasketPage(userID, this);
+            basketPage.setAlwaysOnTop(true);
             basketPage.setVisible(true);
             basketPage.setReloadListener(this);
         } else {
             // USER NOT LOGIN
             LoginPage loginPage = new LoginPage();
+            loginPage.setAlwaysOnTop(true);
             loginPage.setVisible(true);
         }
 
@@ -122,7 +126,7 @@ public class MainPage extends JFrame implements ReloadListener {
         priceFilterBox.addItem(f.new PriceRange(500.0f, 1e10f, "£500<"));
 
         priceFilterBox.addItemListener(e -> {
-            loadProducts(true);
+            loadProducts();
         });
     }
 
@@ -134,7 +138,7 @@ public class MainPage extends JFrame implements ReloadListener {
         subTypeFilterLabel.setVisible(true);
         subTypeFilterBox2.setVisible(true);
         subTypeFilterLabel2.setVisible(true);
-        if(table.equals("Track") || table.equals("Locomotive")){
+        if(table.equals("Track") || table.equals("Locomotive") || table.equals("RollingStock")){
             subTypeFilterLabel.setText("Gauge");
             subTypeFilterBox.addItem(f.new SubFilter<String>("All", ""));
             subTypeFilterBox.addItem(f.new SubFilter<Gauge>(Gauge.OO, "gauge"));
@@ -144,13 +148,14 @@ public class MainPage extends JFrame implements ReloadListener {
             subTypeFilterBox.setVisible(false);
             subTypeFilterLabel.setVisible(false);
         }
-        if(table.equals("Locomotive")){
-            subTypeFilterLabel2.setText("DCC Type");
-            subTypeFilterBox2.addItem(f.new SubFilter<String>("All", ""));
-            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.ANALOGUE, "dcc_type"));
-            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.FITTED, "dcc_type"));
-            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.READY, "dcc_type"));
-            subTypeFilterBox2.addItem(f.new SubFilter<DCCType>(DCCType.SOUND, "dcc_type"));
+        if(table.equals("Locomotive") || table.equals("Controller")){   
+            JComboBox<SubFilter> jcb = table.equals("Controller") ? subTypeFilterBox : subTypeFilterBox2;
+            (table.equals("Controller") ? subTypeFilterLabel : subTypeFilterLabel2).setText("DCC Type");
+            jcb.addItem(f.new SubFilter<String>("All", ""));
+            jcb.addItem(f.new SubFilter<DCCType>(DCCType.ANALOGUE, "dcc_type"));
+            jcb.addItem(f.new SubFilter<DCCType>(DCCType.FITTED, "dcc_type"));
+            jcb.addItem(f.new SubFilter<DCCType>(DCCType.READY, "dcc_type"));
+            jcb.addItem(f.new SubFilter<DCCType>(DCCType.SOUND, "dcc_type"));
         }else{
             subTypeFilterBox2.setVisible(false);
             subTypeFilterLabel2.setVisible(false);
@@ -162,18 +167,20 @@ public class MainPage extends JFrame implements ReloadListener {
         typeFilterBox.addItem(f.new TypeFilter("Locomotive", "Locomotives", "dcc_type"));
         typeFilterBox.addItem(f.new TypeFilter("Track", "Tracks", "track_type"));
         typeFilterBox.addItem(f.new TypeFilter("BoxedSet", "Box Sets", "pack_type"));
+        typeFilterBox.addItem(f.new TypeFilter("RollingStock", "Rolling Stock", ""));
+        typeFilterBox.addItem(f.new TypeFilter("Controller", "Controller", ""));
 
         typeFilterBox.addItemListener(e -> {
             populateSubFilters();
-            loadProducts(true);
+            loadProducts();
         });
         subTypeFilterBox.addItemListener(e -> {
             ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).setSubFilter(e.getItem().toString());
-            loadProducts(true);
+            loadProducts();
         });
         subTypeFilterBox2.addItemListener(e -> {
             ((Filter.TypeFilter)typeFilterBox.getSelectedItem()).setSubFilter(e.getItem().toString());
-            loadProducts(true);
+            loadProducts();
         });
     }
 
@@ -184,7 +191,7 @@ public class MainPage extends JFrame implements ReloadListener {
         sortOptions.addItem(f.new SortBy("Price (desc)", "retail_price", false));
 
         sortOptions.addItemListener(e -> {
-            loadProducts(true);
+            loadProducts();
         });
     }
 
@@ -194,7 +201,7 @@ public class MainPage extends JFrame implements ReloadListener {
         for(String b: toAdd)
             brandFilterBox.addItem(f.new BrandFilter(b));
         brandFilterBox.addItemListener(e -> {
-            loadProducts(true);
+            loadProducts();
         });
     }
 
@@ -207,7 +214,7 @@ public class MainPage extends JFrame implements ReloadListener {
         populateSubFilters();
 
         searchButton.addActionListener(e -> {
-            loadProducts(true);
+            loadProducts();
         });
     }
 
@@ -217,26 +224,36 @@ public class MainPage extends JFrame implements ReloadListener {
 
         if (currentUser != null) {
             OrderHistory ordersPage = new OrderHistory();
+            ordersPage.setAlwaysOnTop(true);
             ordersPage.setVisible(true);
         } else {
             // USER NOT LOGIN
             LoginPage loginPage = new LoginPage();
+            loginPage.setAlwaysOnTop(true);
             loginPage.setVisible(true);
         }
     }
 
+    public void invalidateProductCard(int productID){
+        this.productPanelCache.remove(productID);
+        loadProducts();
+    }
+
     private void button_staff_productsMouseClicked(MouseEvent e) {
         ProductManagePage productManagePage = new ProductManagePage();
+        productManagePage.setAlwaysOnTop(true);
         productManagePage.setVisible(true);
     }
 
     private void button_staff_ordersMouseClicked(MouseEvent e) {
         OrderManagePage orderManagePage = new OrderManagePage();
+        orderManagePage.setAlwaysOnTop(true);
         orderManagePage.setVisible(true);
     }
 
     private void button_mangerMouseClicked(MouseEvent e) {
         ManagerPage managerPage = new ManagerPage();
+        managerPage.setAlwaysOnTop(true);
         managerPage.setVisible(true);
     }
 
@@ -244,7 +261,7 @@ public class MainPage extends JFrame implements ReloadListener {
         UserSession.getInstance().clear();
 
         WelcomePage.getInstance().setVisible(true);
-
+        DatabaseConnectionHandler.shutdown();
         this.dispose();
     }
 
@@ -716,17 +733,17 @@ public class MainPage extends JFrame implements ReloadListener {
     private JSplitPane mainPageSplitPane;
     private JPanel filterPanel;
     private JLabel sortLabel;
-    private JComboBox sortOptions;
+    private JComboBox<Filter.SortBy> sortOptions;
     private JLabel priceFilterLabel;
-    private JComboBox priceFilterBox;
+    private JComboBox<Filter.PriceRange> priceFilterBox;
     private JLabel typeFilterLabel;
-    private JComboBox typeFilterBox;
+    private JComboBox<Filter.TypeFilter> typeFilterBox;
     private JLabel brandFilterLabel;
-    private JComboBox brandFilterBox;
+    private JComboBox<Filter.BrandFilter> brandFilterBox;
     private JLabel subTypeFilterLabel;
-    private JComboBox subTypeFilterBox;
+    private JComboBox<SubFilter> subTypeFilterBox;
     private JLabel subTypeFilterLabel2;
-    private JComboBox subTypeFilterBox2;
+    private JComboBox<SubFilter> subTypeFilterBox2;
     private JScrollPane scrollPane1;
     private JPanel productPanel;
     private JPanel productCardPanel1;
@@ -763,7 +780,7 @@ public class MainPage extends JFrame implements ReloadListener {
     }
 
 
-    private void loadProducts(boolean useCache) {
+    private void loadProducts() {
         new SwingWorker<ArrayList<Product>, Void>() {
             @Override
             protected ArrayList<Product> doInBackground() throws Exception {
@@ -793,16 +810,12 @@ public class MainPage extends JFrame implements ReloadListener {
                     ArrayList<Product> productList = get();
                     // Updating the GUI with a Product List
                     for (Product product : productList) {
-                        JPanel productCard;
-                        if (useCache && productPanelCache.containsKey(product.getProductID())) {
-                            productCard = productPanelCache.get(product.getProductID());
-                        } else {
-                            productCard = createProductCard(product);
-                            if (useCache) {
-                                productPanelCache.put(product.getProductID(), productCard);
-                            }
-                        }
-                        productPanel.add(productCard);
+                        // Cache should ALWAYS be used. Re-rendering product cards that haven't changed takes too long. (>3s)
+                        // If a product is changed elsewhere in the code, please mark the product as needing a refreshed card using
+                        // invalidateProductCard(productID);
+                        if (!productPanelCache.containsKey(product.getProductID()))
+                            productPanelCache.put(product.getProductID(), createProductCard(product));
+                        productPanel.add(productPanelCache.get(product.getProductID()));
                     }
                     productPanel.revalidate();
                     productPanel.repaint();
@@ -887,7 +900,8 @@ public class MainPage extends JFrame implements ReloadListener {
         moreButton.setPreferredSize(new Dimension(100, 30));
 
         moreButton.addActionListener(e -> {
-            ProductPage p = new ProductPage(product);
+            ProductPage p = new ProductPage(this, product);
+            p.setAlwaysOnTop(true);
             p.setVisible(true);
         });
 
@@ -982,6 +996,7 @@ public class MainPage extends JFrame implements ReloadListener {
             }else {
                 // USER NOT LOGIN
                 LoginPage loginPage = new LoginPage();
+                loginPage.setAlwaysOnTop(true);
                 loginPage.setVisible(true);
             }
         });
@@ -1041,7 +1056,6 @@ public class MainPage extends JFrame implements ReloadListener {
             int cartID = CartService.getCartDetails(userID).getCartID();
             int productID = product.getProductID();
             int stock = product.getStockQuantity();
-            System.out.println(!CartService.updateCartItem(cartID, productID, num));
                 if (stock < num){
                     numberButton.setText(String.valueOf(stock));
                     if (stock < 1){
@@ -1103,30 +1117,4 @@ public class MainPage extends JFrame implements ReloadListener {
         return productCardPanel;
     }
 
-    /*
-     * Main function for testing
-     */
-    public static void main(String[] args) {
-        // User user = UserDAO.findUserByEmail("testemail@gmail.com");
-        Logging.Init(true);
-        ImageUtils.ResourceManager.Init();
-        User user = UserDAO.findUserByEmail("manager@manager.com");
-        UserSession.getInstance().setCurrentUser(user);
-
-        EventQueue.invokeLater(() -> {
-            try {
-                MainPage frame = new MainPage();
-                // Close logging :D
-                frame.addWindowListener(new WindowAdapter() {
-                    public void windowClosing(WindowEvent e){
-                        DatabaseConnectionHandler.shutdown();
-                        Logging.Close();
-                    }
-                });
-                frame.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
 }

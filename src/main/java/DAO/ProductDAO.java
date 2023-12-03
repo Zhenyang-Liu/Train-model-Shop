@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 import exception.ConnectionException;
 import exception.DatabaseException;
-import helper.Filter;
 import helper.Logging;
 import model.*;
 
@@ -439,7 +438,7 @@ public class ProductDAO {
             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
+                while (resultSet.next()) {
                     brandList.add(resultSet.getString("brand_name"));
                 }
             }

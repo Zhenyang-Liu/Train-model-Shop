@@ -9,17 +9,10 @@ import java.awt.event.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
-import java.util.*;
 import javax.swing.*;
-import javax.swing.plaf.BorderUIResource;
 
 import DAO.DatabaseConnectionHandler;
-import DAO.UserDAO;
-import com.formdev.flatlaf.extras.*;
-import helper.ImageUtils;
 import helper.Logging;
-import helper.UserSession;
-import model.User;
 
 /**
  * @author Zhenyang Liu
@@ -63,6 +56,7 @@ public class WelcomePage extends JFrame {
 
     private void button_loginMouseClicked() {
         LoginPage loginPage = new LoginPage();
+        loginPage.setAlwaysOnTop(true);
         loginPage.setLoginSuccessListener(() -> {
             this.setVisible(false);
 
@@ -162,8 +156,4 @@ public class WelcomePage extends JFrame {
     private JButton button_login;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 
-    public static void main(String[] args) {
-        WelcomePage frame = new WelcomePage();
-        frame.setVisible(true);
-    }
 }

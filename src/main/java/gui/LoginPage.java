@@ -4,6 +4,7 @@
 
 package gui;
 
+import helper.Logging;
 import helper.UserSession;
 import listeners.ReloadListener;
 import listeners.SetRoleButtons;
@@ -15,6 +16,7 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
+
 import java.sql.SQLException;
 
 import DAO.LoginDAO;
@@ -41,6 +43,7 @@ public class LoginPage extends JFrame {
 
     private void button_to_registerPageMouseClicked(MouseEvent e) {
         RegistrationPage registrationPage = new RegistrationPage();
+        registrationPage.setAlwaysOnTop(true);
         registrationPage.setVisible(true);
 
         this.dispose();
@@ -52,11 +55,13 @@ public class LoginPage extends JFrame {
 
     private String LoginButtonMouseClicked(String email, String password) {
         // Try to get and check login details
+        Logging.getLogger().info("Attempting to log in for email: " + email + "(" + (UserSession.getInstance().isLoggedIn() ? "Logged in" : "Not Logged In"));
         try {
             User user = UserDAO.findUserByEmail(email);
             Login userLogin = LoginDAO.findLoginByUserID(user.getUserID());
 
             if (!UserSession.getInstance().isLoggedIn() && UserDAO.doesUserExist(email)) {
+                Logging.getLogger().info("Matching passwords");
                 if (userLogin.doesPasswordMatch(password)) {
                     UserSession.getInstance().setCurrentUser(user);
 
@@ -71,8 +76,13 @@ public class LoginPage extends JFrame {
                     // Return true as everything went successful
                     backButtonMouseClicked();
                     return "OK";
+                }else{
+                    return "Your password was incorrect";
                 }
-            } else {
+            } else if(!UserDAO.doesUserExist(email)){
+                Logging.getLogger().warning("User does not exist for email: " + email);
+                return "email or password not valid";
+            }else {
                 return "User is already logged in";
             }
 

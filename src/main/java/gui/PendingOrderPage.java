@@ -10,17 +10,12 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import DAO.OrderDAO;
-import DAO.UserDAO;
-import exception.DatabaseException;
 import helper.ImageUtils;
-import helper.UserSession;
 import listeners.ReloadListener;
 import model.Address;
 import model.BankDetail;
 import model.Order;
 import model.Product;
-import model.User;
 import service.AddressService;
 import service.BankDetailService;
 import service.CartService;
@@ -116,6 +111,7 @@ public class PendingOrderPage extends JFrame {
     private void addressAddButtonMouseClicked(MouseEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         AddressDialog addressDialog = new AddressDialog(parentFrame, null, false, false);
+        addressDialog.setAlwaysOnTop(true);
         addressDialog.setVisible(true);
 
         if (addressDialog.isInputValid()) {
@@ -126,6 +122,7 @@ public class PendingOrderPage extends JFrame {
     private void addressEditButtonMouseClicked(MouseEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         AddressDialog addressDialog = new AddressDialog(parentFrame, address, true, false);
+        addressDialog.setAlwaysOnTop(true);
         addressDialog.setVisible(true);
 
         if (addressDialog.isInputValid()) {
@@ -136,6 +133,7 @@ public class PendingOrderPage extends JFrame {
     private void paymentAddButtonMouseClicked(MouseEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         BankDetailDialog bankDetailDialog = new BankDetailDialog(parentFrame,bankDetail,false);
+        bankDetailDialog.setAlwaysOnTop(true);
         bankDetailDialog.setVisible(true);
 
         if (bankDetailDialog.isInputValid()) {
@@ -146,6 +144,7 @@ public class PendingOrderPage extends JFrame {
     private void paymentEditButtonMouseClicked(MouseEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         BankDetailDialog bankDetailDialog = new BankDetailDialog(parentFrame,bankDetail,true);
+        bankDetailDialog.setAlwaysOnTop(true);
         bankDetailDialog.setVisible(true);
 
         if (bankDetailDialog.isInputValid()) {
@@ -651,19 +650,6 @@ public class PendingOrderPage extends JFrame {
         }
     }
 
-
-    public static void main(String[] args) throws DatabaseException {
-         User user = UserDAO.findUserByEmail("manager@manager.com");
-        // User user = UserDAO.findUserByEmail("staff@gmail.com");
-        //User user = UserDAO.findUserByEmail("testemail@gmail.com");
-        UserSession.getInstance().setCurrentUser(user);
-        Order order = OrderDAO.findOrderByID(13);
-
-        SwingUtilities.invokeLater(() -> {
-            PendingOrderPage frame = new PendingOrderPage(order);
-            frame.setVisible(true);
-        });
-    }
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables  @formatter:off
     private JLabel pendingOrderTitleLabel;
     private JPanel pendingOrderContentPanel;

@@ -209,7 +209,7 @@ public class OrderDetailPage extends JFrame {
     private JPanel createOrderItemPanel(Product product, int quantity) {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // 设置边距
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     
         String htmlContent = String.format(
             "<html><body style='text-align: left;'>"
@@ -280,7 +280,7 @@ public class OrderDetailPage extends JFrame {
 
     private void fulfillButtonMouseClicked(ActionEvent e) {
         if (OrderService.fulfillOrder(order)) {
-            JOptionPane.showMessageDialog(null, "Fulfill Order: "+ order.getOrderID() +" success!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Fulfill Order: "+ order.getOrderID() +" success!", "Success", JOptionPane.INFORMATION_MESSAGE);
             if (onCloseCallback != null) {
                 onCloseCallback.run();
             }
@@ -291,17 +291,18 @@ public class OrderDetailPage extends JFrame {
     private void cancelButtonMouseClicked(ActionEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         CancelOrderDialog cancelOrderDialog = new CancelOrderDialog(parentFrame, order, true);
+        cancelOrderDialog.setAlwaysOnTop(true);
         cancelOrderDialog.setVisible(true);
     
         if (cancelOrderDialog.isInputValid()) {
             if (OrderService.cancelOrder(order, cancelOrderDialog.getCancelReason())) {
-                JOptionPane.showMessageDialog(null, "Cancel Order: " + order.getOrderID() + " success!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Cancel Order: " + order.getOrderID() + " success!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 if (onCloseCallback != null) {
                     onCloseCallback.run();
                 }
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(null, "Failed to cancel order.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Failed to cancel order.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -309,6 +310,7 @@ public class OrderDetailPage extends JFrame {
     private void seeCancelReasonButtonClicked(ActionEvent e) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         CancelOrderDialog cancelOrderDialog = new CancelOrderDialog(parentFrame, order,false);
+        cancelOrderDialog.setAlwaysOnTop(true);
         cancelOrderDialog.setVisible(true);
     }
 }

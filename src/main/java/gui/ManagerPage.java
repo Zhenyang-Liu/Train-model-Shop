@@ -4,9 +4,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import DAO.UserDAO;
-import helper.UserSession;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,6 +23,7 @@ public class ManagerPage extends JFrame {
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
 
         JPanel topPanel = createTopPanel();
         add(topPanel, BorderLayout.NORTH);
@@ -48,7 +46,7 @@ public class ManagerPage extends JFrame {
         titleLabel.setForeground(new Color(0x003366));
         topPanel.add(titleLabel, BorderLayout.NORTH);
 
-        String[] searchOptions = {"Name", "Email", "UserID"};
+        String[] searchOptions = {"Name", "Email"};
         JComboBox<String> searchTypeComboBox = new JComboBox<>(searchOptions);
 
         JPanel searchPanel = new JPanel();
@@ -191,8 +189,6 @@ public class ManagerPage extends JFrame {
                 return user.getForename().contains(searchTerm) || user.getSurname().contains(searchTerm);
             case "Email":
                 return user.getEmail().contains(searchTerm);
-            case "UserID":
-                return String.valueOf(user.getUserID()).contains(searchTerm);
             default:
                 return false;
         }
@@ -307,14 +303,4 @@ public class ManagerPage extends JFrame {
             super.fireEditingStopped();
         }
     }    
-
-    public static void main(String[] args) {
-        User user = UserDAO.findUserByEmail("manager@manager.com");
-        UserSession.getInstance().setCurrentUser(user);
-
-        SwingUtilities.invokeLater(() -> {
-            ManagerPage frame = new ManagerPage();
-            frame.setVisible(true);
-        });
-    }
 }

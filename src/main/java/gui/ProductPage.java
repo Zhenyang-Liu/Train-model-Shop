@@ -43,10 +43,8 @@ import javax.swing.text.JTextComponent;
 import DAO.BoxedSetDAO;
 import DAO.ControllerDAO;
 import DAO.LocomotiveDAO;
-import DAO.ProductDAO;
 import DAO.RollingStockDAO;
 import DAO.TrackDAO;
-import DAO.UserDAO;
 import exception.DatabaseException;
 import exception.ExceptionHandler;
 import helper.ImageUtils;
@@ -67,6 +65,7 @@ public class ProductPage extends JFrame {
     private List<Integer> eraList;
 
     private boolean isStaff;
+    private boolean viewOnly;
 
     private JTextField productName, productPrice,productStock,productBrand,productCode;
     private JTextArea productDescription;
@@ -75,9 +74,11 @@ public class ProductPage extends JFrame {
     private JButton saveProduct;
     private JButton deleteProduct;
     private ProductManagePage managePage;
+    private MainPage mainParentPage = null;
 
-    public ProductPage(ProductManagePage managePage, Product product) {
-        this.managePage = managePage;
+    public ProductPage(ProductManagePage mP, Product product) {
+        this.managePage = mP;
+        this.viewOnly = false;
         initializePage(product);
 
         addWindowListener(new WindowAdapter() {
@@ -90,14 +91,22 @@ public class ProductPage extends JFrame {
         });
     }
 
-    public ProductPage(Product product) {
+    public ProductPage(MainPage parentMainPage, Product product) {
+        mainParentPage = parentMainPage;
+        this.viewOnly = true;
+        initializePage(product);
+    }
+
+    public ProductPage(Product product){
         initializePage(product);
     }
 
     private void initializePage(Product product) {
         this.p = product;
-        this.isStaff = PermissionService.hasPermission(UserSession.getInstance().getCurrentUser().getUserID(), "UPDATE_PRODUCT");
-
+        if (!viewOnly){
+            this.isStaff = PermissionService.hasPermission(UserSession.getInstance().getCurrentUser().getUserID(), "UPDATE_PRODUCT");
+        }
+        
         initComponents();
 
         setTitle((isStaff ? "Editing " : "Viewing ") + p.getProductName());
@@ -395,6 +404,7 @@ public class ProductPage extends JFrame {
 
     private void openEraSelectDialog(List<Integer> eras) {
         EraSelect eraSelect = new EraSelect(null, eras);
+        eraSelect.setAlwaysOnTop(true);
         eraSelect.setVisible(true);
         List<Integer> selectedEras = eraSelect.getSelectedEras();
         setSelectedEra(selectedEras);
@@ -412,6 +422,8 @@ public class ProductPage extends JFrame {
     }
 
     private void addListeners(){
+        if(!isStaff)
+            return;
         productImage.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e){
                 updateImage();
@@ -425,9 +437,7 @@ public class ProductPage extends JFrame {
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
-        if(!isStaff)
-            return;
-        saveProduct.addActionListener(e -> {submitProduct();});
+        saveProduct.addActionListener(e -> {submitProduct();if(mainParentPage != null)mainParentPage.invalidateProductCard(p.getProductID());});
         deleteProduct.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(this, 
                 "Are you sure you want to delete this product? This cannot be undone.", 
@@ -441,6 +451,7 @@ public class ProductPage extends JFrame {
                     JOptionPane.showMessageDialog(this, 
                         "Product " + p.getProductCode() + " deleted successfully.", 
                         "Success", JOptionPane.INFORMATION_MESSAGE);
+                    dispose();
                 } else {
                     JOptionPane.showMessageDialog(this, 
                         "Failed to delete product. Error: " + deleteResult, 
@@ -471,7 +482,7 @@ public class ProductPage extends JFrame {
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
     
-        if (isStaff) {
+        if (isStaff && !viewOnly) {
             JPanel productButtons = initProductButtons();
             content.add(productButtons, gbc);
         } else {
@@ -499,7 +510,7 @@ public class ProductPage extends JFrame {
         String validationResult = ProductService.validateProductInput(newName, newCode, newBrand, newPrice, newQuantity);
         String ignore = "Product Code has existed in database.";
         if (!validationResult.equals(ignore) && validationResult != null) {
-            JOptionPane.showMessageDialog(null,validationResult, "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,validationResult, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -511,7 +522,7 @@ public class ProductPage extends JFrame {
         p.setDescription(newDes);
         String result = ProductService.updateProduct(p);
         if (!"success".equals(result)){
-            JOptionPane.showMessageDialog(null,"Update failed. "+result, "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,"Update failed. "+result, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -548,7 +559,7 @@ public class ProductPage extends JFrame {
                 }
             } catch (Exception ex) {
                 Logging.getLogger().warning("Could not update product " + p.getProductID() + "\n Stacktrace: " + ex.getMessage());
-                JOptionPane.showMessageDialog(null,"Update failed. "+ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,"Update failed. "+ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -556,14 +567,7 @@ public class ProductPage extends JFrame {
         JOptionPane.showMessageDialog(this, "Product updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
         setVisible(false);
     }
-    
-    public static void main(String[] args){
-        // UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("testemail@gmail.com"));
-        UserSession.getInstance().setCurrentUser(UserDAO.findUserByEmail("testey@gmail.com"));
-        ProductPage p = new ProductPage(ProductDAO.getAllProduct().get(6));
-        p.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        p.setVisible(true);
-    }
+
 }
 
 

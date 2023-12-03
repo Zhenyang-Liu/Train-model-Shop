@@ -18,8 +18,6 @@ import model.User;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import org.slf4j.Logger;
-
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -43,6 +41,7 @@ public class RegistrationPage extends JFrame {
     private void backButtonMouseClicked(MouseEvent e) {
         this.dispose();
         LoginPage loginPage = new LoginPage();
+        loginPage.setAlwaysOnTop(true);
         loginPage.setVisible(true);
     }
 
@@ -84,11 +83,10 @@ public class RegistrationPage extends JFrame {
                 } catch (DatabaseException e) {
                     Logging.getLogger().warning("Could not add address into database\nStackTrace: " + e.getMessage());
                 }
+                UserSession.getInstance().clear();
                 return "OK";
             }
-            else {
-                UserSession.getInstance().clear();
-            }
+            UserSession.getInstance().clear();
             return "Error creating user login, they may already exist!";
         }
 
@@ -161,6 +159,7 @@ public class RegistrationPage extends JFrame {
     private void onEditAddress() {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         addressDialog = new AddressDialog(parentFrame, new Address(), false, true);
+        addressDialog.setAlwaysOnTop(true);
         addressDialog.setVisible(true);
     }
 

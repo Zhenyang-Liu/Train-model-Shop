@@ -1,9 +1,9 @@
 package model;
 
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.sql.Timestamp;
 
 import helper.Logging;
 
@@ -120,7 +120,12 @@ public class Login{
         byte[] salt = new byte[16];
         SecureRandom random = new SecureRandom();
         random.nextBytes(salt);
-        this.setPasswordSalt(new String(salt));
+        try {
+            this.setPasswordSalt(new String(salt, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            this.setPasswordSalt("");
+            Logging.getLogger().warning("Failed to generate proper salt for new password\nStacktrace: " + e.getMessage());
+        }
         this.setPasswordHash(hash(password, getPasswordSalt()));
     }
 
@@ -150,7 +155,12 @@ public class Login{
             Logging.getLogger().warning("Could not use SHA-512 to hash uh-oh not cool");
             return "";
         };
-        return bytesToHex(md.digest((toHash + salt).getBytes()));
+        try {
+            return bytesToHex(md.digest((toHash + salt).getBytes("UTF-8")));
+        } catch (UnsupportedEncodingException e) {
+            Logging.getLogger().warning("Failed to encode password uh oh\nStacktrace: " + e.getMessage());
+            return "";
+        }
     }
 
     /**

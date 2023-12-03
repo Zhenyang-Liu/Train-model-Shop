@@ -7,7 +7,7 @@ package gui;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.util.List;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.ChangeEvent;
@@ -17,7 +17,6 @@ import exception.DatabaseException;
 import helper.ImageUtils;
 import helper.Logging;
 import listeners.ReloadListener;
-import listeners.SetRoleButtons;
 import model.Cart;
 import model.CartItem;
 import model.Product;
@@ -31,6 +30,7 @@ import static DAO.OrderDAO.findOrderByID;
 public class BasketPage extends JFrame {
     private Cart cart;
     private ReloadListener reloadListener;
+    private MainPage parentPage = null;
 
     public void setReloadListener(ReloadListener listener) {
         this.reloadListener = listener;
@@ -41,6 +41,11 @@ public class BasketPage extends JFrame {
         this.cart = CartService.getCartDetails(userID);
         initComponents();
         loadUserCart(userID);
+    }
+
+    public BasketPage(int userID, MainPage mainParentPage){
+        this(userID);
+        this.parentPage = mainParentPage;
     }
 
     private void checkOutButtonMouseClicked(MouseEvent e) {
@@ -67,9 +72,12 @@ public class BasketPage extends JFrame {
             // Order created successfully
             try {
                 if (reloadListener != null) {reloadListener.reloadProducts();}
+                for(CartItem i: cart.getCartItems())
+                    parentPage.invalidateProductCard(i.getItem().getProductID());
                 this.dispose();
                 PendingOrderPage pendingOrderPage = new PendingOrderPage(findOrderByID(orderID));
                 pendingOrderPage.setReloadListener(reloadListener);
+                pendingOrderPage.setAlwaysOnTop(true);
                 pendingOrderPage.setVisible(true);
             }catch(DatabaseException e1){
                 Logging.getLogger().warning("Could not find create pending order page at orderID " + orderID + "\nStacktrace: " + e1.getMessage());
@@ -322,7 +330,7 @@ public class BasketPage extends JFrame {
     }
 
     // Method to load cart items into the trolley view
-    public void loadTrolleyItems(List<CartItem> cartItems) {
+    public void loadTrolleyItems(ArrayList<CartItem> cartItems) {
         trolleyItemsPanel.removeAll(); // Clear existing content
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -396,6 +404,10 @@ public class BasketPage extends JFrame {
         itemSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
+                if(parentPage != null){
+                    Logging.getLogger().info("invalidating product card");
+                    parentPage.invalidateProductCard(product.getProductID());
+                }
                 int currentQuantity = (Integer) itemSpinner.getValue();
                 if (currentQuantity == 0){
                     if(CartService.removeFromCart(cartItem.getItemID())){
@@ -408,7 +420,10 @@ public class BasketPage extends JFrame {
                             reloadListener.reloadProducts();
                         }
                     }else{
-                        //TODO: Missing logic if update failed
+                        JOptionPane.showMessageDialog(trolleyCardPanel,
+                            "Please try again later",
+                            "System issue",
+                            JOptionPane.ERROR_MESSAGE);
                     }
                 } else if (currentQuantity > 0) {
                     if (cartItem.getProductStock() >= currentQuantity){
@@ -417,21 +432,21 @@ public class BasketPage extends JFrame {
                                 reloadListener.reloadProducts();
                             }
                         }else{
-                            JOptionPane.showMessageDialog(null,
+                            JOptionPane.showMessageDialog(parentPage,
                                     "Illegal Operation",
                                     "Update Failed",
                                     JOptionPane.ERROR_MESSAGE);
                         }
                     }else {
                         itemSpinner.setValue(cartItem.getProductStock());
-                        JOptionPane.showMessageDialog(null,
+                        JOptionPane.showMessageDialog(parentPage,
                                 "Max stock quantity reached",
                                 "Update Failed",
                                 JOptionPane.INFORMATION_MESSAGE);
                     }
 
                 } else {
-                    JOptionPane.showMessageDialog(null,
+                    JOptionPane.showMessageDialog(parentPage,
                             "Illegal Quantity",
                             "Update Failed",
                             JOptionPane.ERROR_MESSAGE);
@@ -460,11 +475,12 @@ public class BasketPage extends JFrame {
                         reloadListener.reloadProducts();
                     }else{
                     }
+                    if(parentPage != null)
+                        parentPage.invalidateProductCard(product.getProductID());
                 }else{
-                    //TODO: Missing logic if update failed
-                    JOptionPane.showMessageDialog(trolleyItemsPanel,
-                            "Please try again later.",
-                            "System Issue",
+                    JOptionPane.showMessageDialog(trolleyCardPanel,
+                            "Please try again later",
+                            "System issue",
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
